@@ -1,0 +1,24 @@
+version: "3"
+
+tasks:
+  shell:
+    desc: Open a shell in the web container
+    cmds:
+      - |
+        docker exec -it -u appuser \
+            -w /var/www/vhosts web_app \
+            /bin/bash -l
+  shell-root:
+    desc: Open a shell in the web container with the root user
+    cmds:
+      - |
+        docker exec -it -u root \
+            -w /var/www/vhosts web_app \
+            /bin/bash -l
+  tests:
+    desc: Execute tests
+    cmds:
+      - |
+        docker exec -u appuser \
+            -w /var/www/vhosts web_app \
+            bash -lc "composer test"
