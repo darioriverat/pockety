@@ -32,6 +32,16 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         strictPort: true,
+        cors: {
+            origin: [
+                'http://127.0.0.1:8080',
+                'http://dev.pockety.com:8080'
+            ]
+        },
+        hmr: {
+            host: 'dev.pockety.com',
+            port: 5173,
+        },
         watch: {
             ignored: [
                 '**/.agents/**',
