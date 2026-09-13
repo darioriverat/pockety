@@ -1,0 +1,573 @@
+<project_specification>
+
+    <project>
+        <name>
+            Not explicitly specified for the new application. The spreadsheet system being replaced is
+            named "Control_de_Ingresos_y_Gastos.xlsx" (Spanish: "Income and Expense Control"). See
+            open_questions for the new application's name.
+        </name>
+        <source_documents>
+            <document>PLAN.md — "Personal Finance Spreadsheet to Programmatic System: Extraction & Migration Plan"</document>
+            <document>CLARIFICATIONS.md — "Clarifications on PLAN.md — Resolutions to Open Questions"</document>
+        </source_documents>
+    </project>
+
+    <overview>
+        <paragraph>
+            The application replaces an existing Google Sheets-based personal/family finance system
+            (source file: Control_de_Ingresos_y_Gastos.xlsx). The spreadsheet tracks, on a monthly basis:
+            income, expenses, bank/cash account balances, investments, credit card and loan debts,
+            accounts receivable, and fixed assets, and produces a consolidated balance sheet
+            (Assets / Liabilities / Equity) per month.
+        </paragraph>
+        <paragraph>
+            The finances tracked span three currencies (CAD, USD, COP) and at least two countries
+            (Canada and Colombia), evidenced by the accounts present in the source data — RBC, CIBC,
+            TD Bank, and Wise on the Canadian/international side; Bancolombia, Davivienda, Nequi, and
+            Éxito on the Colombian side — and by Colombia-specific concepts such as PILA (mandatory
+            social security contributions).
+        </paragraph>
+        <paragraph>
+            A core mechanic of the existing system is a monthly reconciliation: for every tracked
+            account/liability, a "recorded" balance (read off a real bank/card statement) is compared
+            against a "computed" balance (derived from the transaction ledger), and the difference is
+            expected to be zero. The spreadsheet also computes two related expense totals to correct for
+            credit-card/loan payments being logged as expenses alongside the purchases they later settle;
+            these were historically named "Gasto Total" and "Gasto Real", and are renamed in this
+            specification to "Total Recorded Disbursements" and "Net Operating Expenses" respectively
+            (see business_rules).
+        </paragraph>
+    </overview>
+
+    <goals>
+        <goal>
+            Replace hand-maintained, per-month spreadsheet formulas — particularly the account-balance
+            reconciliation, which today requires manually re-curating a list of specific transaction row
+            references for every account, every month — with balances computed by a query
+            (account + period), so the system does not silently break as new transactions are added.
+        </goal>
+        <goal>
+            Eliminate the credit-card/loan double-counting problem structurally (debt principal payments
+            should never be posted as an expense category in the first place) rather than correcting for
+            it after the fact with a separate "real vs. total" calculation.
+        </goal>
+        <goal>
+            Continue supporting ongoing monthly tracking of income, expenses, account balances,
+            investments, debts, receivables, and fixed assets across CAD, USD, and COP.
+        </goal>
+    </goals>
+
+    <users>
+        <note>
+            The source material does not explicitly describe user roles. The data implies a single
+            primary user tracking household finances that include a spouse/partner ("Diana", who also
+            appears as an income source under a baking-related activity) and daughters (an allowance
+            category, "MESADA NIÑAS", exists for them). It is not stated whether other household members
+            have their own access to the system. See open_questions.
+        </note>
+    </users>
+
+    <scope>
+        <in_scope>
+            <item>Monthly financial tracking equivalent to the 21 in-scope source spreadsheet tabs covering January 2025 through September 2026 (income, expenses, accounts, investments, debts, receivables, fixed assets, balance sheet).</item>
+            <item>The expense/transaction ledger equivalent to the source "Gastos" sheet, filtered to transactions dated in 2025-2026 for the initial build (2,631 transactions in the already-extracted source data).</item>
+            <item>The expense category catalog equivalent to the source "Conceptos" sheet: 46 category codes, reduced to 45 distinct categories after merging two duplicates (see business_rules/category_merge_c031_c040).</item>
+            <item>The balance-sheet time series equivalent to the source "Estado Financiero" sheet, for 2025-2026.</item>
+        </in_scope>
+        <out_of_scope>
+            <item>Source spreadsheet data prior to 2025 (46 additional month-tabs, back to November 2020) — explicitly deferred, not part of the initial build. See open_questions for whether/when this will change.</item>
+            <item>The source "Recurrent" sheet (a manually maintained, 27-row list of recurring bills/subscriptions) will NOT be migrated or used by the new system. It has no formula relationship to the rest of the source spreadsheet and was confirmed by the source owner to be purely informational. Recurring expenses are instead handled via a flag on individual transactions — see functional_requirements/recurring_expense_flag.</item>
+            <item>The source "Compartiva Salario" sheet (a one-off comparison of two job salary offers) is unrelated to the monthly accounting cycle.</item>
+            <item>The source "ADDRESS" sheet (a checklist of which institutions have an updated mailing address) is not financial data.</item>
+        </out_of_scope>
+    </scope>
+
+    <data_requirements>
+
+        <categories>
+            <description>
+                Expense categories (source: "Conceptos" sheet), a fixed lookup table of code to
+                description. Two categories originally existed with an identical description
+                ("MESADA NIÑAS", C031 and C040); per business_rule these are merged, with C040 retired.
+            </description>
+            <category><code>C001</code><name_es>MERCADO</name_es><name_en>Groceries</name_en></category>
+            <category><code>C002</code><name_es>REPOSTERÍA</name_es><name_en>Baking Supplies</name_en></category>
+            <category><code>C003</code><name_es>ARTESANÍAS</name_es><name_en>Crafts &amp; Handicrafts</name_en></category>
+            <category><code>C004</code><name_es>TRANSPORTES</name_es><name_en>Transportation</name_en></category>
+            <category><code>C005</code><name_es>HOGAR</name_es><name_en>Household</name_en></category>
+            <category><code>C006</code><name_es>COMIDAS CALLE</name_es><name_en>Dining Out / Takeout</name_en></category>
+            <category><code>C007</code><name_es>JUGUETES NIÑAS</name_es><name_en>Kids' Toys</name_en></category>
+            <category><code>C008</code><name_es>SERVICIOS</name_es><name_en>Utilities</name_en></category>
+            <category><code>C009</code><name_es>CRÉDITO DAVIVIENDA</name_es><name_en>Davivienda Credit Payment</name_en><is_debt_category>true</is_debt_category></category>
+            <category><code>C010</code><name_es>CRÉDITO ÉXITO</name_es><name_en>Éxito Store-Card Payment</name_en><is_debt_category>true</is_debt_category></category>
+            <category><code>C011</code><name_es>NUBE</name_es><name_en>Cloud Storage/Services</name_en></category>
+            <category><code>C012</code><name_es>ARRIENDO</name_es><name_en>Rent</name_en></category>
+            <category><code>C013</code><name_es>CELEBRACIONES Y RECREACIÓN</name_es><name_en>Celebrations &amp; Entertainment</name_en></category>
+            <category><code>C014</code><name_es>GASTOS MÉDICOS</name_es><name_en>Medical Expenses</name_en></category>
+            <category><code>C015</code><name_es>PAGO DIANA</name_es><name_en>Payment to Diana (personal transfer)</name_en></category>
+            <category><code>C016</code><name_es>CONFECCIONES</name_es><name_en>Clothing/Garment Making</name_en></category>
+            <category><code>C017</code><name_es>GASTOS FINANCIEROS</name_es><name_en>Bank/Financial Fees</name_en></category>
+            <category><code>C018</code><name_es>DEUDAS MENORES</name_es><name_en>Minor Debts</name_en></category>
+            <category><code>C019</code><name_es>ROPA Y CALZADO</name_es><name_en>Clothing &amp; Footwear</name_en></category>
+            <category><code>C020</code><name_es>ESTUDIO Y COLEGIATURA</name_es><name_en>Education &amp; Tuition</name_en></category>
+            <category><code>C021</code><name_es>CUIDADO PERSONAL Y BELLEZA</name_es><name_en>Personal Care &amp; Beauty</name_en></category>
+            <category><code>C022</code><name_es>SEGURO DE VIDA</name_es><name_en>Life Insurance</name_en></category>
+            <category><code>C023</code><name_es>INVERSIONES</name_es><name_en>Investments</name_en></category>
+            <category><code>C024</code><name_es>MARKETING</name_es><name_en>Marketing</name_en></category>
+            <category><code>C025</code><name_es>ASEO</name_es><name_en>Cleaning Supplies</name_en></category>
+            <category><code>C026</code><name_es>GASTOS VIAJES</name_es><name_en>Travel Expenses</name_en></category>
+            <category><code>C027</code><name_es>CRÉDITO OCCIDENTE</name_es><name_en>Banco de Occidente Credit Payment</name_en><is_debt_category>true</is_debt_category></category>
+            <category><code>C028</code><name_es>CURSO AUTOMOVILISMO</name_es><name_en>Motorsport/Driving Course</name_en></category>
+            <category><code>C029</code><name_es>COSTOS VEHÍCULO</name_es><name_en>Vehicle Costs (fuel, parking, upkeep)</name_en></category>
+            <category><code>C030</code><name_es>PROPINAS</name_es><name_en>Tips</name_en></category>
+            <category><code>C031</code><name_es>MESADA NIÑAS</name_es><name_en>Kids' Allowance</name_en></category>
+            <category><code>C032</code><name_es>ESTUDIOS ADULTOS</name_es><name_en>Adult Education</name_en></category>
+            <category><code>C033</code><name_es>TECNOLOGIA, GAME CONSOLES, GAMES</name_es><name_en>Technology &amp; Gaming</name_en></category>
+            <category><code>C034</code><name_es>PILA</name_es><name_en>Colombian Social Security Contribution (PILA)</name_en></category>
+            <category><code>C035</code><name_es>TRAMITES Y GASTOS MIGRACIÓN</name_es><name_en>Immigration Procedures &amp; Fees</name_en></category>
+            <category><code>C036</code><name_es>AYUDAS FAMILIA</name_es><name_en>Family Financial Support</name_en></category>
+            <category><code>C037</code><name_es>HOTEL Y ESTADIA</name_es><name_en>Hotel &amp; Lodging</name_en></category>
+            <category><code>C038</code><name_es>CRÉDITO BANCOLOMBIA</name_es><name_en>Bancolombia Credit Card Payment</name_en><is_debt_category>true</is_debt_category></category>
+            <category><code>C039</code><name_es>CREDITO CIBC</name_es><name_en>CIBC Credit Card Payment</name_en><is_debt_category>true</is_debt_category></category>
+            <category><code>C040</code><name_es>MESADA NIÑAS</name_es><name_en>Kids' Allowance</name_en><status>retired_merged_into_C031</status></category>
+            <category><code>C041</code><name_es>PAGO MAMI</name_es><name_en>Payment to Mom (family transfer)</name_en></category>
+            <category><code>C042</code><name_es>TAXES</name_es><name_en>Taxes</name_en></category>
+            <category><code>C043</code><name_es>INSTRUMENTOS Y CLASES DE MUSICA</name_es><name_en>Music Instruments &amp; Lessons</name_en></category>
+            <category><code>C044</code><name_es>CREDITO FORD ESCAPE</name_es><name_en>Ford Escape Auto Loan Payment</name_en><is_debt_category>true</is_debt_category></category>
+            <category><code>C045</code><name_es>DEPRECIACIONES</name_es><name_en>Depreciation</name_en></category>
+            <category><code>C046</code><name_es>CREDITO CANADIAN TIRE MC</name_es><name_en>Canadian Tire Mastercard Payment</name_en><is_debt_category>true</is_debt_category></category>
+
+            <business_rule id="category_merge_c031_c040">
+                C031 and C040 are confirmed duplicates (both "MESADA NIÑAS" / Kids' Allowance). C040 is
+                retired. Any historical transaction tagged C040 must be remapped to C031 during import,
+                with no change to amounts or dates.
+            </business_rule>
+        </categories>
+
+        <transactions>
+            <description>
+                Replaces the source "Gastos" sheet: a single running ledger of every expense transaction.
+            </description>
+            <field><name>FECHA</name><description>Transaction date.</description></field>
+            <field><name>PERIODO</name><description>Accounting period, format YYYYMM.</description></field>
+            <field><name>Quincena</name><description>Pay-period half: value "Q1" or "Q2".</description></field>
+            <field><name>CONCEPTO</name><description>Category code, references the categories table.</description></field>
+            <field>
+                <name>DESCRIPCIÓN</name>
+                <description>
+                    Category display name. In the source spreadsheet this was a derived VLOOKUP of the
+                    category's name and was NOT independently stored data (see business_rule
+                    derived_description_not_stored). It should be looked up from the category record, not
+                    persisted as its own stored value on the transaction.
+                </description>
+            </field>
+            <field>
+                <name>CAD / USD / COP</name>
+                <description>
+                    Transaction amount, in whichever ONE of the three currency fields applies. A single
+                    transaction is never split across more than one currency field in the source data.
+                </description>
+            </field>
+            <field><name>COMENTARIOS</name><description>Free-text memo.</description></field>
+            <field>
+                <name>is_recurring</name>
+                <description>
+                    New field, not present in the original spreadsheet. Boolean flag indicating whether
+                    this expense is a recurring one. Added per the source owner's explicit instruction,
+                    replacing the (unused) "Recurrent" sheet.
+                </description>
+            </field>
+            <field>
+                <name>debt_component</name>
+                <description>
+                    New field, not present as a discrete field in the original spreadsheet (though implied
+                    by free-text memo text on some rows). Expected values: "principal", "interest", or
+                    not-applicable for non-debt transactions. Required to correctly compute Net Operating
+                    Expenses — see business_rules/debt_principal_not_expense.
+                </description>
+            </field>
+
+            <business_rule id="template_rows">
+                The original ledger kept 12 rows at the top with a category code but no date/period, used
+                purely as a copy/paste staging area for recurring line items each month (these are the
+                rows this specification's "is_recurring" flag is meant to replace going forward). They are
+                templates, not transactions, and should not be imported as dated transactions themselves.
+            </business_rule>
+
+            <business_rule id="derived_description_not_stored">
+                A transaction's category display name was a derived lookup of the category code's name in
+                the source spreadsheet, not independently stored data. The new system should look this up
+                from the category record rather than duplicating it on every transaction.
+            </business_rule>
+
+            <deprecated_field>
+                <name>TIPO</name>
+                <original_values>T1, T2, T3</original_values>
+                <reason>
+                    Originally used to track payment method (cash / debit / credit), confirmed by the
+                    source owner to have not been maintained and to be no longer accurate. This field must
+                    NOT be migrated or reintroduced as-is. If payment-method tracking is wanted in the
+                    future, it should be a newly-designed field tied to the accounts entity (i.e. which
+                    account funded the transaction — see accounts/technical_requirement), not a revival of
+                    TIPO.
+                </reason>
+            </deprecated_field>
+        </transactions>
+
+        <accounts>
+            <description>
+                Represents every bank/cash/investment account (assets) and every credit card/loan
+                (liabilities) tracked per month. In the source spreadsheet these appeared across four
+                sections that all shared the same structural pattern: "Cuentas" (bank/cash accounts),
+                "INVERSIÓN" (investments), "CREDITOS Y DEUDAS" (credit cards and loans), and
+                "CTAS X COBRAR" (accounts receivable).
+            </description>
+
+            <behavior id="recorded_vs_computed_vs_variance">
+                Each account/liability carries three parallel sets of values per period, each expressed in
+                CAD, USD, and COP:
+                - "Recorded": the actual balance, as read off the real bank/card statement, entered manually.
+                - "Computed": an expected balance, derived by taking a known prior balance and adding/
+                  subtracting the transactions that touched that account during the period.
+                - "Variance": Recorded minus Computed. This is expected to be (approximately) zero and is
+                  the core reconciliation signal for the account.
+            </behavior>
+
+            <technical_requirement id="computed_balance_must_be_queryable">
+                In the original spreadsheet, each account's "Computed" balance formula was a hand-built,
+                manually-curated list of specific transaction-row references for that account, rebuilt by
+                hand every month. This does not scale and is fragile (it silently breaks if transactions
+                are inserted, deleted, or reordered upstream). The new system's equivalent computation MUST
+                be a query — e.g. sum of transaction amounts where account = X and period = Y — which
+                requires each transaction to carry an explicit account reference. This mirrors the pattern
+                already used correctly, in the source spreadsheet, for the per-category actuals report
+                (see functional_requirements/category_actuals_report), which aggregates by category and
+                period without any hardcoded row references.
+            </technical_requirement>
+
+            <example>
+                <scenario>
+                    Source spreadsheet, June 2026, "RBC Checking" account. Recorded balance: 3,674.22
+                    (CAD). Original computed-balance formula, preserved verbatim to illustrate the pattern
+                    that must be replaced by a query:
+                    "=3674.22-Gastos!G465-Gastos!G450-500-Gastos!G431-Gastos!G430+B6-Gastos!G421-700-Gastos!G420-300-Gastos!G415-Gastos!G411-Gastos!G397-100-Gastos!G396+B8-Gastos!G376+B7-Gastos!G363-Gastos!G362"
+                </scenario>
+                <expected_result>
+                    Variance (Recorded minus Computed) should equal zero once all transactions for the
+                    account and period are correctly recorded and categorized.
+                </expected_result>
+            </example>
+
+            <business_rule id="investments_and_receivables_currently_unused">
+                The "INVERSIÓN" (Investments) and "CTAS X COBRAR" (Accounts Receivable) sections exist in
+                the source template but contained only placeholder rows (all-zero values) throughout the
+                2025-2026 source data. The data model should support them, but no historical non-zero data
+                exists for them in the in-scope period.
+            </business_rule>
+
+            <known_account id="personal_loan_cibc_ford_escape">
+                <description>
+                    One liability account funds the Ford Escape vehicle: a personal loan through CIBC. In
+                    the source spreadsheet, this account's two label columns had drifted apart — one column
+                    still read "Crédito Móvil **6174" (a stale, leftover label from a previous, unrelated
+                    use of the row) while the other correctly read "Personal LOAN CIBC". The account's
+                    outstanding balance is tracked on this same account (there is no separate liability
+                    line for the vehicle loan elsewhere) starting from a known balance (20,470.39 observed
+                    in the sampled month) and declining by the PRINCIPAL portion of each Ford Escape loan
+                    payment (category C044 / CREDITO FORD ESCAPE, memo "FORD ESC CAPITAL"). Confirmed
+                    directly by the source owner.
+                </description>
+            </known_account>
+        </accounts>
+
+        <fixed_assets>
+            <description>
+                The only fixed asset observed in the 2025-2026 source data is a Ford Escape vehicle,
+                recorded at a constant book value across the sampled months — no month-over-month
+                depreciation was actually being applied in the source data, despite a "Depreciaciones"
+                (Depreciation) category/line existing in the template (category C045).
+            </description>
+            <business_rule>
+                The Ford Escape's outstanding LOAN balance is tracked via the "Personal LOAN CIBC"
+                liability account (see accounts/known_account/personal_loan_cibc_ford_escape), separately
+                from the asset's own book value.
+            </business_rule>
+        </fixed_assets>
+
+        <exchange_rates>
+            <description>
+                Three currencies are used throughout: CAD, USD, COP. Monetary totals that mix currencies
+                are folded into a single CAD-equivalent figure using period-specific exchange rates.
+            </description>
+
+            <data_requirement id="three_independent_rate_series">
+                The system must store three independent exchange rate series, one value per accounting
+                period for each of the following source-labeled pairs, and must NOT derive any one of them
+                from the other two:
+                - the rate labeled "USD / COP" in the source
+                - the rate labeled "USD / CAD" in the source
+                - the rate labeled "CAD" in the source (used in formulas as a COP-per-1-CAD figure)
+                This is a deliberate structural requirement, not a limitation to work around: in the source
+                data these three rates were confirmed to be independently, manually maintained, and are NOT
+                mutually consistent with each other (see example below). Deriving one from the other two
+                would silently change historical computed totals. Exact field/column naming for these rate
+                series is not specified by the source material and is left to implementation.
+            </data_requirement>
+
+            <business_rule id="conversion_direction">
+                For a rate labeled "USD / COP" with value X, 1 USD = X COP. For a rate labeled "USD / CAD"
+                with value X, 1 USD = X CAD. To convert an amount FROM USD into the other currency,
+                multiply the USD amount by the rate. Confirmed directly by the source owner. The third
+                rate (labeled "CAD", used as a COP-per-1-CAD figure) follows the same
+                divide-toward-the-target-unit logic used in the source formulas: dividing a COP amount by
+                this rate yields its CAD equivalent.
+            </business_rule>
+
+            <example>
+                <scenario>
+                    Across all 21 in-scope months (January 2025 through September 2026), the "USD/COP"
+                    rate stayed fixed at 4,400 and the "USD/CAD" rate stayed fixed at 0.75 in every single
+                    month, while the "CAD" (CAD-to-COP) rate changed over the same period: 3,000
+                    (early 2025) to 2,550 (mid-2026) to 2,200 (September 2026). Cross-checking: if the
+                    CAD-to-COP rate were derived from the other two, it would compute to
+                    4,400 / 0.75 = 5,866.67, which does not match the actual recorded values in any month
+                    (2,200-3,000). This confirms the three rates are independently maintained in the source
+                    data, not mutually derived.
+                </scenario>
+            </example>
+        </exchange_rates>
+
+        <income>
+            <description>
+                Each month records up to six free-text income line items (e.g. salary installments,
+                benefits, occasional refunds or gifts), each with an amount in one or more of CAD/USD/COP,
+                and a total that folds all lines into a single CAD-equivalent figure.
+            </description>
+        </income>
+
+        <budget>
+            <description>
+                A manually maintained monthly budget amount exists per expense category (source: columns
+                W-Z of each month sheet), used to compare actual category spend against budget and compute
+                an over/under-budget ratio. This is entered data, not derived.
+            </description>
+        </budget>
+
+    </data_requirements>
+
+    <business_rules>
+
+        <business_rule id="total_recorded_disbursements">
+            <name_es>Gasto Total</name_es>
+            <name_en>Total Recorded Disbursements</name_en>
+            <definition>
+                The sum of every expense category's total for the month, across every category code,
+                including categories that represent credit-card/loan payments (C009, C010, C027, C038,
+                C039, C044, C046) rather than real spending.
+            </definition>
+        </business_rule>
+
+        <business_rule id="net_operating_expenses">
+            <name_es>Gasto Real / Gastos Real</name_es>
+            <name_en>Net Operating Expenses</name_en>
+            <definition>
+                Total Recorded Disbursements, MINUS the PRINCIPAL component of any debt/credit-card
+                payments included in it, MINUS depreciation. INTEREST components of debt payments ARE
+                included in Net Operating Expenses — confirmed directly by the source owner.
+            </definition>
+            <rationale>
+                Paying down a credit card or a loan is not, itself, a new expense — the underlying purchase
+                was already recorded as an expense at the time it was made. Counting both the original
+                purchase and the later bill payment as expenses double-counts the same spending.
+            </rationale>
+        </business_rule>
+
+        <business_rule id="debt_principal_not_expense">
+            <definition>
+                A loan or credit-card PRINCIPAL repayment is not an expense; it is a balance-sheet
+                transaction that reduces a liability, funded by reducing an asset (cash). Only the INTEREST
+                portion of a debt payment is a real expense and should be included in Net Operating
+                Expenses. Confirmed by the source owner: interest counts toward Net Operating Expenses;
+                only principal is excluded.
+            </definition>
+            <technical_requirement>
+                Principal and interest must be distinguishable at the data level (not only in free-text
+                memo text) for every debt category (C009, C010, C027, C038, C039, C044, C046), via the
+                "debt_component" field on transactions (see data_requirements/transactions). For the
+                already-extracted 2025-2026 historical data, the existing memo text already distinguishes
+                these for every sampled case (e.g. "FORD ESC CAPITAL" vs. "FORD ESC INTERESES"), so tagging
+                historical rows during import should be mechanical rather than requiring manual re-entry.
+            </technical_requirement>
+        </business_rule>
+
+    </business_rules>
+
+    <functional_requirements>
+
+        <reconciliation>
+            <behavior id="monthly_reconciliation_check">
+                <name_es>Resultado Mes</name_es>
+                <description>
+                    Each month, the system must verify that recorded account/liability balances agree with
+                    what the transaction ledger implies they should be. In the source spreadsheet this was
+                    a single formula combining income, the net variance across every account/investment/
+                    debt/receivable section, Total Recorded Disbursements, that month's debt-payment
+                    total, and that month's credit-card-charges total, with hand-picked signs, expected to
+                    evaluate to (approximately) zero.
+                </description>
+                <example>
+                    <scenario>
+                        Source formula (June 2026), preserved verbatim for reference:
+                        "=B13+(K25+L25*G4+M25/J3)-(G8+I9/J3)-(K30+L30*G4+M30/J3)+(K41+L41*G4+M41/J3)-(K50+L50*G4+M50/J3)-K10+K6*2"
+                    </scenario>
+                </example>
+                <technical_requirement>
+                    This single hand-assembled formula should NOT be ported verbatim. The equivalent
+                    correctness check in the new system should be a standard trial-balance / accounting-
+                    equation check, computed independently from the ledger and account balances
+                    (Assets = Liabilities + Equity, with the residual expected to be at or near zero),
+                    rather than a manually-maintained formula with hand-picked signed terms.
+                </technical_requirement>
+            </behavior>
+        </reconciliation>
+
+        <category_actuals_report>
+            <requirement>
+                For each category and period, the system must be able to report the actual amount spent
+                (summed across CAD/USD/COP and folded into one currency-equivalent figure) versus the
+                manually maintained monthly budget figure for that category (see
+                data_requirements/budget), and the resulting over/under-budget ratio. In the source
+                spreadsheet, this was the one part of the system that queried the ledger correctly (by
+                category and period, without hardcoded row references), and should be used as the model
+                for how account balances are computed too (see data_requirements/accounts/
+                technical_requirement).
+            </requirement>
+        </category_actuals_report>
+
+        <balance_sheet_report>
+            <requirement>
+                For each period, the system must report Assets (sum of accounts, receivables, and fixed
+                assets), Liabilities (sum of credit cards and loans), and Equity (Assets minus
+                Liabilities), each expressed in CAD, USD-equivalent, and COP-equivalent.
+            </requirement>
+            <requirement>
+                The system must maintain a time series of Assets/Liabilities/Equity across periods (source
+                equivalent: the "Estado Financiero" sheet), for reporting trends over time.
+            </requirement>
+        </balance_sheet_report>
+
+        <recurring_expense_flag>
+            <requirement>
+                Individual expense transactions must be taggable as recurring or not, via the
+                "is_recurring" field (see data_requirements/transactions). This replaces the source
+                spreadsheet's separate, informational-only "Recurrent" tracker, which will not be
+                migrated or otherwise used by the new system.
+            </requirement>
+        </recurring_expense_flag>
+
+    </functional_requirements>
+
+    <historical_data_migration>
+        <data_requirement>
+            Initial data load covers 2,631 transactions dated in 2025-2026, already extracted from the
+            source spreadsheet into structured files: conceptos.json / conceptos.csv,
+            gastos_ledger_2025_2026.json / gastos_ledger_2025_2026.csv, gastos_template_rows.json,
+            estado_financiero_2025_2026.json, and month_sheets/*.json (one file per in-scope month). The
+            import process should read from these already-extracted files rather than re-parsing the
+            original spreadsheet. (recurrent.json also exists among the extracted files but must NOT be
+            imported or used, per the out-of-scope decision on the "Recurrent" sheet.)
+        </data_requirement>
+        <data_requirement id="float_noise_normalization">
+            Several recorded balances in the extracted source data are floating-point noise that should be
+            exactly zero (e.g. a Bancolombia COP balance of -1.19e-10 instead of 0, observed in several
+            months across the 2025-2026 window). The import process should round/normalize near-zero noise
+            of this kind rather than importing it as a non-zero balance.
+        </data_requirement>
+    </historical_data_migration>
+
+    <technical_requirements>
+        <technical_requirement id="stack">
+            The application will be built with Laravel (backend) and React (frontend), using the
+            "laravel-react-starter-kit". Project scaffolding will be provided separately and should be
+            used as the starting point rather than generating a new project skeleton from scratch.
+        </technical_requirement>
+    </technical_requirements>
+
+    <acceptance_criteria>
+        <acceptance_criteria id="reconciliation_balances">
+            For any given period, once all transactions for that period are correctly recorded and
+            categorized, the variance (Recorded minus Computed) for every account and liability should be
+            zero, and the resulting Assets = Liabilities + Equity check (see
+            functional_requirements/reconciliation) should hold with a residual at or near zero.
+        </acceptance_criteria>
+        <acceptance_criteria id="category_merge_integrity">
+            After merging category C040 into C031, the total historical amount recorded under the combined
+            category must equal the sum of what was previously recorded separately under C031 and C040 —
+            no transaction amounts or dates may change as a result of the merge.
+        </acceptance_criteria>
+    </acceptance_criteria>
+
+    <open_questions>
+
+        <open_question id="application_name">
+            <question>What should the new application be named?</question>
+            <context>Not specified anywhere in the source material; only the old spreadsheet's file name is known.</context>
+        </open_question>
+
+        <open_question id="income_categorization">
+            <question>Should income be categorized (similar to expense categories), or remain free-text line items as in the source spreadsheet?</question>
+            <context>The source spreadsheet has no category-code system for income, unlike expenses.</context>
+        </open_question>
+
+        <open_question id="stale_fx_rate_handling">
+            <question>
+                The "USD/COP" and "USD/CAD" rates never changed across the entire 21-month source window,
+                while the CAD-to-COP rate was actively updated. Only 18 of 2,631 in-scope transactions are
+                USD-denominated. Should the new system (a) import the historical rate exactly as recorded
+                per month even though it never moved, (b) backfill more accurate historical USD/COP and
+                USD/CAD rates for those 18 transactions, or (c) accept the existing values as-is?
+            </question>
+            <context>Raised during clarification with the source owner; not yet decided.</context>
+        </open_question>
+
+        <open_question id="other_label_drift_check">
+            <question>
+                Should the other rows in the "CREDITOS Y DEUDAS" (Credit Cards &amp; Loans) section be
+                checked for the same kind of stale-label drift found on the "Personal LOAN CIBC" /
+                "Crédito Móvil **6174" row before or during migration?
+            </question>
+            <context>
+                Only that one row was specifically checked and confirmed to have drifted labels, because
+                the source owner pointed to it directly. Other rows in the same section were not
+                individually re-verified for the same issue.
+            </context>
+        </open_question>
+
+        <open_question id="pre_2025_migration_timeline">
+            <question>Will the pre-2025 spreadsheet data (46 additional month-tabs, back to November 2020) ever be migrated into this system, and if so, on what timeline?</question>
+            <context>Explicitly deferred in the plan; not addressed by the clarifications.</context>
+        </open_question>
+
+        <open_question id="database_engine">
+            <question>Which database engine will the Laravel application use (e.g. MySQL, PostgreSQL, SQLite)?</question>
+            <context>Not specified by the source owner; may be dictated by the starter kit's defaults or by project scaffolding not yet reviewed.</context>
+        </open_question>
+
+        <open_question id="authentication_and_access">
+            <question>What authentication/authorization approach is required, and is this a single-user or multi-user (e.g. household members with their own logins) application?</question>
+            <context>Not addressed anywhere in the source material (PLAN.md and CLARIFICATIONS.md focus entirely on data and business logic), but required for any web application built on the stated stack.</context>
+        </open_question>
+
+        <open_question id="ui_and_api_design">
+            <question>What screens/pages and API endpoints are required?</question>
+            <context>The source material specifies data structure and business logic in detail but does not describe any UI layout, navigation, or API surface.</context>
+        </open_question>
+
+        <open_question id="deployment_environment">
+            <question>What is the target deployment/hosting environment?</question>
+            <context>Not specified anywhere in the source material.</context>
+        </open_question>
+
+    </open_questions>
+
+</project_specification>
