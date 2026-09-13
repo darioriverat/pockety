@@ -10,6 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -36,6 +37,7 @@ interface Category {
     code: string;
     name_es: string;
     name_en: string;
+    is_debt_category: boolean;
 }
 
 interface Transaction {
@@ -75,6 +77,7 @@ interface TransactionFormData {
     amount: string;
     comments: string;
     is_recurring: boolean;
+    debt_component: 'principal' | 'interest' | '';
 }
 
 export default function Transactions() {
@@ -93,6 +96,7 @@ export default function Transactions() {
         amount: '',
         comments: '',
         is_recurring: false,
+        debt_component: '',
     });
 
     useEffect(() => {
@@ -138,6 +142,7 @@ export default function Transactions() {
             category_id: parseInt(formData.category_id),
             comments: formData.comments || null,
             is_recurring: formData.is_recurring,
+            debt_component: formData.debt_component || null,
         };
 
         // Set the appropriate currency field
@@ -192,6 +197,7 @@ export default function Transactions() {
             amount: transaction.amount.toString(),
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
+            debt_component: (transaction.debt_component || '') as 'principal' | 'interest' | '',
         });
         setIsDialogOpen(true);
     };
@@ -222,6 +228,7 @@ export default function Transactions() {
             amount: '',
             comments: '',
             is_recurring: false,
+            debt_component: '',
         });
     };
 
@@ -431,6 +438,66 @@ export default function Transactions() {
                                             placeholder="Optional notes..."
                                         />
                                     </div>
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="is_recurring"
+                                            checked={formData.is_recurring}
+                                            onCheckedChange={(checked) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    is_recurring: checked === true,
+                                                })
+                                            }
+                                        />
+                                        <Label
+                                            htmlFor="is_recurring"
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                            Recurring transaction
+                                        </Label>
+                                    </div>
+                                    {formData.category_id &&
+                                        categories.find(
+                                            (c) =>
+                                                c.id.toString() ===
+                                                formData.category_id
+                                        )?.is_debt_category && (
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="debt_component">
+                                                    Debt Component
+                                                </Label>
+                                                <Select
+                                                    value={
+                                                        formData.debt_component
+                                                    }
+                                                    onValueChange={(value) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            debt_component:
+                                                                value as
+                                                                    | 'principal'
+                                                                    | 'interest'
+                                                                    | '',
+                                                        })
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select component" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="">
+                                                            None
+                                                        </SelectItem>
+                                                        <SelectItem value="principal">
+                                                            Principal
+                                                        </SelectItem>
+                                                        <SelectItem value="interest">
+                                                            Interest
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        )}
                                 </div>
                                 <DialogFooter>
                                     <Button type="submit">
@@ -492,6 +559,11 @@ export default function Transactions() {
                                                     <Badge variant="outline">
                                                         {transaction.currency}
                                                     </Badge>
+                                                    {transaction.is_recurring && (
+                                                        <Badge variant="secondary">
+                                                            Recurring
+                                                        </Badge>
+                                                    )}
                                                 </div>
                                                 <CardDescription className="mt-1">
                                                     <div className="space-y-1">
@@ -520,7 +592,21 @@ export default function Transactions() {
                                                                     .category
                                                                     .name_en
                                                             }
+                                                            {' / '}
+                                                            {
+                                                                transaction
+                                                                    .category
+                                                                    .name_es
+                                                            }
                                                         </div>
+                                                        {transaction.debt_component && (
+                                                            <div>
+                                                                <span className="font-medium">
+                                                                    Debt Component:
+                                                                </span>{' '}
+                                                                {transaction.debt_component}
+                                                            </div>
+                                                        )}
                                                         {transaction.comments && (
                                                             <div>
                                                                 <span className="font-medium">
