@@ -459,3 +459,84 @@ categoriesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 })
 
 categories.form = categoriesForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+export const transactions = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: transactions.url(options),
+    method: 'get',
+})
+
+transactions.definition = {
+    methods: ["get","head"],
+    url: '/transactions',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+transactions.url = (options?: RouteQueryOptions) => {
+    return transactions.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+transactions.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: transactions.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+transactions.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: transactions.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+const transactionsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: transactions.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+transactionsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: transactions.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+transactionsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: transactions.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+transactions.form = transactionsForm

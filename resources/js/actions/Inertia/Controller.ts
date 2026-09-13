@@ -242,6 +242,86 @@ Controller7a4f8d9d0be39757f6a1352cf8f1ab45.form = Controller7a4f8d9d0be39757f6a1
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+const Controllere5aa2cad321b30063c3b415df5452200 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllere5aa2cad321b30063c3b415df5452200.url(options),
+    method: 'get',
+})
+
+Controllere5aa2cad321b30063c3b415df5452200.definition = {
+    methods: ["get","head"],
+    url: '/transactions',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+Controllere5aa2cad321b30063c3b415df5452200.url = (options?: RouteQueryOptions) => {
+    return Controllere5aa2cad321b30063c3b415df5452200.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+Controllere5aa2cad321b30063c3b415df5452200.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllere5aa2cad321b30063c3b415df5452200.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+Controllere5aa2cad321b30063c3b415df5452200.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controllere5aa2cad321b30063c3b415df5452200.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+const Controllere5aa2cad321b30063c3b415df5452200Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllere5aa2cad321b30063c3b415df5452200.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+Controllere5aa2cad321b30063c3b415df5452200Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllere5aa2cad321b30063c3b415df5452200.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/transactions'
+*/
+Controllere5aa2cad321b30063c3b415df5452200Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllere5aa2cad321b30063c3b415df5452200.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controllere5aa2cad321b30063c3b415df5452200.form = Controllere5aa2cad321b30063c3b415df5452200Form
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/settings/appearance'
 */
 const Controllere19ee86e9cf603ce1a59a1ec5d21dec5 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -329,6 +409,7 @@ const Controller = {
     '/': Controller980bb49ee7ae63891f1d891d2fbcf1c9,
     '/dashboard': Controller42a740574ecbfbac32f8cc353fc32db9,
     '/categories': Controller7a4f8d9d0be39757f6a1352cf8f1ab45,
+    '/transactions': Controllere5aa2cad321b30063c3b415df5452200,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,
 }
 

@@ -20,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\Services\Contracts\CategoryServiceInterface::class,
             \App\Services\CategoryService::class
         );
+
+        $this->app->bind(
+            \App\Domain\Services\Contracts\TransactionServiceInterface::class,
+            \App\Services\TransactionService::class
+        );
     }
 
     /**
