@@ -15,6 +15,13 @@ tasks:
         docker exec -it -u root \
             -w /var/www/vhosts web_app \
             /bin/bash -l
+  dev:
+    desc: Run the development server in the web container
+    cmds:
+      - |
+        docker exec -it -u appuser \
+            -w /var/www/vhosts web_app \
+            "npm" "run" "dev"
   tests:
     desc: Execute tests
     cmds:
