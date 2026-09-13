@@ -112,7 +112,7 @@
       "Step 3: Verify 'MERCADO / Groceries' is displayed",
       "Step 4: Verify the description is looked up from category table, not stored in transaction"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -125,7 +125,7 @@
       "Step 5: Verify transaction is marked as recurring",
       "Step 6: Verify recurring indicator is visible in transaction list"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -137,7 +137,7 @@
       "Step 4: Submit transaction",
       "Step 5: Verify debt_component is saved as 'principal'"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -149,7 +149,7 @@
       "Step 4: Submit transaction",
       "Step 5: Verify debt_component is saved as 'interest'"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -161,7 +161,7 @@
       "Step 4: Submit transaction without debt_component",
       "Step 5: Verify transaction is created successfully"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
