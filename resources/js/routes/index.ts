@@ -378,3 +378,84 @@ dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 })
 
 dashboard.form = dashboardForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories'
+*/
+export const categories = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: categories.url(options),
+    method: 'get',
+})
+
+categories.definition = {
+    methods: ["get","head"],
+    url: '/categories',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories'
+*/
+categories.url = (options?: RouteQueryOptions) => {
+    return categories.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories'
+*/
+categories.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: categories.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories'
+*/
+categories.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: categories.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories'
+*/
+const categoriesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: categories.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories'
+*/
+categoriesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: categories.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories'
+*/
+categoriesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: categories.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+categories.form = categoriesForm
