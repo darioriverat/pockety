@@ -7,7 +7,7 @@
       "Step 2: Verify the page loads without errors",
       "Step 3: Verify the dashboard displays main navigation"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -18,7 +18,7 @@
       "Step 3: Verify C040 is not in the list",
       "Step 4: Verify C031 (MESADA NIÑAS) appears only once"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -29,7 +29,7 @@
       "Step 3: Verify Spanish name 'MERCADO' is displayed",
       "Step 4: Verify English name 'Groceries' is displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -40,7 +40,7 @@
       "Step 3: Verify it has a debt category indicator",
       "Step 4: Verify non-debt categories (e.g., C001) do not have this indicator"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

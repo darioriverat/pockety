@@ -1,3 +1,14 @@
+HARNESS NOTE (2026-09-13):
+Previous sessions reported Puppeteer MCP as "still connecting" / unavailable.
+That was a harness bug (corrupt npx cache + 5s MCP wait), not an application
+issue. Browser automation SHOULD be tried this session. Do not skip UI
+verification based on the older BLOCKER notes below.
+
+Keep future updates to this file SHORT (one session summary). Do not repeat
+the full history.
+
+================================================================================
+
 POCKETY - Session 2 Progress Report
 ===================================
 Date: September 13, 2026
@@ -783,3 +794,104 @@ New Features: 5 (features #10-14)
 API Tests Passed: 5/5 (100%)
 
 ================================================================================
+
+================================================================================
+SESSION 6 - UI VERIFICATION WITH BROWSER AUTOMATION
+================================================================================
+Date: 2026-09-13
+Session Start: Fresh context window
+
+CRITICAL DISCOVERY:
+------------------
+✅ Browser automation (Puppeteer) IS AVAILABLE!
+   - Previous session notes incorrectly stated it was unavailable
+   - Successfully tested all puppeteer tools (navigate, screenshot, click, fill)
+   - Can now perform proper UI verification
+
+UI VERIFICATION COMPLETED:
+--------------------------
+✅ 1. Dashboard Access (Feature #1)
+   - Navigated to http://dev.pockety.com:8080/
+   - Logged in with test user (admin@example.com / password)
+   - Dashboard loads successfully with navigation menu
+   - Shows: Dashboard, Categories, Transactions links
+   - Screenshot: dashboard-initial.png, after-login.png
+
+✅ 2. Categories Page (Features #2-4)
+   - Total categories: 45 ✓
+   - All categories display bilingual names (ES/EN) ✓
+   - C001: "ES: MERCADO" / "EN: Groceries" ✓
+   - C040 correctly excluded (jumps from C039 to C041) ✓
+   - C031 (MESADA NIÑAS) appears only once ✓
+   - Debt indicators working: C009, C010, C038, C039, C044, C046 marked ✓
+   - Screenshots: categories-page.png, categories-scrolled.png
+
+✅ 3. Transactions Page
+   - Transactions list displays correctly
+   - Shows 9 existing transactions (from previous session's API tests)
+   - Bilingual category display working: "C001 - Groceries / MERCADO" ✓
+   - Multi-currency support verified: CAD, USD, COP ✓
+   - "Recurring" badges visible on recurring transactions ✓
+   - Debt component displayed: "Debt Component: principal" ✓
+   - Debt component displayed: "Debt Component: interest" ✓
+   - Combined features working: Recurring + Debt payment ✓
+   - Non-debt transactions correctly show no debt component ✓
+   - Screenshots: transactions-page.png, transactions-scrolled.png
+
+✅ 4. Add Transaction Form
+   - Modal opens successfully
+   - Form fields present: Date, Period, Quincena, Category, Currency, Amount, Comments
+   - "Recurring transaction" checkbox visible
+   - Form structure matches requirements
+   - Screenshot: add-transaction-form.png
+
+FEATURES MARKED AS PASSING:
+---------------------------
+✅ Feature #1: User can access the application dashboard
+✅ Feature #2: System displays all 45 active expense categories
+✅ Feature #3: Each category displays both Spanish and English names
+✅ Feature #4: Debt categories are marked with a special indicator
+
+Total: 4/175 tests now passing (2.3%)
+
+OBSERVATIONS:
+-------------
+- All backend features from Session 5 are working correctly in the UI
+- Previous sessions implemented features #10-14 (recurring, debt component)
+- These features are visible and working but not yet marked as passing
+- Need to create NEW transactions through the form to fully verify creation features
+
+CODE QUALITY:
+-------------
+- No console errors observed
+- UI is clean and professional
+- Navigation works smoothly
+- Forms are well-structured
+- Responsive layout
+
+NEXT STEPS:
+-----------
+1. Complete testing of transaction creation (features #5-9)
+   - Create CAD transaction
+   - Create USD transaction
+   - Create COP transaction
+   - Verify single currency validation
+   - Verify category validation
+
+2. Test recurring transaction creation (feature #11)
+3. Test debt component selection (features #12-14)
+4. Continue with remaining features from feature_list.json
+
+TECHNICAL NOTES:
+----------------
+- Added /logs to .gitignore (MCP puppeteer logs)
+- Browser automation fully functional
+- Test user credentials working: admin@example.com / password
+- App running on http://dev.pockety.com:8080/
+
+SESSION 6 STATUS: ✓ SUCCESSFUL
+==============================
+Progress: 4 features verified and marked as passing
+Browser automation confirmed working
+Application in stable state
+Ready for continued feature implementation
