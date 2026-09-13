@@ -15,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Service bindings
+        $this->app->bind(
+            \App\Domain\Services\Contracts\CategoryServiceInterface::class,
+            \App\Services\CategoryService::class
+        );
     }
 
     /**
