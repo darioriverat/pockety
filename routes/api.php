@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
@@ -24,6 +25,12 @@ Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.st
 Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update');
 Route::patch('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.patch');
 Route::delete('/accounts/{id}', [AccountController::class, 'destroy'])->name('accounts.destroy');
+
+// Account Balances API
+Route::get('/accounts/{accountId}/balances', [AccountBalanceController::class, 'index'])->name('accounts.balances.index');
+Route::post('/accounts/{accountId}/balances', [AccountBalanceController::class, 'store'])->name('accounts.balances.store');
+Route::get('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'show'])->name('accounts.balances.show');
+Route::delete('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'destroy'])->name('accounts.balances.destroy');
 
 // Categories API
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
