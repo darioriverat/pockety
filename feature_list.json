@@ -53,7 +53,7 @@
       "Step 5: Verify transaction appears in the list",
       "Step 6: Verify all fields match the input"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -66,7 +66,7 @@
       "Step 5: Verify transaction is created with USD currency",
       "Step 6: Verify CAD and COP fields are empty/null"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -78,7 +78,7 @@
       "Step 4: Submit the form",
       "Step 5: Verify transaction is created with COP currency"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
