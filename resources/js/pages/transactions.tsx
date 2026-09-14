@@ -50,8 +50,8 @@ interface Transaction {
     amount_cad: number | null;
     amount_usd: number | null;
     amount_cop: number | null;
-    currency: string;
-    amount: number;
+    currency: string | null;
+    amount: number | null;
     comments: string | null;
     is_recurring: boolean;
     debt_component: string | null;
@@ -233,8 +233,11 @@ export default function Transactions() {
             period: transaction.period,
             quincena: transaction.quincena as 'Q1' | 'Q2',
             category_id: transaction.category_id.toString(),
-            currency: transaction.currency as 'CAD' | 'USD' | 'COP',
-            amount: transaction.amount.toString(),
+            currency: (transaction.currency ?? 'CAD') as
+                | 'CAD'
+                | 'USD'
+                | 'COP',
+            amount: (transaction.amount ?? 0).toString(),
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
             debt_component: (transaction.debt_component || '') as 'principal' | 'interest' | '',
@@ -272,7 +275,14 @@ export default function Transactions() {
         });
     };
 
-    const formatCurrency = (amount: number, currency: string) => {
+    const formatCurrency = (
+        amount: number | null,
+        currency: string | null
+    ) => {
+        if (amount === null || currency === null) {
+            return '—';
+        }
+
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currency,
@@ -530,13 +540,17 @@ export default function Transactions() {
                                                 </Label>
                                                 <Select
                                                     value={
-                                                        formData.debt_component
+                                                        formData.debt_component ||
+                                                        'none'
                                                     }
                                                     onValueChange={(value) =>
                                                         setFormData({
                                                             ...formData,
                                                             debt_component:
-                                                                value as
+                                                                (value ===
+                                                                'none'
+                                                                    ? ''
+                                                                    : value) as
                                                                     | 'principal'
                                                                     | 'interest'
                                                                     | '',
@@ -550,7 +564,7 @@ export default function Transactions() {
                                                         <SelectValue placeholder="Select component" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="">
+                                                        <SelectItem value="none">
                                                             None
                                                         </SelectItem>
                                                         <SelectItem value="principal">
@@ -611,16 +625,20 @@ export default function Transactions() {
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-category">Category</Label>
                                 <Select
-                                    value={filters.category_id}
+                                    value={filters.category_id || 'all'}
                                     onValueChange={(value) =>
-                                        setFilters({ ...filters, category_id: value })
+                                        setFilters({
+                                            ...filters,
+                                            category_id:
+                                                value === 'all' ? '' : value,
+                                        })
                                     }
                                 >
                                     <SelectTrigger id="filter-category">
                                         <SelectValue placeholder="All" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All Categories</SelectItem>
+                                        <SelectItem value="all">All Categories</SelectItem>
                                         {categories.map((cat) => (
                                             <SelectItem
                                                 key={cat.id}
@@ -636,16 +654,20 @@ export default function Transactions() {
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-quincena">Quincena</Label>
                                 <Select
-                                    value={filters.quincena}
+                                    value={filters.quincena || 'all'}
                                     onValueChange={(value) =>
-                                        setFilters({ ...filters, quincena: value })
+                                        setFilters({
+                                            ...filters,
+                                            quincena:
+                                                value === 'all' ? '' : value,
+                                        })
                                     }
                                 >
                                     <SelectTrigger id="filter-quincena">
                                         <SelectValue placeholder="All" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All</SelectItem>
+                                        <SelectItem value="all">All</SelectItem>
                                         <SelectItem value="Q1">Q1</SelectItem>
                                         <SelectItem value="Q2">Q2</SelectItem>
                                     </SelectContent>
@@ -655,16 +677,20 @@ export default function Transactions() {
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-currency">Currency</Label>
                                 <Select
-                                    value={filters.currency}
+                                    value={filters.currency || 'all'}
                                     onValueChange={(value) =>
-                                        setFilters({ ...filters, currency: value })
+                                        setFilters({
+                                            ...filters,
+                                            currency:
+                                                value === 'all' ? '' : value,
+                                        })
                                     }
                                 >
                                     <SelectTrigger id="filter-currency">
                                         <SelectValue placeholder="All" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All</SelectItem>
+                                        <SelectItem value="all">All</SelectItem>
                                         <SelectItem value="CAD">CAD</SelectItem>
                                         <SelectItem value="USD">USD</SelectItem>
                                         <SelectItem value="COP">COP</SelectItem>
@@ -675,16 +701,20 @@ export default function Transactions() {
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-recurring">Recurring</Label>
                                 <Select
-                                    value={filters.is_recurring}
+                                    value={filters.is_recurring || 'all'}
                                     onValueChange={(value) =>
-                                        setFilters({ ...filters, is_recurring: value })
+                                        setFilters({
+                                            ...filters,
+                                            is_recurring:
+                                                value === 'all' ? '' : value,
+                                        })
                                     }
                                 >
                                     <SelectTrigger id="filter-recurring">
                                         <SelectValue placeholder="All" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All</SelectItem>
+                                        <SelectItem value="all">All</SelectItem>
                                         <SelectItem value="1">Recurring Only</SelectItem>
                                         <SelectItem value="0">Non-recurring</SelectItem>
                                     </SelectContent>

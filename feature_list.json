@@ -1477,7 +1477,7 @@
             "Step 3: Verify response contains array of transactions",
             "Step 4: Verify each transaction has expected fields (id, date, period, category, amount, currency, etc.)"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
