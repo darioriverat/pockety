@@ -8,6 +8,7 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::inertia('accounts', 'accounts')->name('accounts');
     Route::inertia('categories', 'categories')->name('categories');
     Route::inertia('transactions', 'transactions')->name('transactions');
     Route::inertia('import', 'import')->name('import');

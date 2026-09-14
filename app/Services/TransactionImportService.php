@@ -22,6 +22,9 @@ class TransactionImportService
         }
 
         $jsonContent = file_get_contents($filePath);
+        if ($jsonContent === false) {
+            throw new \InvalidArgumentException("Failed to read file: {$filePath}");
+        }
         $transactions = json_decode($jsonContent, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -139,7 +142,7 @@ class TransactionImportService
      */
     private function getCategoryMapping(): array
     {
-        return Category::all()->pluck('id', 'code')->toArray();
+        return Category::pluck('id', 'code')->toArray();
     }
 
     /**

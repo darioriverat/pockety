@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Domain\Services\Contracts\AccountServiceInterface;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
+use App\Services\AccountService;
 use App\Services\CategoryService;
 use App\Services\TransactionService;
 use Carbon\CarbonImmutable;
@@ -20,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Service bindings
+        $this->app->bind(
+            AccountServiceInterface::class,
+            AccountService::class
+        );
+
         $this->app->bind(
             CategoryServiceInterface::class,
             CategoryService::class

@@ -382,6 +382,87 @@ dashboard.form = dashboardForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/accounts'
+*/
+export const accounts = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: accounts.url(options),
+    method: 'get',
+})
+
+accounts.definition = {
+    methods: ["get","head"],
+    url: '/accounts',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/accounts'
+*/
+accounts.url = (options?: RouteQueryOptions) => {
+    return accounts.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/accounts'
+*/
+accounts.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: accounts.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/accounts'
+*/
+accounts.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: accounts.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/accounts'
+*/
+const accountsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: accounts.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/accounts'
+*/
+accountsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: accounts.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/accounts'
+*/
+accountsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: accounts.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+accounts.form = accountsForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/categories'
 */
 export const categories = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

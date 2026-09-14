@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionImportController;
@@ -15,6 +16,14 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group.
 |
 */
+
+// Accounts API
+Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
+Route::get('/accounts/{id}', [AccountController::class, 'show'])->name('accounts.show');
+Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
+Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update');
+Route::patch('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.patch');
+Route::delete('/accounts/{id}', [AccountController::class, 'destroy'])->name('accounts.destroy');
 
 // Categories API
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
