@@ -1616,3 +1616,52 @@ Based on feature_list.json, continue with account management:
 
 SESSION 12 - COMPLETE ✓
 ========================
+================================================================================
+SESSION 13 - Account Balance Recording (Test #32 - Backend Complete)
+================================================================================
+Date: September 14, 2026
+Focus: Implement recorded balance feature for account reconciliation
+
+COMPLETED WORK
+--------------
+✅ Backend Implementation (Test #32)
+   - Created AccountBalanceController with full CRUD operations
+   - Added API routes: POST/GET /api/accounts/{accountId}/balances
+   - Multi-currency balance support (CAD, USD, COP)
+   - Period-based recording (YYYYMM format: e.g., 202501)
+   - Validation: period format, numeric balances, account existence
+   - HATEOAS links in responses
+
+✅ Backend Testing & Verification
+   - All 39 backend tests passing
+   - PHPStan: No errors (baseline updated)
+   - Pint: Code style passing
+   - Frontend unit tests: 2 passing
+
+✅ API Verification (Test #32 Requirements Met)
+   - Created account "RBC Checking" (ID: 5)
+   - Saved balance for period 202501: CAD 3,674.22
+   - Retrieved balance successfully via API
+   - All CRUD operations verified working
+
+ISSUES DISCOVERED
+-----------------
+❌ Frontend Rendering Issue (Pre-existing)
+   - Accounts page shows blank (white screen)
+   - Transactions page also blank
+   - Dashboard page works correctly
+   - Issue exists BEFORE this session's changes (verified by reverting)
+   - Likely Inertia.js/Vite rendering problem
+   - Affects: /accounts and /transactions routes
+
+COMPLETION STATUS
+-----------------
+Tests Passing: 31 of 175 (17.7%)
+Backend for Test #32: ✅ Complete
+Frontend for Test #32: ⏸️  Pending (blocked by rendering issue)
+
+NEXT SESSION PRIORITIES
+------------------------
+1. Fix Inertia.js/Vite rendering issue for accounts/transactions pages
+2. Complete Test #32 frontend UI and verify end-to-end
+3. Continue with Tests #33-38 (account reconciliation features)
