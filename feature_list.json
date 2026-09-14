@@ -456,7 +456,7 @@
             "Step 4: Verify 'Liabilities' section header is displayed",
             "Step 5: Verify credit cards and loans appear under Liabilities"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
