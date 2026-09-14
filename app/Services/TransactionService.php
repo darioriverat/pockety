@@ -11,6 +11,9 @@ class TransactionService implements TransactionServiceInterface
 {
     /**
      * Get all transactions with optional filtering.
+     *
+     * @param  array{period?: string, category_id?: int, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool}  $filters
+     * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array
     {
@@ -64,6 +67,8 @@ class TransactionService implements TransactionServiceInterface
 
     /**
      * Create a new transaction.
+     *
+     * @param  array{date: string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, debt_component?: string|null}  $data
      */
     public function create(array $data): TransactionEntity
     {
@@ -81,6 +86,8 @@ class TransactionService implements TransactionServiceInterface
 
     /**
      * Update an existing transaction.
+     *
+     * @param  array{date?: string, period?: string, quincena?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, debt_component?: string|null}  $data
      */
     public function update(int $id, array $data): TransactionEntity
     {
@@ -163,6 +170,8 @@ class TransactionService implements TransactionServiceInterface
 
     /**
      * Validate that only one currency amount is set.
+     *
+     * @param  array{amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null}  $data
      *
      * @throws \InvalidArgumentException
      */

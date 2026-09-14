@@ -486,3 +486,59 @@ destroyForm.delete = (args: { id: string | number } | [id: string | number ] | s
 })
 
 destroy.form = destroyForm
+
+/**
+* @see \App\Http\Controllers\TransactionImportController::importMethod
+* @see app/Http/Controllers/TransactionImportController.php:18
+* @route '/api/transactions/import'
+*/
+export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: importMethod.url(options),
+    method: 'post',
+})
+
+importMethod.definition = {
+    methods: ["post"],
+    url: '/api/transactions/import',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\TransactionImportController::importMethod
+* @see app/Http/Controllers/TransactionImportController.php:18
+* @route '/api/transactions/import'
+*/
+importMethod.url = (options?: RouteQueryOptions) => {
+    return importMethod.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\TransactionImportController::importMethod
+* @see app/Http/Controllers/TransactionImportController.php:18
+* @route '/api/transactions/import'
+*/
+importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: importMethod.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionImportController::importMethod
+* @see app/Http/Controllers/TransactionImportController.php:18
+* @route '/api/transactions/import'
+*/
+const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: importMethod.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionImportController::importMethod
+* @see app/Http/Controllers/TransactionImportController.php:18
+* @route '/api/transactions/import'
+*/
+importMethodForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: importMethod.url(options),
+    method: 'post',
+})
+
+importMethod.form = importMethodForm

@@ -10,6 +10,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
     Route::inertia('categories', 'categories')->name('categories');
     Route::inertia('transactions', 'transactions')->name('transactions');
+    Route::inertia('import', 'import')->name('import');
 });
 
 // Development routes (remove in production)

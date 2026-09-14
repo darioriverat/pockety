@@ -16,6 +16,8 @@ readonly class CategoryEntity
 
     /**
      * Create from array (useful for batch creation).
+     *
+     * @param  array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_active: bool, status?: string|null}  $data
      */
     public static function fromArray(array $data): self
     {
@@ -32,6 +34,8 @@ readonly class CategoryEntity
 
     /**
      * Convert to array for JSON serialization.
+     *
+     * @return array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_active: bool, status: string|null}
      */
     public function toArray(): array
     {
