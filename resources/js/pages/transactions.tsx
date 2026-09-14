@@ -30,7 +30,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Filter, X } from 'lucide-react';
 
 interface Category {
     id: number;
@@ -80,6 +80,15 @@ interface TransactionFormData {
     debt_component: 'principal' | 'interest' | '';
 }
 
+interface FilterState {
+    period: string;
+    category_id: string;
+    quincena: string;
+    currency: string;
+    is_recurring: string;
+    search: string;
+}
+
 export default function Transactions() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -98,11 +107,19 @@ export default function Transactions() {
         is_recurring: false,
         debt_component: '',
     });
+    const [filters, setFilters] = useState<FilterState>({
+        period: '',
+        category_id: '',
+        quincena: '',
+        currency: '',
+        is_recurring: '',
+        search: '',
+    });
 
     useEffect(() => {
         fetchTransactions();
         fetchCategories();
-    }, []);
+    }, [filters]);
 
     const fetchCategories = async () => {
         try {
@@ -118,10 +135,33 @@ export default function Transactions() {
     const fetchTransactions = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/transactions');
+
+            // Build query parameters from filters
+            const params = new URLSearchParams();
+            if (filters.period) params.append('period', filters.period);
+            if (filters.category_id) params.append('category_id', filters.category_id);
+            if (filters.quincena) params.append('quincena', filters.quincena);
+            if (filters.currency) params.append('currency', filters.currency);
+            if (filters.is_recurring) params.append('is_recurring', filters.is_recurring);
+
+            const url = `/api/transactions${params.toString() ? '?' + params.toString() : ''}`;
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch transactions');
             const data: ApiResponse = await response.json();
-            setTransactions(data.data);
+
+            // Apply client-side search filter for comments
+            let filteredData = data.data;
+            if (filters.search) {
+                const searchLower = filters.search.toLowerCase();
+                filteredData = data.data.filter(t =>
+                    t.comments?.toLowerCase().includes(searchLower) ||
+                    t.category.name_en.toLowerCase().includes(searchLower) ||
+                    t.category.name_es.toLowerCase().includes(searchLower) ||
+                    t.category.code.toLowerCase().includes(searchLower)
+                );
+            }
+
+            setTransactions(filteredData);
             setError(null);
         } catch (err) {
             setError(
@@ -239,6 +279,19 @@ export default function Transactions() {
             minimumFractionDigits: 2,
         }).format(amount);
     };
+
+    const clearFilters = () => {
+        setFilters({
+            period: '',
+            category_id: '',
+            quincena: '',
+            currency: '',
+            is_recurring: '',
+            search: '',
+        });
+    };
+
+    const hasActiveFilters = Object.values(filters).some(v => v !== '');
 
     return (
         <>
@@ -520,6 +573,138 @@ export default function Transactions() {
                         </DialogContent>
                     </Dialog>
                 </div>
+
+                {/* Filters Section */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Filter className="h-5 w-5" />
+                                <CardTitle className="text-lg">Filters</CardTitle>
+                            </div>
+                            {hasActiveFilters && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={clearFilters}
+                                >
+                                    <X className="mr-2 h-4 w-4" />
+                                    Clear Filters
+                                </Button>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter-period">Period</Label>
+                                <Input
+                                    id="filter-period"
+                                    placeholder="202501"
+                                    value={filters.period}
+                                    onChange={(e) =>
+                                        setFilters({ ...filters, period: e.target.value })
+                                    }
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter-category">Category</Label>
+                                <Select
+                                    value={filters.category_id}
+                                    onValueChange={(value) =>
+                                        setFilters({ ...filters, category_id: value })
+                                    }
+                                >
+                                    <SelectTrigger id="filter-category">
+                                        <SelectValue placeholder="All" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All Categories</SelectItem>
+                                        {categories.map((cat) => (
+                                            <SelectItem
+                                                key={cat.id}
+                                                value={cat.id.toString()}
+                                            >
+                                                {cat.code} - {cat.name_en}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter-quincena">Quincena</Label>
+                                <Select
+                                    value={filters.quincena}
+                                    onValueChange={(value) =>
+                                        setFilters({ ...filters, quincena: value })
+                                    }
+                                >
+                                    <SelectTrigger id="filter-quincena">
+                                        <SelectValue placeholder="All" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All</SelectItem>
+                                        <SelectItem value="Q1">Q1</SelectItem>
+                                        <SelectItem value="Q2">Q2</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter-currency">Currency</Label>
+                                <Select
+                                    value={filters.currency}
+                                    onValueChange={(value) =>
+                                        setFilters({ ...filters, currency: value })
+                                    }
+                                >
+                                    <SelectTrigger id="filter-currency">
+                                        <SelectValue placeholder="All" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All</SelectItem>
+                                        <SelectItem value="CAD">CAD</SelectItem>
+                                        <SelectItem value="USD">USD</SelectItem>
+                                        <SelectItem value="COP">COP</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter-recurring">Recurring</Label>
+                                <Select
+                                    value={filters.is_recurring}
+                                    onValueChange={(value) =>
+                                        setFilters({ ...filters, is_recurring: value })
+                                    }
+                                >
+                                    <SelectTrigger id="filter-recurring">
+                                        <SelectValue placeholder="All" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All</SelectItem>
+                                        <SelectItem value="1">Recurring Only</SelectItem>
+                                        <SelectItem value="0">Non-recurring</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter-search">Search</Label>
+                                <Input
+                                    id="filter-search"
+                                    placeholder="Search comments..."
+                                    value={filters.search}
+                                    onChange={(e) =>
+                                        setFilters({ ...filters, search: e.target.value })
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {error && (
                     <Card className="border-destructive">

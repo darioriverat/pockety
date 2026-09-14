@@ -198,7 +198,7 @@
       "Step 4: Change filter to 202602",
       "Step 5: Verify only transactions from February 2026 are displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -210,7 +210,7 @@
       "Step 4: Change filter to C004 - TRANSPORTES",
       "Step 5: Verify only transportation transactions are displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -223,7 +223,7 @@
       "Step 5: Change quincena to Q2",
       "Step 6: Verify only Q2 transactions are shown"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -235,7 +235,7 @@
       "Step 4: Apply USD filter",
       "Step 5: Verify only USD transactions are displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -247,7 +247,7 @@
       "Step 4: Filter by 'non-recurring only'",
       "Step 5: Verify only non-recurring transactions are shown"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -259,7 +259,7 @@
       "Step 4: Clear search",
       "Step 5: Verify all transactions are shown again"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
