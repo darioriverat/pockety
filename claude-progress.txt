@@ -997,3 +997,64 @@ Browser automation: ✓ Operational
 
 SESSION 7 - COMPLETE ✓
 =======================
+
+
+SESSION 8 - Validation Features and Transaction Management
+===========================================================
+Date: 2026-09-13
+Duration: ~2 hours
+Starting state: 12/175 tests passing (6.9%)
+Ending state: 16/175 tests passing (9.1%)
+
+ACCOMPLISHED
+------------
+✅ Feature #8: Transaction only allows one currency per transaction
+   - Frontend: Single currency dropdown + single amount field design
+   - Backend: validateSingleCurrency() enforces exactly one currency
+   - Tested: Multiple currency attempt prevented at both UI and service layers
+   - Error handling: Clear error if multiple currencies provided
+
+✅ Feature #9: Transaction category is validated against catalog
+   - Frontend: Dropdown populated with valid categories only (45 categories)
+   - Backend: Controller validation with exists:categories,id rule
+   - Backend: Service validation with validateCategory() method
+   - Tested invalid category: API rejected with "selected category id is invalid"
+   - Tested valid category: API accepted and transaction created
+
+✅ Feature #15: User can edit an existing transaction
+   - UI: Edit (pencil) button visible on all transactions
+   - Form: Opens with "Edit Transaction" title
+   - Form: All fields pre-populated with current transaction data
+   - Button: Shows "Update" instead of "Create"
+   - Backend: PUT /api/transactions/{id} endpoint functional
+
+✅ Feature #16: User can delete a transaction  
+   - UI: Delete (trash) button visible on all transactions
+   - Confirmation: Browser dialog "Are you sure you want to delete?"
+   - Backend: DELETE /api/transactions/{id} endpoint functional
+   - Service: TransactionService.delete() method implemented
+
+TECHNICAL NOTES
+---------------
+- Browser automation (puppeteer MCP) working correctly
+- Multi-layer validation: Controller → Service → Database
+- React state management working with shadcn/ui components
+- Confirmation dialogs using native browser confirm()
+
+TESTING METHODOLOGY
+-------------------
+- Verified features through UI with browser automation
+- Tested backend validation with direct API calls (curl)
+- Confirmed error messages display correctly
+- Verified both valid and invalid scenarios
+
+COMPLETION STATUS
+-----------------
+Progress: 16 of 175 tests passing (9.1%)
+Session: +4 features completed
+Remaining: 159 tests
+App state: Clean, stable, all features working
+Browser automation: ✓ Operational
+
+SESSION 8 - COMPLETE ✓
+=======================
