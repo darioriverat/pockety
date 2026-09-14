@@ -1361,3 +1361,169 @@ Based on feature_list.json, the next tests to implement are likely related to:
 
 SESSION 10 - COMPLETE ✓
 =======================
+
+SESSION 11 - Account Management Feature
+========================================
+Date: 2026-09-14
+Duration: ~2 hours
+Status: ✓ COMPLETE
+
+OBJECTIVE
+---------
+Implement account management feature to allow users to create and manage
+bank accounts, investments, credit cards/loans, and accounts receivable.
+
+ACCOMPLISHMENTS
+---------------
+Feature #28: User can create a bank account (asset account) - ✓ PASSING
+
+Backend Implementation:
+- Created AccountEntity (Domain/Entities) with asset/liability detection
+- Implemented AccountServiceInterface (Domain/Services/Contracts)
+- Created AccountService with full CRUD operations
+- Built AccountController with RESTful API endpoints
+- Registered service binding in AppServiceProvider
+- Added API routes: GET/POST/PUT/PATCH/DELETE /api/accounts
+- Added web route: /accounts page
+
+Frontend Implementation:
+- Created accounts.tsx page with full UI
+- Implemented "Add Account" dialog with form
+- Account type selector (Bank, Investment, Liability, Receivable)
+- Currency selector (CAD, USD, COP)
+- Grouped display: Assets and Liabilities sections
+- Added Accounts menu item to sidebar navigation
+- Auto-generated TypeScript routes and actions
+
+Features:
+- View all accounts grouped by assets/liabilities
+- Create new accounts with name, type, currency, and notes
+- Account cards show icons based on type
+- Clean, polished UI matching existing pages
+- Real-time updates after account creation
+
+Bug Fixes:
+- Fixed PHPStan errors in TransactionImportService.php
+  * Added false check for file_get_contents result
+  * Optimized Category::pluck query (removed unnecessary ::all())
+
+TESTING & VERIFICATION
+-----------------------
+Backend Tests:
+- All 39 PHPUnit tests passing (136 assertions)
+- All PHPStan checks passing (no errors)
+- All Pint style checks passing
+
+Browser Automation:
+- Successfully navigated to /accounts page
+- Opened "Add Account" dialog
+- Filled form: "RBC Checking", Bank Account, CAD
+- Submitted form and verified account creation
+- Confirmed account appears in Assets section
+- Verified API returns correct account data
+
+Database Verification:
+✓ Account created with id: 1
+✓ Name: "RBC Checking"
+✓ Type: "bank"
+✓ Primary Currency: "CAD"
+✓ Is Active: true
+✓ API endpoint working correctly
+
+UI Verification:
+✓ Accounts page loads without errors
+✓ "Add Account" button functional
+✓ Dialog opens and closes correctly
+✓ Form validation working
+✓ Account card displays with correct data
+✓ Total count updates (1 asset, 0 liabilities)
+✓ No console errors
+
+TECHNICAL DETAILS
+-----------------
+Architecture Pattern:
+- Domain-Driven Design approach
+- Entity objects for data transfer
+- Service interfaces for contracts
+- Service implementations for business logic
+- Controllers handle HTTP requests/responses
+- Clean separation of concerns
+
+Account Types:
+- bank: Bank/cash accounts (asset)
+- investment: Investment accounts (asset)
+- liability: Credit cards and loans (liability)
+- receivable: Accounts receivable (asset)
+
+API Endpoints:
+- GET /api/accounts - List all accounts (with optional type filter)
+- GET /api/accounts/{id} - Get single account
+- POST /api/accounts - Create new account
+- PUT/PATCH /api/accounts/{id} - Update account
+- DELETE /api/accounts/{id} - Deactivate account (soft delete)
+
+Response Format:
+- HATEOAS-compliant with links section
+- Grouped data (assets/liabilities) for easier frontend use
+- Metadata includes total count and applied filters
+
+Frontend Components:
+- Dialog for account creation
+- Select components for type and currency
+- Input validation
+- Loading states with skeleton screens
+- Error handling with user-friendly messages
+
+Dev Server:
+- Vite dev server restarted during session
+- Frontend hot reload working correctly
+- All assets building successfully
+
+COMPLETION STATUS
+-----------------
+Progress: 28 of 175 tests passing (16.0%)
+Session: +1 feature completed (#28)
+Remaining: 147 tests
+App state: Clean, stable, all features working
+Browser automation: ✓ Operational
+All backend tests: ✓ Passing (39 tests)
+Code quality: ✓ PHPStan + Pint passing
+Vite dev server: ✓ Running
+
+FILES CHANGED
+-------------
+Backend (7 files):
++ app/Domain/Entities/AccountEntity.php (new)
++ app/Domain/Services/Contracts/AccountServiceInterface.php (new)
++ app/Services/AccountService.php (new)
++ app/Http/Controllers/AccountController.php (new)
+M app/Providers/AppServiceProvider.php (service binding)
+M routes/api.php (account routes)
+M routes/web.php (accounts page route)
+M app/Services/TransactionImportService.php (bug fixes)
+
+Frontend (3 files + auto-generated):
++ resources/js/pages/accounts.tsx (new)
+M resources/js/components/app-sidebar.tsx (menu item)
++ Auto-generated route and action files
+
+Data:
+M feature_list.json (test #28 marked as passing)
+
+NEXT PRIORITIES
+---------------
+Based on feature_list.json, continue with account management features:
+- Test #29: User can create an investment account
+- Test #30: User can create a credit card/loan liability account
+- Test #31: User can create an accounts receivable account
+- Test #32: User can enter recorded balance for an account
+- Test #33: User can enter multi-currency balances
+- Test #34-38: Account reconciliation features
+
+The account infrastructure is now in place. Next session should focus on:
+1. Testing the other account types (investment, liability, receivable)
+2. Implementing account balance tracking
+3. Building the reconciliation features
+
+SESSION 11 - COMPLETE ✓
+========================
