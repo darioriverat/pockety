@@ -51,8 +51,14 @@ This will:
 # Shell in the container
 task shell
 
-# Run tests
+# Run all tests
 task tests
+
+# Run backend tests
+task backend-tests
+
+# Run frontend unit/component tests
+task frontend-tests
 
 # Start development server (with hot reload)
 task dev
@@ -143,6 +149,12 @@ Historical data from the original spreadsheet (2025-2026) is available in `plan/
 ```bash
 # Run all tests
 task tests
+
+# Run backend tests
+task backend-tests
+
+# Run frontend unit/component tests
+task frontend-tests
 
 # Run specific test
 docker exec -u appuser web_app bash -lc "cd /var/www/vhosts && php artisan test --filter=TestName"

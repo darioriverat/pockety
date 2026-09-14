@@ -22,10 +22,22 @@ tasks:
         docker exec -it -u appuser \
             -w /var/www/vhosts web_app \
             "npm" "run" "dev"
-  tests:
-    desc: Execute tests
+  backend-tests:
+    desc: Execute backend tests
     cmds:
       - |
         docker exec -u appuser \
             -w /var/www/vhosts web_app \
             bash -lc "composer test"
+  frontend-tests:
+    desc: Execute frontend unit and component tests
+    cmds:
+      - |
+        docker exec -u appuser \
+            -w /var/www/vhosts web_app \
+            bash -lc "npm run test:unit"
+  tests:
+    desc: Execute backend and frontend tests
+    cmds:
+      - task: backend-tests
+      - task: frontend-tests
