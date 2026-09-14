@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\VerifyCsrfToken;
+use App\Models\Category;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -15,54 +17,57 @@ if (app()->environment('local')) {
     Route::get('/dev/fix-categories-table', function () {
         try {
             // Add status column if it doesn't exist
-            if (!\Schema::hasColumn('categories', 'status')) {
-                \DB::statement('ALTER TABLE categories ADD COLUMN status VARCHAR(255) NULL AFTER is_active');
+            if (! Schema::hasColumn('categories', 'status')) {
+                DB::statement('ALTER TABLE categories ADD COLUMN status VARCHAR(255) NULL AFTER is_active');
             }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Categories table fixed successfully',
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage(),
             ], 500);
         }
-    })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/migrate', function () {
         try {
-            \Artisan::call('migrate', ['--force' => true]);
+            Artisan::call('migrate', ['--force' => true]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Migrations run successfully',
-                'output' => \Artisan::output(),
+                'output' => Artisan::output(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage(),
             ], 500);
         }
-    })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/seed-categories', function () {
         try {
-            \Artisan::call('db:seed', ['--class' => 'CategorySeeder', '--force' => true]);
-            $categoryCount = \App\Models\Category::count();
+            Artisan::call('db:seed', ['--class' => 'CategorySeeder', '--force' => true]);
+            $categoryCount = Category::count();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Categories seeded successfully',
                 'count' => $categoryCount,
-                'output' => \Artisan::output(),
+                'output' => Artisan::output(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage(),
             ], 500);
         }
-    })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
 }
 
 require __DIR__.'/settings.php';

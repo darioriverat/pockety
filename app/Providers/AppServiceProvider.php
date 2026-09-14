@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Domain\Services\Contracts\CategoryServiceInterface;
+use App\Domain\Services\Contracts\TransactionServiceInterface;
+use App\Services\CategoryService;
+use App\Services\TransactionService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -17,13 +21,13 @@ class AppServiceProvider extends ServiceProvider
     {
         // Service bindings
         $this->app->bind(
-            \App\Domain\Services\Contracts\CategoryServiceInterface::class,
-            \App\Services\CategoryService::class
+            CategoryServiceInterface::class,
+            CategoryService::class
         );
 
         $this->app->bind(
-            \App\Domain\Services\Contracts\TransactionServiceInterface::class,
-            \App\Services\TransactionService::class
+            TransactionServiceInterface::class,
+            TransactionService::class
         );
     }
 

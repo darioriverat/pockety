@@ -3,18 +3,19 @@
 require __DIR__.'/vendor/autoload.php';
 
 $app = require_once __DIR__.'/bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
 use App\Models\Transaction;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Schema;
 
 echo "Transaction table structure:\n";
 $columns = Schema::getColumns('transactions');
 foreach ($columns as $column) {
-    echo "  - {$column['name']}: {$column['type_name']}" . ($column['nullable'] ? ' (nullable)' : '') . "\n";
+    echo "  - {$column['name']}: {$column['type_name']}".($column['nullable'] ? ' (nullable)' : '')."\n";
 }
 
-echo "\nTransaction count: " . Transaction::count() . "\n";
+echo "\nTransaction count: ".Transaction::count()."\n";
 
 if (Transaction::count() > 0) {
     echo "\nFirst few transactions:\n";

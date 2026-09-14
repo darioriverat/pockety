@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Domain\Entities\TransactionEntity;
-use App\Domain\Entities\CategoryEntity;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +55,7 @@ class TransactionService implements TransactionServiceInterface
     {
         $transaction = Transaction::with('category')->find($id);
 
-        if (!$transaction) {
+        if (! $transaction) {
             return null;
         }
 
@@ -107,6 +106,7 @@ class TransactionService implements TransactionServiceInterface
     public function delete(int $id): bool
     {
         $transaction = Transaction::findOrFail($id);
+
         return $transaction->delete();
     }
 
@@ -198,7 +198,7 @@ class TransactionService implements TransactionServiceInterface
     {
         $exists = DB::table('categories')->where('id', $categoryId)->exists();
 
-        if (!$exists) {
+        if (! $exists) {
             throw new \InvalidArgumentException("Category with ID {$categoryId} does not exist");
         }
     }

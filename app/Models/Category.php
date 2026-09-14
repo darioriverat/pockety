@@ -62,6 +62,7 @@ class Category extends Model
     public function getDisplayNameAttribute(): string
     {
         $locale = app()->getLocale();
+
         return $locale === 'es' ? $this->name_es : $this->name_en;
     }
 

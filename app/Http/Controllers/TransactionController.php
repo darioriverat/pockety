@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Services\Contracts\TransactionServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -32,7 +33,7 @@ class TransactionController extends Controller
 
         $transactions = $this->service->getAll($filters);
 
-        $data = array_map(fn($entity) => $entity->toArray(), $transactions);
+        $data = array_map(fn ($entity) => $entity->toArray(), $transactions);
 
         return response()->json([
             'data' => $data,
@@ -55,7 +56,7 @@ class TransactionController extends Controller
     {
         $transaction = $this->service->getById($id);
 
-        if (!$transaction) {
+        if (! $transaction) {
             return response()->json([
                 'error' => 'Transaction not found',
             ], 404);
@@ -151,7 +152,7 @@ class TransactionController extends Controller
             ], 422);
         } catch (ValidationException $e) {
             throw $e;
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Transaction not found',
             ], 404);
@@ -172,7 +173,7 @@ class TransactionController extends Controller
                 'message' => 'Transaction deleted successfully',
             ], 200);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Transaction not found',
             ], 404);

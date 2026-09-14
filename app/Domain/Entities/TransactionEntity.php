@@ -87,6 +87,7 @@ readonly class TransactionEntity
         if ($this->amountCop !== null && $this->amountCop != 0) {
             return 'COP';
         }
+
         return null;
     }
 

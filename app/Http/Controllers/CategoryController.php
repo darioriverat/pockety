@@ -20,7 +20,7 @@ class CategoryController extends Controller
     {
         $categories = $this->service->getAllActive();
 
-        $data = array_map(fn($entity) => $entity->toArray(), $categories);
+        $data = array_map(fn ($entity) => $entity->toArray(), $categories);
 
         return response()->json([
             'data' => $data,
@@ -42,7 +42,7 @@ class CategoryController extends Controller
     {
         $category = $this->service->getByCode($code);
 
-        if (!$category) {
+        if (! $category) {
             return response()->json([
                 'error' => 'Category not found',
             ], 404);

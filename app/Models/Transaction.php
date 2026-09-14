@@ -62,6 +62,7 @@ class Transaction extends Model
         if ($this->amount_cop !== null && $this->amount_cop != 0) {
             return 'COP';
         }
+
         return null;
     }
 
@@ -116,7 +117,7 @@ class Transaction extends Model
     public function scopeForCurrency($query, string $currency)
     {
         return $query->whereNotNull("amount_{$currency}")
-                     ->where("amount_{$currency}", '!=', 0);
+            ->where("amount_{$currency}", '!=', 0);
     }
 
     /**

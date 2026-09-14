@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Check if column doesn't exist before adding it
-        if (!Schema::hasColumn('categories', 'status')) {
+        if (! Schema::hasColumn('categories', 'status')) {
             Schema::table('categories', function (Blueprint $table) {
                 $table->string('status')->nullable()->after('is_active');
             });

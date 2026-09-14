@@ -61,7 +61,7 @@ class CategoryService implements CategoryServiceInterface
     {
         $category = Category::where('code', $code)->first();
 
-        if (!$category) {
+        if (! $category) {
             return null;
         }
 
