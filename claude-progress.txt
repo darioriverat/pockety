@@ -1963,3 +1963,103 @@ NEXT SESSION PRIORITIES
 5. Dashboard summary cards (income/expenses/net, asset/liability
    totals) - currently all false in feature_list.json.
 ========================
+
+========================
+SESSION 17 - Account Balance Entry UI (single + multi-currency)
+========================
+
+CONTEXT
+-------
+Step 3 verification: `task tests` ran clean before starting (backend
+39/39, frontend 2/2, phpstan clean, pint clean) - no regressions from
+Session 16. Confirmed containers (web_app, web_app_db, web_app_redis)
+were already up. Confirmed app reachable at http://dev.pockety.com:8080/.
+
+WORK DONE
+---------
+Implemented the "Manage Balances" UI on the accounts page
+(resources/js/pages/accounts.tsx), wiring up the existing
+AccountBalanceController API (GET/POST/DELETE
+/api/accounts/{id}/balances) which had no UI before this session:
+- Added a "Manage Balances" button (Wallet icon) to every account
+  card, opening a Dialog scoped to that account.
+- Dialog form: Period (YYYYMM text input, validated client-side with
+  a regex before submit), CAD/USD/COP numeric inputs side-by-side,
+  optional Notes textarea, "Save Balance" button. POSTs to
+  /api/accounts/{id}/balances (updateOrCreate semantics already
+  handled server-side per period).
+- Below the form: a "Recorded Balances" list fetched via GET, showing
+  each period's three currency values (formatted with
+  Intl.NumberFormat, wrapped in try/catch same pattern as
+  transactions.tsx to avoid the blank-screen crash class from Session
+  15) plus a Delete button per row (DELETE endpoint).
+- Dialog resets/refetches correctly on open/close per account (no
+  stale data leaking between different accounts' balance dialogs).
+
+VERIFICATION (browser, real clicks/fills)
+------------------------------------------
+- Logged in as test@example.com / password. NOTE: hit a real puppeteer
+  gotcha this session - calling puppeteer_fill for the email and
+  password fields in the SAME parallel tool-call batch caused
+  interleaved/racing keystrokes (verified via DOM inspection: password
+  field ended up containing a shuffled mix of both strings, e.g.
+  "tpeassts@weoxradmple.com"). Fix: fill fields sequentially, one
+  tool-call at a time, with a screenshot check in between. Also found
+  puppeteer_fill does not clear existing field content first - must
+  clear the input value via evaluate before re-filling if a previous
+  value is present. Recording this here so future sessions don't lose
+  time on this again.
+- Clicked "Manage Balances" on "RBC Checking", entered period=202501,
+  CAD=3674.22, saved - dialog's "Recorded Balances" list immediately
+  showed "202501 - CA$3,674.22 - $0.00 - COP 0.00", form cleared.
+- Clicked "Manage Balances" on "Wise Multi-Currency", entered
+  period=202501, CAD=1000, USD=500, COP=2000000, saved - list showed
+  "202501 - CA$1,000.00 - $500.00 - COP 2,000,000.00" - all three
+  currencies persisted correctly for one period/account.
+- No console errors observed at any step. npm run build completed
+  clean (no new TS errors).
+- Backend: 39/39 passing (unchanged, no backend code touched - the
+  AccountBalanceController/routes/model already existed from Session
+  13). Frontend: 2/2 passing.
+
+FEATURE_LIST.JSON UPDATE
+-------------------------
+Marked passes: true for:
+- "User can enter recorded balance for an account for a specific
+  period"
+- "User can enter recorded balance in multiple currencies for same
+  account/period"
+Both verified end-to-end per steps above.
+
+CURRENT STATE
+--------------
+Tests passing: 35 of 175 (was 33)
+Accounts page: Assets/Liabilities split, Add Account dialog, and now
+  a working Manage Balances dialog (create/list/delete recorded
+  balances per period, all 3 currencies) on every account card.
+Backend: 39/39 tests passing. Frontend: 2/2 passing.
+
+NEXT SESSION PRIORITIES
+------------------------
+1. Account reconciliation report: for a given period, compute
+   "Computed" balance per account as a query over transactions (sum
+   of transaction amounts where account_id = X and period = Y, added
+   to prior period's computed/recorded balance), display Recorded vs
+   Computed vs Variance (= Recorded - Computed) in CAD/USD/COP,
+   highlight non-zero variance. This unblocks 4-5 false tests at once
+   (computed-balance/variance/multi-currency-variance/transaction-
+   account-linkage tests around line ~400-450 in feature_list.json).
+2. Verify transactions already carry an account_id foreign key end to
+   end (the "Transactions must reference an account for reconciliation
+   to work" test) - check the transaction form/model/migration; add
+   the account Select to the transaction form if missing.
+3. Dashboard summary cards (income/expenses/net, asset/liability
+   totals) - all false in feature_list.json.
+4. Add Edit/Delete actions to account cards themselves (currently
+   create + balance-only; API already supports PUT/PATCH/DELETE for
+   accounts).
+5. When testing forms with puppeteer, always fill fields ONE AT A TIME
+   (never two puppeteer_fill calls in the same parallel batch) and
+   clear stale values before re-filling - see this session's notes
+   above for the exact failure mode and fix.
+========================

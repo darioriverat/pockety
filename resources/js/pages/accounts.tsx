@@ -28,7 +28,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusIcon, Building2 } from 'lucide-react';
+import { PlusIcon, Building2, Wallet } from 'lucide-react';
 
 interface Account {
     id: number;
@@ -48,11 +48,48 @@ interface AccountFormData {
     notes: string;
 }
 
+interface AccountBalance {
+    id: number;
+    account_id: number;
+    period: string;
+    recorded_balance_cad: number;
+    recorded_balance_usd: number;
+    recorded_balance_cop: number;
+    notes: string | null;
+}
+
+interface BalanceFormData {
+    period: string;
+    recorded_balance_cad: string;
+    recorded_balance_usd: string;
+    recorded_balance_cop: string;
+    notes: string;
+}
+
 const emptyForm: AccountFormData = {
     name: '',
     type: 'bank',
     primary_currency: 'CAD',
     notes: '',
+};
+
+const emptyBalanceForm: BalanceFormData = {
+    period: '',
+    recorded_balance_cad: '',
+    recorded_balance_usd: '',
+    recorded_balance_cop: '',
+    notes: '',
+};
+
+const formatCurrency = (value: number, currency: string): string => {
+    try {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency,
+        }).format(value);
+    } catch {
+        return value.toFixed(2);
+    }
 };
 
 export default function Accounts() {
@@ -63,6 +100,17 @@ export default function Accounts() {
     const [formData, setFormData] = useState<AccountFormData>(emptyForm);
     const [formError, setFormError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+
+    const [balanceDialogAccount, setBalanceDialogAccount] =
+        useState<Account | null>(null);
+    const [balances, setBalances] = useState<AccountBalance[]>([]);
+    const [balancesLoading, setBalancesLoading] = useState(false);
+    const [balanceForm, setBalanceForm] =
+        useState<BalanceFormData>(emptyBalanceForm);
+    const [balanceFormError, setBalanceFormError] = useState<string | null>(
+        null
+    );
+    const [balanceSubmitting, setBalanceSubmitting] = useState(false);
 
     useEffect(() => {
         fetchAccounts();
@@ -135,6 +183,118 @@ export default function Accounts() {
         }
     };
 
+    const fetchBalances = async (accountId: number) => {
+        try {
+            setBalancesLoading(true);
+            const response = await fetch(`/api/accounts/${accountId}/balances`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch balances');
+            }
+
+            const data: any = await response.json();
+            setBalances(data.data || []);
+        } catch (err) {
+            setBalanceFormError(
+                err instanceof Error ? err.message : 'An error occurred'
+            );
+        } finally {
+            setBalancesLoading(false);
+        }
+    };
+
+    const openBalanceDialog = (account: Account) => {
+        setBalanceDialogAccount(account);
+        setBalanceForm(emptyBalanceForm);
+        setBalanceFormError(null);
+        fetchBalances(account.id);
+    };
+
+    const closeBalanceDialog = (open: boolean) => {
+        if (!open) {
+            setBalanceDialogAccount(null);
+            setBalances([]);
+            setBalanceForm(emptyBalanceForm);
+            setBalanceFormError(null);
+        }
+    };
+
+    const handleBalanceSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setBalanceFormError(null);
+
+        if (!balanceDialogAccount) return;
+
+        if (!/^\d{6}$/.test(balanceForm.period)) {
+            setBalanceFormError('Period must be in YYYYMM format (e.g. 202501).');
+            return;
+        }
+
+        const payload: Record<string, unknown> = {
+            period: balanceForm.period,
+            recorded_balance_cad: balanceForm.recorded_balance_cad
+                ? parseFloat(balanceForm.recorded_balance_cad)
+                : 0,
+            recorded_balance_usd: balanceForm.recorded_balance_usd
+                ? parseFloat(balanceForm.recorded_balance_usd)
+                : 0,
+            recorded_balance_cop: balanceForm.recorded_balance_cop
+                ? parseFloat(balanceForm.recorded_balance_cop)
+                : 0,
+            notes: balanceForm.notes.trim() || null,
+        };
+
+        try {
+            setBalanceSubmitting(true);
+            const response = await fetch(
+                `/api/accounts/${balanceDialogAccount.id}/balances`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                const message = errorData.messages
+                    ? Object.values(errorData.messages).flat().join(' ')
+                    : errorData.error || 'Failed to save balance';
+                throw new Error(message);
+            }
+
+            await fetchBalances(balanceDialogAccount.id);
+            setBalanceForm(emptyBalanceForm);
+        } catch (err) {
+            setBalanceFormError(
+                err instanceof Error ? err.message : 'An error occurred'
+            );
+        } finally {
+            setBalanceSubmitting(false);
+        }
+    };
+
+    const handleBalanceDelete = async (balanceId: number) => {
+        if (!balanceDialogAccount) return;
+
+        try {
+            const response = await fetch(
+                `/api/accounts/${balanceDialogAccount.id}/balances/${balanceId}`,
+                { method: 'DELETE' }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to delete balance');
+            }
+
+            await fetchBalances(balanceDialogAccount.id);
+        } catch (err) {
+            setBalanceFormError(
+                err instanceof Error ? err.message : 'An error occurred'
+            );
+        }
+    };
+
     const getAccountTypeLabel = (type: string): string => {
         const labels: Record<string, string> = {
             bank: 'Bank Account',
@@ -170,6 +330,16 @@ export default function Accounts() {
                     </div>
                 </CardDescription>
             </CardHeader>
+            <CardContent>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openBalanceDialog(account)}
+                >
+                    <Wallet className="mr-2 h-4 w-4" />
+                    Manage Balances
+                </Button>
+            </CardContent>
         </Card>
     );
 
@@ -401,6 +571,207 @@ export default function Accounts() {
                         </div>
                     </>
                 )}
+
+                <Dialog
+                    open={balanceDialogAccount !== null}
+                    onOpenChange={closeBalanceDialog}
+                >
+                    <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>
+                                Manage Balances
+                                {balanceDialogAccount
+                                    ? ` — ${balanceDialogAccount.name}`
+                                    : ''}
+                            </DialogTitle>
+                            <DialogDescription>
+                                Enter the recorded balance for a specific
+                                period (YYYYMM), in one or more currencies.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <form onSubmit={handleBalanceSubmit}>
+                            <div className="grid gap-4 py-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="balance-period">
+                                        Period (YYYYMM)
+                                    </Label>
+                                    <Input
+                                        id="balance-period"
+                                        value={balanceForm.period}
+                                        onChange={(e) =>
+                                            setBalanceForm({
+                                                ...balanceForm,
+                                                period: e.target.value,
+                                            })
+                                        }
+                                        placeholder="e.g. 202501"
+                                        maxLength={6}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="balance-cad">
+                                            CAD
+                                        </Label>
+                                        <Input
+                                            id="balance-cad"
+                                            type="number"
+                                            step="0.01"
+                                            value={
+                                                balanceForm.recorded_balance_cad
+                                            }
+                                            onChange={(e) =>
+                                                setBalanceForm({
+                                                    ...balanceForm,
+                                                    recorded_balance_cad:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="balance-usd">
+                                            USD
+                                        </Label>
+                                        <Input
+                                            id="balance-usd"
+                                            type="number"
+                                            step="0.01"
+                                            value={
+                                                balanceForm.recorded_balance_usd
+                                            }
+                                            onChange={(e) =>
+                                                setBalanceForm({
+                                                    ...balanceForm,
+                                                    recorded_balance_usd:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="balance-cop">
+                                            COP
+                                        </Label>
+                                        <Input
+                                            id="balance-cop"
+                                            type="number"
+                                            step="0.01"
+                                            value={
+                                                balanceForm.recorded_balance_cop
+                                            }
+                                            onChange={(e) =>
+                                                setBalanceForm({
+                                                    ...balanceForm,
+                                                    recorded_balance_cop:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="balance-notes">
+                                        Notes
+                                    </Label>
+                                    <Textarea
+                                        id="balance-notes"
+                                        value={balanceForm.notes}
+                                        onChange={(e) =>
+                                            setBalanceForm({
+                                                ...balanceForm,
+                                                notes: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Optional notes"
+                                    />
+                                </div>
+
+                                {balanceFormError && (
+                                    <p className="text-sm text-destructive">
+                                        {balanceFormError}
+                                    </p>
+                                )}
+                            </div>
+
+                            <DialogFooter>
+                                <Button
+                                    type="submit"
+                                    disabled={balanceSubmitting}
+                                >
+                                    {balanceSubmitting
+                                        ? 'Saving...'
+                                        : 'Save Balance'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+
+                        <div className="mt-4 space-y-2 border-t pt-4">
+                            <h3 className="text-sm font-semibold">
+                                Recorded Balances
+                            </h3>
+                            {balancesLoading ? (
+                                <p className="text-sm text-muted-foreground">
+                                    Loading...
+                                </p>
+                            ) : balances.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                    No balances recorded yet.
+                                </p>
+                            ) : (
+                                <ul className="space-y-2">
+                                    {balances.map((balance) => (
+                                        <li
+                                            key={balance.id}
+                                            className="flex items-center justify-between rounded-md border p-2 text-sm"
+                                        >
+                                            <div>
+                                                <span className="font-medium">
+                                                    {balance.period}
+                                                </span>
+                                                <div className="text-muted-foreground">
+                                                    {formatCurrency(
+                                                        balance.recorded_balance_cad,
+                                                        'CAD'
+                                                    )}{' '}
+                                                    ·{' '}
+                                                    {formatCurrency(
+                                                        balance.recorded_balance_usd,
+                                                        'USD'
+                                                    )}{' '}
+                                                    ·{' '}
+                                                    {formatCurrency(
+                                                        balance.recorded_balance_cop,
+                                                        'COP'
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                    handleBalanceDelete(
+                                                        balance.id
+                                                    )
+                                                }
+                                            >
+                                                Delete
+                                            </Button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );

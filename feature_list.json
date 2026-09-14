@@ -382,7 +382,7 @@
             "Step 4: Save",
             "Step 5: Verify recorded balance is saved for that period"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -394,7 +394,7 @@
             "Step 4: Save",
             "Step 5: Verify all three currency balances are saved"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
