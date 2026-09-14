@@ -5,7 +5,8 @@ const baseURL =
 
 export default defineConfig({
     testDir: './tests/browser',
-    fullyParallel: true,
+    fullyParallel: false,
+    workers: 1,
     retries: process.env.CI ? 2 : 0,
     reporter: 'list',
     use: {

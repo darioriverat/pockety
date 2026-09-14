@@ -327,7 +327,10 @@ export default function Transactions() {
                                                     })
                                                 }
                                             >
-                                                <SelectTrigger>
+                                                <SelectTrigger
+                                                    id="quincena"
+                                                    aria-label="Quincena"
+                                                >
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -354,7 +357,10 @@ export default function Transactions() {
                                                 })
                                             }
                                         >
-                                            <SelectTrigger>
+                                            <SelectTrigger
+                                                id="category"
+                                                aria-label="Category"
+                                            >
                                                 <SelectValue placeholder="Select category" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -387,7 +393,10 @@ export default function Transactions() {
                                                     })
                                                 }
                                             >
-                                                <SelectTrigger>
+                                                <SelectTrigger
+                                                    id="currency"
+                                                    aria-label="Currency"
+                                                >
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -481,7 +490,10 @@ export default function Transactions() {
                                                         })
                                                     }
                                                 >
-                                                    <SelectTrigger>
+                                                    <SelectTrigger
+                                                        id="debt_component"
+                                                        aria-label="Debt Component"
+                                                    >
                                                         <SelectValue placeholder="Select component" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -624,6 +636,7 @@ export default function Transactions() {
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
+                                                    aria-label="Edit transaction"
                                                     onClick={() =>
                                                         handleEdit(transaction)
                                                     }
@@ -633,6 +646,7 @@ export default function Transactions() {
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
+                                                    aria-label="Delete transaction"
                                                     onClick={() =>
                                                         handleDelete(
                                                             transaction.id
