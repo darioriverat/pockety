@@ -90,7 +90,7 @@
       "Step 4: Verify system prevents or warns about multiple currencies",
       "Step 5: Verify only one currency can be selected at a time"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -101,7 +101,7 @@
       "Step 3: Verify system rejects the invalid category",
       "Step 4: Verify error message is displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
