@@ -60,6 +60,15 @@ task backend-tests
 # Run frontend unit/component tests
 task frontend-tests
 
+# Seed browser test data
+task browser-test-seed
+
+# Install Playwright browser binaries
+task browser-test-install
+
+# Run browser tests
+task browser-tests
+
 # Start development server (with hot reload)
 task dev
 ```
@@ -155,6 +164,15 @@ task backend-tests
 
 # Run frontend unit/component tests
 task frontend-tests
+
+# Seed browser test data
+task browser-test-seed
+
+# Install Playwright browser binaries
+task browser-test-install
+
+# Run browser tests
+task browser-tests
 
 # Run specific test
 docker exec -u appuser web_app bash -lc "cd /var/www/vhosts && php artisan test --filter=TestName"

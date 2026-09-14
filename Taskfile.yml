@@ -36,6 +36,29 @@ tasks:
         docker exec -u appuser \
             -w /var/www/vhosts web_app \
             bash -lc "npm run test:unit"
+  browser-test-seed:
+    desc: Seed browser test data
+    cmds:
+      - |
+        docker exec -u appuser \
+            -w /var/www/vhosts web_app \
+            bash -lc "php artisan db:seed --class=BrowserTestSeeder"
+  browser-test-install:
+    desc: Install Playwright browser binaries
+    cmds:
+      - |
+        docker exec -u appuser \
+            -w /var/www/vhosts web_app \
+            bash -lc "npx playwright install chromium"
+  browser-tests:
+    desc: Execute Playwright browser tests
+    cmds:
+      - task: browser-test-install
+      - task: browser-test-seed
+      - |
+        docker exec -u appuser \
+            -w /var/www/vhosts web_app \
+            bash -lc "PLAYWRIGHT_BASE_URL=http://host.docker.internal:8080 npm run test:browser"
   tests:
     desc: Execute backend and frontend tests
     cmds:
