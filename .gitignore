@@ -30,3 +30,4 @@ Thumbs.db
 /plan
 .claude_settings.json
 set-test-password.php
+.last-run.json
