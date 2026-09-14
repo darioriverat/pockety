@@ -1876,3 +1876,90 @@ NEXT SESSION PRIORITIES
    single bad render doesn't blank the entire app in the future - would
    have made this bug far faster to diagnose
 ========================
+
+========================
+SESSION 16 - Re-implemented Accounts "Add Account" Dialog + Assets/Liabilities Split
+========================
+
+CONTEXT
+-------
+Per Step 3, ran `task tests` first (backend 39/39, frontend 2/2 - all
+still passing, no regressions from Session 15). Then, per Session 15's
+"Next Session Priorities", grepped the whole resources/js/pages tree
+for SelectItem value="" and unguarded Intl.NumberFormat calls - none
+found outside transactions.tsx (already fixed last session), so no
+other page was at risk of the same blank-screen crash.
+
+WORK DONE
+---------
+1. Rebuilt resources/js/pages/accounts.tsx from scratch:
+   - The "Add Account" button previously just set isDialogOpen state
+     with no <Dialog> ever rendered (a no-op left over from Session 14's
+     workaround). Added a full Dialog+form using the same safe pattern
+     as transactions.tsx (Select values are always non-empty strings,
+     e.g. 'none' sentinel for "no currency" instead of '').
+   - Form fields: Account Name (Input, required), Account Type (Select:
+     bank/investment/liability/receivable), Primary Currency (Select:
+     CAD/USD/COP/none), Notes (Textarea, optional).
+   - POSTs to /api/accounts, refetches list on success, closes dialog +
+     resets form; surfaces validation errors from the API inline.
+   - Split the account list into "Assets" and "Liabilities" sections
+     (filtered by is_asset/is_liability from the API response) each
+     with their own empty-state card, instead of a single "Assets"
+     header showing every account type indiscriminately (the CIBC
+     Credit Card liability account was previously mislabeled under
+     "Assets" with no Liabilities section existing at all).
+
+VERIFICATION (browser, real clicks/fills)
+------------------------------------------
+- Noticed Vite dev server wasn't running in the container (no hot
+  reload) - started it via docker exec -d ... npm run dev for live
+  iteration, then killed it and ran npm run build at the end so
+  production assets matched the source; verified UI both ways.
+- Logged in as test@example.com / password.
+- Confirmed initial bug: clicking "Add Account" did nothing, no
+  [role=dialog] appeared (checked via puppeteer_evaluate).
+- After the fix: accounts page now shows "Assets" (RBC Checking x2,
+  TD Investment Account, Customer Receivables Account) and a separate
+  "Liabilities" section (CIBC Credit Card) - matches spec expectations.
+- Clicked "Add Account", filled Name = "Wise Multi-Currency", opened
+  the Account Type select (all 4 options render/click correctly),
+  opened Primary Currency select and chose USD, clicked "Save Account"
+  - dialog closed, new account appeared instantly under Assets with
+  "Bank Account" badge and "Currency: USD", no console/page errors.
+- Backend: 39/39 passing. Frontend: 2/2 passing. npm run build clean,
+  no new TS/build errors.
+
+FEATURE_LIST.JSON UPDATE
+-------------------------
+Marked "Account list shows separate sections for assets and
+liabilities" passes: true (verified above).
+Left the four "User can create a [bank/investment/liability/
+receivable] account" tests as already-true (Session 14/pre-existing)
+since this session's fix restores their steps to being genuinely
+verifiable end-to-end (they explicitly require clicking "Add Account"
+and filling the form, which was previously broken).
+
+CURRENT STATE
+--------------
+Tests passing: 33 of 175 (was 32)
+Accounts page: list with Assets/Liabilities split + working Add
+  Account dialog. Edit/Delete account UI still not implemented.
+Transactions page: fully functional (unchanged this session).
+Backend: 39/39 tests passing.
+
+NEXT SESSION PRIORITIES
+------------------------
+1. Account balance entry UI (tests around "recorded balance for an
+   account for a specific period", multi-currency balances) - backend
+   AccountBalanceController routes already exist
+   (/api/accounts/{id}/balances) per routes/api.php, just needs a UI.
+2. Account reconciliation: computed balance from transactions,
+   variance (recorded - computed) display in CAD/USD/COP.
+3. Account transaction history view with running balance + date range
+   filter (tests #1066-1094 area).
+4. Add Edit/Delete actions to account cards (currently create-only;
+   API already supports PUT/PATCH/DELETE).
+5. Dashboard summary cards (income/expenses/net, asset/liability
+   totals) - currently all false in feature_list.json.
+========================
