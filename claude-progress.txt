@@ -1775,3 +1775,104 @@ NEXT SESSION PRIORITIES
 
 SESSION 14 - COMPLETE ✓ (Blocker Resolved)
 ========================
+
+========================
+SESSION 15 - Fixed Transactions Page Blank Screen (Critical Regression)
+========================
+
+CONTEXT
+-------
+Per Step 3 (verification before new work), logged in (had to seed a fresh
+test@example.com user - the previous DB had no matching user/password;
+CategorySeeder failing on a unique constraint had blocked DatabaseSeeder's
+User::factory() call from ever running). Confirmed Accounts page works but
+the Transactions page was still a 100% blank white screen, exactly as
+flagged (unresolved) in Session 14 notes.
+
+ROOT CAUSE FOUND
+-----------------
+Used Playwright connected over CDP to the Puppeteer-launched Chrome
+instance (found the real debug port via the DevToolsActivePort file in the
+chrome profile dir, not the default 9222) to capture the actual
+`pageerror` event, since puppeteer_evaluate only surfaces console.log
+calls made *after* the page already loaded, not the original crash.
+
+Found: `PAGEERROR: Invalid currency code : null`
+
+Two compounding bugs in resources/js/pages/transactions.tsx:
+1. Five `<SelectItem value="">` (Radix UI Select requires a non-empty
+   value; empty string throws synchronously on render and crashes the
+   whole React root) - in the debt_component form select and 4 filter
+   selects: category, quincena, currency, is_recurring.
+2. `formatCurrency()` called `Intl.NumberFormat(...).format()` with a
+   null currency for one real transaction (id 1789: amount_cad=0, all
+   other currency fields null -> backend Transaction::getCurrencyAttribute()
+   treats amount=0 as "not set" -> currency ends up null). This is real
+   production-shaped data, not a stub - must be handled defensively.
+
+FIX
+---
+- Replaced value="" with sentinel values ('all' for filters, 'none' for
+  debt_component), mapping back to '' internally for filter state / API
+  query building - no behavior change to filtering logic itself.
+- Made formatCurrency null-safe (renders an em dash instead of throwing).
+- Widened Transaction.currency/amount types to allow null and fixed
+  handleEdit to fall back to 'CAD'/0 instead of crashing on null.
+
+VERIFICATION (browser, real clicks/fills)
+------------------------------------------
+- /transactions loads: 2637 transactions listed, no console/page errors
+- Category filter dropdown opens, selecting "C001 - Groceries" filters
+  list to 524 rows, "Clear Filters" button appears/works
+- Search "BlueCross" finds 4 matches; the one with null currency (id
+  1789, 2025-07-25) renders an em dash cleanly instead of crashing
+- Add Transaction dialog: filled date/category/currency/amount, created
+  a real transaction (total 2637->2638), then deleted it (back to 2637)
+- Edit dialog opens pre-filled with correct values, closed without
+  saving (verified no accidental mutation)
+- Backend tests: 39/39 passing (task backend-tests)
+- Frontend unit tests: 2/2 passing (task frontend-tests)
+- Rebuilt production assets (npm run build) cleanly; no new TS/build
+  errors (pre-existing duplicate-key TS errors in generated Wayfinder
+  action files - AccountController.ts/TransactionController.ts line 412 -
+  are unrelated codegen artifacts, not touched this session)
+
+FEATURE_LIST.JSON UPDATE
+-------------------------
+Marked #122 "API endpoint GET /api/transactions returns list of
+transactions" passes: true (verified via curl: 200 status, .data is an
+array, each item has id/date/period/category/amount/currency/etc.)
+
+Note: features #4-26 (transaction CRUD/filtering) were already marked
+true from earlier sessions; since the page was blank they were at risk
+of being stale/incorrect. This session's fix restores them to an
+actually-verifiable-true state - re-tested create/edit/delete/filter/
+search above and all genuinely work now.
+
+CURRENT STATE
+--------------
+Tests passing: 32 of 175 (was 31)
+Transactions page: fully functional (list, filter, search, CRUD)
+Accounts page: list/view works; "Add Account" button is a no-op
+  (dialog/form was stripped out in Session 14 as a workaround for a
+  different, now-superseded bug - still needs to be re-implemented)
+Backend: 39/39 tests passing, PHPStan/Pint not re-run this session
+  (no PHP changes made)
+
+NEXT SESSION PRIORITIES
+------------------------
+1. Re-implement the Accounts "Add Account" dialog/form (removed in
+   Session 14; now that the real Select/Intl bug class is understood,
+   check accounts.tsx and any other page for the same value="" /
+   null-currency patterns before re-adding Dialog+Select there)
+2. Grep the whole resources/js/pages tree for SelectItem value="" and
+   Intl.NumberFormat calls without null guards - proactively fix any
+   other pages before they are clicked into and found blank
+3. Continue implementing false features: account reconciliation
+   (balance computation/variance), budget vs actual reporting, CSV
+   export, transaction sorting, account transaction history with
+   running balance
+4. Consider adding an ErrorBoundary around the Inertia page root so a
+   single bad render doesn't blank the entire app in the future - would
+   have made this bug far faster to diagnose
+========================
