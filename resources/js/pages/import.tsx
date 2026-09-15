@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -28,6 +28,29 @@ interface AccountImportResult {
     errors: string[];
 }
 
+interface BalanceSheetSnapshot {
+    period: string;
+    assets_cad: number;
+    liabilities_cad: number;
+    equity_cad: number;
+}
+
+interface BalanceSheetImportResult {
+    periods_imported: number;
+    periods: string[];
+    snapshots: BalanceSheetSnapshot[];
+    errors: string[];
+}
+
+interface BalanceSheetImportStatistics {
+    total: number;
+    periods_covered: {
+        min: string | null;
+        max: string | null;
+    };
+    snapshots: BalanceSheetSnapshot[];
+}
+
 interface ImportStatistics {
     total: number;
     by_period: Record<string, number>;
@@ -41,6 +64,15 @@ interface ImportStatistics {
 interface AccountImportStatistics {
     total: number;
     by_type: Record<string, number>;
+}
+
+function formatCad(value: number): string {
+    return new Intl.NumberFormat('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value);
 }
 
 export default function Import() {
@@ -59,6 +91,20 @@ export default function Import() {
     const [accountStatistics, setAccountStatistics] =
         useState<AccountImportStatistics | null>(null);
     const [loadingAccountStats, setLoadingAccountStats] = useState(false);
+
+    const [importingBalanceSheet, setImportingBalanceSheet] = useState(false);
+    const [balanceSheetResult, setBalanceSheetResult] =
+        useState<BalanceSheetImportResult | null>(null);
+    const [balanceSheetError, setBalanceSheetError] = useState<string | null>(
+        null,
+    );
+    const [balanceSheetStatistics, setBalanceSheetStatistics] =
+        useState<BalanceSheetImportStatistics | null>(null);
+    const [loadingBalanceSheetStats, setLoadingBalanceSheetStats] =
+        useState(false);
+    const [selectedBalanceSheetFile, setSelectedBalanceSheetFile] = useState(
+        'estado_financiero_2025_2026.json',
+    );
 
     const handleImport = async () => {
         setImporting(true);
@@ -195,11 +241,79 @@ export default function Import() {
         }
     };
 
-    // Load statistics on mount
-    useState(() => {
+    const handleBalanceSheetImport = async () => {
+        if (
+            !confirm(
+                `Import balance sheet history from ${selectedBalanceSheetFile}?`,
+            )
+        ) {
+            return;
+        }
+
+        setImportingBalanceSheet(true);
+        setBalanceSheetError(null);
+        setBalanceSheetResult(null);
+
+        try {
+            const response = await fetch('/api/balance-sheet/import', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    file_path: selectedBalanceSheetFile,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Balance sheet import failed');
+            }
+
+            setBalanceSheetResult(data.data);
+            fetchBalanceSheetStatistics();
+        } catch (err) {
+            setBalanceSheetError(
+                err instanceof Error ? err.message : 'An error occurred',
+            );
+        } finally {
+            setImportingBalanceSheet(false);
+        }
+    };
+
+    const fetchBalanceSheetStatistics = async () => {
+        setLoadingBalanceSheetStats(true);
+        try {
+            const response = await fetch(
+                '/api/balance-sheet/import/statistics',
+                {
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                },
+            );
+
+            const data = await response.json();
+            setBalanceSheetStatistics(data.data);
+        } catch (err) {
+            console.error('Failed to fetch balance sheet statistics:', err);
+        } finally {
+            setLoadingBalanceSheetStats(false);
+        }
+    };
+
+    useEffect(() => {
         fetchStatistics();
         fetchAccountStatistics();
-    });
+        fetchBalanceSheetStatistics();
+    }, []);
+
+    const balanceSheetSnapshots =
+        balanceSheetResult?.snapshots ??
+        balanceSheetStatistics?.snapshots ??
+        [];
 
     return (
         <>
@@ -350,6 +464,243 @@ export default function Import() {
                                         </Badge>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                {/* Balance Sheet History Import Card */}
+                <Card data-testid="balance-sheet-import-card">
+                    <CardHeader>
+                        <CardTitle>Import Balance Sheet History</CardTitle>
+                        <CardDescription>
+                            Import Assets / Liabilities / Equity totals from
+                            the Estado Financiero source file. This will:
+                            <ul className="list-disc list-inside mt-2 space-y-1">
+                                <li>
+                                    Load every period present in
+                                    estado_financiero_2025_2026.json
+                                </li>
+                                <li>
+                                    Store CAD totals for Assets, Liabilities,
+                                    and Equity
+                                </li>
+                                <li>
+                                    Normalize floating-point noise near zero
+                                </li>
+                            </ul>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="balance-sheet-file"
+                                className="text-sm font-medium"
+                            >
+                                Source file
+                            </label>
+                            <select
+                                id="balance-sheet-file"
+                                data-testid="balance-sheet-file-select"
+                                className="flex h-10 w-full max-w-lg rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                value={selectedBalanceSheetFile}
+                                onChange={(event) =>
+                                    setSelectedBalanceSheetFile(
+                                        event.target.value,
+                                    )
+                                }
+                            >
+                                <option value="estado_financiero_2025_2026.json">
+                                    estado_financiero_2025_2026.json
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="flex flex-wrap gap-4">
+                            <Button
+                                onClick={handleBalanceSheetImport}
+                                disabled={importingBalanceSheet}
+                                size="lg"
+                                data-testid="import-balance-sheet-button"
+                            >
+                                {importingBalanceSheet ? (
+                                    <>
+                                        <Spinner className="mr-2 h-4 w-4" />
+                                        Importing Balance Sheet History...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Import Balance Sheet History
+                                    </>
+                                )}
+                            </Button>
+
+                            <Button
+                                onClick={fetchBalanceSheetStatistics}
+                                disabled={loadingBalanceSheetStats}
+                                variant="outline"
+                                size="lg"
+                                data-testid="refresh-balance-sheet-stats"
+                            >
+                                {loadingBalanceSheetStats ? (
+                                    <Spinner className="mr-2 h-4 w-4" />
+                                ) : (
+                                    <Database className="mr-2 h-4 w-4" />
+                                )}
+                                Refresh Balance Sheet Stats
+                            </Button>
+                        </div>
+
+                        {balanceSheetResult && (
+                            <Alert
+                                className={
+                                    balanceSheetResult.errors.length > 0
+                                        ? 'border-yellow-500'
+                                        : 'border-green-500'
+                                }
+                                data-testid="balance-sheet-import-result"
+                            >
+                                <CheckCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    <div className="space-y-2">
+                                        <p className="font-semibold">
+                                            Balance Sheet History Import
+                                            Completed
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            <Badge
+                                                variant="default"
+                                                data-testid="balance-sheet-periods-imported"
+                                            >
+                                                Periods imported:{' '}
+                                                {
+                                                    balanceSheetResult.periods_imported
+                                                }
+                                            </Badge>
+                                            {balanceSheetResult.errors
+                                                .length > 0 && (
+                                                <Badge variant="destructive">
+                                                    Errors:{' '}
+                                                    {
+                                                        balanceSheetResult
+                                                            .errors.length
+                                                    }
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {balanceSheetError && (
+                            <Alert variant="destructive">
+                                <XCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    {balanceSheetError}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {balanceSheetStatistics && (
+                            <div
+                                className="rounded-md border p-4"
+                                data-testid="balance-sheet-import-stats"
+                            >
+                                <p
+                                    className="text-2xl font-bold"
+                                    data-testid="balance-sheet-total-periods"
+                                >
+                                    {balanceSheetStatistics.total}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    Historical Balance Sheet Periods
+                                    {balanceSheetStatistics.periods_covered
+                                        .min &&
+                                        balanceSheetStatistics.periods_covered
+                                            .max && (
+                                            <>
+                                                {' '}
+                                                (
+                                                {
+                                                    balanceSheetStatistics
+                                                        .periods_covered.min
+                                                }{' '}
+                                                →{' '}
+                                                {
+                                                    balanceSheetStatistics
+                                                        .periods_covered.max
+                                                }
+                                                )
+                                            </>
+                                        )}
+                                </p>
+                            </div>
+                        )}
+
+                        {balanceSheetSnapshots.length > 0 && (
+                            <div className="overflow-x-auto rounded-md border">
+                                <table
+                                    className="min-w-full text-sm"
+                                    data-testid="balance-sheet-import-table"
+                                >
+                                    <thead className="bg-muted/50">
+                                        <tr>
+                                            <th className="px-3 py-2 text-left font-medium">
+                                                Period
+                                            </th>
+                                            <th className="px-3 py-2 text-right font-medium">
+                                                Assets
+                                            </th>
+                                            <th className="px-3 py-2 text-right font-medium">
+                                                Liabilities
+                                            </th>
+                                            <th className="px-3 py-2 text-right font-medium">
+                                                Equity
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {balanceSheetSnapshots.map(
+                                            (snapshot) => (
+                                                <tr
+                                                    key={snapshot.period}
+                                                    data-testid={`balance-sheet-row-${snapshot.period}`}
+                                                    className="border-t"
+                                                >
+                                                    <td className="px-3 py-2 font-medium">
+                                                        {snapshot.period}
+                                                    </td>
+                                                    <td
+                                                        className="px-3 py-2 text-right"
+                                                        data-testid={`assets-${snapshot.period}`}
+                                                    >
+                                                        {formatCad(
+                                                            snapshot.assets_cad,
+                                                        )}
+                                                    </td>
+                                                    <td
+                                                        className="px-3 py-2 text-right"
+                                                        data-testid={`liabilities-${snapshot.period}`}
+                                                    >
+                                                        {formatCad(
+                                                            snapshot.liabilities_cad,
+                                                        )}
+                                                    </td>
+                                                    <td
+                                                        className="px-3 py-2 text-right"
+                                                        data-testid={`equity-${snapshot.period}`}
+                                                    >
+                                                        {formatCad(
+                                                            snapshot.equity_cad,
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ),
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         )}
                     </CardContent>

@@ -6,6 +6,7 @@ import TransactionController from './TransactionController'
 import IncomeController from './IncomeController'
 import ReconciliationController from './ReconciliationController'
 import BalanceSheetController from './BalanceSheetController'
+import BalanceSheetImportController from './BalanceSheetImportController'
 import TransactionImportController from './TransactionImportController'
 import ExchangeRateController from './ExchangeRateController'
 import ExchangeRateImportController from './ExchangeRateImportController'
@@ -23,6 +24,7 @@ const Controllers = {
     IncomeController: Object.assign(IncomeController, IncomeController),
     ReconciliationController: Object.assign(ReconciliationController, ReconciliationController),
     BalanceSheetController: Object.assign(BalanceSheetController, BalanceSheetController),
+    BalanceSheetImportController: Object.assign(BalanceSheetImportController, BalanceSheetImportController),
     TransactionImportController: Object.assign(TransactionImportController, TransactionImportController),
     ExchangeRateController: Object.assign(ExchangeRateController, ExchangeRateController),
     ExchangeRateImportController: Object.assign(ExchangeRateImportController, ExchangeRateImportController),

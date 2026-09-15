@@ -160,3 +160,59 @@ showForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 })
 
 show.form = showForm
+
+/**
+* @see \App\Http\Controllers\BalanceSheetImportController::importMethod
+* @see app/Http/Controllers/BalanceSheetImportController.php:18
+* @route '/api/balance-sheet/import'
+*/
+export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: importMethod.url(options),
+    method: 'post',
+})
+
+importMethod.definition = {
+    methods: ["post"],
+    url: '/api/balance-sheet/import',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\BalanceSheetImportController::importMethod
+* @see app/Http/Controllers/BalanceSheetImportController.php:18
+* @route '/api/balance-sheet/import'
+*/
+importMethod.url = (options?: RouteQueryOptions) => {
+    return importMethod.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\BalanceSheetImportController::importMethod
+* @see app/Http/Controllers/BalanceSheetImportController.php:18
+* @route '/api/balance-sheet/import'
+*/
+importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: importMethod.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\BalanceSheetImportController::importMethod
+* @see app/Http/Controllers/BalanceSheetImportController.php:18
+* @route '/api/balance-sheet/import'
+*/
+const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: importMethod.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\BalanceSheetImportController::importMethod
+* @see app/Http/Controllers/BalanceSheetImportController.php:18
+* @route '/api/balance-sheet/import'
+*/
+importMethodForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: importMethod.url(options),
+    method: 'post',
+})
+
+importMethod.form = importMethodForm

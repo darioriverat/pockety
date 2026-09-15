@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountImportController;
 use App\Http\Controllers\BalanceSheetController;
+use App\Http\Controllers\BalanceSheetImportController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExchangeRateController;
@@ -69,6 +70,8 @@ Route::get('/periods/{period}/reconciliation', [ReconciliationController::class,
 Route::get('/balance-sheet/time-series', [BalanceSheetController::class, 'timeSeries'])->name('balance-sheet.time-series');
 Route::get('/balance-sheet', [BalanceSheetController::class, 'show'])->name('balance-sheet.show');
 Route::get('/periods/{period}/balance-sheet', [BalanceSheetController::class, 'show'])->name('periods.balance-sheet');
+Route::post('/balance-sheet/import', [BalanceSheetImportController::class, 'import'])->name('balance-sheet.import');
+Route::get('/balance-sheet/import/statistics', [BalanceSheetImportController::class, 'statistics'])->name('balance-sheet.import.statistics');
 
 // Transaction Import API
 Route::post('/transactions/import', [TransactionImportController::class, 'import'])->name('transactions.import');

@@ -756,6 +756,77 @@ HTML;
 
         return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
     })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/import-balance-sheet-history', function () {
+        $service = app(\App\Services\BalanceSheetImportService::class);
+        $result = $service->importFromDefaultPath();
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-balance-sheet-import-ui', function () {
+        $service = app(\App\Services\BalanceSheetImportService::class);
+        $stats = $service->getImportStatistics();
+        $formatCad = fn (float $value): string => '$'.number_format($value, 2);
+
+        $rows = '';
+        foreach ($stats['snapshots'] as $snapshot) {
+            $period = e($snapshot['period']);
+            $assets = e($formatCad((float) $snapshot['assets_cad']));
+            $liabilities = e($formatCad((float) $snapshot['liabilities_cad']));
+            $equity = e($formatCad((float) $snapshot['equity_cad']));
+            $rows .= "<tr data-testid=\"balance-sheet-row-{$period}\">"
+                ."<td>{$period}</td>"
+                ."<td data-testid=\"assets-{$period}\">{$assets}</td>"
+                ."<td data-testid=\"liabilities-{$period}\">{$liabilities}</td>"
+                ."<td data-testid=\"equity-{$period}\">{$equity}</td>"
+                .'</tr>';
+        }
+
+        $total = (int) $stats['total'];
+        $min = e((string) ($stats['periods_covered']['min'] ?? '—'));
+        $max = e((string) ($stats['periods_covered']['max'] ?? '—'));
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Balance Sheet History Import Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; display: inline-block; margin-bottom: 1.5rem; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat .value { font-size: 1.35rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1>Import Balance Sheet History</h1>
+  <p class="meta">Source: estado_financiero_2025_2026.json ({$min} → {$max})</p>
+  <div class="stat">
+    <strong>Periods imported</strong>
+    <span class="value" data-testid="balance-sheet-total-periods">{$total}</span>
+  </div>
+  <table data-testid="balance-sheet-import-table">
+    <thead><tr><th>Period</th><th>Assets</th><th>Liabilities</th><th>Equity</th></tr></thead>
+    <tbody>{$rows}</tbody>
+  </table>
+  <p class="nav"><a href="/import">Open live Import page</a></p>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
 }
 
 require __DIR__.'/settings.php';

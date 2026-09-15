@@ -818,7 +818,7 @@
             "Step 5: Verify balance sheet data for 21 periods is imported",
             "Step 6: Verify Assets, Liabilities, Equity values match source"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
