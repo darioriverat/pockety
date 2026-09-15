@@ -640,7 +640,7 @@
             "Step 5: Save",
             "Step 6: Verify budget is saved for C001 in period 202501"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -652,7 +652,7 @@
             "Step 4: Verify actual spending shows CAD 750.00",
             "Step 5: Verify actual is computed by summing transactions, not stored"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -664,7 +664,7 @@
             "Step 4: Verify variance = actual - budget = -50.00 (under budget)",
             "Step 5: Verify percentage = (actual / budget) * 100 = 93.75%"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -677,7 +677,7 @@
             "Step 5: Verify variance = +100.00",
             "Step 6: Verify percentage = 112.5%"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -689,7 +689,7 @@
             "Step 4: Verify actuals are converted using period exchange rates",
             "Step 5: Verify total actual is in CAD equivalent"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",

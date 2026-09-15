@@ -14,6 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('categories', 'categories')->name('categories');
     Route::inertia('transactions', 'transactions')->name('transactions');
     Route::inertia('exchange-rates', 'exchange-rates')->name('exchange-rates');
+    Route::inertia('budgets', 'budgets')->name('budgets');
     Route::inertia('import', 'import')->name('import');
 });
 
@@ -175,7 +176,8 @@ if (app()->environment('local')) {
         $filter = request()->query('grep');
         $cwd = base_path();
         $grep = $filter ? ' --grep='.escapeshellarg($filter) : '';
-        $command = 'export HOME=/tmp && cd '.escapeshellarg($cwd).' && PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080 npx playwright test'.$grep.' 2>&1';
+        $baseUrl = getenv('PLAYWRIGHT_BASE_URL') ?: 'http://host.docker.internal:8080';
+        $command = 'export HOME=/tmp && cd '.escapeshellarg($cwd).' && PLAYWRIGHT_BASE_URL='.escapeshellarg($baseUrl).' npx playwright test'.$grep.' 2>&1';
         $output = [];
         $exitCode = 0;
         exec($command, $output, $exitCode);
@@ -249,6 +251,101 @@ if (app()->environment('local')) {
   <div class="grid">{$assetHtml}</div>
   <h2>Liabilities</h2>
   <div class="grid">{$liabilityHtml}</div>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-budgets-ui', function () {
+        $period = request()->query('period', '202501');
+        $service = app(\App\Services\BudgetService::class);
+        $report = $service->getBudgetVsActualReport($period);
+        $rowsWithBudget = array_values(array_filter(
+            $report['rows'],
+            fn ($row) => $row['budget_cad'] !== null || $row['actual_cad'] > 0
+        ));
+
+        $formatCad = fn (?float $value): string => $value === null
+            ? '—'
+            : '$'.number_format($value, 2);
+
+        $rowHtml = '';
+        foreach ($rowsWithBudget as $row) {
+            $code = e($row['category_code']);
+            $name = e($row['category_name_es']);
+            $budget = e($formatCad($row['budget_cad']));
+            $actual = e($formatCad($row['actual_cad']));
+            $variance = e($formatCad($row['variance_cad']));
+            $pct = $row['percentage'] !== null ? e(number_format($row['percentage'], 2).'%') : '—';
+            $status = $row['budget_cad'] === null
+                ? 'No budget'
+                : ($row['is_over_budget'] ? 'Over budget' : 'Under budget');
+            $overClass = $row['is_over_budget'] ? ' over' : '';
+
+            $rowHtml .= "<tr class=\"{$overClass}\" data-testid=\"budget-row-{$code}\" data-over-budget=\""
+                .($row['is_over_budget'] ? 'true' : 'false')."\">"
+                ."<td>{$code} {$name}</td>"
+                ."<td>{$budget}</td>"
+                ."<td>{$actual}</td>"
+                ."<td>{$variance}</td>"
+                ."<td>{$pct}</td>"
+                ."<td>{$status}</td>"
+                .'</tr>';
+        }
+
+        $totalBudget = e($formatCad($report['totals']['budget_cad']));
+        $totalActual = e($formatCad($report['totals']['actual_cad']));
+        $totalVariance = e($formatCad($report['totals']['variance_cad']));
+        $periodLabel = e($period);
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Budgets Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 140px; }
+    .stat strong { display: block; font-size: 0.8rem; color: #78716c; text-transform: uppercase; }
+    .stat span { font-size: 1.4rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr.over { background: #fef2f2; }
+    .nav { margin-top: 1.5rem; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1>Budgets</h1>
+  <p class="meta">Budget vs Actual verification for period {$periodLabel}</p>
+  <div class="summary">
+    <div class="stat" data-testid="budget-total"><strong>Total Budget</strong><span>{$totalBudget}</span></div>
+    <div class="stat" data-testid="actual-total"><strong>Total Actual</strong><span>{$totalActual}</span></div>
+    <div class="stat" data-testid="variance-total"><strong>Variance</strong><span>{$totalVariance}</span></div>
+  </div>
+  <table data-testid="budget-vs-actual-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Budget</th>
+        <th>Actual</th>
+        <th>Variance</th>
+        <th>%</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {$rowHtml}
+    </tbody>
+  </table>
+  <p class="nav"><a href="/budgets">Open live Budgets page</a></p>
 </body>
 </html>
 HTML;

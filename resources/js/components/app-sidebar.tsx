@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Tags, Receipt, Upload, Landmark, ScaleIcon, Banknote, DollarSign } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Tags, Receipt, Upload, Landmark, ScaleIcon, Banknote, DollarSign, PiggyBank } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -46,6 +46,11 @@ const mainNavItems: NavItem[] = [
         title: 'Transactions',
         href: '/transactions',
         icon: Receipt,
+    },
+    {
+        title: 'Budgets',
+        href: '/budgets',
+        icon: PiggyBank,
     },
     {
         title: 'Exchange Rates',

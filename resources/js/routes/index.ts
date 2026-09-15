@@ -868,6 +868,87 @@ exchangeRates.form = exchangeRatesForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/budgets'
+*/
+export const budgets = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: budgets.url(options),
+    method: 'get',
+})
+
+budgets.definition = {
+    methods: ["get","head"],
+    url: '/budgets',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/budgets'
+*/
+budgets.url = (options?: RouteQueryOptions) => {
+    return budgets.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/budgets'
+*/
+budgets.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: budgets.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/budgets'
+*/
+budgets.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: budgets.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/budgets'
+*/
+const budgetsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: budgets.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/budgets'
+*/
+budgetsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: budgets.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/budgets'
+*/
+budgetsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: budgets.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+budgets.form = budgetsForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

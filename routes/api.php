@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountImportController;
+use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExchangeRateController;
 use App\Http\Controllers\ExchangeRateImportController;
@@ -73,3 +74,8 @@ Route::get('/exchange-rates/show', [ExchangeRateController::class, 'show'])->nam
 Route::post('/exchange-rates', [ExchangeRateController::class, 'store'])->name('exchange-rates.store');
 Route::post('/exchange-rates/import', [ExchangeRateImportController::class, 'import'])->name('exchange-rates.import');
 Route::get('/exchange-rates/import/statistics', [ExchangeRateImportController::class, 'statistics'])->name('exchange-rates.import.statistics');
+
+// Budgets API
+Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
+Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
+Route::get('/budgets/report', [BudgetController::class, 'report'])->name('budgets.report');

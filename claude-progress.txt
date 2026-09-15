@@ -2526,3 +2526,67 @@ NEXT SESSION
 3. Fixed assets tracking (#52-56)
 4. Reports/exports (PDF, CSV)
 5. Continue reducing remaining 119 tests
+
+Date: September 15, 2026 (Session 24)
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP unavailable this session (local SDK policy rejected tool calls)
+- Playwright browser automation working via /dev/browser-tests (host.docker.internal)
+- Unit tests via /dev/run-tests (Auth CSRF 419 when PHPUnit runs over HTTP is environmental)
+
+VERIFICATION (prior work)
+-------------------------
+- BudgetTest: 10/10 OK (new)
+- Frontend unit: 19/19 OK
+- Playwright dashboard smoke: passed
+- Playwright budgets features 57-61: passed
+
+ACCOMPLISHED
+------------
+1. Budget Management Backend:
+   - BudgetService (upsert, list, budget-vs-actual report)
+   - BudgetController (index, store, report)
+   - API: GET/POST /api/budgets, GET /api/budgets/report
+   - Actuals computed live from transactions (not stored)
+   - Multi-currency conversion via period exchange rates
+
+2. Budget Management Frontend:
+   - resources/js/pages/budgets.tsx
+   - Set Monthly Budget form (period, category, CAD amount)
+   - Budget vs Actual report table with over-budget highlighting
+   - Summary cards (total budget, actual, over-budget count)
+   - Sidebar nav link Budgets with PiggyBank icon
+
+3. Tests:
+   - tests/Feature/BudgetTest.php (10 tests)
+   - tests/browser/budgets.spec.ts (set budget, under/over, percentages)
+   - Fixed /dev/browser-tests base URL to host.docker.internal
+
+4. Verification artifacts:
+   - verification/session-24/ (budget-save.json, report, UI HTML)
+
+feature_list.json UPDATED (passes: true):
+- #57: User can set monthly budget for a specific category and period
+- #58: System calculates actual spending per category per period from transactions
+- #59: Budget vs actual report shows over/under budget calculation
+- #60: Budget vs actual report highlights over-budget categories
+- #61: Budget vs actual report converts multi-currency actuals to CAD equivalent
+
+CURRENT STATE
+-------------
+Tests passing: 61 of 175
+Remaining: 114
+Backend BudgetTest: 10/10
+Frontend unit: 19/19 OK
+Budgets: Complete and verified via Playwright
+
+NEXT SESSION
+------------
+1. Financial summary disbursements and operating expenses (#62+)
+2. Balance sheet time series and equity (#66+)
+3. Fixed assets tracking
+4. Reports/exports (PDF, CSV)
+5. Continue reducing remaining 114 tests
