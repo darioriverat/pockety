@@ -3033,3 +3033,45 @@ Priority features to implement:
 - Test #78: Budget vs actual report CSV export (similar to transactions export)
 - Test #79-onwards: Continue with functional features
 
+
+
+========================
+SESSION 32 - Sep 15, 2026
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Docker containers running
+- Development servers active
+
+VERIFICATION AND BUG FIXES
+-------------------------
+Before implementing new features ran verification tests:
+- Backend tests: Found 2 failing tests in SecurityTest
+- Root cause: phpunit.xml SESSION_DRIVER set to cookie (incompatible with withSession in tests)
+- FIX: Changed SESSION_DRIVER to array in phpunit.xml
+- Fixed PHPStan errors in TransactionController::export from previous session
+- All tests passing after fixes: Backend 131/131, Frontend 19/19
+- Browser verification: Dashboard and Categories pages working correctly
+
+FEATURE IMPLEMENTED
+-------------------
+Test #78: User can export budget vs actual report to CSV
+
+Backend: BudgetController::exportReport() method, route GET /api/budgets/report/export
+Frontend: Export to CSV button with Download icon on budgets page
+CSV includes: Category Code, Names (ES/EN), Budget, Actual, Variance, Percentage, Over Budget
+Totals row included at end
+Verified via browser and curl testing
+
+CURRENT STATE
+-------------
+Tests passing: 83 of 175 (1 new test completed this session)
+Remaining: 92 tests
+Backend tests: 131/131 passing
+Frontend tests: 19/19 passing
+
+Git Commit: 5868479 Implement and verify test #78: Budget vs actual CSV export
+
+NEXT SESSION: Test #79 (Period selector navigation) and beyond
