@@ -3719,3 +3719,56 @@ NEXT SESSION SHOULD:
 
 ================================================================================
 
+
+================================================================================
+SESSION 45 - September 15, 2026
+================================================================================
+
+OBJECTIVE: Implement test #93 - transaction amount must be positive
+
+VERIFICATION (pre-work):
+- Frontend unit tests: 38 passing
+- TransactionPaginationTest: 4/4 PASS
+- Playwright feature 5: PASS (core transactions regression)
+- App reachable at http://dev.pockety.com:8080 (HTTP 200)
+- Puppeteer MCP blocked by sandbox/auto-review this session;
+  verification done via Playwright screenshots
+
+IMPLEMENTATION - TEST #93:
+Feature: Transaction form validates that amount is a positive number
+
+Backend:
+- TransactionController store/update: amount_* rules min:0 → gt:0
+- Custom messages: "Amount must be a positive number."
+
+Frontend (transactions.tsx):
+- Client-side guard rejects NaN / <= 0 before submit
+- Surfaces amount_* API validation errors in formError
+- aria-invalid / aria-describedby on amount field
+
+Tests added:
+- TransactionValidationTest: +3 tests (negative, zero, positive decimal) → 7/7 PASS
+- tests/browser/transactions.spec.ts feature 93 PASS
+
+Browser verification:
+- Screenshots: verification/test-93-amount-positive/
+  01-negative-amount-rejected.png — error "Amount must be a positive number"
+  02-positive-amount-accepted.png — CA$100.50 created
+- Zero console errors in Playwright run
+
+Updated feature_list.json: marked amount-positive test as passes=true
+
+CURRENT STATUS:
+- Tests passing: 96 of 175 (up from 95)
+- Tests remaining: 79
+- Application in clean working state
+
+NEXT SESSION SHOULD:
+1. Pick next highest-priority feature with passes=false
+   (next: Transaction form validates that date is a valid date)
+2. Prefer /dev/run-tests and /dev/browser-tests when Docker socket is blocked
+3. Retry Puppeteer MCP; fall back to Playwright screenshots if blocked
+4. Verify with screenshots before flipping passes
+
+================================================================================
+
