@@ -3826,3 +3826,117 @@ NEXT SESSION SHOULD:
 
 ================================================================================
 
+
+
+================================================================================
+SESSION 47 - September 15, 2026
+================================================================================
+
+OBJECTIVE: Implement test #95 - Account name uniqueness validation
+
+SANDBOX CONSTRAINTS THIS SESSION:
+- Docker socket blocked (permission denied)
+- Puppeteer MCP blocked (sandbox restriction)
+- npx command blocked (not in allowed commands)
+- Backend API verified via curl successfully
+- Cannot run Playwright or phpunit directly
+
+VERIFICATION (pre-work):
+✅ App responding at http://dev.pockety.com:8080/
+✅ API endpoints working (categories, transactions)
+✅ Recent verification screenshots exist (Session 46, tests 93-94)
+⚠️ Cannot run test suite due to Docker socket block
+⚠️ Cannot run browser automation due to Puppeteer block
+
+IMPLEMENTATION - TEST #95:
+Feature: Account form validates that account name is unique
+
+Backend Implementation:
+1. AccountController.php:
+   - store(): Added 'unique:accounts,name' validation
+   - update(): Added 'unique:accounts,name,{id}' validation
+   - Custom error message: "An account with this name already exists."
+
+2. AccountValidationTest.php (NEW):
+   - test_account_name_must_be_unique() - Verifies duplicate rejection
+   - test_account_name_can_be_reused_after_deactivation() - Documents behavior
+   - test_account_can_update_with_same_name() - Verifies same name allowed
+   - test_account_cannot_update_to_existing_name() - Verifies duplicate rejection
+   - test_unique_account_names_are_accepted() - Verifies unique names work
+
+3. Frontend:
+   - NO CHANGES NEEDED
+   - accounts.tsx already handles API validation errors (lines 168-172, 512-516)
+   - Error message displays in dialog form
+
+4. Browser Tests:
+   - Added feature 95 test to tests/browser/accounts.spec.ts
+   - Covers all 5 test steps from feature_list.json
+
+API VERIFICATION (via curl):
+✅ POST /api/accounts with duplicate name → 422 error with message
+✅ POST /api/accounts with unique name → 201 created successfully
+✅ PATCH /api/accounts/{id} with same name → 200 updated successfully
+✅ PATCH /api/accounts/{id} with duplicate name → 422 error with message
+
+Test Results:
+- Duplicate "Test Account Unique" correctly rejected
+- Unique "Test Account Unique 2" correctly accepted
+- Update with same name correctly allowed
+- Update to duplicate name correctly rejected
+
+FILES CHANGED:
+- app/Http/Controllers/AccountController.php (modified)
+- tests/Feature/AccountValidationTest.php (new)
+- tests/browser/accounts.spec.ts (modified)
+- verification/test-95-account-name-unique/README.md (new)
+- verification/test-95-account-name-unique/verification-script.mjs (new)
+
+COMMITTED: 56575cb "Implement account name uniqueness validation (test #95) - backend verified"
+
+BROWSER VERIFICATION STATUS:
+⚠️ PENDING - Browser automation tools blocked in this session
+⚠️ feature_list.json NOT updated - awaiting browser verification
+⚠️ Test marked as "passes": false (unchanged)
+
+The implementation is complete and backend-verified. The feature works correctly
+at the API level. Frontend error handling is already in place. Browser test is
+written and ready to run.
+
+NEXT SESSION MUST:
+1. Run browser verification test:
+   npx playwright test tests/browser/accounts.spec.ts --grep "feature 95"
+2. Take screenshots of:
+   - Duplicate name rejection with error message
+   - Successful creation with unique name
+3. Save screenshots to verification/test-95-account-name-unique/
+4. ONLY THEN update feature_list.json to mark test #95 as "passes": true
+5. Commit the verification screenshots and feature_list.json update
+
+ALTERNATIVE if browser tools available:
+- Use Puppeteer or Playwright to verify UI
+- Follow same verification process as Sessions 45-46
+
+CURRENT STATUS:
+- Tests passing: 97 of 175 (unchanged from Session 46)
+- Test #95: Implementation complete, pending browser verification
+- Tests remaining: 78
+- Application in clean working state
+- All code committed
+
+IMPLEMENTATION QUALITY:
+✅ Backend validation working correctly
+✅ Comprehensive test coverage (5 test cases)
+✅ Custom error messages user-friendly
+✅ Update validation correctly excludes own record
+✅ Frontend already handles errors properly
+✅ Browser test written and ready
+✅ Code follows Laravel best practices
+
+NEXT FEATURE TO IMPLEMENT:
+Test #96: "Exchange rate form validates that rates are positive numbers"
+- Also requires browser verification
+- Same pattern as test #95: backend validation + frontend display
+
+================================================================================
+
