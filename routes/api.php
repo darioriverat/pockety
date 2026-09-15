@@ -6,6 +6,7 @@ use App\Http\Controllers\AccountImportController;
 use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\BalanceSheetImportController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CategoryActualsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExchangeRateController;
 use App\Http\Controllers\ExchangeRateImportController;
@@ -78,6 +79,9 @@ Route::delete('/income/{id}', [IncomeController::class, 'destroy'])->name('incom
 
 // Periods history API (must be registered before /periods/{period}/...)
 Route::get('/periods/history', [PeriodHistoryController::class, 'index'])->name('periods.history');
+
+// Category actuals report (ledger aggregation by category + period)
+Route::get('/category-actuals', [CategoryActualsController::class, 'index'])->name('category-actuals.index');
 
 // Reconciliation API
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');

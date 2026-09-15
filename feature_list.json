@@ -1029,7 +1029,7 @@
       "Step 5: Refresh report",
       "Step 6: Verify C001 total automatically includes new transaction"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1040,7 +1040,7 @@
       "Step 3: Verify categories with no transactions show 0.00 actual",
       "Step 4: Verify categories with transactions show correct totals"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

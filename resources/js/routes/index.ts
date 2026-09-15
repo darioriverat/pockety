@@ -1354,6 +1354,87 @@ periodsHistory.form = periodsHistoryForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/category-actuals'
+*/
+export const categoryActuals = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: categoryActuals.url(options),
+    method: 'get',
+})
+
+categoryActuals.definition = {
+    methods: ["get","head"],
+    url: '/category-actuals',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/category-actuals'
+*/
+categoryActuals.url = (options?: RouteQueryOptions) => {
+    return categoryActuals.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/category-actuals'
+*/
+categoryActuals.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: categoryActuals.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/category-actuals'
+*/
+categoryActuals.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: categoryActuals.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/category-actuals'
+*/
+const categoryActualsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: categoryActuals.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/category-actuals'
+*/
+categoryActualsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: categoryActuals.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/category-actuals'
+*/
+categoryActualsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: categoryActuals.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+categoryActuals.form = categoryActualsForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

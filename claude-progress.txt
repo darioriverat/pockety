@@ -3205,3 +3205,45 @@ NEXT SESSION
 ------------
 - Test #86: Category actuals report aggregates by category and period
 - Prefer /dev/browser-tests for UI verification when host Chrome/Puppeteer blocked
+
+========================
+SESSION 36 - Sep 15, 2026
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP still blocked in Local SDK; used /dev/browser-tests + Playwright screenshots
+- Helpers: /dev/build-assets, /dev/run-tests, /dev/frontend-tests, /dev/browser-tests
+
+VERIFICATION
+------------
+- CategoryActualsTest: 8/8
+- Frontend unit suite: 31/31 (includes category-actuals.test.tsx)
+- Playwright feature 86: passed
+- Screenshots: verification/test-86-category-actuals/
+  - Initial C001 = CAD 150.25 (2 tx)
+  - After refresh C001 = CAD 192.75 (3 tx)
+  - 45 active categories; C040 excluded; zeros for empty categories
+
+FEATURES COMPLETED
+------------------
+Test #86: Category actuals aggregation — passes:true
+Test #87: All 45 active categories in report — passes:true (same UI verification)
+
+Implementation:
+- Domain: CategoryActualEntity + CategoryActualCollection + CategoryActualsServiceInterface
+- Service/Controller: CategoryActualsService, CategoryActualsController
+- API: GET /api/category-actuals?period=YYYYMM
+- Page: /category-actuals + sidebar link + Refresh button
+- Dev HTML: /dev/verify-category-actuals-ui
+
+CURRENT STATE
+-------------
+Tests passing: 89 of 175 (2 new this session)
+Remaining: 86 tests
+
+NEXT SESSION
+------------
+- Test #88: Click category in actuals report to see detailed transactions
+  (links already point to /transactions?period=&category= — need filtered detail view)

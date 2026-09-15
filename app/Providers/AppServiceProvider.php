@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Domain\Services\Contracts\IncomeServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Services\AccountService;
+use App\Services\CategoryActualsService;
 use App\Services\CategoryService;
 use App\Services\IncomeService;
 use App\Services\PeriodHistoryService;
@@ -49,6 +51,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             PeriodHistoryServiceInterface::class,
             PeriodHistoryService::class
+        );
+
+        $this->app->bind(
+            CategoryActualsServiceInterface::class,
+            CategoryActualsService::class
         );
     }
 

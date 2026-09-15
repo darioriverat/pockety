@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\VerifyCsrfToken;
@@ -34,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('balance-sheet/time-series', 'balance-sheet-time-series')->name('balance-sheet-time-series');
     Route::inertia('fixed-assets', 'fixed-assets')->name('fixed-assets');
     Route::inertia('periods/history', 'periods-history')->name('periods-history');
+    Route::inertia('category-actuals', 'category-actuals')->name('category-actuals');
     Route::inertia('import', 'import')->name('import');
 });
 
@@ -905,6 +907,100 @@ HTML;
     <tbody>{$rows}</tbody>
   </table>
   <p class="nav"><a href="/periods/history">Open live Periods History page</a></p>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-category-actuals-ui', function () {
+        $period = request()->query('period', '202501');
+        if (! is_string($period) || ! preg_match('/^\d{6}$/', $period)) {
+            $period = '202501';
+        }
+
+        $service = app(CategoryActualsServiceInterface::class);
+        $report = $service->getReport($period);
+        $formatCad = fn (float $value): string => '$'.number_format($value, 2);
+
+        $rows = '';
+        foreach ($report->all() as $entity) {
+            $code = e($entity->categoryCode);
+            $name = e($entity->categoryNameEs);
+            $nameEn = e($entity->categoryNameEn);
+            $tx = e((string) $entity->transactionCount);
+            $amount = e($formatCad($entity->actualCad));
+            $rows .= "<tr data-testid=\"category-actual-row-{$code}\" data-category-code=\"{$code}\">"
+                ."<td><a data-testid=\"category-actual-link-{$code}\" href=\"/transactions?period={$period}&category={$code}\">{$code}</a></td>"
+                ."<td>{$name} <span style=\"color:#78716c\">{$nameEn}</span></td>"
+                ."<td data-testid=\"category-actual-tx-{$code}\">{$tx}</td>"
+                ."<td data-testid=\"category-actual-amount-{$code}\">{$amount}</td>"
+                ."</tr>\n";
+        }
+
+        $count = $report->count();
+        $totalActual = round(array_sum(array_map(
+            static fn ($entity) => $entity->actualCad,
+            $report->all()
+        )), 2);
+        $totalTx = array_sum(array_map(
+            static fn ($entity) => $entity->transactionCount,
+            $report->all()
+        ));
+        $totalActualFormatted = e($formatCad($totalActual));
+        $periodLabel = e($period);
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Category Actuals Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 160px; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat .value { font-size: 1.35rem; display: block; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 1.5rem; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    td:nth-child(3), td:nth-child(4), th:nth-child(3), th:nth-child(4) { text-align: right; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1 data-testid="category-actuals-heading">Category Actuals</h1>
+  <p class="meta">Verification for period {$periodLabel} — ledger aggregation by category</p>
+  <div class="summary" data-testid="category-actuals-summary">
+    <div class="stat">
+      <strong>Categories</strong>
+      <span class="value" data-testid="category-actuals-count">{$count}</span>
+    </div>
+    <div class="stat">
+      <strong>Total Actual</strong>
+      <span class="value" data-testid="category-actuals-total">{$totalActualFormatted}</span>
+    </div>
+    <div class="stat">
+      <strong>Transactions</strong>
+      <span class="value" data-testid="category-actuals-tx-total">{$totalTx}</span>
+    </div>
+  </div>
+  <table data-testid="category-actuals-table">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Category</th>
+        <th>Transactions</th>
+        <th>Actual (CAD)</th>
+      </tr>
+    </thead>
+    <tbody>{$rows}</tbody>
+  </table>
+  <p class="nav"><a href="/category-actuals">Open live Category Actuals page</a></p>
 </body>
 </html>
 HTML;
