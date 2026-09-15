@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::inertia('accounts', 'accounts')->name('accounts');
     Route::inertia('reconciliation', 'reconciliation')->name('reconciliation');
     Route::inertia('categories', 'categories')->name('categories');
