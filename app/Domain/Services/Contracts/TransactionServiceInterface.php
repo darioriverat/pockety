@@ -9,10 +9,18 @@ interface TransactionServiceInterface
     /**
      * Get all transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool}  $filters  Optional filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool, search?: string}  $filters  Optional filters
      * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array;
+
+    /**
+     * Get a paginated page of transactions with optional filtering.
+     *
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool, search?: string}  $filters
+     * @return array{data: TransactionEntity[], total: int, page: int, per_page: int, last_page: int}
+     */
+    public function getPaginated(array $filters = [], int $page = 1, int $perPage = 50): array;
 
     /**
      * Get a transaction by its ID.

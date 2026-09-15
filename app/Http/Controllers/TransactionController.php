@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Services\Contracts\TransactionServiceInterface;
+use App\Services\TransactionService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -16,10 +18,11 @@ class TransactionController extends Controller
     ) {}
 
     /**
-     * Get all transactions with optional filtering.
+     * Get all transactions with optional filtering and pagination.
      *
      * GET /api/transactions
-     * Query params: period, category_id, category (code), account_id, quincena, currency, is_recurring
+     * Query params: period, category_id, category (code), account_id, quincena, currency,
+     *               is_recurring, search, page, per_page
      */
     public function index(Request $request): JsonResponse
     {
@@ -31,7 +34,37 @@ class TransactionController extends Controller
             'quincena',
             'currency',
             'is_recurring',
+            'search',
         ]);
+
+        $wantsPagination = $request->has('page') || $request->has('per_page');
+
+        if ($wantsPagination) {
+            $validated = $request->validate([
+                'page' => 'sometimes|integer|min:1',
+                'per_page' => ['sometimes', 'integer', Rule::in(TransactionService::ALLOWED_PER_PAGE)],
+            ]);
+
+            $page = (int) ($validated['page'] ?? 1);
+            $perPage = (int) ($validated['per_page'] ?? TransactionService::DEFAULT_PER_PAGE);
+
+            $result = $this->service->getPaginated($filters, $page, $perPage);
+            $data = array_map(fn ($entity) => $entity->toArray(), $result['data']);
+
+            return response()->json([
+                'data' => $data,
+                'links' => [
+                    'self' => route('transactions.index'),
+                ],
+                'meta' => [
+                    'total' => $result['total'],
+                    'page' => $result['page'],
+                    'per_page' => $result['per_page'],
+                    'last_page' => $result['last_page'],
+                    'filters' => $filters,
+                ],
+            ]);
+        }
 
         $transactions = $this->service->getAll($filters);
 

@@ -5,22 +5,92 @@ namespace App\Services;
 use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class TransactionService implements TransactionServiceInterface
 {
+    public const ALLOWED_PER_PAGE = [25, 50, 100];
+
+    public const DEFAULT_PER_PAGE = 50;
+
     /**
      * Get all transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool, search?: string}  $filters
      * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array
     {
+        $query = $this->buildFilteredQuery($filters);
+
+        if ($query === null) {
+            return [];
+        }
+
+        $transactions = $query->orderBy('date', 'desc')->orderBy('id', 'desc')->get();
+
+        return $transactions->map(function ($transaction) {
+            return $this->toEntity($transaction);
+        })->toArray();
+    }
+
+    /**
+     * Get a paginated page of transactions with optional filtering.
+     *
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool, search?: string}  $filters
+     * @return array{data: TransactionEntity[], total: int, page: int, per_page: int, last_page: int}
+     */
+    public function getPaginated(array $filters = [], int $page = 1, int $perPage = self::DEFAULT_PER_PAGE): array
+    {
+        $page = max(1, $page);
+        if (! in_array($perPage, self::ALLOWED_PER_PAGE, true)) {
+            $perPage = self::DEFAULT_PER_PAGE;
+        }
+
+        $query = $this->buildFilteredQuery($filters);
+
+        if ($query === null) {
+            return [
+                'data' => [],
+                'total' => 0,
+                'page' => $page,
+                'per_page' => $perPage,
+                'last_page' => 1,
+            ];
+        }
+
+        $total = (clone $query)->count();
+        $lastPage = max(1, (int) ceil($total / $perPage));
+        if ($page > $lastPage) {
+            $page = $lastPage;
+        }
+
+        $transactions = $query
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->forPage($page, $perPage)
+            ->get();
+
+        return [
+            'data' => $transactions->map(fn ($transaction) => $this->toEntity($transaction))->toArray(),
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+            'last_page' => $lastPage,
+        ];
+    }
+
+    /**
+     * Build a filtered transactions query, or null when filters guarantee no results.
+     *
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool, search?: string}  $filters
+     */
+    private function buildFilteredQuery(array $filters): ?Builder
+    {
         $query = Transaction::with(['category', 'account']);
 
-        // Apply filters
-        if (isset($filters['period'])) {
+        if (isset($filters['period']) && $filters['period'] !== '') {
             $query->forPeriod($filters['period']);
         }
 
@@ -32,33 +102,43 @@ class TransactionService implements TransactionServiceInterface
                 ->value('id');
 
             if ($categoryId === null) {
-                return [];
+                return null;
             }
 
             $query->forCategory((int) $categoryId);
         }
 
-        if (isset($filters['account_id'])) {
+        if (isset($filters['account_id']) && $filters['account_id'] !== '') {
             $query->forAccount($filters['account_id']);
         }
 
-        if (isset($filters['quincena'])) {
+        if (isset($filters['quincena']) && $filters['quincena'] !== '') {
             $query->forQuincena($filters['quincena']);
         }
 
-        if (isset($filters['currency'])) {
+        if (isset($filters['currency']) && $filters['currency'] !== '') {
             $query->forCurrency(strtolower($filters['currency']));
         }
 
-        if (isset($filters['is_recurring'])) {
-            $query->where('is_recurring', (bool) $filters['is_recurring']);
+        if (isset($filters['is_recurring']) && $filters['is_recurring'] !== '') {
+            $query->where('is_recurring', filter_var($filters['is_recurring'], FILTER_VALIDATE_BOOLEAN));
         }
 
-        $transactions = $query->orderBy('date', 'desc')->get();
+        if (isset($filters['search']) && is_string($filters['search']) && trim($filters['search']) !== '') {
+            $search = trim($filters['search']);
+            $query->where(function (Builder $builder) use ($search) {
+                $builder
+                    ->where('comments', 'like', '%'.$search.'%')
+                    ->orWhereHas('category', function (Builder $categoryQuery) use ($search) {
+                        $categoryQuery
+                            ->where('code', 'like', '%'.$search.'%')
+                            ->orWhere('name_en', 'like', '%'.$search.'%')
+                            ->orWhere('name_es', 'like', '%'.$search.'%');
+                    });
+            });
+        }
 
-        return $transactions->map(function ($transaction) {
-            return $this->toEntity($transaction);
-        })->toArray();
+        return $query;
     }
 
     /**

@@ -32,9 +32,20 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { usePeriod } from '@/hooks/use-period';
 import { formatPeriod, generatePeriods, isPeriodFormatValid } from '@/lib/periods';
-import { Plus, Pencil, Trash2, Filter, X, Download } from 'lucide-react';
+import {
+    ChevronLeft,
+    ChevronRight,
+    Plus,
+    Pencil,
+    Trash2,
+    Filter,
+    X,
+    Download,
+} from 'lucide-react';
 
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
+const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
+const DEFAULT_PAGE_SIZE = 50;
 
 interface Category {
     id: number;
@@ -76,7 +87,17 @@ interface ApiResponse {
     };
     meta: {
         total: number;
+        page?: number;
+        per_page?: number;
+        last_page?: number;
     };
+}
+
+interface PaginationMeta {
+    total: number;
+    page: number;
+    per_page: number;
+    last_page: number;
 }
 
 interface TransactionFormData {
@@ -112,6 +133,14 @@ export default function Transactions() {
     const [formError, setFormError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [page, setPage] = useState(1);
+    const [perPage, setPerPage] = useState<number>(DEFAULT_PAGE_SIZE);
+    const [pagination, setPagination] = useState<PaginationMeta>({
+        total: 0,
+        page: 1,
+        per_page: DEFAULT_PAGE_SIZE,
+        last_page: 1,
+    });
     const urlFiltersApplied = useRef(false);
     const [detailCategoryCode, setDetailCategoryCode] = useState<string | null>(
         null,
@@ -196,10 +225,13 @@ export default function Transactions() {
     }, [categories, setPeriod]);
 
     useEffect(() => {
-        fetchTransactions();
         fetchCategories();
         fetchAccounts();
-    }, [filters]);
+    }, []);
+
+    useEffect(() => {
+        fetchTransactions();
+    }, [filters, page, perPage]);
 
     const fetchAccounts = async () => {
         try {
@@ -227,32 +259,28 @@ export default function Transactions() {
         try {
             setLoading(true);
 
-            // Build query parameters from filters
             const params = new URLSearchParams();
             if (filters.period) params.append('period', filters.period);
             if (filters.category_id) params.append('category_id', filters.category_id);
             if (filters.quincena) params.append('quincena', filters.quincena);
             if (filters.currency) params.append('currency', filters.currency);
             if (filters.is_recurring) params.append('is_recurring', filters.is_recurring);
+            if (filters.search.trim()) params.append('search', filters.search.trim());
+            params.append('page', page.toString());
+            params.append('per_page', perPage.toString());
 
-            const url = `/api/transactions${params.toString() ? '?' + params.toString() : ''}`;
+            const url = `/api/transactions?${params.toString()}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch transactions');
             const data: ApiResponse = await response.json();
 
-            // Apply client-side search filter for comments
-            let filteredData = data.data;
-            if (filters.search) {
-                const searchLower = filters.search.toLowerCase();
-                filteredData = data.data.filter(t =>
-                    t.comments?.toLowerCase().includes(searchLower) ||
-                    t.category.name_en.toLowerCase().includes(searchLower) ||
-                    t.category.name_es.toLowerCase().includes(searchLower) ||
-                    t.category.code.toLowerCase().includes(searchLower)
-                );
-            }
-
-            setTransactions(filteredData);
+            setTransactions(data.data);
+            setPagination({
+                total: data.meta.total,
+                page: data.meta.page ?? page,
+                per_page: data.meta.per_page ?? perPage,
+                last_page: data.meta.last_page ?? 1,
+            });
             setError(null);
         } catch (err) {
             setError(
@@ -261,6 +289,11 @@ export default function Transactions() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const updateFilters = (next: FilterState) => {
+        setPage(1);
+        setFilters(next);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -422,7 +455,7 @@ export default function Transactions() {
 
     const clearFilters = () => {
         setDetailCategoryCode(null);
-        setFilters({
+        updateFilters({
             period,
             category_id: '',
             quincena: '',
@@ -431,6 +464,8 @@ export default function Transactions() {
             search: '',
         });
     };
+
+    const showPaginationControls = pagination.total > 50;
 
     const hasActiveFilters =
         filters.category_id !== '' ||
@@ -827,8 +862,9 @@ export default function Transactions() {
                                 className="text-sm text-muted-foreground"
                                 data-testid="category-detail-count"
                             >
-                                Showing {transactions.length} transaction
-                                {transactions.length === 1 ? '' : 's'}
+                                Showing {transactions.length} of{' '}
+                                {pagination.total} transaction
+                                {pagination.total === 1 ? '' : 's'}
                             </p>
                             <Button variant="outline" size="sm" asChild>
                                 <Link
@@ -870,7 +906,7 @@ export default function Transactions() {
                                     value={filters.period || period}
                                     onValueChange={(value) => {
                                         setPeriod(value);
-                                        setFilters({
+                                        updateFilters({
                                             ...filters,
                                             period: value,
                                         });
@@ -902,7 +938,7 @@ export default function Transactions() {
                                     onValueChange={(value) => {
                                         const nextId =
                                             value === 'all' ? '' : value;
-                                        setFilters({
+                                        updateFilters({
                                             ...filters,
                                             category_id: nextId,
                                         });
@@ -945,7 +981,7 @@ export default function Transactions() {
                                 <Select
                                     value={filters.quincena || 'all'}
                                     onValueChange={(value) =>
-                                        setFilters({
+                                        updateFilters({
                                             ...filters,
                                             quincena:
                                                 value === 'all' ? '' : value,
@@ -968,7 +1004,7 @@ export default function Transactions() {
                                 <Select
                                     value={filters.currency || 'all'}
                                     onValueChange={(value) =>
-                                        setFilters({
+                                        updateFilters({
                                             ...filters,
                                             currency:
                                                 value === 'all' ? '' : value,
@@ -992,7 +1028,7 @@ export default function Transactions() {
                                 <Select
                                     value={filters.is_recurring || 'all'}
                                     onValueChange={(value) =>
-                                        setFilters({
+                                        updateFilters({
                                             ...filters,
                                             is_recurring:
                                                 value === 'all' ? '' : value,
@@ -1017,7 +1053,10 @@ export default function Transactions() {
                                     placeholder="Search comments..."
                                     value={filters.search}
                                     onChange={(e) =>
-                                        setFilters({ ...filters, search: e.target.value })
+                                        updateFilters({
+                                            ...filters,
+                                            search: e.target.value,
+                                        })
                                     }
                                 />
                             </div>
@@ -1053,13 +1092,98 @@ export default function Transactions() {
                     </div>
                 ) : (
                     <>
-                        <div className="mb-2">
+                        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
                             <p
                                 className="text-sm text-muted-foreground"
                                 data-testid="transactions-total"
                             >
-                                Total transactions: {transactions.length}
+                                Total transactions: {pagination.total}
                             </p>
+                            {showPaginationControls && (
+                                <div
+                                    className="flex flex-wrap items-center gap-3"
+                                    data-testid="pagination-controls"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="page-size"
+                                            className="text-sm text-muted-foreground"
+                                        >
+                                            Per page
+                                        </Label>
+                                        <Select
+                                            value={perPage.toString()}
+                                            onValueChange={(value) => {
+                                                setPage(1);
+                                                setPerPage(Number(value));
+                                            }}
+                                        >
+                                            <SelectTrigger
+                                                id="page-size"
+                                                className="w-[100px]"
+                                                data-testid="page-size-select"
+                                                aria-label="Page size"
+                                            >
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {PAGE_SIZE_OPTIONS.map(
+                                                    (size) => (
+                                                        <SelectItem
+                                                            key={size}
+                                                            value={size.toString()}
+                                                        >
+                                                            {size}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <p
+                                        className="text-sm text-muted-foreground"
+                                        data-testid="pagination-status"
+                                    >
+                                        Page {pagination.page} of{' '}
+                                        {pagination.last_page}
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={pagination.page <= 1}
+                                            onClick={() =>
+                                                setPage((current) =>
+                                                    Math.max(1, current - 1),
+                                                )
+                                            }
+                                            data-testid="pagination-prev"
+                                            aria-label="Previous page"
+                                        >
+                                            <ChevronLeft className="mr-1 h-4 w-4" />
+                                            Previous
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={
+                                                pagination.page >=
+                                                pagination.last_page
+                                            }
+                                            onClick={() =>
+                                                setPage((current) =>
+                                                    current + 1,
+                                                )
+                                            }
+                                            data-testid="pagination-next"
+                                            aria-label="Next page"
+                                        >
+                                            Next
+                                            <ChevronRight className="ml-1 h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div

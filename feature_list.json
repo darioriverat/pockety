@@ -1111,7 +1111,7 @@
       "Step 5: Verify next set of transactions is displayed",
       "Step 6: Verify page number and total pages are shown"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
