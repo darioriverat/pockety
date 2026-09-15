@@ -981,7 +981,7 @@
       "Step 4: Verify page updates to show data for selected period",
       "Step 5: Verify period selection persists across page navigation"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

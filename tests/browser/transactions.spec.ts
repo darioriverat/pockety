@@ -13,6 +13,13 @@ async function openTransactionsPage(page: Page): Promise<void> {
 
     await expect(page).toHaveURL(/\/transactions$/);
     await expect(page.getByRole('heading', { name: 'Transactions' })).toBeVisible();
+
+    // Shared period defaults to January 2025; these tests use January 2026 fixtures.
+    await page.getByTestId('page-period-selector').click();
+    await page.getByRole('option', { name: 'January 2026', exact: true }).click();
+    await expect(page.getByTestId('page-period-selector')).toContainText(
+        'January 2026',
+    );
 }
 
 async function openAddTransactionDialog(page: Page): Promise<void> {

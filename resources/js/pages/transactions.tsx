@@ -30,6 +30,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { usePeriod } from '@/hooks/use-period';
+import { formatPeriod, generatePeriods } from '@/lib/periods';
 import { Plus, Pencil, Trash2, Filter, X, Download } from 'lucide-react';
 
 interface Category {
@@ -98,6 +100,8 @@ interface FilterState {
 }
 
 export default function Transactions() {
+    const { period, setPeriod } = usePeriod();
+    const periods = generatePeriods();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);
@@ -118,13 +122,19 @@ export default function Transactions() {
         debt_component: '',
     });
     const [filters, setFilters] = useState<FilterState>({
-        period: '',
+        period,
         category_id: '',
         quincena: '',
         currency: '',
         is_recurring: '',
         search: '',
     });
+
+    useEffect(() => {
+        setFilters((prev) =>
+            prev.period === period ? prev : { ...prev, period },
+        );
+    }, [period]);
 
     useEffect(() => {
         fetchTransactions();
@@ -331,7 +341,7 @@ export default function Transactions() {
 
     const clearFilters = () => {
         setFilters({
-            period: '',
+            period,
             category_id: '',
             quincena: '',
             currency: '',
@@ -340,7 +350,12 @@ export default function Transactions() {
         });
     };
 
-    const hasActiveFilters = Object.values(filters).some(v => v !== '');
+    const hasActiveFilters =
+        filters.category_id !== '' ||
+        filters.quincena !== '' ||
+        filters.currency !== '' ||
+        filters.is_recurring !== '' ||
+        filters.search !== '';
 
     return (
         <>
@@ -692,14 +707,33 @@ export default function Transactions() {
                         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-period">Period</Label>
-                                <Input
-                                    id="filter-period"
-                                    placeholder="202501"
-                                    value={filters.period}
-                                    onChange={(e) =>
-                                        setFilters({ ...filters, period: e.target.value })
-                                    }
-                                />
+                                <Select
+                                    value={filters.period || period}
+                                    onValueChange={(value) => {
+                                        setPeriod(value);
+                                        setFilters({
+                                            ...filters,
+                                            period: value,
+                                        });
+                                    }}
+                                >
+                                    <SelectTrigger
+                                        id="filter-period"
+                                        data-testid="page-period-selector"
+                                    >
+                                        <SelectValue placeholder="Select period" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {periods.map((item) => (
+                                            <SelectItem
+                                                key={item}
+                                                value={item}
+                                            >
+                                                {formatPeriod(item)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="grid gap-2">

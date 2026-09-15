@@ -3075,3 +3075,43 @@ Frontend tests: 19/19 passing
 Git Commit: 5868479 Implement and verify test #78: Budget vs actual CSV export
 
 NEXT SESSION: Test #79 (Period selector navigation) and beyond
+
+
+========================
+SESSION 33 - Sep 15, 2026
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Container-based unit and Playwright runs used for verification
+
+VERIFICATION
+------------
+- Frontend unit tests: 28/28 passing
+- Playwright period-selector.spec.ts: passed
+- Screenshots: period-selector-01/02/03 under verification directory
+  (Jan 2025 $100 -> Feb 2025 $250; persisted on Transactions)
+
+FEATURE IMPLEMENTED
+-------------------
+Test #82 (index 81): User can navigate to different periods using period selector
+
+- resources/js/lib/periods.ts — generatePeriods, formatPeriod, isValidPeriod
+- resources/js/hooks/use-period.tsx — localStorage key pockety.selectedPeriod
+- resources/js/components/period-selector.tsx — reusable Select
+- Global PeriodSelector in app-sidebar-header
+- Wired: financial-summary, balance-sheet, budgets, exchange-rates,
+  transactions, reconciliation
+- Header testid=period-selector; page testid=page-period-selector
+- Unit + Playwright coverage added
+
+CURRENT STATE
+-------------
+Tests passing: 84 of 175 (1 new this session)
+Remaining: 91 tests
+
+NEXT SESSION
+------------
+- Test #83: System validates period format as YYYYMM
+- Test #84: System validates quincena as Q1 or Q2 only

@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { usePeriod } from '@/hooks/use-period';
 import { ScaleIcon, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface CurrencyAmounts {
@@ -61,15 +62,9 @@ const formatCurrency = (value: number, currency: string): string => {
     }
 };
 
-const currentPeriod = (): string => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    return `${year}${month}`;
-};
-
 export default function Reconciliation() {
-    const [period, setPeriod] = useState<string>(currentPeriod());
+    const { period: sharedPeriod } = usePeriod();
+    const [period, setPeriod] = useState<string>(sharedPeriod);
     const [report, setReport] = useState<ReconciliationReport | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

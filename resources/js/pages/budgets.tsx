@@ -20,6 +20,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { usePeriod } from '@/hooks/use-period';
+import { formatPeriod, generatePeriods } from '@/lib/periods';
 import {
     CheckCircle,
     XCircle,
@@ -54,37 +56,6 @@ interface ReportTotals {
     variance_cad: number;
 }
 
-function generatePeriods(): string[] {
-    const periods: string[] = [];
-    for (let year = 2025; year <= 2026; year++) {
-        const maxMonth = year === 2026 ? 9 : 12;
-        for (let month = 1; month <= maxMonth; month++) {
-            periods.push(`${year}${month.toString().padStart(2, '0')}`);
-        }
-    }
-    return periods;
-}
-
-function formatPeriod(period: string): string {
-    const year = period.substring(0, 4);
-    const month = period.substring(4, 6);
-    const monthNames = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December',
-    ];
-    return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
-}
-
 function formatCad(value: number | null | undefined): string {
     if (value === null || value === undefined) {
         return '—';
@@ -97,7 +68,8 @@ function formatCad(value: number | null | undefined): string {
 
 export default function Budgets() {
     const periods = generatePeriods();
-    const [selectedPeriod, setSelectedPeriod] = useState<string>('202501');
+    const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
+        usePeriod();
     const [categories, setCategories] = useState<CategoryOption[]>([]);
     const [selectedCategoryCode, setSelectedCategoryCode] =
         useState<string>('');
@@ -295,7 +267,10 @@ export default function Budgets() {
                                         value={selectedPeriod}
                                         onValueChange={setSelectedPeriod}
                                     >
-                                        <SelectTrigger id="period">
+                                        <SelectTrigger
+                                            id="period"
+                                            data-testid="page-period-selector"
+                                        >
                                             <SelectValue placeholder="Select period" />
                                         </SelectTrigger>
                                         <SelectContent>
