@@ -85,7 +85,7 @@ test('feature 95: Account form validates that account name is unique', async ({
     // Step 1: Create account with name 'RBC Checking'
     await page.getByRole('button', { name: /Add Account/i }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText('Add Account')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Add Account' })).toBeVisible();
 
     await page.getByLabel('Account Name').fill('RBC Checking');
     await page.getByLabel('Account Type').click();
