@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TransactionController extends Controller
 {
@@ -186,7 +187,7 @@ class TransactionController extends Controller
      * GET /api/transactions/export
      * Query params: period, category_id, account_id, quincena, currency, is_recurring
      */
-    public function export(Request $request)
+    public function export(Request $request): StreamedResponse
     {
         $filters = $request->only([
             'period',
@@ -209,6 +210,10 @@ class TransactionController extends Controller
         $callback = function () use ($transactions) {
             $file = fopen('php://output', 'w');
 
+            if ($file === false) {
+                return;
+            }
+
             // CSV header
             fputcsv($file, [
                 'Date',
@@ -230,13 +235,15 @@ class TransactionController extends Controller
             // CSV rows
             foreach ($transactions as $entity) {
                 $data = $entity->toArray();
+                $accountName = $entity->account !== null ? $entity->account['name'] : '';
+
                 fputcsv($file, [
                     $data['date'],
                     $data['period'],
                     $data['quincena'],
                     $data['category']['code'] ?? '',
                     $data['category']['name_en'] ?? '',
-                    $data['account'] ?? '',
+                    $accountName,
                     $data['amount_cad'] ?? '',
                     $data['amount_usd'] ?? '',
                     $data['amount_cop'] ?? '',

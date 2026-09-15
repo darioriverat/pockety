@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Services\BudgetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BudgetController extends Controller
 {
@@ -110,5 +111,77 @@ class BudgetController extends Controller
                 'currency' => 'CAD',
             ],
         ]);
+    }
+
+    /**
+     * Export budget vs actual report to CSV.
+     *
+     * GET /api/budgets/report/export
+     * Query params: period (required)
+     */
+    public function exportReport(Request $request): StreamedResponse
+    {
+        $validated = $request->validate([
+            'period' => 'required|string|size:6|regex:/^\d{6}$/',
+        ]);
+
+        $report = $this->budgetService->getBudgetVsActualReport($validated['period']);
+
+        $filename = 'budget_vs_actual_'.$validated['period'].'_'.date('Y-m-d').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ];
+
+        $callback = function () use ($report) {
+            $file = fopen('php://output', 'w');
+
+            if ($file === false) {
+                return;
+            }
+
+            // CSV header
+            fputcsv($file, [
+                'Category Code',
+                'Category Name (Spanish)',
+                'Category Name (English)',
+                'Budget (CAD)',
+                'Actual (CAD)',
+                'Variance (CAD)',
+                'Percentage (%)',
+                'Over Budget',
+            ]);
+
+            // CSV rows
+            foreach ($report['rows'] as $row) {
+                fputcsv($file, [
+                    $row['category_code'],
+                    $row['category_name_es'],
+                    $row['category_name_en'],
+                    $row['budget_cad'] !== null ? number_format($row['budget_cad'], 2, '.', '') : '',
+                    number_format($row['actual_cad'], 2, '.', ''),
+                    $row['variance_cad'] !== null ? number_format($row['variance_cad'], 2, '.', '') : '',
+                    $row['percentage'] !== null ? number_format($row['percentage'], 2, '.', '') : '',
+                    $row['is_over_budget'] ? 'Yes' : 'No',
+                ]);
+            }
+
+            // Add totals row
+            fputcsv($file, [
+                'TOTAL',
+                '',
+                '',
+                number_format($report['totals']['budget_cad'], 2, '.', ''),
+                number_format($report['totals']['actual_cad'], 2, '.', ''),
+                number_format($report['totals']['variance_cad'], 2, '.', ''),
+                '',
+                '',
+            ]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

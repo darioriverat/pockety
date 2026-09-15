@@ -26,6 +26,7 @@ import {
     PiggyBank,
     TrendingUp,
     AlertTriangle,
+    Download,
 } from 'lucide-react';
 
 interface CategoryOption {
@@ -213,6 +214,11 @@ export default function Budgets() {
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleExport = () => {
+        const url = `/api/budgets/report/export?period=${encodeURIComponent(selectedPeriod)}`;
+        window.location.href = url;
     };
 
     const rowsWithBudget = reportRows.filter((row) => row.budget_cad !== null);
@@ -415,11 +421,25 @@ export default function Budgets() {
 
                     <Card className="mt-6">
                         <CardHeader>
-                            <CardTitle>Budget vs Actual Report</CardTitle>
-                            <CardDescription>
-                                Compare budgeted amounts against computed actual
-                                spend for {formatPeriod(selectedPeriod)}
-                            </CardDescription>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle>Budget vs Actual Report</CardTitle>
+                                    <CardDescription>
+                                        Compare budgeted amounts against computed
+                                        actual spend for {formatPeriod(selectedPeriod)}
+                                    </CardDescription>
+                                </div>
+                                <Button
+                                    onClick={handleExport}
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-2"
+                                    data-testid="export-budget-report"
+                                >
+                                    <Download className="h-4 w-4" />
+                                    Export to CSV
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             {loadingReport ? (

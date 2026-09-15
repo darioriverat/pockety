@@ -935,7 +935,7 @@
       "Step 3: Click 'Export' button",
       "Step 4: Verify CSV contains category, budget, actual, variance, percentage columns"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
