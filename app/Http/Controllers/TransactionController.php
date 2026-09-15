@@ -19,13 +19,14 @@ class TransactionController extends Controller
      * Get all transactions with optional filtering.
      *
      * GET /api/transactions
-     * Query params: period, category_id, account_id, quincena, currency, is_recurring
+     * Query params: period, category_id, category (code), account_id, quincena, currency, is_recurring
      */
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only([
             'period',
             'category_id',
+            'category',
             'account_id',
             'quincena',
             'currency',
@@ -193,13 +194,14 @@ class TransactionController extends Controller
      * Export transactions to CSV.
      *
      * GET /api/transactions/export
-     * Query params: period, category_id, account_id, quincena, currency, is_recurring
+     * Query params: period, category_id, category (code), account_id, quincena, currency, is_recurring
      */
     public function export(Request $request): StreamedResponse
     {
         $filters = $request->only([
             'period',
             'category_id',
+            'category',
             'account_id',
             'quincena',
             'currency',

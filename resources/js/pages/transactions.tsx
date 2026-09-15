@@ -1,5 +1,5 @@
-import { Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { Head, Link } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -112,6 +112,10 @@ export default function Transactions() {
     const [formError, setFormError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const urlFiltersApplied = useRef(false);
+    const [detailCategoryCode, setDetailCategoryCode] = useState<string | null>(
+        null,
+    );
     const [formData, setFormData] = useState<TransactionFormData>({
         date: new Date().toISOString().split('T')[0],
         period: new Date().toISOString().slice(0, 7).replace('-', ''),
@@ -124,20 +128,72 @@ export default function Transactions() {
         is_recurring: false,
         debt_component: '',
     });
-    const [filters, setFilters] = useState<FilterState>({
-        period,
-        category_id: '',
-        quincena: '',
-        currency: '',
-        is_recurring: '',
-        search: '',
+    const [filters, setFilters] = useState<FilterState>(() => {
+        const params =
+            typeof window !== 'undefined'
+                ? new URLSearchParams(window.location.search)
+                : null;
+        const urlPeriod = params?.get('period') ?? '';
+        return {
+            period: urlPeriod || period,
+            category_id: '',
+            quincena: '',
+            currency: '',
+            is_recurring: '',
+            search: '',
+        };
     });
 
     useEffect(() => {
+        if (!urlFiltersApplied.current) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('period') || params.get('category')) {
+                return;
+            }
+        }
+
         setFilters((prev) =>
             prev.period === period ? prev : { ...prev, period },
         );
     }, [period]);
+
+    useEffect(() => {
+        if (urlFiltersApplied.current || categories.length === 0) {
+            return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const urlPeriod = params.get('period');
+        const urlCategoryCode = params.get('category');
+
+        if (!urlPeriod && !urlCategoryCode) {
+            urlFiltersApplied.current = true;
+            return;
+        }
+
+        let nextCategoryId = '';
+        if (urlCategoryCode) {
+            const matched = categories.find(
+                (category) => category.code === urlCategoryCode,
+            );
+            if (!matched) {
+                return;
+            }
+            nextCategoryId = matched.id.toString();
+            setDetailCategoryCode(urlCategoryCode);
+        }
+
+        if (urlPeriod) {
+            setPeriod(urlPeriod);
+        }
+
+        setFilters((prev) => ({
+            ...prev,
+            period: urlPeriod || prev.period,
+            category_id: nextCategoryId || prev.category_id,
+        }));
+        urlFiltersApplied.current = true;
+    }, [categories, setPeriod]);
 
     useEffect(() => {
         fetchTransactions();
@@ -321,10 +377,12 @@ export default function Transactions() {
     const handleExportCSV = () => {
         const params = new URLSearchParams();
         if (filters.period) params.append('period', filters.period);
-        if (filters.category) params.append('category_id', filters.category);
+        if (filters.category_id)
+            params.append('category_id', filters.category_id);
         if (filters.quincena) params.append('quincena', filters.quincena);
         if (filters.currency) params.append('currency', filters.currency);
-        if (filters.recurring !== 'all') params.append('is_recurring', filters.recurring);
+        if (filters.is_recurring)
+            params.append('is_recurring', filters.is_recurring);
 
         const url = `/api/transactions/export?${params.toString()}`;
         window.location.href = url;
@@ -363,6 +421,7 @@ export default function Transactions() {
     };
 
     const clearFilters = () => {
+        setDetailCategoryCode(null);
         setFilters({
             period,
             category_id: '',
@@ -380,13 +439,27 @@ export default function Transactions() {
         filters.is_recurring !== '' ||
         filters.search !== '';
 
+    const selectedCategory = categories.find(
+        (category) => category.id.toString() === filters.category_id,
+    );
+    const detailCategory = detailCategoryCode
+        ? categories.find((category) => category.code === detailCategoryCode) ??
+          selectedCategory
+        : selectedCategory;
+
     return (
         <>
             <Head title="Transactions" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div
+                className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
+                data-testid="transactions-page"
+            >
                 <div className="mb-4 flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
+                        <h1
+                            className="text-3xl font-bold tracking-tight"
+                            data-testid="transactions-heading"
+                        >
                             Transactions
                         </h1>
                         <p className="text-muted-foreground">
@@ -728,6 +801,47 @@ export default function Transactions() {
                     </div>
                 </div>
 
+                {detailCategory && filters.category_id && (
+                    <Card
+                        className="border-teal-200 bg-teal-50/60 dark:border-teal-900 dark:bg-teal-950/30"
+                        data-testid="category-detail-banner"
+                    >
+                        <CardHeader className="pb-3">
+                            <CardTitle
+                                className="text-lg"
+                                data-testid="category-detail-heading"
+                            >
+                                {detailCategory.code} —{' '}
+                                {detailCategory.name_es} /{' '}
+                                {detailCategory.name_en}
+                            </CardTitle>
+                            <CardDescription>
+                                Detailed transactions for period{' '}
+                                {filters.period
+                                    ? formatPeriod(filters.period)
+                                    : 'all periods'}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-wrap items-center gap-3">
+                            <p
+                                className="text-sm text-muted-foreground"
+                                data-testid="category-detail-count"
+                            >
+                                Showing {transactions.length} transaction
+                                {transactions.length === 1 ? '' : 's'}
+                            </p>
+                            <Button variant="outline" size="sm" asChild>
+                                <Link
+                                    href={`/category-actuals`}
+                                    data-testid="back-to-category-actuals"
+                                >
+                                    Back to Category Actuals
+                                </Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Filters Section */}
                 <Card>
                     <CardHeader>
@@ -785,15 +899,31 @@ export default function Transactions() {
                                 <Label htmlFor="filter-category">Category</Label>
                                 <Select
                                     value={filters.category_id || 'all'}
-                                    onValueChange={(value) =>
+                                    onValueChange={(value) => {
+                                        const nextId =
+                                            value === 'all' ? '' : value;
                                         setFilters({
                                             ...filters,
-                                            category_id:
-                                                value === 'all' ? '' : value,
-                                        })
-                                    }
+                                            category_id: nextId,
+                                        });
+                                        if (!nextId) {
+                                            setDetailCategoryCode(null);
+                                        } else {
+                                            const matched = categories.find(
+                                                (category) =>
+                                                    category.id.toString() ===
+                                                    nextId,
+                                            );
+                                            setDetailCategoryCode(
+                                                matched?.code ?? null,
+                                            );
+                                        }
+                                    }}
                                 >
-                                    <SelectTrigger id="filter-category">
+                                    <SelectTrigger
+                                        id="filter-category"
+                                        data-testid="filter-category"
+                                    >
                                         <SelectValue placeholder="All" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -924,19 +1054,37 @@ export default function Transactions() {
                 ) : (
                     <>
                         <div className="mb-2">
-                            <p className="text-sm text-muted-foreground">
+                            <p
+                                className="text-sm text-muted-foreground"
+                                data-testid="transactions-total"
+                            >
                                 Total transactions: {transactions.length}
                             </p>
                         </div>
 
-                        <div className="space-y-2">
+                        <div
+                            className="space-y-2"
+                            data-testid="transactions-list"
+                        >
                             {transactions.map((transaction) => (
-                                <Card key={transaction.id}>
+                                <Card
+                                    key={transaction.id}
+                                    data-testid={`transaction-row-${transaction.id}`}
+                                    data-category-code={
+                                        transaction.category.code
+                                    }
+                                    data-transaction-comments={
+                                        transaction.comments ?? ''
+                                    }
+                                >
                                     <CardHeader>
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
-                                                    <CardTitle className="text-lg">
+                                                    <CardTitle
+                                                        className="text-lg"
+                                                        data-testid={`transaction-amount-${transaction.id}`}
+                                                    >
                                                         {formatCurrency(
                                                             transaction.amount,
                                                             transaction.currency
@@ -953,7 +1101,9 @@ export default function Transactions() {
                                                 </div>
                                                 <CardDescription className="mt-1">
                                                     <div className="space-y-1">
-                                                        <div>
+                                                        <div
+                                                            data-testid={`transaction-date-${transaction.id}`}
+                                                        >
                                                             <span className="font-medium">
                                                                 Date:
                                                             </span>{' '}
@@ -985,18 +1135,15 @@ export default function Transactions() {
                                                                     .name_es
                                                             }
                                                         </div>
-                                                        {transaction.account && (
-                                                            <div>
-                                                                <span className="font-medium">
-                                                                    Account:
-                                                                </span>{' '}
-                                                                {
-                                                                    transaction
-                                                                        .account
-                                                                        .name
-                                                                }
-                                                            </div>
-                                                        )}
+                                                        <div
+                                                            data-testid={`transaction-account-${transaction.id}`}
+                                                        >
+                                                            <span className="font-medium">
+                                                                Account:
+                                                            </span>{' '}
+                                                            {transaction.account
+                                                                ?.name ?? '—'}
+                                                        </div>
                                                         {transaction.debt_component && (
                                                             <div>
                                                                 <span className="font-medium">
@@ -1005,16 +1152,15 @@ export default function Transactions() {
                                                                 {transaction.debt_component}
                                                             </div>
                                                         )}
-                                                        {transaction.comments && (
-                                                            <div>
-                                                                <span className="font-medium">
-                                                                    Comments:
-                                                                </span>{' '}
-                                                                {
-                                                                    transaction.comments
-                                                                }
-                                                            </div>
-                                                        )}
+                                                        <div
+                                                            data-testid={`transaction-comments-${transaction.id}`}
+                                                        >
+                                                            <span className="font-medium">
+                                                                Comments:
+                                                            </span>{' '}
+                                                            {transaction.comments ??
+                                                                '—'}
+                                                        </div>
                                                     </div>
                                                 </CardDescription>
                                             </div>

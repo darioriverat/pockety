@@ -12,7 +12,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Get all transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool}  $filters
      * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array
@@ -24,8 +24,18 @@ class TransactionService implements TransactionServiceInterface
             $query->forPeriod($filters['period']);
         }
 
-        if (isset($filters['category_id'])) {
-            $query->forCategory($filters['category_id']);
+        if (isset($filters['category_id']) && $filters['category_id'] !== '') {
+            $query->forCategory((int) $filters['category_id']);
+        } elseif (isset($filters['category']) && $filters['category'] !== '') {
+            $categoryId = DB::table('categories')
+                ->where('code', $filters['category'])
+                ->value('id');
+
+            if ($categoryId === null) {
+                return [];
+            }
+
+            $query->forCategory((int) $categoryId);
         }
 
         if (isset($filters['account_id'])) {

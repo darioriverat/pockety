@@ -1007,6 +1007,94 @@ HTML;
 
         return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
     })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-category-actuals-detail-ui', function () {
+        $period = request()->query('period', '202501');
+        $categoryCode = request()->query('category', 'C001');
+        if (! is_string($period) || ! preg_match('/^\d{6}$/', $period)) {
+            $period = '202501';
+        }
+        if (! is_string($categoryCode) || $categoryCode === '') {
+            $categoryCode = 'C001';
+        }
+
+        $service = app(\App\Domain\Services\Contracts\TransactionServiceInterface::class);
+        $transactions = $service->getAll([
+            'period' => $period,
+            'category' => $categoryCode,
+        ]);
+
+        $category = \App\Models\Category::query()->where('code', $categoryCode)->first();
+        $categoryLabel = $category
+            ? e($category->code.' — '.$category->name_es.' / '.$category->name_en)
+            : e($categoryCode);
+
+        $rows = '';
+        foreach ($transactions as $entity) {
+            $data = $entity->toArray();
+            $id = e((string) $data['id']);
+            $date = e($data['date']);
+            $amount = e(number_format((float) ($data['amount'] ?? 0), 2));
+            $currency = e((string) ($data['currency'] ?? 'CAD'));
+            $comments = e((string) ($data['comments'] ?? '—'));
+            $account = e((string) ($data['account']['name'] ?? '—'));
+            $rows .= "<tr data-testid=\"transaction-row-{$id}\" data-category-code=\"".e($categoryCode)."\">"
+                ."<td data-testid=\"transaction-date-{$id}\">{$date}</td>"
+                ."<td data-testid=\"transaction-amount-{$id}\">{$currency} {$amount}</td>"
+                ."<td data-testid=\"transaction-comments-{$id}\">{$comments}</td>"
+                ."<td data-testid=\"transaction-account-{$id}\">{$account}</td>"
+                ."</tr>\n";
+        }
+
+        $count = count($transactions);
+        $periodLabel = e($period);
+        $categoryCodeEsc = e($categoryCode);
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Category Actuals Detail Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1rem; }
+    .banner { background: #ecfdf5; border: 1px solid #99f6e4; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 1.5rem; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nav a { color: #0f766e; margin-right: 1rem; }
+  </style>
+</head>
+<body>
+  <h1 data-testid="transactions-heading">Transactions</h1>
+  <p class="meta">Filtered detail view for category {$categoryCodeEsc} in period {$periodLabel}</p>
+  <div class="banner" data-testid="category-detail-banner">
+    <h2 data-testid="category-detail-heading">{$categoryLabel}</h2>
+    <p data-testid="category-detail-count">Showing {$count} transaction(s)</p>
+  </div>
+  <table data-testid="transactions-list">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Comments</th>
+        <th>Account</th>
+      </tr>
+    </thead>
+    <tbody>{$rows}</tbody>
+  </table>
+  <p class="nav">
+    <a href="/category-actuals" data-testid="back-to-category-actuals">Back to Category Actuals</a>
+    <a href="/transactions?period={$periodLabel}&amp;category={$categoryCodeEsc}">Open live filtered transactions</a>
+  </p>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
 }
 
 require __DIR__.'/settings.php';

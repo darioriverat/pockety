@@ -1051,7 +1051,7 @@
       "Step 3: Verify detail view shows all C001 transactions for that period",
       "Step 4: Verify transaction details are complete (date, amount, comments, account)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

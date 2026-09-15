@@ -3247,3 +3247,45 @@ NEXT SESSION
 ------------
 - Test #88: Click category in actuals report to see detailed transactions
   (links already point to /transactions?period=&category= — need filtered detail view)
+
+========================
+SESSION 37 - Sep 15, 2026
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked this session (approval rejected); verification via /dev/browser-tests + Playwright screenshots
+- Helpers: /dev/build-assets, /dev/run-tests, /dev/frontend-tests, /dev/browser-tests
+
+VERIFICATION (pre-work)
+-----------------------
+- CategoryActualsTest: 8/8
+- Frontend unit suite: 31/31 (before new test)
+- Playwright feature 86: passed
+
+FEATURES COMPLETED
+------------------
+Test #88: Click category in actuals to detailed transactions — passes:true
+
+Implementation:
+- API: GET /api/transactions accepts category=C001 (code) in addition to category_id
+- Transactions page reads ?period=&category= from URL, applies filters, shows detail banner
+- Always shows date, amount, comments, account on each transaction row
+- Fixed CSV export filter param bug (category_id / is_recurring)
+- Dev HTML: /dev/verify-category-actuals-detail-ui
+
+Tests:
+- TransactionFilterTest: 3/3
+- Frontend suite: 32/32 (includes category-actuals-detail.test.tsx)
+- Playwright feature 88: passed
+- Screenshots: verification/test-88-category-detail/
+
+CURRENT STATE
+-------------
+Tests passing: 90 of 175 (1 new this session)
+Remaining: 85 tests
+
+NEXT SESSION
+------------
+- Test #89: System prevents deletion of category that has associated transactions

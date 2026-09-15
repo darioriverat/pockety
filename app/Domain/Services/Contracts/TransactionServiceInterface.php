@@ -9,7 +9,7 @@ interface TransactionServiceInterface
     /**
      * Get all transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool}  $filters  Optional filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool}  $filters  Optional filters
      * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array;
