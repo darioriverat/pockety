@@ -7,6 +7,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExchangeRateController;
 use App\Http\Controllers\ExchangeRateImportController;
+use App\Http\Controllers\FinancialSummaryController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\TransactionController;
@@ -79,3 +80,6 @@ Route::get('/exchange-rates/import/statistics', [ExchangeRateImportController::c
 Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
 Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
 Route::get('/budgets/report', [BudgetController::class, 'report'])->name('budgets.report');
+
+// Financial Summary API
+Route::get('/financial-summary', [FinancialSummaryController::class, 'show'])->name('financial-summary.show');

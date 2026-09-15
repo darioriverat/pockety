@@ -949,6 +949,87 @@ budgets.form = budgetsForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+export const financialSummary = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: financialSummary.url(options),
+    method: 'get',
+})
+
+financialSummary.definition = {
+    methods: ["get","head"],
+    url: '/financial-summary',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+financialSummary.url = (options?: RouteQueryOptions) => {
+    return financialSummary.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+financialSummary.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: financialSummary.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+financialSummary.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: financialSummary.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+const financialSummaryForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: financialSummary.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+financialSummaryForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: financialSummary.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+financialSummaryForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: financialSummary.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+financialSummary.form = financialSummaryForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

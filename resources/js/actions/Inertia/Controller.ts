@@ -642,6 +642,86 @@ Controllerd65bcf739ad2a9a13b6c3c100ab1c5e2.form = Controllerd65bcf739ad2a9a13b6c
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+const Controllerf28969a658a3db543064530fa037e4a0 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllerf28969a658a3db543064530fa037e4a0.url(options),
+    method: 'get',
+})
+
+Controllerf28969a658a3db543064530fa037e4a0.definition = {
+    methods: ["get","head"],
+    url: '/financial-summary',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+Controllerf28969a658a3db543064530fa037e4a0.url = (options?: RouteQueryOptions) => {
+    return Controllerf28969a658a3db543064530fa037e4a0.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+Controllerf28969a658a3db543064530fa037e4a0.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllerf28969a658a3db543064530fa037e4a0.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+Controllerf28969a658a3db543064530fa037e4a0.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controllerf28969a658a3db543064530fa037e4a0.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+const Controllerf28969a658a3db543064530fa037e4a0Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllerf28969a658a3db543064530fa037e4a0.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+Controllerf28969a658a3db543064530fa037e4a0Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllerf28969a658a3db543064530fa037e4a0.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/financial-summary'
+*/
+Controllerf28969a658a3db543064530fa037e4a0Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllerf28969a658a3db543064530fa037e4a0.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controllerf28969a658a3db543064530fa037e4a0.form = Controllerf28969a658a3db543064530fa037e4a0Form
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 const Controller319c434a45921953484cb2f345f6ad0c = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -814,6 +894,7 @@ const Controller = {
     '/transactions': Controllere5aa2cad321b30063c3b415df5452200,
     '/exchange-rates': Controller9ec6ff571c4d5816f375bbafc9964ac9,
     '/budgets': Controllerd65bcf739ad2a9a13b6c3c100ab1c5e2,
+    '/financial-summary': Controllerf28969a658a3db543064530fa037e4a0,
     '/import': Controller319c434a45921953484cb2f345f6ad0c,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,
 }

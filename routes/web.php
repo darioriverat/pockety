@@ -15,6 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('transactions', 'transactions')->name('transactions');
     Route::inertia('exchange-rates', 'exchange-rates')->name('exchange-rates');
     Route::inertia('budgets', 'budgets')->name('budgets');
+    Route::inertia('financial-summary', 'financial-summary')->name('financial-summary');
     Route::inertia('import', 'import')->name('import');
 });
 
@@ -346,6 +347,113 @@ HTML;
     </tbody>
   </table>
   <p class="nav"><a href="/budgets">Open live Budgets page</a></p>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-financial-summary-ui', function () {
+        $period = request()->query('period', '202501');
+        $service = app(\App\Services\FinancialSummaryService::class);
+        $summary = $service->getSummary($period);
+
+        $formatCad = fn (float $value): string => '$'.number_format($value, 2);
+
+        $rowHtml = '';
+        foreach ($summary['category_totals'] as $row) {
+            if ($row['total_cad'] <= 0 && ! $row['is_debt_category'] && ! $row['is_depreciation']) {
+                continue;
+            }
+
+            $code = e($row['category_code']);
+            $name = e($row['category_name_es']);
+            $total = e($formatCad($row['total_cad']));
+            $principal = e($formatCad($row['principal_cad']));
+            $interest = e($formatCad($row['interest_cad']));
+            $flags = [];
+            if ($row['is_debt_category']) {
+                $flags[] = 'Debt';
+            }
+            if ($row['is_depreciation']) {
+                $flags[] = 'Depreciation';
+            }
+            $flagsLabel = e(implode(', ', $flags) ?: '—');
+            $debtAttr = $row['is_debt_category'] ? 'true' : 'false';
+            $depAttr = $row['is_depreciation'] ? 'true' : 'false';
+
+            $rowHtml .= "<tr data-testid=\"summary-row-{$code}\" data-debt=\"{$debtAttr}\" data-depreciation=\"{$depAttr}\">"
+                ."<td>{$code} {$name}</td>"
+                ."<td data-testid=\"total-{$code}\">{$total}</td>"
+                ."<td data-testid=\"principal-{$code}\">{$principal}</td>"
+                ."<td data-testid=\"interest-{$code}\">{$interest}</td>"
+                ."<td>{$flagsLabel}</td>"
+                .'</tr>';
+        }
+
+        $disbursements = e($formatCad($summary['total_recorded_disbursements_cad']));
+        $netOperating = e($formatCad($summary['net_operating_expenses_cad']));
+        $principalExcluded = e($formatCad($summary['debt_principal_excluded_cad']));
+        $depreciationExcluded = e($formatCad($summary['depreciation_excluded_cad']));
+        $interestIncluded = e($formatCad($summary['debt_interest_included_cad']));
+        $periodLabel = e($period);
+
+        $debtBadges = '';
+        foreach (\App\Services\FinancialSummaryService::DEBT_PAYMENT_CATEGORY_CODES as $code) {
+            $safe = e($code);
+            $debtBadges .= "<span class=\"badge\" data-testid=\"debt-code-{$safe}\">{$safe}</span>";
+        }
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Financial Summary Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f7f5f0; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 160px; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat span { font-size: 1.35rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .badge { background: #e7e5e4; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.85rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #f0fdf4; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nav { margin-top: 1.5rem; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1>Financial Summary</h1>
+  <p class="meta">Verification for period {$periodLabel}</p>
+  <div class="summary">
+    <div class="stat"><strong>Total Recorded Disbursements</strong><span data-testid="total-recorded-disbursements">{$disbursements}</span></div>
+    <div class="stat"><strong>Net Operating Expenses</strong><span data-testid="net-operating-expenses">{$netOperating}</span></div>
+    <div class="stat"><strong>Debt Principal Excluded</strong><span data-testid="debt-principal-excluded">{$principalExcluded}</span></div>
+    <div class="stat"><strong>Depreciation Excluded</strong><span data-testid="depreciation-excluded">{$depreciationExcluded}</span></div>
+    <div class="stat"><strong>Debt Interest Included</strong><span data-testid="debt-interest-included">{$interestIncluded}</span></div>
+  </div>
+  <div class="badges" data-testid="debt-category-codes">{$debtBadges}</div>
+  <table data-testid="financial-summary-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Total</th>
+        <th>Principal</th>
+        <th>Interest</th>
+        <th>Flags</th>
+      </tr>
+    </thead>
+    <tbody>
+      {$rowHtml}
+    </tbody>
+  </table>
+  <p class="nav"><a href="/financial-summary">Open live Financial Summary page</a></p>
 </body>
 </html>
 HTML;

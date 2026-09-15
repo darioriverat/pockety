@@ -700,7 +700,7 @@
             "Step 3: Verify it equals sum of all category totals including debt payments",
             "Step 4: Verify debt payment categories (C009, C010, C027, C038, C039, C044, C046) are included"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -712,7 +712,7 @@
             "Step 4: Verify debt interest IS included in Net Operating Expenses",
             "Step 5: Verify depreciation is excluded"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -724,7 +724,7 @@
             "Step 4: Verify Total Recorded Disbursements includes CAD 550.00",
             "Step 5: Verify Net Operating Expenses includes only CAD 50.00 (interest only, principal excluded)"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",

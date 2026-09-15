@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Financial Summary Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f7f5f0; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 160px; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat span { font-size: 1.35rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .badge { background: #e7e5e4; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.85rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #f0fdf4; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nav { margin-top: 1.5rem; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1>Financial Summary</h1>
+  <p class="meta">Verification for period 202501</p>
+  <div class="summary">
+    <div class="stat"><strong>Total Recorded Disbursements</strong><span data-testid="total-recorded-disbursements">$1,450.00</span></div>
+    <div class="stat"><strong>Net Operating Expenses</strong><span data-testid="net-operating-expenses">$300.00</span></div>
+    <div class="stat"><strong>Debt Principal Excluded</strong><span data-testid="debt-principal-excluded">$1,000.00</span></div>
+    <div class="stat"><strong>Depreciation Excluded</strong><span data-testid="depreciation-excluded">$150.00</span></div>
+    <div class="stat"><strong>Debt Interest Included</strong><span data-testid="debt-interest-included">$100.00</span></div>
+  </div>
+  <div class="badges" data-testid="debt-category-codes"><span class="badge" data-testid="debt-code-C009">C009</span><span class="badge" data-testid="debt-code-C010">C010</span><span class="badge" data-testid="debt-code-C027">C027</span><span class="badge" data-testid="debt-code-C038">C038</span><span class="badge" data-testid="debt-code-C039">C039</span><span class="badge" data-testid="debt-code-C044">C044</span><span class="badge" data-testid="debt-code-C046">C046</span></div>
+  <table data-testid="financial-summary-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Total</th>
+        <th>Principal</th>
+        <th>Interest</th>
+        <th>Flags</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-testid="summary-row-C001" data-debt="false" data-depreciation="false"><td>C001 MERCADO</td><td data-testid="total-C001">$200.00</td><td data-testid="principal-C001">$0.00</td><td data-testid="interest-C001">$0.00</td><td>—</td></tr><tr data-testid="summary-row-C009" data-debt="true" data-depreciation="false"><td>C009 CRÉDITO DAVIVIENDA</td><td data-testid="total-C009">$0.00</td><td data-testid="principal-C009">$0.00</td><td data-testid="interest-C009">$0.00</td><td>Debt</td></tr><tr data-testid="summary-row-C010" data-debt="true" data-depreciation="false"><td>C010 CRÉDITO ÉXITO</td><td data-testid="total-C010">$0.00</td><td data-testid="principal-C010">$0.00</td><td data-testid="interest-C010">$0.00</td><td>Debt</td></tr><tr data-testid="summary-row-C027" data-debt="true" data-depreciation="false"><td>C027 CRÉDITO OCCIDENTE</td><td data-testid="total-C027">$0.00</td><td data-testid="principal-C027">$0.00</td><td data-testid="interest-C027">$0.00</td><td>Debt</td></tr><tr data-testid="summary-row-C038" data-debt="true" data-depreciation="false"><td>C038 CRÉDITO BANCOLOMBIA</td><td data-testid="total-C038">$0.00</td><td data-testid="principal-C038">$0.00</td><td data-testid="interest-C038">$0.00</td><td>Debt</td></tr><tr data-testid="summary-row-C039" data-debt="true" data-depreciation="false"><td>C039 CREDITO CIBC</td><td data-testid="total-C039">$0.00</td><td data-testid="principal-C039">$0.00</td><td data-testid="interest-C039">$0.00</td><td>Debt</td></tr><tr data-testid="summary-row-C044" data-debt="true" data-depreciation="false"><td>C044 CREDITO FORD ESCAPE</td><td data-testid="total-C044">$1,100.00</td><td data-testid="principal-C044">$1,000.00</td><td data-testid="interest-C044">$100.00</td><td>Debt</td></tr><tr data-testid="summary-row-C045" data-debt="false" data-depreciation="true"><td>C045 DEPRECIACIONES</td><td data-testid="total-C045">$150.00</td><td data-testid="principal-C045">$0.00</td><td data-testid="interest-C045">$0.00</td><td>Depreciation</td></tr><tr data-testid="summary-row-C046" data-debt="true" data-depreciation="false"><td>C046 CREDITO CANADIAN TIRE MC</td><td data-testid="total-C046">$0.00</td><td data-testid="principal-C046">$0.00</td><td data-testid="interest-C046">$0.00</td><td>Debt</td></tr>
+    </tbody>
+  </table>
+  <p class="nav"><a href="/financial-summary">Open live Financial Summary page</a></p>
+</body>
+</html>
