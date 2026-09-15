@@ -41,3 +41,11 @@ export function formatPeriod(period: string): string {
 export function isValidPeriod(period: string): boolean {
     return generatePeriods().includes(period);
 }
+
+/**
+ * Checks that a period string uses the YYYYMM format (six digits).
+ * Does not restrict the value to the app's supported period range.
+ */
+export function isPeriodFormatValid(period: string): boolean {
+    return /^\d{6}$/.test(period);
+}

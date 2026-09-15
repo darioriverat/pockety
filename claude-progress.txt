@@ -3115,3 +3115,52 @@ NEXT SESSION
 ------------
 - Test #83: System validates period format as YYYYMM
 - Test #84: System validates quincena as Q1 or Q2 only
+
+
+========================
+SESSION 34 - Sep 15, 2026
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Docker containers presumed running (app responds) but THIS session cannot access
+  Docker socket or launch Chrome: Local SDK rejects required_permissions=["all"]
+  ("cannot request interactive approval"). Puppeteer MCP similarly blocked.
+
+VERIFICATION
+------------
+- Smoke: dashboard HTTP 200; auth page HTML loads
+- API period validation LIVE after code deploy (volume mount):
+  POST /api/transactions period=2025-01 -> 422 "The period must be in YYYYMM format."
+  POST period=01/2025 -> 422 period errors
+  POST quincena=Q3 -> 422 "The quincena must be Q1 or Q2."
+- Could NOT run: task backend-tests, frontend-tests, Playwright, capture scripts
+  (Docker socket EPERM; Chrome launch SIGABRT/EPERM in sandbox)
+
+FEATURE WORK (test #83 - NOT marked passing yet)
+-----------------------------------------------
+Implemented end-to-end period YYYYMM validation for Add Transaction:
+
+- resources/js/lib/periods.ts — isPeriodFormatValid()
+- resources/js/pages/transactions.tsx — client validation + inline role=alert
+  (data-testid=transaction-form-error); better API error parsing
+- TransactionController — custom messages for period/quincena
+- tests/Feature/TransactionValidationTest.php
+- Vitest + Playwright coverage (feature 83)
+- verification/capture-period-format.mjs (screenshots when runnable)
+
+feature_list.json: test #83 remains passes:false until UI screenshots exist.
+
+CURRENT STATE
+-------------
+Tests passing: 84 of 175 (unchanged this session — no screenshot verification)
+Remaining: 91 tests
+
+NEXT SESSION (PRIORITY)
+-----------------------
+1. Approve/disable sandbox so Docker + Chrome work
+2. Run: node verification/capture-period-format.mjs
+3. Run: task backend-tests && task frontend-tests
+4. If screenshots OK, set feature_list.json test #83 passes:true
+5. Then test #84 (quincena Q1/Q2) — backend + dropdown already largely done

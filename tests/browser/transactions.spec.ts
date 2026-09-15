@@ -573,3 +573,42 @@ test('feature 16: users can delete an existing transaction', async ({
 
     expect(consoleErrors).toEqual([]);
 });
+
+test('feature 83: system validates period format as YYYYMM', async ({
+    page,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const comments = `feature-83-period-${Date.now()}`;
+
+    await openTransactionsPage(page);
+    await openAddTransactionDialog(page);
+
+    await page.getByLabel('Date').fill('2025-01-15');
+    await page.getByLabel('Period (YYYYMM)').fill('2025-01');
+    await selectOption(page, 'Quincena', 'Q1');
+    await selectOption(page, 'Category', 'C001 - Groceries');
+    await selectOption(page, 'Currency', 'CAD');
+    await page.getByLabel('Amount').fill('42.00');
+    await page.getByLabel('Comments').fill(comments);
+
+    await page.getByRole('button', { name: 'Create' }).click();
+
+    const formError = page.getByTestId('transaction-form-error');
+    await expect(formError).toBeVisible();
+    await expect(formError).toContainText(/YYYYMM/i);
+    await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
+
+    await page.getByLabel('Period (YYYYMM)').fill('01/2025');
+    await page.getByRole('button', { name: 'Create' }).click();
+    await expect(formError).toBeVisible();
+    await expect(formError).toContainText(/YYYYMM/i);
+
+    await page.getByLabel('Period (YYYYMM)').fill('202501');
+    await submitTransactionForm(page, 'Create');
+
+    await expect(
+        page.locator('[data-slot="card"]').filter({ hasText: comments }),
+    ).toBeVisible();
+
+    expect(consoleErrors).toEqual([]);
+});

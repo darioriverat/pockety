@@ -31,8 +31,10 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { usePeriod } from '@/hooks/use-period';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatPeriod, generatePeriods, isPeriodFormatValid } from '@/lib/periods';
 import { Plus, Pencil, Trash2, Filter, X, Download } from 'lucide-react';
+
+const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
 
 interface Category {
     id: number;
@@ -107,6 +109,7 @@ export default function Transactions() {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [formError, setFormError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState<TransactionFormData>({
@@ -206,10 +209,16 @@ export default function Transactions() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setFormError(null);
 
-        const payload: any = {
+        if (!isPeriodFormatValid(formData.period.trim())) {
+            setFormError(PERIOD_FORMAT_ERROR);
+            return;
+        }
+
+        const payload: Record<string, unknown> = {
             date: formData.date,
-            period: formData.period,
+            period: formData.period.trim(),
             quincena: formData.quincena,
             category_id: parseInt(formData.category_id),
             account_id: formData.account_id
@@ -250,18 +259,31 @@ export default function Transactions() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to save transaction');
+                const periodErrors = errorData.errors?.period;
+                if (Array.isArray(periodErrors) && periodErrors.length > 0) {
+                    setFormError(periodErrors[0]);
+                    return;
+                }
+                const message =
+                    errorData.message ||
+                    errorData.error ||
+                    'Failed to save transaction';
+                setFormError(message);
+                return;
             }
 
             await fetchTransactions();
             setIsDialogOpen(false);
             resetForm();
         } catch (err) {
-            alert(err instanceof Error ? err.message : 'An error occurred');
+            setFormError(
+                err instanceof Error ? err.message : 'An error occurred',
+            );
         }
     };
 
     const handleEdit = (transaction: Transaction) => {
+        setFormError(null);
         setEditingId(transaction.id);
         setFormData({
             date: transaction.date,
@@ -310,6 +332,7 @@ export default function Transactions() {
 
     const resetForm = () => {
         setEditingId(null);
+        setFormError(null);
         setFormData({
             date: new Date().toISOString().split('T')[0],
             period: new Date().toISOString().slice(0, 7).replace('-', ''),
@@ -427,13 +450,25 @@ export default function Transactions() {
                                             <Input
                                                 id="period"
                                                 value={formData.period}
-                                                onChange={(e) =>
+                                                onChange={(e) => {
+                                                    setFormError(null);
                                                     setFormData({
                                                         ...formData,
                                                         period: e.target.value,
-                                                    })
-                                                }
+                                                    });
+                                                }}
                                                 placeholder="202501"
+                                                aria-invalid={
+                                                    formError !== null &&
+                                                    formError
+                                                        .toLowerCase()
+                                                        .includes('period')
+                                                }
+                                                aria-describedby={
+                                                    formError
+                                                        ? 'period-error'
+                                                        : undefined
+                                                }
                                                 required
                                             />
                                         </div>
@@ -672,6 +707,16 @@ export default function Transactions() {
                                             </div>
                                         )}
                                 </div>
+                                {formError && (
+                                    <p
+                                        id="period-error"
+                                        className="text-destructive text-sm"
+                                        role="alert"
+                                        data-testid="transaction-form-error"
+                                    >
+                                        {formError}
+                                    </p>
+                                )}
                                 <DialogFooter>
                                     <Button type="submit">
                                         {editingId ? 'Update' : 'Create'}

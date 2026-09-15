@@ -92,6 +92,10 @@ class TransactionController extends Controller
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
+            ], [
+                'period.size' => 'The period must be in YYYYMM format.',
+                'period.regex' => 'The period must be in YYYYMM format.',
+                'quincena.in' => 'The quincena must be Q1 or Q2.',
             ]);
 
             $transaction = $this->service->create($validated);
@@ -134,6 +138,10 @@ class TransactionController extends Controller
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
+            ], [
+                'period.size' => 'The period must be in YYYYMM format.',
+                'period.regex' => 'The period must be in YYYYMM format.',
+                'quincena.in' => 'The quincena must be Q1 or Q2.',
             ]);
 
             $transaction = $this->service->update($id, $validated);

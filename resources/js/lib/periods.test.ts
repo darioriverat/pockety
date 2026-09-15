@@ -3,6 +3,7 @@ import {
     DEFAULT_PERIOD,
     formatPeriod,
     generatePeriods,
+    isPeriodFormatValid,
     isValidPeriod,
 } from '@/lib/periods';
 
@@ -41,5 +42,18 @@ describe('isValidPeriod', () => {
         expect(isValidPeriod('202610')).toBe(false);
         expect(isValidPeriod('2024')).toBe(false);
         expect(isValidPeriod('invalid')).toBe(false);
+    });
+});
+
+describe('isPeriodFormatValid', () => {
+    it('accepts YYYYMM and rejects other formats', () => {
+        expect(isPeriodFormatValid('202501')).toBe(true);
+        expect(isPeriodFormatValid('202612')).toBe(true);
+        expect(isPeriodFormatValid('2025-01')).toBe(false);
+        expect(isPeriodFormatValid('01/2025')).toBe(false);
+        expect(isPeriodFormatValid('2025')).toBe(false);
+        expect(isPeriodFormatValid('2025010')).toBe(false);
+        expect(isPeriodFormatValid('abcdef')).toBe(false);
+        expect(isPeriodFormatValid('')).toBe(false);
     });
 });
