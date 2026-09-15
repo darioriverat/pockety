@@ -3,6 +3,7 @@
 use App\Domain\Services\Contracts\AccountServiceInterface;
 use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
+use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Account;
@@ -1018,13 +1019,13 @@ HTML;
             $categoryCode = 'C001';
         }
 
-        $service = app(\App\Domain\Services\Contracts\TransactionServiceInterface::class);
+        $service = app(TransactionServiceInterface::class);
         $transactions = $service->getAll([
             'period' => $period,
             'category' => $categoryCode,
         ]);
 
-        $category = \App\Models\Category::query()->where('code', $categoryCode)->first();
+        $category = Category::query()->where('code', $categoryCode)->first();
         $categoryLabel = $category
             ? e($category->code.' — '.$category->name_es.' / '.$category->name_en)
             : e($categoryCode);
@@ -1037,8 +1038,8 @@ HTML;
             $amount = e(number_format((float) ($data['amount'] ?? 0), 2));
             $currency = e((string) ($data['currency'] ?? 'CAD'));
             $comments = e((string) ($data['comments'] ?? '—'));
-            $account = e((string) ($data['account']['name'] ?? '—'));
-            $rows .= "<tr data-testid=\"transaction-row-{$id}\" data-category-code=\"".e($categoryCode)."\">"
+            $account = e((string) (isset($data['account']['name']) ? $data['account']['name'] : '—'));
+            $rows .= "<tr data-testid=\"transaction-row-{$id}\" data-category-code=\"".e($categoryCode).'">'
                 ."<td data-testid=\"transaction-date-{$id}\">{$date}</td>"
                 ."<td data-testid=\"transaction-amount-{$id}\">{$currency} {$amount}</td>"
                 ."<td data-testid=\"transaction-comments-{$id}\">{$comments}</td>"

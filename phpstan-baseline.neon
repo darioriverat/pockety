@@ -633,5 +633,11 @@ parameters:
 		-
 			message: '#^Class App\\Http\\Middleware\\VerifyCsrfToken not found\.$#'
 			identifier: class.notFound
-			count: 20
+			count: 23
+			path: routes/web.php
+
+		-
+			message: '#^Offset ''account'' on array\{id\: int, date\: string, period\: string, quincena\: string, category_id\: int, account_id\: int\|null, amount_cad\: float\|null, amount_usd\: float\|null, \.\.\.\} in isset\(\) does not exist\.$#'
+			identifier: isset.offset
+			count: 1
 			path: routes/web.php

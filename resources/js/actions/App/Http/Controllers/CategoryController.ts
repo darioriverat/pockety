@@ -179,6 +179,90 @@ showForm.head = (args: { code: string | number } | [code: string | number ] | st
 
 show.form = showForm
 
-const CategoryController = { index, show }
+/**
+* @see \App\Http\Controllers\CategoryController::destroy
+* @see app/Http/Controllers/CategoryController.php:65
+* @route '/api/categories/{code}'
+*/
+export const destroy = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+
+destroy.definition = {
+    methods: ["delete"],
+    url: '/api/categories/{code}',
+} satisfies RouteDefinition<["delete"]>
+
+/**
+* @see \App\Http\Controllers\CategoryController::destroy
+* @see app/Http/Controllers/CategoryController.php:65
+* @route '/api/categories/{code}'
+*/
+destroy.url = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { code: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            code: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        code: args.code,
+    }
+
+    return destroy.definition.url
+            .replace('{code}', parsedArgs.code.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\CategoryController::destroy
+* @see app/Http/Controllers/CategoryController.php:65
+* @route '/api/categories/{code}'
+*/
+destroy.delete = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::destroy
+* @see app/Http/Controllers/CategoryController.php:65
+* @route '/api/categories/{code}'
+*/
+const destroyForm = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: destroy.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'DELETE',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::destroy
+* @see app/Http/Controllers/CategoryController.php:65
+* @route '/api/categories/{code}'
+*/
+destroyForm.delete = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: destroy.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'DELETE',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+destroy.form = destroyForm
+
+const CategoryController = { index, show, destroy }
 
 export default CategoryController

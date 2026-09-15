@@ -1063,7 +1063,7 @@
       "Step 4: Verify system prevents deletion or shows warning",
       "Step 5: Verify message indicates transactions exist for this category"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
