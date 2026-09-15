@@ -1075,7 +1075,7 @@
       "Step 4: Verify each transaction shows date, amount, category, comments",
       "Step 5: Verify running balance is calculated and displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
