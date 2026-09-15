@@ -20,7 +20,7 @@ class ExchangeRateController extends Controller
         $period = $request->input('period');
         $rate = ExchangeRate::forPeriod($period);
 
-        if (!$rate) {
+        if (! $rate) {
             return response()->json([
                 'message' => 'Exchange rates not found for period '.$period,
                 'data' => null,

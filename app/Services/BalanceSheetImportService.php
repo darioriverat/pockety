@@ -57,12 +57,14 @@ class BalanceSheetImportService
             foreach ($rows as $index => $row) {
                 if (! is_array($row)) {
                     $errors[] = "Row {$index}: expected an object";
+
                     continue;
                 }
 
                 $period = isset($row['periodo']) ? (string) $row['periodo'] : null;
                 if ($period === null || ! preg_match('/^\d{6}$/', $period)) {
                     $errors[] = "Row {$index}: invalid or missing periodo";
+
                     continue;
                 }
 
@@ -71,6 +73,7 @@ class BalanceSheetImportService
                     || ! array_key_exists('patrimonio_value', $row)
                 ) {
                     $errors[] = "Period {$period}: missing activo/pasivo/patrimonio values";
+
                     continue;
                 }
 

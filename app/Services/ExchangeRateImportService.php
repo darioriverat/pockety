@@ -19,7 +19,7 @@ class ExchangeRateImportService
      */
     public function importFromMonthSheets(string $directory): array
     {
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             throw new \InvalidArgumentException("Directory not found: {$directory}");
         }
 
@@ -41,8 +41,9 @@ class ExchangeRateImportService
                 try {
                     $data = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
 
-                    if (!isset($data['header'])) {
+                    if (! isset($data['header'])) {
                         $errors[] = basename($file).': Missing header';
+
                         continue;
                     }
 
@@ -50,8 +51,9 @@ class ExchangeRateImportService
 
                     // Extract period
                     $period = $header['period']['value'] ?? null;
-                    if (!$period || !preg_match('/^\d{6}$/', $period)) {
+                    if (! $period || ! preg_match('/^\d{6}$/', $period)) {
                         $errors[] = basename($file).': Invalid or missing period';
+
                         continue;
                     }
 
@@ -62,6 +64,7 @@ class ExchangeRateImportService
 
                     if ($usdCop === null || $usdCad === null || $cadCop === null) {
                         $errors[] = basename($file).': Missing exchange rate data';
+
                         continue;
                     }
 

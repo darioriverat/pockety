@@ -26,7 +26,7 @@ class ExchangeRateImportController extends Controller
         $basePath = base_path('plan/extracted');
         $fullPath = realpath($basePath.'/'.$directory);
 
-        if (!$fullPath || !str_starts_with($fullPath, $basePath) || !is_dir($fullPath)) {
+        if (! $fullPath || ! str_starts_with($fullPath, $basePath) || ! is_dir($fullPath)) {
             return response()->json([
                 'message' => 'Invalid directory path',
             ], 400);

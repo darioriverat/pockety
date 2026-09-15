@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\ExchangeRate;
 use App\Models\User;
+use App\Services\ExchangeRateImportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -142,7 +143,7 @@ class ExchangeRateTest extends TestCase
     public function test_usd_cop_rate_is_fixed_at_4400_across_all_months(): void
     {
         // Import rates from month sheets
-        $importService = app(\App\Services\ExchangeRateImportService::class);
+        $importService = app(ExchangeRateImportService::class);
         $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
 
         $this->assertEquals(21, $result['rates_imported']);
@@ -157,7 +158,7 @@ class ExchangeRateTest extends TestCase
     public function test_usd_cad_rate_is_fixed_at_0_75_across_all_months(): void
     {
         // Import rates from month sheets
-        $importService = app(\App\Services\ExchangeRateImportService::class);
+        $importService = app(ExchangeRateImportService::class);
         $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
 
         $this->assertEquals(21, $result['rates_imported']);
@@ -172,7 +173,7 @@ class ExchangeRateTest extends TestCase
     public function test_cad_cop_rate_varies_across_months(): void
     {
         // Import rates from month sheets
-        $importService = app(\App\Services\ExchangeRateImportService::class);
+        $importService = app(ExchangeRateImportService::class);
         $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
 
         $this->assertEquals(21, $result['rates_imported']);
@@ -199,7 +200,7 @@ class ExchangeRateTest extends TestCase
 
     public function test_import_creates_21_exchange_rate_records(): void
     {
-        $importService = app(\App\Services\ExchangeRateImportService::class);
+        $importService = app(ExchangeRateImportService::class);
         $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
 
         $this->assertEquals(21, $result['rates_imported']);
@@ -211,7 +212,7 @@ class ExchangeRateTest extends TestCase
     public function test_import_statistics_returns_correct_data(): void
     {
         // Import rates first
-        $importService = app(\App\Services\ExchangeRateImportService::class);
+        $importService = app(ExchangeRateImportService::class);
         $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
 
         $response = $this->getJson('/api/exchange-rates/import/statistics');
@@ -238,7 +239,7 @@ class ExchangeRateTest extends TestCase
     public function test_three_rate_series_are_independent(): void
     {
         // Import rates from month sheets
-        $importService = app(\App\Services\ExchangeRateImportService::class);
+        $importService = app(ExchangeRateImportService::class);
         $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
 
         // Get a sample rate

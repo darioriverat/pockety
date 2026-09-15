@@ -1,13 +1,26 @@
 <?php
 
+use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\VerifyCsrfToken;
+use App\Models\Account;
+use App\Models\AccountBalance;
 use App\Models\Category;
+use App\Models\ExchangeRate;
+use App\Models\FixedAsset;
+use App\Models\FixedAssetValuation;
+use App\Models\User;
+use App\Services\AccountImportService;
+use App\Services\BalanceSheetImportService;
+use App\Services\BalanceSheetService;
+use App\Services\BudgetService;
+use App\Services\FinancialSummaryService;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::inertia('accounts', 'accounts')->name('accounts');
     Route::inertia('income', 'income')->name('income');
     Route::inertia('reconciliation', 'reconciliation')->name('reconciliation');
@@ -80,7 +93,7 @@ if (app()->environment('local')) {
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/login-as-test-user', function () {
-        $user = \App\Models\User::query()->updateOrCreate(
+        $user = User::query()->updateOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Browser Test User',
@@ -161,7 +174,7 @@ if (app()->environment('local')) {
 
     Route::get('/dev/import-accounts', function () {
         try {
-            $service = app(\App\Services\AccountImportService::class);
+            $service = app(AccountImportService::class);
             $result = $service->importFromDefaultPath();
 
             return response()->json([
@@ -209,7 +222,7 @@ if (app()->environment('local')) {
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/verify-accounts-ui', function () {
-        $service = app(\App\Domain\Services\Contracts\AccountServiceInterface::class);
+        $service = app(AccountServiceInterface::class);
         $accounts = array_map(fn ($e) => $e->toArray(), $service->getAllActive());
         $assets = array_values(array_filter($accounts, fn ($a) => $a['is_asset']));
         $liabilities = array_values(array_filter($accounts, fn ($a) => $a['is_liability']));
@@ -264,7 +277,7 @@ HTML;
 
     Route::get('/dev/verify-budgets-ui', function () {
         $period = request()->query('period', '202501');
-        $service = app(\App\Services\BudgetService::class);
+        $service = app(BudgetService::class);
         $report = $service->getBudgetVsActualReport($period);
         $rowsWithBudget = array_values(array_filter(
             $report['rows'],
@@ -289,7 +302,7 @@ HTML;
             $overClass = $row['is_over_budget'] ? ' over' : '';
 
             $rowHtml .= "<tr class=\"{$overClass}\" data-testid=\"budget-row-{$code}\" data-over-budget=\""
-                .($row['is_over_budget'] ? 'true' : 'false')."\">"
+                .($row['is_over_budget'] ? 'true' : 'false').'">'
                 ."<td>{$code} {$name}</td>"
                 ."<td>{$budget}</td>"
                 ."<td>{$actual}</td>"
@@ -359,7 +372,7 @@ HTML;
 
     Route::get('/dev/verify-financial-summary-ui', function () {
         $period = request()->query('period', '202501');
-        $service = app(\App\Services\FinancialSummaryService::class);
+        $service = app(FinancialSummaryService::class);
         $summary = $service->getSummary($period);
 
         $formatCad = fn (float $value): string => '$'.number_format($value, 2);
@@ -403,7 +416,7 @@ HTML;
         $periodLabel = e($period);
 
         $debtBadges = '';
-        foreach (\App\Services\FinancialSummaryService::DEBT_PAYMENT_CATEGORY_CODES as $code) {
+        foreach (FinancialSummaryService::DEBT_PAYMENT_CATEGORY_CODES as $code) {
             $safe = e($code);
             $debtBadges .= "<span class=\"badge\" data-testid=\"debt-code-{$safe}\">{$safe}</span>";
         }
@@ -475,7 +488,7 @@ HTML;
             ], 422);
         }
 
-        $asset = \App\Models\FixedAsset::query()->firstOrCreate(
+        $asset = FixedAsset::query()->firstOrCreate(
             ['name' => 'Ford Escape'],
             [
                 'description' => 'Family vehicle',
@@ -484,7 +497,7 @@ HTML;
             ]
         );
 
-        \App\Models\FixedAssetValuation::query()->updateOrCreate(
+        FixedAssetValuation::query()->updateOrCreate(
             [
                 'fixed_asset_id' => $asset->id,
                 'period' => $period,
@@ -507,7 +520,7 @@ HTML;
 
     Route::get('/dev/verify-balance-sheet-ui', function () {
         $period = request()->query('period', '202501');
-        $service = app(\App\Services\BalanceSheetService::class);
+        $service = app(BalanceSheetService::class);
         $sheet = $service->getBalanceSheet($period);
 
         $formatCad = fn (float $value): string => '$'.number_format($value, 2);
@@ -611,7 +624,7 @@ HTML;
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/seed-balance-sheet-time-series', function () {
-        $bank = \App\Models\Account::query()->firstOrCreate(
+        $bank = Account::query()->firstOrCreate(
             ['name' => 'RBC Checking TS'],
             [
                 'type' => 'bank',
@@ -619,7 +632,7 @@ HTML;
                 'is_active' => true,
             ]
         );
-        $loan = \App\Models\Account::query()->firstOrCreate(
+        $loan = Account::query()->firstOrCreate(
             ['name' => 'Personal LOAN CIBC TS'],
             [
                 'type' => 'liability',
@@ -635,7 +648,7 @@ HTML;
         ];
 
         foreach ($fixtures as $period => $amounts) {
-            \App\Models\ExchangeRate::query()->updateOrCreate(
+            ExchangeRate::query()->updateOrCreate(
                 ['period' => $period],
                 [
                     'usd_cop' => 4400,
@@ -644,7 +657,7 @@ HTML;
                 ]
             );
 
-            \App\Models\AccountBalance::query()->updateOrCreate(
+            AccountBalance::query()->updateOrCreate(
                 [
                     'account_id' => $bank->id,
                     'period' => $period,
@@ -654,7 +667,7 @@ HTML;
                 ]
             );
 
-            \App\Models\AccountBalance::query()->updateOrCreate(
+            AccountBalance::query()->updateOrCreate(
                 [
                     'account_id' => $loan->id,
                     'period' => $period,
@@ -676,7 +689,7 @@ HTML;
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/verify-balance-sheet-time-series-ui', function () {
-        $service = app(\App\Services\BalanceSheetService::class);
+        $service = app(BalanceSheetService::class);
         $series = $service->getTimeSeries('202501', '202609');
         $formatCad = fn (float $value): string => '$'.number_format($value, 2);
 
@@ -759,7 +772,7 @@ HTML;
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/import-balance-sheet-history', function () {
-        $service = app(\App\Services\BalanceSheetImportService::class);
+        $service = app(BalanceSheetImportService::class);
         $result = $service->importFromDefaultPath();
 
         return response()->json([
@@ -769,7 +782,7 @@ HTML;
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/verify-balance-sheet-import-ui', function () {
-        $service = app(\App\Services\BalanceSheetImportService::class);
+        $service = app(BalanceSheetImportService::class);
         $stats = $service->getImportStatistics();
         $formatCad = fn (float $value): string => '$'.number_format($value, 2);
 

@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
-use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 

@@ -357,8 +357,8 @@ class FixedAssetTest extends TestCase
         $response = $this->actingAs($this->user)
             ->getJson('/api/balance-sheet?period=202501');
 
-        $response->assertOk()
-            ->assertJsonPath('data.total_assets.fixed_assets_cad', 25000.00);
+        $response->assertOk();
+        $this->assertEquals(25000.00, $response->json('data.total_assets.fixed_assets_cad'));
 
         // Verify it's in the breakdown
         $breakdown = $response->json('data.total_assets.breakdown');

@@ -7,7 +7,7 @@ use App\Models\FixedAssetValuation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\FixedAssetValuation>
+ * @extends Factory<FixedAssetValuation>
  */
 class FixedAssetValuationFactory extends Factory
 {

@@ -39,7 +39,7 @@ class Income extends Model
     /**
      * Get the total amount for this income line in CAD equivalent.
      * This requires exchange rates for the period.
-     * 
+     *
      * Per app spec: "For USD/CAD rate X, 1 USD = X CAD, multiply USD by rate.
      * For CAD/COP rate, divide COP by rate to get CAD."
      */

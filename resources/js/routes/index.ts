@@ -1192,6 +1192,87 @@ balanceSheetTimeSeries.form = balanceSheetTimeSeriesForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/fixed-assets'
+*/
+export const fixedAssets = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: fixedAssets.url(options),
+    method: 'get',
+})
+
+fixedAssets.definition = {
+    methods: ["get","head"],
+    url: '/fixed-assets',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/fixed-assets'
+*/
+fixedAssets.url = (options?: RouteQueryOptions) => {
+    return fixedAssets.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/fixed-assets'
+*/
+fixedAssets.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: fixedAssets.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/fixed-assets'
+*/
+fixedAssets.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: fixedAssets.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/fixed-assets'
+*/
+const fixedAssetsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: fixedAssets.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/fixed-assets'
+*/
+fixedAssetsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: fixedAssets.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/fixed-assets'
+*/
+fixedAssetsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: fixedAssets.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+fixedAssets.form = fixedAssetsForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
