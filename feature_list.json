@@ -866,7 +866,7 @@
       "Step 3: Set book value for period 202502: CAD 24,500.00 (after depreciation)",
       "Step 4: Verify different book values per period are saved"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -877,7 +877,7 @@
       "Step 3: Verify total assets includes the fixed asset value",
       "Step 4: Verify fixed assets section shows the breakdown"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -889,7 +889,7 @@
       "Step 4: Verify loan balance decreases with principal payments",
       "Step 5: Verify asset book value is independent of loan balance"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
