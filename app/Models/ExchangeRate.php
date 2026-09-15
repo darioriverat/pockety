@@ -66,6 +66,22 @@ class ExchangeRate extends Model
     }
 
     /**
+     * Convert CAD to USD.
+     *
+     * Per app spec: USD/CAD rate X means 1 USD = X CAD, so CAD → USD divides by the rate.
+     */
+    public function cadToUsd(float $amount): float
+    {
+        $rate = (float) $this->usd_cad;
+
+        if ($rate == 0.0) {
+            return 0.0;
+        }
+
+        return round($amount / $rate, 2);
+    }
+
+    /**
      * Convert any currency to CAD equivalent.
      */
     public function toCad(float $amount, string $currency): float

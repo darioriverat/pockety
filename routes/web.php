@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('exchange-rates', 'exchange-rates')->name('exchange-rates');
     Route::inertia('budgets', 'budgets')->name('budgets');
     Route::inertia('financial-summary', 'financial-summary')->name('financial-summary');
+    Route::inertia('balance-sheet', 'balance-sheet')->name('balance-sheet');
     Route::inertia('import', 'import')->name('import');
 });
 
@@ -454,6 +455,152 @@ HTML;
     </tbody>
   </table>
   <p class="nav"><a href="/financial-summary">Open live Financial Summary page</a></p>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/seed-balance-sheet-fixture', function () {
+        $period = request()->query('period', '202501');
+        $bookValue = (float) request()->query('book_value', 25000);
+
+        if (! preg_match('/^\d{6}$/', $period)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Invalid period',
+            ], 422);
+        }
+
+        $asset = \App\Models\FixedAsset::query()->firstOrCreate(
+            ['name' => 'Ford Escape'],
+            [
+                'description' => 'Family vehicle',
+                'initial_value_cad' => $bookValue,
+                'is_active' => true,
+            ]
+        );
+
+        \App\Models\FixedAssetValuation::query()->updateOrCreate(
+            [
+                'fixed_asset_id' => $asset->id,
+                'period' => $period,
+            ],
+            [
+                'book_value_cad' => $bookValue,
+                'depreciation_cad' => 0,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'fixed_asset_id' => $asset->id,
+                'period' => $period,
+                'book_value_cad' => $bookValue,
+            ],
+        ]);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-balance-sheet-ui', function () {
+        $period = request()->query('period', '202501');
+        $service = app(\App\Services\BalanceSheetService::class);
+        $sheet = $service->getBalanceSheet($period);
+
+        $formatCad = fn (float $value): string => '$'.number_format($value, 2);
+        $formatUsd = fn (float $value): string => 'US$'.number_format($value, 2);
+        $formatCop = fn (float $value): string => 'COP '.number_format($value, 0);
+
+        $assetRows = '';
+        foreach ($sheet['total_assets']['breakdown'] as $row) {
+            $name = e($row['name']);
+            $type = e($row['type']);
+            $cad = e($formatCad((float) $row['cad']));
+            $assetRows .= "<tr data-testid=\"asset-row-{$type}-{$row['id']}\">"
+                ."<td>{$name}</td><td>{$type}</td><td>{$cad}</td></tr>";
+        }
+
+        $liabilityRows = '';
+        foreach ($sheet['total_liabilities']['breakdown'] as $row) {
+            $name = e($row['name']);
+            $cad = e($formatCad((float) $row['cad']));
+            $liabilityRows .= "<tr data-testid=\"liability-row-{$row['id']}\">"
+                ."<td>{$name}</td><td>liability</td><td>{$cad}</td></tr>";
+        }
+
+        $assetsCad = e($formatCad($sheet['total_assets']['cad']));
+        $assetsUsd = e($formatUsd($sheet['total_assets']['usd']));
+        $assetsCop = e($formatCop($sheet['total_assets']['cop']));
+        $liabCad = e($formatCad($sheet['total_liabilities']['cad']));
+        $liabUsd = e($formatUsd($sheet['total_liabilities']['usd']));
+        $liabCop = e($formatCop($sheet['total_liabilities']['cop']));
+        $equityCad = e($formatCad($sheet['equity']['cad']));
+        $equityUsd = e($formatUsd($sheet['equity']['usd']));
+        $equityCop = e($formatCop($sheet['equity']['cop']));
+        $accountsCad = e($formatCad($sheet['total_assets']['accounts_cad']));
+        $fixedCad = e($formatCad($sheet['total_assets']['fixed_assets_cad']));
+        $periodLabel = e($period);
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Balance Sheet Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 180px; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat .cad { font-size: 1.35rem; display: block; }
+    .stat .alt { font-size: 0.9rem; color: #57534e; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 1.5rem; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1>Balance Sheet</h1>
+  <p class="meta">Verification for period {$periodLabel}</p>
+  <div class="summary" data-testid="balance-sheet-summary">
+    <div class="stat">
+      <strong>Total Assets</strong>
+      <span class="cad" data-testid="total-assets-cad">{$assetsCad}</span>
+      <span class="alt" data-testid="total-assets-usd">{$assetsUsd}</span>
+      <span class="alt" data-testid="total-assets-cop">{$assetsCop}</span>
+    </div>
+    <div class="stat">
+      <strong>Total Liabilities</strong>
+      <span class="cad" data-testid="total-liabilities-cad">{$liabCad}</span>
+      <span class="alt" data-testid="total-liabilities-usd">{$liabUsd}</span>
+      <span class="alt" data-testid="total-liabilities-cop">{$liabCop}</span>
+    </div>
+    <div class="stat">
+      <strong>Equity</strong>
+      <span class="cad" data-testid="equity-cad">{$equityCad}</span>
+      <span class="alt" data-testid="equity-usd">{$equityUsd}</span>
+      <span class="alt" data-testid="equity-cop">{$equityCop}</span>
+    </div>
+  </div>
+  <p>
+    <span data-testid="accounts-assets-cad">Accounts: {$accountsCad}</span>
+    ·
+    <span data-testid="fixed-assets-cad">Fixed assets: {$fixedCad}</span>
+  </p>
+  <table data-testid="assets-table">
+    <thead><tr><th>Name</th><th>Type</th><th>CAD</th></tr></thead>
+    <tbody>{$assetRows}</tbody>
+  </table>
+  <table data-testid="liabilities-table">
+    <thead><tr><th>Name</th><th>Type</th><th>CAD</th></tr></thead>
+    <tbody>{$liabilityRows}</tbody>
+  </table>
+  <div data-testid="multi-currency-totals"></div>
+  <p class="nav"><a href="/balance-sheet">Open live Balance Sheet page</a></p>
 </body>
 </html>
 HTML;

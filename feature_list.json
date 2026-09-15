@@ -735,7 +735,7 @@
             "Step 3: Verify total assets = sum of all bank accounts + investments + receivables + fixed assets",
             "Step 4: Verify amount is in CAD equivalent"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -746,7 +746,7 @@
             "Step 3: Verify total liabilities = sum of all credit cards + loans",
             "Step 4: Verify amount is in CAD equivalent"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -758,7 +758,7 @@
             "Step 4: Verify equity = assets - liabilities",
             "Step 5: Verify calculation is displayed correctly"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -769,7 +769,7 @@
             "Step 3: Verify Liabilities total is displayed in CAD",
             "Step 4: Verify Equity total is displayed in CAD"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -781,7 +781,7 @@
             "Step 4: Verify Equity total is also shown in USD equivalent",
             "Step 5: Verify conversion uses period exchange rates"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -793,7 +793,7 @@
             "Step 4: Verify Equity total is also shown in COP equivalent",
             "Step 5: Verify conversion uses period exchange rates"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -1568,7 +1568,7 @@
             "Step 3: Verify response contains total_assets, total_liabilities, equity",
             "Step 4: Verify each is provided in CAD, USD, and COP equivalents"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",

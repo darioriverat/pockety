@@ -1030,6 +1030,87 @@ financialSummary.form = financialSummaryForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet'
+*/
+export const balanceSheet = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: balanceSheet.url(options),
+    method: 'get',
+})
+
+balanceSheet.definition = {
+    methods: ["get","head"],
+    url: '/balance-sheet',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet'
+*/
+balanceSheet.url = (options?: RouteQueryOptions) => {
+    return balanceSheet.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet'
+*/
+balanceSheet.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: balanceSheet.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet'
+*/
+balanceSheet.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: balanceSheet.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet'
+*/
+const balanceSheetForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: balanceSheet.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet'
+*/
+balanceSheetForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: balanceSheet.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet'
+*/
+balanceSheetForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: balanceSheet.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+balanceSheet.form = balanceSheetForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

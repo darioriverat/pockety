@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Balance Sheet Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 180px; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat .cad { font-size: 1.35rem; display: block; }
+    .stat .alt { font-size: 0.9rem; color: #57534e; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 1.5rem; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1>Balance Sheet</h1>
+  <p class="meta">Verification for period 202501</p>
+  <div class="summary" data-testid="balance-sheet-summary">
+    <div class="stat">
+      <strong>Total Assets</strong>
+      <span class="cad" data-testid="total-assets-cad">$31,250.00</span>
+      <span class="alt" data-testid="total-assets-usd">US$41,666.67</span>
+      <span class="alt" data-testid="total-assets-cop">COP 93,750,000</span>
+    </div>
+    <div class="stat">
+      <strong>Total Liabilities</strong>
+      <span class="cad" data-testid="total-liabilities-cad">$2,000.00</span>
+      <span class="alt" data-testid="total-liabilities-usd">US$2,666.67</span>
+      <span class="alt" data-testid="total-liabilities-cop">COP 6,000,000</span>
+    </div>
+    <div class="stat">
+      <strong>Equity</strong>
+      <span class="cad" data-testid="equity-cad">$29,250.00</span>
+      <span class="alt" data-testid="equity-usd">US$39,000.00</span>
+      <span class="alt" data-testid="equity-cop">COP 87,750,000</span>
+    </div>
+  </div>
+  <p>
+    <span data-testid="accounts-assets-cad">Accounts: $6,250.00</span>
+    ·
+    <span data-testid="fixed-assets-cad">Fixed assets: $25,000.00</span>
+  </p>
+  <table data-testid="assets-table">
+    <thead><tr><th>Name</th><th>Type</th><th>CAD</th></tr></thead>
+    <tbody><tr data-testid="asset-row-bank-1"><td>RBC Checking BS</td><td>bank</td><td>$1,000.00</td></tr><tr data-testid="asset-row-investment-2"><td>TD Brokerage BS</td><td>investment</td><td>$5,000.00</td></tr><tr data-testid="asset-row-receivable-3"><td>Loan to Diana BS</td><td>receivable</td><td>$250.00</td></tr><tr data-testid="asset-row-fixed_asset-1"><td>Ford Escape</td><td>fixed_asset</td><td>$25,000.00</td></tr></tbody>
+  </table>
+  <table data-testid="liabilities-table">
+    <thead><tr><th>Name</th><th>Type</th><th>CAD</th></tr></thead>
+    <tbody><tr data-testid="liability-row-4"><td>Personal LOAN CIBC BS</td><td>liability</td><td>$2,000.00</td></tr></tbody>
+  </table>
+  <div data-testid="multi-currency-totals"></div>
+  <p class="nav"><a href="/balance-sheet">Open live Balance Sheet page</a></p>
+</body>
+</html>

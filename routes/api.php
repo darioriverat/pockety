@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountImportController;
+use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExchangeRateController;
@@ -63,6 +64,10 @@ Route::delete('/income/{id}', [IncomeController::class, 'destroy'])->name('incom
 
 // Reconciliation API
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');
+
+// Balance Sheet API
+Route::get('/balance-sheet', [BalanceSheetController::class, 'show'])->name('balance-sheet.show');
+Route::get('/periods/{period}/balance-sheet', [BalanceSheetController::class, 'show'])->name('periods.balance-sheet');
 
 // Transaction Import API
 Route::post('/transactions/import', [TransactionImportController::class, 'import'])->name('transactions.import');
