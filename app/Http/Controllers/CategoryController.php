@@ -56,4 +56,39 @@ class CategoryController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Delete a category by code.
+     *
+     * DELETE /api/categories/{code}
+     */
+    public function destroy(string $code): JsonResponse
+    {
+        try {
+            $deleted = $this->service->delete($code);
+
+            if (! $deleted) {
+                $hasTransactions = $this->service->hasTransactions($code);
+
+                return response()->json([
+                    'error' => 'Cannot delete category',
+                    'message' => $hasTransactions
+                        ? 'This category has associated transactions and cannot be deleted'
+                        : 'Category deletion failed',
+                    'has_transactions' => $hasTransactions,
+                ], 422);
+            }
+
+            return response()->json([
+                'message' => 'Category deleted successfully',
+                'links' => [
+                    'index' => route('categories.index'),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 404);
+        }
+    }
 }

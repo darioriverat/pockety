@@ -100,4 +100,43 @@ class CategoryService implements CategoryServiceInterface
             );
         })->all();
     }
+
+    /**
+     * Delete a category by its code.
+     * Returns true if deleted successfully, false if category has transactions.
+     *
+     * @throws \Exception if category not found
+     */
+    public function delete(string $code): bool
+    {
+        $category = Category::where('code', $code)->first();
+
+        if (! $category) {
+            throw new \Exception("Category with code {$code} not found");
+        }
+
+        // Check if category has associated transactions
+        if ($category->transactions()->exists()) {
+            return false;
+        }
+
+        // Safe to delete
+        $category->delete();
+
+        return true;
+    }
+
+    /**
+     * Check if a category has associated transactions.
+     */
+    public function hasTransactions(string $code): bool
+    {
+        $category = Category::where('code', $code)->first();
+
+        if (! $category) {
+            return false;
+        }
+
+        return $category->transactions()->exists();
+    }
 }

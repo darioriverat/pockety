@@ -31,4 +31,17 @@ interface CategoryServiceInterface
      * @return CategoryEntity[]
      */
     public function getDebtCategories(): array;
+
+    /**
+     * Delete a category by its code.
+     * Returns true if deleted successfully, false if category has transactions.
+     *
+     * @throws \Exception if category not found
+     */
+    public function delete(string $code): bool;
+
+    /**
+     * Check if a category has associated transactions.
+     */
+    public function hasTransactions(string $code): bool;
 }

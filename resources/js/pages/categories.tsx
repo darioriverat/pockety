@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 interface Category {
     id: number;
@@ -34,6 +36,7 @@ export default function Categories() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     useEffect(() => {
         fetchCategories();
@@ -55,6 +58,42 @@ export default function Categories() {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (code: string, categoryName: string) => {
+        if (!confirm(`Are you sure you want to delete category ${code} (${categoryName})?`)) {
+            return;
+        }
+
+        const categoryId = categories.find(c => c.code === code)?.id;
+        setDeletingId(categoryId || null);
+
+        try {
+            const response = await fetch(`/api/categories/${code}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (errorData.has_transactions) {
+                    alert(errorData.message || 'This category has associated transactions and cannot be deleted');
+                } else {
+                    throw new Error(errorData.message || 'Failed to delete category');
+                }
+                return;
+            }
+
+            // Remove category from list on successful deletion
+            setCategories(categories.filter(c => c.code !== code));
+            setError(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -121,16 +160,27 @@ export default function Categories() {
                                             <CardTitle className="text-lg">
                                                 {category.code}
                                             </CardTitle>
-                                            {category.is_debt_category && (
-                                                <Badge variant="secondary">
-                                                    Debt
-                                                </Badge>
-                                            )}
-                                            {!category.is_active && (
-                                                <Badge variant="outline">
-                                                    Retired
-                                                </Badge>
-                                            )}
+                                            <div className="flex gap-2 items-center">
+                                                {category.is_debt_category && (
+                                                    <Badge variant="secondary">
+                                                        Debt
+                                                    </Badge>
+                                                )}
+                                                {!category.is_active && (
+                                                    <Badge variant="outline">
+                                                        Retired
+                                                    </Badge>
+                                                )}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(category.code, category.name_en)}
+                                                    disabled={deletingId === category.id}
+                                                    className="h-8 w-8 p-0"
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </div>
                                         </div>
                                         <CardDescription>
                                             <div className="space-y-1">
