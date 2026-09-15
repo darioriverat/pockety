@@ -912,7 +912,7 @@
       "Step 3: Verify transaction count is displayed",
       "Step 4: Verify count matches number of transactions in that period"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
