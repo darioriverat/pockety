@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\BudgetController::index
-* @see app/Http/Controllers/BudgetController.php:19
+* @see app/Http/Controllers/BudgetController.php:20
 * @route '/api/budgets'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetController::index
-* @see app/Http/Controllers/BudgetController.php:19
+* @see app/Http/Controllers/BudgetController.php:20
 * @route '/api/budgets'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\BudgetController::index
-* @see app/Http/Controllers/BudgetController.php:19
+* @see app/Http/Controllers/BudgetController.php:20
 * @route '/api/budgets'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::index
-* @see app/Http/Controllers/BudgetController.php:19
+* @see app/Http/Controllers/BudgetController.php:20
 * @route '/api/budgets'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::index
-* @see app/Http/Controllers/BudgetController.php:19
+* @see app/Http/Controllers/BudgetController.php:20
 * @route '/api/budgets'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\BudgetController::index
-* @see app/Http/Controllers/BudgetController.php:19
+* @see app/Http/Controllers/BudgetController.php:20
 * @route '/api/budgets'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::index
-* @see app/Http/Controllers/BudgetController.php:19
+* @see app/Http/Controllers/BudgetController.php:20
 * @route '/api/budgets'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\BudgetController::store
-* @see app/Http/Controllers/BudgetController.php:47
+* @see app/Http/Controllers/BudgetController.php:48
 * @route '/api/budgets'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetController::store
-* @see app/Http/Controllers/BudgetController.php:47
+* @see app/Http/Controllers/BudgetController.php:48
 * @route '/api/budgets'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\BudgetController::store
-* @see app/Http/Controllers/BudgetController.php:47
+* @see app/Http/Controllers/BudgetController.php:48
 * @route '/api/budgets'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::store
-* @see app/Http/Controllers/BudgetController.php:47
+* @see app/Http/Controllers/BudgetController.php:48
 * @route '/api/budgets'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\BudgetController::store
-* @see app/Http/Controllers/BudgetController.php:47
+* @see app/Http/Controllers/BudgetController.php:48
 * @route '/api/budgets'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -138,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\BudgetController::report
-* @see app/Http/Controllers/BudgetController.php:93
+* @see app/Http/Controllers/BudgetController.php:94
 * @route '/api/budgets/report'
 */
 export const report = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -153,7 +153,7 @@ report.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetController::report
-* @see app/Http/Controllers/BudgetController.php:93
+* @see app/Http/Controllers/BudgetController.php:94
 * @route '/api/budgets/report'
 */
 report.url = (options?: RouteQueryOptions) => {
@@ -162,7 +162,7 @@ report.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\BudgetController::report
-* @see app/Http/Controllers/BudgetController.php:93
+* @see app/Http/Controllers/BudgetController.php:94
 * @route '/api/budgets/report'
 */
 report.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -172,7 +172,7 @@ report.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::report
-* @see app/Http/Controllers/BudgetController.php:93
+* @see app/Http/Controllers/BudgetController.php:94
 * @route '/api/budgets/report'
 */
 report.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -182,7 +182,7 @@ report.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::report
-* @see app/Http/Controllers/BudgetController.php:93
+* @see app/Http/Controllers/BudgetController.php:94
 * @route '/api/budgets/report'
 */
 const reportForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -192,7 +192,7 @@ const reportForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\BudgetController::report
-* @see app/Http/Controllers/BudgetController.php:93
+* @see app/Http/Controllers/BudgetController.php:94
 * @route '/api/budgets/report'
 */
 reportForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -202,7 +202,7 @@ reportForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::report
-* @see app/Http/Controllers/BudgetController.php:93
+* @see app/Http/Controllers/BudgetController.php:94
 * @route '/api/budgets/report'
 */
 reportForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
