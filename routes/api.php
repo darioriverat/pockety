@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExchangeRateController;
 use App\Http\Controllers\ExchangeRateImportController;
 use App\Http\Controllers\FinancialSummaryController;
+use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\TransactionController;
@@ -42,6 +43,16 @@ Route::get('/accounts/{accountId}/balances', [AccountBalanceController::class, '
 Route::post('/accounts/{accountId}/balances', [AccountBalanceController::class, 'store'])->name('accounts.balances.store')->whereNumber('accountId');
 Route::get('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'show'])->name('accounts.balances.show')->whereNumber(['accountId', 'id']);
 Route::delete('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'destroy'])->name('accounts.balances.destroy')->whereNumber(['accountId', 'id']);
+
+// Fixed Assets API
+Route::get('/fixed-assets', [FixedAssetController::class, 'index'])->name('fixed-assets.index');
+Route::get('/fixed-assets/{id}', [FixedAssetController::class, 'show'])->name('fixed-assets.show')->whereNumber('id');
+Route::post('/fixed-assets', [FixedAssetController::class, 'store'])->name('fixed-assets.store');
+Route::put('/fixed-assets/{id}', [FixedAssetController::class, 'update'])->name('fixed-assets.update')->whereNumber('id');
+Route::patch('/fixed-assets/{id}', [FixedAssetController::class, 'update'])->name('fixed-assets.patch')->whereNumber('id');
+Route::delete('/fixed-assets/{id}', [FixedAssetController::class, 'destroy'])->name('fixed-assets.destroy')->whereNumber('id');
+Route::get('/fixed-assets/{id}/valuations', [FixedAssetController::class, 'valuations'])->name('fixed-assets.valuations')->whereNumber('id');
+Route::post('/fixed-assets/{id}/valuations', [FixedAssetController::class, 'storeValuation'])->name('fixed-assets.valuations.store')->whereNumber('id');
 
 // Categories API
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');

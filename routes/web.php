@@ -18,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('financial-summary', 'financial-summary')->name('financial-summary');
     Route::inertia('balance-sheet', 'balance-sheet')->name('balance-sheet');
     Route::inertia('balance-sheet/time-series', 'balance-sheet-time-series')->name('balance-sheet-time-series');
+    Route::inertia('fixed-assets', 'fixed-assets')->name('fixed-assets');
     Route::inertia('import', 'import')->name('import');
 });
 
