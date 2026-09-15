@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('reconciliation', 'reconciliation')->name('reconciliation');
     Route::inertia('categories', 'categories')->name('categories');
     Route::inertia('transactions', 'transactions')->name('transactions');
+    Route::inertia('exchange-rates', 'exchange-rates')->name('exchange-rates');
     Route::inertia('import', 'import')->name('import');
 });
 

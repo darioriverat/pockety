@@ -4,6 +4,8 @@ use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountImportController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ExchangeRateController;
+use App\Http\Controllers\ExchangeRateImportController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\TransactionController;
@@ -64,3 +66,10 @@ Route::get('/periods/{period}/reconciliation', [ReconciliationController::class,
 Route::post('/transactions/import', [TransactionImportController::class, 'import'])->name('transactions.import');
 Route::get('/transactions/import/statistics', [TransactionImportController::class, 'statistics'])->name('transactions.import.statistics');
 Route::post('/transactions/import/clear', [TransactionImportController::class, 'clear'])->name('transactions.import.clear');
+
+// Exchange Rates API
+Route::get('/exchange-rates', [ExchangeRateController::class, 'index'])->name('exchange-rates.index');
+Route::get('/exchange-rates/show', [ExchangeRateController::class, 'show'])->name('exchange-rates.show');
+Route::post('/exchange-rates', [ExchangeRateController::class, 'store'])->name('exchange-rates.store');
+Route::post('/exchange-rates/import', [ExchangeRateImportController::class, 'import'])->name('exchange-rates.import');
+Route::get('/exchange-rates/import/statistics', [ExchangeRateImportController::class, 'statistics'])->name('exchange-rates.import.statistics');

@@ -787,6 +787,87 @@ transactions.form = transactionsForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+export const exchangeRates = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: exchangeRates.url(options),
+    method: 'get',
+})
+
+exchangeRates.definition = {
+    methods: ["get","head"],
+    url: '/exchange-rates',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+exchangeRates.url = (options?: RouteQueryOptions) => {
+    return exchangeRates.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+exchangeRates.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: exchangeRates.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+exchangeRates.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: exchangeRates.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+const exchangeRatesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exchangeRates.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+exchangeRatesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exchangeRates.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+exchangeRatesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exchangeRates.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+exchangeRates.form = exchangeRatesForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

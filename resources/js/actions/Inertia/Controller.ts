@@ -482,6 +482,86 @@ Controllere5aa2cad321b30063c3b415df5452200.form = Controllere5aa2cad321b30063c3b
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+const Controller9ec6ff571c4d5816f375bbafc9964ac9 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller9ec6ff571c4d5816f375bbafc9964ac9.url(options),
+    method: 'get',
+})
+
+Controller9ec6ff571c4d5816f375bbafc9964ac9.definition = {
+    methods: ["get","head"],
+    url: '/exchange-rates',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+Controller9ec6ff571c4d5816f375bbafc9964ac9.url = (options?: RouteQueryOptions) => {
+    return Controller9ec6ff571c4d5816f375bbafc9964ac9.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+Controller9ec6ff571c4d5816f375bbafc9964ac9.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller9ec6ff571c4d5816f375bbafc9964ac9.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+Controller9ec6ff571c4d5816f375bbafc9964ac9.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller9ec6ff571c4d5816f375bbafc9964ac9.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+const Controller9ec6ff571c4d5816f375bbafc9964ac9Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller9ec6ff571c4d5816f375bbafc9964ac9.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+Controller9ec6ff571c4d5816f375bbafc9964ac9Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller9ec6ff571c4d5816f375bbafc9964ac9.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/exchange-rates'
+*/
+Controller9ec6ff571c4d5816f375bbafc9964ac9Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller9ec6ff571c4d5816f375bbafc9964ac9.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controller9ec6ff571c4d5816f375bbafc9964ac9.form = Controller9ec6ff571c4d5816f375bbafc9964ac9Form
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 const Controller319c434a45921953484cb2f345f6ad0c = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -652,6 +732,7 @@ const Controller = {
     '/reconciliation': Controller5fbe311172c80aea24e168c1390225a1,
     '/categories': Controller7a4f8d9d0be39757f6a1352cf8f1ab45,
     '/transactions': Controllere5aa2cad321b30063c3b415df5452200,
+    '/exchange-rates': Controller9ec6ff571c4d5816f375bbafc9964ac9,
     '/import': Controller319c434a45921953484cb2f345f6ad0c,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,
 }

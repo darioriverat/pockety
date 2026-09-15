@@ -16,7 +16,7 @@
             "Step 1: Navigate to categories page",
             "Step 2: Verify 45 categories are displayed",
             "Step 3: Verify C040 is not in the list",
-            "Step 4: Verify C031 (MESADA NI\u00d1AS) appears only once"
+            "Step 4: Verify C031 (MESADA NIÑAS) appears only once"
         ],
         "passes": true
     },
@@ -36,7 +36,7 @@
         "description": "Debt categories are marked with a special indicator",
         "steps": [
             "Step 1: Navigate to categories page",
-            "Step 2: Locate category C009 (CR\u00c9DITO DAVIVIENDA)",
+            "Step 2: Locate category C009 (CRÉDITO DAVIVIENDA)",
             "Step 3: Verify it has a debt category indicator",
             "Step 4: Verify non-debt categories (e.g., C001) do not have this indicator"
         ],
@@ -460,12 +460,12 @@
     },
     {
         "category": "functional",
-        "description": "User can view list of all known accounts from source data (RBC, CIBC, TD, Wise, Bancolombia, Davivienda, Nequi, \u00c9xito)",
+        "description": "User can view list of all known accounts from source data (RBC, CIBC, TD, Wise, Bancolombia, Davivienda, Nequi, Éxito)",
         "steps": [
             "Step 1: Import historical account data",
             "Step 2: Navigate to accounts page",
             "Step 3: Verify Canadian accounts are listed: RBC, CIBC, TD Bank, Wise",
-            "Step 4: Verify Colombian accounts are listed: Bancolombia, Davivienda, Nequi, \u00c9xito",
+            "Step 4: Verify Colombian accounts are listed: Bancolombia, Davivienda, Nequi, Éxito",
             "Step 5: Verify each account shows its type and currencies"
         ],
         "passes": true
@@ -477,7 +477,7 @@
             "Step 1: Navigate to accounts page",
             "Step 2: Find 'Personal LOAN CIBC' account",
             "Step 3: Verify it is a liability account",
-            "Step 4: Verify it is NOT labeled 'Cr\u00e9dito M\u00f3vil **6174' (old stale label)",
+            "Step 4: Verify it is NOT labeled 'Crédito Móvil **6174' (old stale label)",
             "Step 5: Verify associated transactions include Ford Escape payments"
         ],
         "passes": true
@@ -542,7 +542,7 @@
             "Step 4: Save",
             "Step 5: Verify rate is saved for period 202501"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -554,7 +554,7 @@
             "Step 4: Save",
             "Step 5: Verify rate is saved for period 202501"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -566,7 +566,7 @@
             "Step 4: Save",
             "Step 5: Verify rate is saved for period 202501"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -580,7 +580,7 @@
             "Step 6: Verify all three rates are stored independently",
             "Step 7: Verify CAD rate is not auto-calculated from the other two"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -592,7 +592,7 @@
             "Step 4: Verify rates for all 21 months (Jan 2025 - Sep 2026) are imported",
             "Step 5: Verify three independent rate series are populated"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -603,7 +603,7 @@
             "Step 3: Verify USD/COP rate is 4,400 for periods 202501 through 202609",
             "Step 4: Verify rate does not change across periods"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -614,7 +614,7 @@
             "Step 3: Verify USD/CAD rate is 0.75 for periods 202501 through 202609",
             "Step 4: Verify rate does not change across periods"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -627,7 +627,7 @@
             "Step 5: Verify CAD rate for Sep 2026 is around 2,200",
             "Step 6: Verify rate changes over time"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
