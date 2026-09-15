@@ -2442,3 +2442,87 @@ NEXT SESSION
 2. Or Budget management (#57+)
 3. Run npx playwright install chromium then accounts.spec.ts
 4. Prefer Puppeteer screenshots if MCP approval available
+
+
+========================
+SESSION 23 - Exchange Rates Feature (#44-51)
+Date: September 15, 2026
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP available (UI verification successful)
+- Docker containers running smoothly
+
+VERIFICATION (prior work)
+-------------------------
+- Backend tests: 75/75 OK (including new ExchangeRateTest)
+- Frontend unit: 19/19 OK
+- Dashboard verified via browser automation
+
+ACCOMPLISHED
+------------
+1. Exchange Rates Backend:
+   - Created ExchangeRate model with USD/COP, USD/CAD, CAD/COP fields
+   - Created ExchangeRateController (index, show, store endpoints)
+   - Created ExchangeRateImportService to parse month_sheets JSON
+   - Created ExchangeRateImportController (import, statistics)
+   - API routes: /api/exchange-rates, /api/exchange-rates/import
+   - Import verified: 21 periods (Jan 2025 - Sep 2026)
+
+2. Exchange Rates Frontend:
+   - Created exchange-rates.tsx with full-featured UI
+   - Import Historical Rates card with import button and statistics
+   - Set Exchange Rates form with period selector (Jan 2025 - Sep 2026)
+   - Input fields for USD/COP, USD/CAD, CAD/COP rates
+   - Historical Exchange Rates table showing all imported rates
+   - Added "Exchange Rates" navigation link with DollarSign icon
+   - Successfully built frontend assets (npm run build)
+
+3. Tests Created:
+   - tests/Feature/ExchangeRateTest.php (13 tests, all passing)
+   - Verified: rate CRUD operations, import, validation
+   - Verified: USD/COP fixed at 4400 across all 21 months
+   - Verified: USD/CAD fixed at 0.75 across all 21 months
+   - Verified: CAD/COP varies (3000 → 2550 → 2200)
+   - Verified: Three rate series are independent (not derived)
+
+4. Data Verification:
+   - Imported exchange rates from month_sheets: 21 periods
+   - Jan 2025: USD/COP=4400, USD/CAD=0.75, CAD/COP=3000
+   - Sep 2026: USD/COP=4400, USD/CAD=0.75, CAD/COP=2200
+   - Confirmed rates match app spec requirements exactly
+
+5. UI Verification via Browser Automation:
+   - Screenshots captured of exchange rates page
+   - Verified import statistics display (21 rates, Jan 2025 - Sep 2026)
+   - Verified form with period selector and rate inputs
+   - Verified historical table showing all rates correctly
+   - Verified navigation menu includes Exchange Rates link
+
+feature_list.json UPDATED (passes: true):
+- #44: User can set exchange rate USD/COP for a specific period
+- #45: User can set exchange rate USD/CAD for a specific period
+- #46: User can set exchange rate CAD/COP (COP per 1 CAD) for a specific period
+- #47: Exchange rates are independently maintained (not derived from each other)
+- #48: System can import historical exchange rates from extracted data
+- #49: Historical exchange rates show USD/COP fixed at 4,400 across all 21 months
+- #50: Historical exchange rates show USD/CAD fixed at 0.75 across all 21 months
+- #51: Historical exchange rates show CAD rate varies (3,000 to 2,200) across 21 months
+
+CURRENT STATE
+-------------
+Tests passing: 56 of 175
+Remaining: 119
+Backend: 75/75 tests passing (added 13 new ExchangeRateTest tests)
+Frontend unit: 19/19 OK
+Exchange rates: Complete and verified
+
+NEXT SESSION
+------------
+1. Budget management features (#57+)
+2. Balance sheet time series (#42-43)
+3. Fixed assets tracking (#52-56)
+4. Reports/exports (PDF, CSV)
+5. Continue reducing remaining 119 tests
