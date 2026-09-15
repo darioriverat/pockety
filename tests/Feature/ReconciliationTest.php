@@ -134,4 +134,124 @@ class ReconciliationTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_reconciliation_includes_accounting_equation_check(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $assetAccount = Account::create([
+            'name' => 'Test Bank',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $liabilityAccount = Account::create([
+            'name' => 'Test Credit Card',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $assetAccount->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $liabilityAccount->id,
+            'period' => '202501',
+            'recorded_balance_cad' => -500,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [
+                'accounting_equation' => [
+                    'assets_cad',
+                    'liabilities_cad',
+                    'equity_cad',
+                    'residual_cad',
+                    'is_balanced',
+                ],
+            ],
+        ]);
+
+        $equation = $response->json('data.accounting_equation');
+        $this->assertEquals(1000, $equation['assets_cad']);
+        $this->assertEquals(500, $equation['liabilities_cad']);
+        $this->assertEquals(500, $equation['equity_cad']);
+        $this->assertEquals(0, $equation['residual_cad']);
+        $this->assertTrue($equation['is_balanced']);
+    }
+
+    public function test_reconciliation_detects_unbalanced_accounting_equation(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $assetAccount = Account::create([
+            'name' => 'Test Bank',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        // Create asset without corresponding liability/equity
+        // This simulates an unbalanced equation
+        AccountBalance::create([
+            'account_id' => $assetAccount->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        $response->assertOk();
+
+        $equation = $response->json('data.accounting_equation');
+        $this->assertEquals(1000, $equation['assets_cad']);
+        $this->assertEquals(0, $equation['liabilities_cad']);
+        $this->assertEquals(1000, $equation['equity_cad']);
+        // Residual should be: 1000 - (0 + 1000) = 0
+        $this->assertEquals(0, $equation['residual_cad']);
+    }
+
+    public function test_reconciliation_includes_income_and_expense_totals(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $category = Category::create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+            'is_debt_category' => false,
+            'is_active' => true,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'amount_cad' => 250,
+        ]);
+
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.expenses_total_cad', 250);
+        $response->assertJsonPath('data.net_operating_expenses_cad', 250);
+    }
 }

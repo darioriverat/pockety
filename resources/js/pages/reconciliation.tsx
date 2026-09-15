@@ -32,10 +32,22 @@ interface AccountReconciliation {
     is_balanced: boolean;
 }
 
+interface AccountingEquation {
+    assets_cad: number;
+    liabilities_cad: number;
+    equity_cad: number;
+    residual_cad: number;
+    is_balanced: boolean;
+}
+
 interface ReconciliationReport {
     period: string;
     status: 'balanced' | 'unbalanced';
     accounts: AccountReconciliation[];
+    accounting_equation: AccountingEquation;
+    income_total_cad: number;
+    expenses_total_cad: number;
+    net_operating_expenses_cad: number;
 }
 
 const formatCurrency = (value: number, currency: string): string => {
@@ -206,6 +218,143 @@ export default function Reconciliation() {
                         )}
                     </CardContent>
                 </Card>
+
+                {report && report.accounting_equation && (
+                    <Card data-testid="accounting-equation-card">
+                        <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                                <span>Accounting Equation</span>
+                                <Badge
+                                    variant={
+                                        report.accounting_equation.is_balanced
+                                            ? 'default'
+                                            : 'destructive'
+                                    }
+                                    data-testid="equation-status"
+                                >
+                                    {report.accounting_equation.is_balanced
+                                        ? 'Balanced'
+                                        : 'Unbalanced'}
+                                </Badge>
+                            </CardTitle>
+                            <CardDescription>
+                                Assets = Liabilities + Equity
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">
+                                            Assets
+                                        </p>
+                                        <p
+                                            className="text-2xl font-bold"
+                                            data-testid="assets-value"
+                                        >
+                                            {formatCurrency(
+                                                report.accounting_equation
+                                                    .assets_cad,
+                                                'CAD'
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">
+                                            Liabilities
+                                        </p>
+                                        <p
+                                            className="text-2xl font-bold"
+                                            data-testid="liabilities-value"
+                                        >
+                                            {formatCurrency(
+                                                report.accounting_equation
+                                                    .liabilities_cad,
+                                                'CAD'
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">
+                                            Equity
+                                        </p>
+                                        <p
+                                            className="text-2xl font-bold"
+                                            data-testid="equity-value"
+                                        >
+                                            {formatCurrency(
+                                                report.accounting_equation
+                                                    .equity_cad,
+                                                'CAD'
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">
+                                            Residual
+                                        </p>
+                                        <p
+                                            className={`text-2xl font-bold ${Math.abs(report.accounting_equation.residual_cad) <= 0.01 ? 'text-green-600' : 'text-red-600'}`}
+                                            data-testid="residual-value"
+                                        >
+                                            {formatCurrency(
+                                                report.accounting_equation
+                                                    .residual_cad,
+                                                'CAD'
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="border-t pt-4">
+                                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">
+                                                Income Total
+                                            </p>
+                                            <p
+                                                className="text-lg font-semibold"
+                                                data-testid="income-total"
+                                            >
+                                                {formatCurrency(
+                                                    report.income_total_cad,
+                                                    'CAD'
+                                                )}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">
+                                                Total Disbursements
+                                            </p>
+                                            <p
+                                                className="text-lg font-semibold"
+                                                data-testid="expenses-total"
+                                            >
+                                                {formatCurrency(
+                                                    report.expenses_total_cad,
+                                                    'CAD'
+                                                )}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">
+                                                Net Operating Expenses
+                                            </p>
+                                            <p
+                                                className="text-lg font-semibold"
+                                                data-testid="net-expenses"
+                                            >
+                                                {formatCurrency(
+                                                    report.net_operating_expenses_cad,
+                                                    'CAD'
+                                                )}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {report && report.accounts.length === 0 && (
                     <p className="text-muted-foreground">

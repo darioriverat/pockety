@@ -13,6 +13,12 @@ class ReconciliationService
      */
     private const VARIANCE_THRESHOLD = 0.01;
 
+    public function __construct(
+        private readonly BalanceSheetService $balanceSheetService,
+        private readonly FinancialSummaryService $financialSummaryService,
+        private readonly IncomeService $incomeService
+    ) {}
+
     /**
      * Build the full reconciliation report for a given period (YYYYMM).
      *
@@ -24,7 +30,19 @@ class ReconciliationService
      *   transactions for the account.
      * - Variance: Recorded minus Computed.
      *
-     * @return array{period: string, status: string, accounts: array<int, array<string, mixed>>}
+     * Also includes:
+     * - Accounting equation check (Assets = Liabilities + Equity)
+     * - Income and expense totals for the period
+     *
+     * @return array{
+     *     period: string,
+     *     status: string,
+     *     accounts: array<int, array<string, mixed>>,
+     *     accounting_equation: array<string, mixed>,
+     *     income_total_cad: float,
+     *     expenses_total_cad: float,
+     *     net_operating_expenses_cad: float
+     * }
      */
     public function reconcileForPeriod(string $period): array
     {
@@ -39,12 +57,56 @@ class ReconciliationService
             $results[] = $this->reconcileAccount($account, $period);
         }
 
-        $overallBalanced = collect($results)->every(fn (array $result) => $result['is_balanced']);
+        $accountsBalanced = collect($results)->every(fn (array $result) => $result['is_balanced']);
+
+        // Get accounting equation check
+        $equation = $this->checkAccountingEquation($period);
+
+        // Get income and expenses
+        $incomeTotal = $this->incomeService->getTotalCadEquivalent($period);
+        $financialSummary = $this->financialSummaryService->getSummary($period);
 
         return [
             'period' => $period,
-            'status' => $overallBalanced ? 'balanced' : 'unbalanced',
+            'status' => $accountsBalanced && $equation['is_balanced'] ? 'balanced' : 'unbalanced',
             'accounts' => $results,
+            'accounting_equation' => $equation,
+            'income_total_cad' => round($incomeTotal, 2),
+            'expenses_total_cad' => round($financialSummary['total_recorded_disbursements_cad'], 2),
+            'net_operating_expenses_cad' => round($financialSummary['net_operating_expenses_cad'], 2),
+        ];
+    }
+
+    /**
+     * Check the accounting equation: Assets = Liabilities + Equity
+     * Returns the residual (should be near zero for a balanced sheet).
+     *
+     * @return array{
+     *     assets_cad: float,
+     *     liabilities_cad: float,
+     *     equity_cad: float,
+     *     residual_cad: float,
+     *     is_balanced: bool
+     * }
+     */
+    private function checkAccountingEquation(string $period): array
+    {
+        $balanceSheet = $this->balanceSheetService->getBalanceSheet($period);
+
+        $assetsCad = $balanceSheet['total_assets']['cad'];
+        $liabilitiesCad = $balanceSheet['total_liabilities']['cad'];
+        $equityCad = $balanceSheet['equity']['cad'];
+
+        // Accounting equation: Assets = Liabilities + Equity
+        // Residual = Assets - (Liabilities + Equity), should be near zero
+        $residualCad = round($assetsCad - ($liabilitiesCad + $equityCad), 2);
+
+        return [
+            'assets_cad' => $assetsCad,
+            'liabilities_cad' => $liabilitiesCad,
+            'equity_cad' => $equityCad,
+            'residual_cad' => $residualCad,
+            'is_balanced' => abs($residualCad) <= self::VARIANCE_THRESHOLD,
         ];
     }
 

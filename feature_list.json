@@ -1,2107 +1,2107 @@
 [
-    {
-        "category": "functional",
-        "description": "User can access the application dashboard at http://dev.pockety.com:8080/",
-        "steps": [
-            "Step 1: Navigate to http://dev.pockety.com:8080/",
-            "Step 2: Verify the page loads without errors",
-            "Step 3: Verify the dashboard displays main navigation"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System displays all 45 active expense categories (C001-C046, excluding retired C040)",
-        "steps": [
-            "Step 1: Navigate to categories page",
-            "Step 2: Verify 45 categories are displayed",
-            "Step 3: Verify C040 is not in the list",
-            "Step 4: Verify C031 (MESADA NIÑAS) appears only once"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Each category displays both Spanish and English names",
-        "steps": [
-            "Step 1: Navigate to categories page",
-            "Step 2: Select category C001",
-            "Step 3: Verify Spanish name 'MERCADO' is displayed",
-            "Step 4: Verify English name 'Groceries' is displayed"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Debt categories are marked with a special indicator",
-        "steps": [
-            "Step 1: Navigate to categories page",
-            "Step 2: Locate category C009 (CRÉDITO DAVIVIENDA)",
-            "Step 3: Verify it has a debt category indicator",
-            "Step 4: Verify non-debt categories (e.g., C001) do not have this indicator"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can create a new expense transaction with CAD currency",
-        "steps": [
-            "Step 1: Navigate to transactions page",
-            "Step 2: Click 'Add Transaction' button",
-            "Step 3: Fill in date, period (YYYYMM), quincena (Q1), category (C001), CAD amount (100.50), and comments",
-            "Step 4: Submit the form",
-            "Step 5: Verify transaction appears in the list",
-            "Step 6: Verify all fields match the input"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can create a new expense transaction with USD currency",
-        "steps": [
-            "Step 1: Navigate to transactions page",
-            "Step 2: Click 'Add Transaction' button",
-            "Step 3: Fill in date, period, quincena, category, USD amount (50.00)",
-            "Step 4: Submit the form",
-            "Step 5: Verify transaction is created with USD currency",
-            "Step 6: Verify CAD and COP fields are empty/null"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can create a new expense transaction with COP currency",
-        "steps": [
-            "Step 1: Navigate to transactions page",
-            "Step 2: Click 'Add Transaction' button",
-            "Step 3: Fill in date, period, quincena, category, COP amount (500000)",
-            "Step 4: Submit the form",
-            "Step 5: Verify transaction is created with COP currency"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transaction only allows one currency per transaction (not multiple)",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Enter CAD amount (100.00)",
-            "Step 3: Attempt to also enter USD amount",
-            "Step 4: Verify system prevents or warns about multiple currencies",
-            "Step 5: Verify only one currency can be selected at a time"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transaction category is validated against the category catalog",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Attempt to enter an invalid category code (e.g., C999)",
-            "Step 3: Verify system rejects the invalid category",
-            "Step 4: Verify error message is displayed"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transaction displays category description as lookup, not stored value",
-        "steps": [
-            "Step 1: Create a transaction with category C001",
-            "Step 2: View the transaction details",
-            "Step 3: Verify 'MERCADO / Groceries' is displayed",
-            "Step 4: Verify the description is looked up from category table, not stored in transaction"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can mark a transaction as recurring",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Fill in transaction details",
-            "Step 3: Check 'is_recurring' checkbox/toggle",
-            "Step 4: Submit form",
-            "Step 5: Verify transaction is marked as recurring",
-            "Step 6: Verify recurring indicator is visible in transaction list"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can specify debt component as 'principal' for debt payment transactions",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Select a debt category (e.g., C044 - CREDITO FORD ESCAPE)",
-            "Step 3: Select debt_component as 'principal'",
-            "Step 4: Submit transaction",
-            "Step 5: Verify debt_component is saved as 'principal'"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can specify debt component as 'interest' for debt payment transactions",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Select a debt category (e.g., C044 - CREDITO FORD ESCAPE)",
-            "Step 3: Select debt_component as 'interest'",
-            "Step 4: Submit transaction",
-            "Step 5: Verify debt_component is saved as 'interest'"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Non-debt transactions do not require debt_component field",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Select a non-debt category (e.g., C001 - MERCADO)",
-            "Step 3: Verify debt_component field is not required or is hidden",
-            "Step 4: Submit transaction without debt_component",
-            "Step 5: Verify transaction is created successfully"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can edit an existing transaction",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Select a transaction to edit",
-            "Step 3: Modify the amount",
-            "Step 4: Submit changes",
-            "Step 5: Verify transaction is updated",
-            "Step 6: Verify new amount is displayed"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can delete a transaction",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Select a transaction",
-            "Step 3: Click delete button",
-            "Step 4: Confirm deletion",
-            "Step 5: Verify transaction is removed from list"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transactions can be filtered by period (YYYYMM format)",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Select period filter (e.g., 202501)",
-            "Step 3: Verify only transactions from January 2025 are displayed",
-            "Step 4: Change filter to 202602",
-            "Step 5: Verify only transactions from February 2026 are displayed"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transactions can be filtered by category",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Select category filter (e.g., C001 - MERCADO)",
-            "Step 3: Verify only grocery transactions are displayed",
-            "Step 4: Change filter to C004 - TRANSPORTES",
-            "Step 5: Verify only transportation transactions are displayed"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transactions can be filtered by quincena (Q1 or Q2)",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Set period filter to 202501",
-            "Step 3: Set quincena filter to Q1",
-            "Step 4: Verify only Q1 transactions from January 2025 are shown",
-            "Step 5: Change quincena to Q2",
-            "Step 6: Verify only Q2 transactions are shown"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transactions can be filtered by currency (CAD, USD, or COP)",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Apply CAD currency filter",
-            "Step 3: Verify only CAD transactions are displayed",
-            "Step 4: Apply USD filter",
-            "Step 5: Verify only USD transactions are displayed"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can filter transactions by recurring status",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Filter by 'recurring only'",
-            "Step 3: Verify only transactions marked as recurring are shown",
-            "Step 4: Filter by 'non-recurring only'",
-            "Step 5: Verify only non-recurring transactions are shown"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can search transactions by comments/description text",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Enter search text in search box (e.g., 'FORD')",
-            "Step 3: Verify only transactions containing 'FORD' in comments are displayed",
-            "Step 4: Clear search",
-            "Step 5: Verify all transactions are shown again"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System can import historical transactions from gastos_ledger_2025_2026.json",
-        "steps": [
-            "Step 1: Navigate to admin/import page",
-            "Step 2: Select 'Import Transactions' option",
-            "Step 3: Select file plan/extracted/gastos_ledger_2025_2026.json",
-            "Step 4: Confirm import",
-            "Step 5: Verify 2,631 transactions are imported",
-            "Step 6: Verify import summary shows success"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Historical import correctly maps C040 transactions to C031",
-        "steps": [
-            "Step 1: Import historical data",
-            "Step 2: Query for transactions with original category C040",
-            "Step 3: Verify all C040 transactions are mapped to C031",
-            "Step 4: Verify no transaction has category C040",
-            "Step 5: Verify amounts and dates remain unchanged"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Historical import skips template rows (rows without dates)",
-        "steps": [
-            "Step 1: Review gastos_template_rows.json",
-            "Step 2: Perform historical data import",
-            "Step 3: Verify template rows (12 rows with no date) are not imported",
-            "Step 4: Verify only dated transactions are imported"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Historical import correctly tags debt principal transactions",
-        "steps": [
-            "Step 1: Import historical data",
-            "Step 2: Find Ford Escape payment transactions with memo 'FORD ESC CAPITAL'",
-            "Step 3: Verify debt_component is set to 'principal'",
-            "Step 4: Verify category is C044"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Historical import correctly tags debt interest transactions",
-        "steps": [
-            "Step 1: Import historical data",
-            "Step 2: Find Ford Escape payment transactions with memo 'FORD ESC INTERESES'",
-            "Step 3: Verify debt_component is set to 'interest'",
-            "Step 4: Verify category is C044"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can create a bank account (asset account)",
-        "steps": [
-            "Step 1: Navigate to accounts page",
-            "Step 2: Click 'Add Account' button",
-            "Step 3: Select account type 'Bank Account'",
-            "Step 4: Enter account name (e.g., 'RBC Checking')",
-            "Step 5: Select primary currency (CAD)",
-            "Step 6: Submit form",
-            "Step 7: Verify account is created and appears in accounts list"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can create an investment account",
-        "steps": [
-            "Step 1: Navigate to accounts page",
-            "Step 2: Click 'Add Account' button",
-            "Step 3: Select account type 'Investment'",
-            "Step 4: Enter account name",
-            "Step 5: Submit form",
-            "Step 6: Verify investment account is created"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can create a credit card/loan liability account",
-        "steps": [
-            "Step 1: Navigate to accounts page",
-            "Step 2: Click 'Add Account' button",
-            "Step 3: Select account type 'Credit Card/Loan'",
-            "Step 4: Enter account name (e.g., 'CIBC Credit Card')",
-            "Step 5: Submit form",
-            "Step 6: Verify liability account is created"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can create an accounts receivable account",
-        "steps": [
-            "Step 1: Navigate to accounts page",
-            "Step 2: Click 'Add Account' button",
-            "Step 3: Select account type 'Accounts Receivable'",
-            "Step 4: Enter account name",
-            "Step 5: Submit form",
-            "Step 6: Verify receivable account is created"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can enter recorded balance for an account for a specific period",
-        "steps": [
-            "Step 1: Navigate to account details for 'RBC Checking'",
-            "Step 2: Select period 202501 (January 2025)",
-            "Step 3: Enter recorded balance: CAD 3,674.22",
-            "Step 4: Save",
-            "Step 5: Verify recorded balance is saved for that period"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can enter recorded balance in multiple currencies for same account/period",
-        "steps": [
-            "Step 1: Navigate to account details for 'Wise Multi-Currency'",
-            "Step 2: Select period 202501",
-            "Step 3: Enter recorded balance: CAD 1,000.00, USD 500.00, COP 2,000,000",
-            "Step 4: Save",
-            "Step 5: Verify all three currency balances are saved"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System computes expected balance for an account based on transactions",
-        "steps": [
-            "Step 1: Create account 'Test Bank' with recorded balance CAD 1,000.00 for period 202501",
-            "Step 2: Create transaction for period 202501, account 'Test Bank', category C001, amount CAD -100.00",
-            "Step 3: View account reconciliation for period 202501",
-            "Step 4: Verify computed balance is CAD 900.00 (1000 - 100)",
-            "Step 5: Verify variance is 0.00 if recorded balance was also adjusted"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System calculates variance (recorded minus computed) for each account per period",
-        "steps": [
-            "Step 1: Navigate to account reconciliation for period 202501",
-            "Step 2: Find account 'RBC Checking'",
-            "Step 3: Verify recorded balance is displayed",
-            "Step 4: Verify computed balance is displayed",
-            "Step 5: Verify variance = recorded - computed",
-            "Step 6: Verify variance is highlighted if non-zero"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Account reconciliation shows variance in all three currencies (CAD, USD, COP)",
-        "steps": [
-            "Step 1: Navigate to account reconciliation",
-            "Step 2: Select an account with multi-currency balances",
-            "Step 3: Verify recorded, computed, and variance are shown for CAD",
-            "Step 4: Verify recorded, computed, and variance are shown for USD",
-            "Step 5: Verify recorded, computed, and variance are shown for COP"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Transactions must reference an account for reconciliation to work",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Verify account field is present",
-            "Step 3: Fill in transaction details with account 'RBC Checking'",
-            "Step 4: Submit form",
-            "Step 5: Verify transaction is linked to account",
-            "Step 6: Verify account's computed balance includes this transaction"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Account list shows separate sections for assets and liabilities",
-        "steps": [
-            "Step 1: Navigate to accounts page",
-            "Step 2: Verify 'Assets' section header is displayed",
-            "Step 3: Verify bank accounts and investments appear under Assets",
-            "Step 4: Verify 'Liabilities' section header is displayed",
-            "Step 5: Verify credit cards and loans appear under Liabilities"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can view list of all known accounts from source data (RBC, CIBC, TD, Wise, Bancolombia, Davivienda, Nequi, Éxito)",
-        "steps": [
-            "Step 1: Import historical account data",
-            "Step 2: Navigate to accounts page",
-            "Step 3: Verify Canadian accounts are listed: RBC, CIBC, TD Bank, Wise",
-            "Step 4: Verify Colombian accounts are listed: Bancolombia, Davivienda, Nequi, Éxito",
-            "Step 5: Verify each account shows its type and currencies"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Personal Loan CIBC account is correctly named and linked to Ford Escape loan",
-        "steps": [
-            "Step 1: Navigate to accounts page",
-            "Step 2: Find 'Personal LOAN CIBC' account",
-            "Step 3: Verify it is a liability account",
-            "Step 4: Verify it is NOT labeled 'Crédito Móvil **6174' (old stale label)",
-            "Step 5: Verify associated transactions include Ford Escape payments"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can add monthly income line items with description and amount",
-        "steps": [
-            "Step 1: Navigate to income page",
-            "Step 2: Select period 202501",
-            "Step 3: Click 'Add Income' button",
-            "Step 4: Enter description (e.g., 'Salary - Main Job')",
-            "Step 5: Enter amount CAD 5,000.00",
-            "Step 6: Submit",
-            "Step 7: Verify income line item is added to period 202501"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Income line items support multiple currencies per line",
-        "steps": [
-            "Step 1: Navigate to income page for period 202501",
-            "Step 2: Add income line with description 'Mixed Income'",
-            "Step 3: Enter CAD 1,000.00 and USD 500.00 in the same line",
-            "Step 4: Submit",
-            "Step 5: Verify both currency amounts are saved for this income line"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Income page shows up to 6 line items per month as per source system",
-        "steps": [
-            "Step 1: Navigate to income page for period 202501",
-            "Step 2: Attempt to add 6 income line items",
-            "Step 3: Verify all 6 can be added",
-            "Step 4: Verify system allows at least 6 line items"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Income total is computed by summing all line items converted to CAD equivalent",
-        "steps": [
-            "Step 1: Navigate to income page for period 202501",
-            "Step 2: Add income: CAD 3,000.00",
-            "Step 3: Add income: USD 1,000.00",
-            "Step 4: Add income: COP 2,000,000",
-            "Step 5: Verify total income in CAD equivalent is computed using period exchange rates",
-            "Step 6: Verify total is displayed prominently"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can set exchange rate USD/COP for a specific period",
-        "steps": [
-            "Step 1: Navigate to exchange rates page",
-            "Step 2: Select period 202501",
-            "Step 3: Enter USD/COP rate: 4,400",
-            "Step 4: Save",
-            "Step 5: Verify rate is saved for period 202501"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can set exchange rate USD/CAD for a specific period",
-        "steps": [
-            "Step 1: Navigate to exchange rates page",
-            "Step 2: Select period 202501",
-            "Step 3: Enter USD/CAD rate: 0.75",
-            "Step 4: Save",
-            "Step 5: Verify rate is saved for period 202501"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can set exchange rate CAD/COP (COP per 1 CAD) for a specific period",
-        "steps": [
-            "Step 1: Navigate to exchange rates page",
-            "Step 2: Select period 202501",
-            "Step 3: Enter CAD rate (COP per CAD): 3,000",
-            "Step 4: Save",
-            "Step 5: Verify rate is saved for period 202501"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Exchange rates are independently maintained (not derived from each other)",
-        "steps": [
-            "Step 1: Navigate to exchange rates for period 202501",
-            "Step 2: Set USD/COP = 4,400",
-            "Step 3: Set USD/CAD = 0.75",
-            "Step 4: Set CAD = 3,000 (independent value, not 4400/0.75)",
-            "Step 5: Save",
-            "Step 6: Verify all three rates are stored independently",
-            "Step 7: Verify CAD rate is not auto-calculated from the other two"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System can import historical exchange rates from extracted data",
-        "steps": [
-            "Step 1: Navigate to import page",
-            "Step 2: Select 'Import Exchange Rates'",
-            "Step 3: Import from month_sheets JSON files",
-            "Step 4: Verify rates for all 21 months (Jan 2025 - Sep 2026) are imported",
-            "Step 5: Verify three independent rate series are populated"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Historical exchange rates show USD/COP fixed at 4,400 across all 21 months",
-        "steps": [
-            "Step 1: Import historical exchange rates",
-            "Step 2: Navigate to exchange rates page",
-            "Step 3: Verify USD/COP rate is 4,400 for periods 202501 through 202609",
-            "Step 4: Verify rate does not change across periods"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Historical exchange rates show USD/CAD fixed at 0.75 across all 21 months",
-        "steps": [
-            "Step 1: Import historical exchange rates",
-            "Step 2: Navigate to exchange rates page",
-            "Step 3: Verify USD/CAD rate is 0.75 for periods 202501 through 202609",
-            "Step 4: Verify rate does not change across periods"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Historical exchange rates show CAD rate varies (3,000 to 2,200) across 21 months",
-        "steps": [
-            "Step 1: Import historical exchange rates",
-            "Step 2: Navigate to exchange rates page",
-            "Step 3: Verify CAD rate for early 2025 is around 3,000",
-            "Step 4: Verify CAD rate for mid-2026 is around 2,550",
-            "Step 5: Verify CAD rate for Sep 2026 is around 2,200",
-            "Step 6: Verify rate changes over time"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can set monthly budget for a specific category and period",
-        "steps": [
-            "Step 1: Navigate to budgets page",
-            "Step 2: Select period 202501",
-            "Step 3: Select category C001 (MERCADO)",
-            "Step 4: Enter budget amount: CAD 800.00",
-            "Step 5: Save",
-            "Step 6: Verify budget is saved for C001 in period 202501"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System calculates actual spending per category per period from transactions",
-        "steps": [
-            "Step 1: Create transactions for C001 in period 202501 totaling CAD 750.00",
-            "Step 2: Navigate to budget vs actual report for period 202501",
-            "Step 3: Find category C001",
-            "Step 4: Verify actual spending shows CAD 750.00",
-            "Step 5: Verify actual is computed by summing transactions, not stored"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Budget vs actual report shows over/under budget calculation",
-        "steps": [
-            "Step 1: Set budget for C001 in period 202501: CAD 800.00",
-            "Step 2: Create transactions totaling CAD 750.00 for C001 in 202501",
-            "Step 3: Navigate to budget vs actual report",
-            "Step 4: Verify variance = actual - budget = -50.00 (under budget)",
-            "Step 5: Verify percentage = (actual / budget) * 100 = 93.75%"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Budget vs actual report highlights over-budget categories",
-        "steps": [
-            "Step 1: Set budget for C001 in period 202501: CAD 800.00",
-            "Step 2: Create transactions totaling CAD 900.00 for C001 in 202501",
-            "Step 3: Navigate to budget vs actual report",
-            "Step 4: Verify category C001 is highlighted as over-budget",
-            "Step 5: Verify variance = +100.00",
-            "Step 6: Verify percentage = 112.5%"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Budget vs actual report converts multi-currency actuals to CAD equivalent",
-        "steps": [
-            "Step 1: Set budget for C001 in 202501: CAD 800.00",
-            "Step 2: Create transactions: CAD 300.00, USD 200.00, COP 500,000",
-            "Step 3: View budget vs actual report",
-            "Step 4: Verify actuals are converted using period exchange rates",
-            "Step 5: Verify total actual is in CAD equivalent"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System calculates Total Recorded Disbursements (Gasto Total) for a period",
-        "steps": [
-            "Step 1: Navigate to financial summary for period 202501",
-            "Step 2: Verify Total Recorded Disbursements is displayed",
-            "Step 3: Verify it equals sum of all category totals including debt payments",
-            "Step 4: Verify debt payment categories (C009, C010, C027, C038, C039, C044, C046) are included"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System calculates Net Operating Expenses (Gasto Real) for a period",
-        "steps": [
-            "Step 1: Navigate to financial summary for period 202501",
-            "Step 2: Verify Net Operating Expenses is displayed",
-            "Step 3: Verify it equals Total Recorded Disbursements minus debt principal payments",
-            "Step 4: Verify debt interest IS included in Net Operating Expenses",
-            "Step 5: Verify depreciation is excluded"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Net Operating Expenses correctly excludes principal portion of Ford Escape loan",
-        "steps": [
-            "Step 1: Create transaction: C044, amount CAD 500.00, debt_component = 'principal', memo 'FORD ESC CAPITAL'",
-            "Step 2: Create transaction: C044, amount CAD 50.00, debt_component = 'interest', memo 'FORD ESC INTERESES'",
-            "Step 3: View financial summary",
-            "Step 4: Verify Total Recorded Disbursements includes CAD 550.00",
-            "Step 5: Verify Net Operating Expenses includes only CAD 50.00 (interest only, principal excluded)"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System calculates total assets for a period across all accounts and investments",
-        "steps": [
-            "Step 1: Set up accounts with recorded balances for period 202501",
-            "Step 2: Navigate to balance sheet for period 202501",
-            "Step 3: Verify total assets = sum of all bank accounts + investments + receivables + fixed assets",
-            "Step 4: Verify amount is in CAD equivalent"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System calculates total liabilities for a period across all debts and credit cards",
-        "steps": [
-            "Step 1: Set up liability accounts with balances for period 202501",
-            "Step 2: Navigate to balance sheet for period 202501",
-            "Step 3: Verify total liabilities = sum of all credit cards + loans",
-            "Step 4: Verify amount is in CAD equivalent"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System calculates equity as Assets minus Liabilities",
-        "steps": [
-            "Step 1: Navigate to balance sheet for period 202501",
-            "Step 2: Note total assets amount",
-            "Step 3: Note total liabilities amount",
-            "Step 4: Verify equity = assets - liabilities",
-            "Step 5: Verify calculation is displayed correctly"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Balance sheet shows Assets, Liabilities, and Equity in CAD",
-        "steps": [
-            "Step 1: Navigate to balance sheet for period 202501",
-            "Step 2: Verify Assets total is displayed in CAD",
-            "Step 3: Verify Liabilities total is displayed in CAD",
-            "Step 4: Verify Equity total is displayed in CAD"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Balance sheet shows Assets, Liabilities, and Equity in USD equivalent",
-        "steps": [
-            "Step 1: Navigate to balance sheet for period 202501",
-            "Step 2: Verify Assets total is also shown in USD equivalent",
-            "Step 3: Verify Liabilities total is also shown in USD equivalent",
-            "Step 4: Verify Equity total is also shown in USD equivalent",
-            "Step 5: Verify conversion uses period exchange rates"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Balance sheet shows Assets, Liabilities, and Equity in COP equivalent",
-        "steps": [
-            "Step 1: Navigate to balance sheet for period 202501",
-            "Step 2: Verify Assets total is also shown in COP equivalent",
-            "Step 3: Verify Liabilities total is also shown in COP equivalent",
-            "Step 4: Verify Equity total is also shown in COP equivalent",
-            "Step 5: Verify conversion uses period exchange rates"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Balance sheet time series shows historical trend across multiple periods",
-        "steps": [
-            "Step 1: Navigate to balance sheet time series page",
-            "Step 2: Verify data is shown for multiple periods (at least Jan 2025 to Sep 2026)",
-            "Step 3: Verify each period shows Assets, Liabilities, Equity",
-            "Step 4: Verify trend chart or table is displayed",
-            "Step 5: Verify user can see changes over time"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "System can import historical balance sheet data from estado_financiero_2025_2026.json",
-        "steps": [
-            "Step 1: Navigate to import page",
-            "Step 2: Select 'Import Balance Sheet History'",
-            "Step 3: Select estado_financiero_2025_2026.json",
-            "Step 4: Confirm import",
-            "Step 5: Verify balance sheet data for 21 periods is imported",
-            "Step 6: Verify Assets, Liabilities, Equity values match source"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Monthly reconciliation check verifies Assets = Liabilities + Equity",
-        "steps": [
-            "Step 1: Navigate to reconciliation page for period 202501",
-            "Step 2: Verify accounting equation: Assets = Liabilities + Equity",
-            "Step 3: Verify residual/difference is displayed",
-            "Step 4: Verify if residual is near zero, reconciliation passes",
-            "Step 5: Verify if residual is non-zero, warning is shown"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Monthly reconciliation check incorporates income, expenses, and account variances",
-        "steps": [
-            "Step 1: Navigate to reconciliation page for period 202501",
-            "Step 2: Verify income is included in calculation",
-            "Step 3: Verify expenses are included in calculation",
-            "Step 4: Verify account variances are included",
-            "Step 5: Verify final reconciliation result shows balanced or unbalanced status"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can add a fixed asset (e.g., Ford Escape vehicle)",
-        "steps": [
-            "Step 1: Navigate to fixed assets page",
-            "Step 2: Click 'Add Fixed Asset'",
-            "Step 3: Enter asset name: 'Ford Escape'",
-            "Step 4: Enter book value: CAD 25,000.00",
-            "Step 5: Submit",
-            "Step 6: Verify asset is added to fixed assets list"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Fixed asset book value can be set per period",
-        "steps": [
-            "Step 1: Navigate to fixed asset 'Ford Escape'",
-            "Step 2: Set book value for period 202501: CAD 25,000.00",
-            "Step 3: Set book value for period 202502: CAD 24,500.00 (after depreciation)",
-            "Step 4: Verify different book values per period are saved"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Fixed assets are included in total assets calculation",
-        "steps": [
-            "Step 1: Add fixed asset with book value CAD 25,000.00 for period 202501",
-            "Step 2: Navigate to balance sheet for period 202501",
-            "Step 3: Verify total assets includes the fixed asset value",
-            "Step 4: Verify fixed assets section shows the breakdown"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Ford Escape loan balance is tracked separately from asset book value",
-        "steps": [
-            "Step 1: Navigate to fixed assets, verify Ford Escape book value",
-            "Step 2: Navigate to liabilities, find 'Personal LOAN CIBC'",
-            "Step 3: Verify loan balance is tracked separately",
-            "Step 4: Verify loan balance decreases with principal payments",
-            "Step 5: Verify asset book value is independent of loan balance"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Historical import normalizes floating-point noise to zero",
-        "steps": [
-            "Step 1: Review extracted data for near-zero balances (e.g., -1.19e-10)",
-            "Step 2: Import historical account balances",
-            "Step 3: Check imported balances for accounts that had floating-point noise",
-            "Step 4: Verify balances are rounded to 0.00 instead of -1.19e-10",
-            "Step 5: Verify no significant balance data is lost"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can view transaction count per period",
-        "steps": [
-            "Step 1: Navigate to dashboard or reports",
-            "Step 2: Select period 202501",
-            "Step 3: Verify transaction count is displayed",
-            "Step 4: Verify count matches number of transactions in that period"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can export transactions to CSV",
-        "steps": [
-            "Step 1: Navigate to transactions page",
-            "Step 2: Apply filters (e.g., period 202501)",
-            "Step 3: Click 'Export to CSV' button",
-            "Step 4: Verify CSV file is downloaded",
-            "Step 5: Open CSV and verify data matches displayed transactions"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can export budget vs actual report to CSV",
-        "steps": [
-            "Step 1: Navigate to budget vs actual report",
-            "Step 2: Select period 202501",
-            "Step 3: Click 'Export' button",
-            "Step 4: Verify CSV contains category, budget, actual, variance, percentage columns"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Dashboard shows summary cards for current period: total income, total expenses, net",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Verify current period is auto-selected",
-            "Step 3: Verify 'Total Income' card is displayed with CAD amount",
-            "Step 4: Verify 'Total Expenses' card is displayed",
-            "Step 5: Verify 'Net' card shows income - expenses"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Dashboard shows summary of account balances: total assets and total liabilities",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Verify 'Total Assets' card is displayed",
-            "Step 3: Verify 'Total Liabilities' card is displayed",
-            "Step 4: Verify amounts are in CAD equivalent"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "Dashboard shows quick reconciliation status for current period",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Verify reconciliation status widget is displayed",
-            "Step 3: Verify status shows 'Balanced' or 'Unbalanced' with variance",
-            "Step 4: Verify link to detailed reconciliation page"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "User can navigate to different periods using period selector",
-        "steps": [
-            "Step 1: Navigate to any page with period data (e.g., transactions)",
-            "Step 2: Locate period selector dropdown/control",
-            "Step 3: Select a different period (e.g., change from 202501 to 202502)",
-            "Step 4: Verify page updates to show data for selected period",
-            "Step 5: Verify period selection persists across page navigation"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System validates period format as YYYYMM",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Enter invalid period format (e.g., '01/2025' or '2025-01')",
-            "Step 3: Verify validation error is shown",
-            "Step 4: Enter valid format '202501'",
-            "Step 5: Verify form accepts it"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System validates quincena as Q1 or Q2 only",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Attempt to enter invalid quincena value (e.g., 'Q3')",
-            "Step 3: Verify validation error or dropdown only shows Q1 and Q2",
-            "Step 4: Select Q1",
-            "Step 5: Verify form accepts it"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can view list of all periods with data",
-        "steps": [
-            "Step 1: Navigate to periods/history page",
-            "Step 2: Verify list of periods from Jan 2025 to Sep 2026 (at least 21 periods)",
-            "Step 3: Verify each period shows summary stats (transaction count, income, expenses)",
-            "Step 4: Verify periods are sorted chronologically"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Category actuals report aggregates by category and period without hardcoded row references",
-        "steps": [
-            "Step 1: Create multiple transactions for C001 in period 202501",
-            "Step 2: Navigate to category actuals report for 202501",
-            "Step 3: Verify C001 actual total equals sum of all C001 transactions",
-            "Step 4: Add another C001 transaction",
-            "Step 5: Refresh report",
-            "Step 6: Verify C001 total automatically includes new transaction"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Category actuals report shows all 45 active categories",
-        "steps": [
-            "Step 1: Navigate to category actuals report for period 202501",
-            "Step 2: Verify all 45 categories (C001-C046 except C040) are listed",
-            "Step 3: Verify categories with no transactions show 0.00 actual",
-            "Step 4: Verify categories with transactions show correct totals"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can click on a category in actuals report to see detailed transactions",
-        "steps": [
-            "Step 1: Navigate to category actuals report for period 202501",
-            "Step 2: Click on category C001",
-            "Step 3: Verify detail view shows all C001 transactions for that period",
-            "Step 4: Verify transaction details are complete (date, amount, comments, account)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System prevents deletion of category that has associated transactions",
-        "steps": [
-            "Step 1: Create a transaction with category C001",
-            "Step 2: Navigate to categories page",
-            "Step 3: Attempt to delete category C001",
-            "Step 4: Verify system prevents deletion or shows warning",
-            "Step 5: Verify message indicates transactions exist for this category"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can view account transaction history sorted by date",
-        "steps": [
-            "Step 1: Navigate to account details for 'RBC Checking'",
-            "Step 2: View transaction history",
-            "Step 3: Verify transactions are sorted by date (newest first or oldest first)",
-            "Step 4: Verify each transaction shows date, amount, category, comments",
-            "Step 5: Verify running balance is calculated and displayed"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Account transaction history shows running balance after each transaction",
-        "steps": [
-            "Step 1: Navigate to account details with multiple transactions",
-            "Step 2: View transaction history",
-            "Step 3: Verify starting balance is shown",
-            "Step 4: Verify each transaction shows balance after that transaction",
-            "Step 5: Verify final balance matches account's current balance"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can filter account transaction history by date range",
-        "steps": [
-            "Step 1: Navigate to account transaction history",
-            "Step 2: Apply date range filter (e.g., Jan 1 2025 to Jan 31 2025)",
-            "Step 3: Verify only transactions in that date range are shown",
-            "Step 4: Verify starting balance for filtered view is correct"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System supports pagination for large transaction lists",
-        "steps": [
-            "Step 1: Navigate to transactions page",
-            "Step 2: Verify if more than 50 transactions exist, pagination controls are shown",
-            "Step 3: Verify page size options (e.g., 25, 50, 100 per page)",
-            "Step 4: Click next page",
-            "Step 5: Verify next set of transactions is displayed",
-            "Step 6: Verify page number and total pages are shown"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Transaction form validates that amount is a positive number",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Enter negative amount (e.g., -100)",
-            "Step 3: Verify validation error is shown",
-            "Step 4: Enter positive amount (e.g., 100.50)",
-            "Step 5: Verify form accepts it"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Transaction form validates that date is a valid date",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Enter invalid date (e.g., '2025-13-45')",
-            "Step 3: Verify validation error is shown",
-            "Step 4: Enter valid date (e.g., '2025-01-15')",
-            "Step 5: Verify form accepts it"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Account form validates that account name is unique",
-        "steps": [
-            "Step 1: Create account with name 'RBC Checking'",
-            "Step 2: Attempt to create another account with same name",
-            "Step 3: Verify validation error is shown",
-            "Step 4: Change name to 'RBC Savings'",
-            "Step 5: Verify form accepts unique name"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Exchange rate form validates that rates are positive numbers",
-        "steps": [
-            "Step 1: Navigate to exchange rates form",
-            "Step 2: Enter negative or zero rate",
-            "Step 3: Verify validation error is shown",
-            "Step 4: Enter positive rate (e.g., 4400)",
-            "Step 5: Verify form accepts it"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Budget form validates that budget amount is a positive number",
-        "steps": [
-            "Step 1: Navigate to budget form",
-            "Step 2: Enter negative budget amount",
-            "Step 3: Verify validation error is shown",
-            "Step 4: Enter positive amount",
-            "Step 5: Verify form accepts it"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can view all transactions for a specific category across all periods",
-        "steps": [
-            "Step 1: Navigate to categories page",
-            "Step 2: Click on category C001",
-            "Step 3: Verify all C001 transactions across all periods are shown",
-            "Step 4: Verify transactions can be filtered by period",
-            "Step 5: Verify total spending for that category is displayed"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can view summary statistics for a category: total spent, average per period, period count",
-        "steps": [
-            "Step 1: Navigate to category details for C001",
-            "Step 2: Verify total amount spent across all periods is shown",
-            "Step 3: Verify average spending per period is calculated",
-            "Step 4: Verify number of periods with transactions is shown",
-            "Step 5: Verify number of total transactions is shown"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Dashboard shows chart of income vs expenses over time",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Verify income vs expenses chart is displayed",
-            "Step 3: Verify chart shows last 6-12 months",
-            "Step 4: Verify both income and expenses lines/bars are visible",
-            "Step 5: Verify chart legend is clear"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Dashboard shows chart of assets vs liabilities over time",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Verify assets vs liabilities chart is displayed",
-            "Step 3: Verify chart shows trend over multiple periods",
-            "Step 4: Verify equity can be visualized",
-            "Step 5: Verify chart is interactive (hover for values)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Dashboard shows top spending categories for current period",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Verify 'Top Spending Categories' widget is displayed",
-            "Step 3: Verify top 5-10 categories by spending are shown",
-            "Step 4: Verify amounts are displayed",
-            "Step 5: Verify percentages or chart visualization is included"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can compare two periods side-by-side",
-        "steps": [
-            "Step 1: Navigate to period comparison page",
-            "Step 2: Select first period: 202501",
-            "Step 3: Select second period: 202502",
-            "Step 4: Verify income, expenses, and balances for both periods are shown side-by-side",
-            "Step 5: Verify differences/changes are calculated and highlighted"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can view year-to-date totals for income and expenses",
-        "steps": [
-            "Step 1: Navigate to reports page",
-            "Step 2: Select year 2025",
-            "Step 3: Verify YTD income total is displayed",
-            "Step 4: Verify YTD expense total is displayed",
-            "Step 5: Verify YTD net (income - expenses) is displayed",
-            "Step 6: Verify totals update when year selection changes"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System shows warning when variance exceeds acceptable threshold",
-        "steps": [
-            "Step 1: Navigate to account reconciliation",
-            "Step 2: Create variance > $10 for an account",
-            "Step 3: Verify warning icon or highlight is shown",
-            "Step 4: Verify tooltip or message explains the variance",
-            "Step 5: Verify user can click to investigate transactions"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can manually mark an account variance as reviewed/acknowledged",
-        "steps": [
-            "Step 1: Navigate to account with non-zero variance",
-            "Step 2: Click 'Acknowledge Variance' or similar button",
-            "Step 3: Add optional note explaining variance",
-            "Step 4: Submit",
-            "Step 5: Verify variance is marked as reviewed",
-            "Step 6: Verify variance still shows but with 'reviewed' indicator"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "Search functionality works across transactions, accounts, and categories",
-        "steps": [
-            "Step 1: Use global search box in header",
-            "Step 2: Enter search term (e.g., 'RBC')",
-            "Step 3: Verify search results include matching accounts",
-            "Step 4: Verify search results include matching transactions (in comments)",
-            "Step 5: Verify results are organized by type"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can bulk edit multiple transactions (e.g., change category)",
-        "steps": [
-            "Step 1: Navigate to transactions page",
-            "Step 2: Select multiple transactions using checkboxes",
-            "Step 3: Click 'Bulk Edit' button",
-            "Step 4: Change category to C002",
-            "Step 5: Confirm changes",
-            "Step 6: Verify all selected transactions have updated category"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can duplicate a transaction",
-        "steps": [
-            "Step 1: Navigate to transaction details",
-            "Step 2: Click 'Duplicate' button",
-            "Step 3: Verify form is pre-filled with same values",
-            "Step 4: Modify date to current date",
-            "Step 5: Submit",
-            "Step 6: Verify new transaction is created with same details"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System shows recent activity feed on dashboard",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Verify recent activity widget is displayed",
-            "Step 3: Verify last 10-20 transactions/changes are shown",
-            "Step 4: Verify each item shows date, type, and summary",
-            "Step 5: Verify user can click to view details"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can set default currency preference for views",
-        "steps": [
-            "Step 1: Navigate to settings/preferences",
-            "Step 2: Set default display currency to CAD",
-            "Step 3: Save",
-            "Step 4: Navigate to dashboard",
-            "Step 5: Verify amounts are displayed in CAD by default",
-            "Step 6: Verify user can toggle to see other currencies"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can toggle between Spanish and English category names",
-        "steps": [
-            "Step 1: Navigate to categories or transactions page",
-            "Step 2: Verify language toggle is available",
-            "Step 3: Switch to Spanish",
-            "Step 4: Verify category names display in Spanish (e.g., MERCADO)",
-            "Step 5: Switch to English",
-            "Step 6: Verify category names display in English (e.g., Groceries)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System auto-calculates period from transaction date",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Enter date: 2025-01-15",
-            "Step 3: Verify period is auto-filled as 202501",
-            "Step 4: Change date to 2026-02-20",
-            "Step 5: Verify period updates to 202602"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can generate PDF report of balance sheet for a period",
-        "steps": [
-            "Step 1: Navigate to balance sheet for period 202501",
-            "Step 2: Click 'Export to PDF' button",
-            "Step 3: Verify PDF is generated and downloaded",
-            "Step 4: Open PDF",
-            "Step 5: Verify it contains assets, liabilities, equity with proper formatting"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can generate PDF report of income statement for a period",
-        "steps": [
-            "Step 1: Navigate to income statement/summary for period 202501",
-            "Step 2: Click 'Export to PDF' button",
-            "Step 3: Verify PDF is generated",
-            "Step 4: Verify it shows income line items, total income, expenses by category, net"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System displays error message when required field is missing",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Leave date field empty",
-            "Step 3: Attempt to submit",
-            "Step 4: Verify error message is displayed near date field",
-            "Step 5: Verify form does not submit",
-            "Step 6: Fill in date and verify error clears"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System displays success message after creating a transaction",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Fill in all required fields",
-            "Step 3: Submit form",
-            "Step 4: Verify success message is displayed (e.g., toast notification)",
-            "Step 5: Verify user is redirected to transaction list or details page"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "System displays confirmation dialog before deleting a transaction",
-        "steps": [
-            "Step 1: Navigate to transaction details",
-            "Step 2: Click 'Delete' button",
-            "Step 3: Verify confirmation dialog appears",
-            "Step 4: Verify dialog shows warning message",
-            "Step 5: Click 'Cancel' and verify transaction is not deleted",
-            "Step 6: Click 'Delete' again and confirm, verify transaction is deleted"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can sort transactions table by date",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Click on 'Date' column header",
-            "Step 3: Verify transactions are sorted by date ascending",
-            "Step 4: Click 'Date' header again",
-            "Step 5: Verify transactions are sorted by date descending"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can sort transactions table by amount",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Click on 'Amount' column header",
-            "Step 3: Verify transactions are sorted by amount ascending",
-            "Step 4: Click again",
-            "Step 5: Verify transactions are sorted by amount descending"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "User can sort transactions table by category",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Click on 'Category' column header",
-            "Step 3: Verify transactions are sorted alphabetically by category",
-            "Step 4: Click again",
-            "Step 5: Verify sort order reverses"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/transactions returns list of transactions",
-        "steps": [
-            "Step 1: Make GET request to /api/transactions",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains array of transactions",
-            "Step 4: Verify each transaction has expected fields (id, date, period, category, amount, currency, etc.)"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint POST /api/transactions creates a new transaction",
-        "steps": [
-            "Step 1: Make POST request to /api/transactions with transaction data",
-            "Step 2: Verify response status is 201",
-            "Step 3: Verify response contains created transaction with ID",
-            "Step 4: Verify transaction is saved in database"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/transactions/{id} returns single transaction",
-        "steps": [
-            "Step 1: Create a transaction",
-            "Step 2: Make GET request to /api/transactions/{id}",
-            "Step 3: Verify response status is 200",
-            "Step 4: Verify response contains transaction details",
-            "Step 5: Verify all fields match created transaction"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint PUT /api/transactions/{id} updates a transaction",
-        "steps": [
-            "Step 1: Create a transaction",
-            "Step 2: Make PUT request to /api/transactions/{id} with updated data",
-            "Step 3: Verify response status is 200",
-            "Step 4: Verify response contains updated transaction",
-            "Step 5: Verify changes are persisted in database"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint DELETE /api/transactions/{id} deletes a transaction",
-        "steps": [
-            "Step 1: Create a transaction",
-            "Step 2: Make DELETE request to /api/transactions/{id}",
-            "Step 3: Verify response status is 204 or 200",
-            "Step 4: Verify transaction is removed from database",
-            "Step 5: Verify GET request for same ID returns 404"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/categories returns list of all categories",
-        "steps": [
-            "Step 1: Make GET request to /api/categories",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains 45 active categories",
-            "Step 4: Verify each category has code, name_es, name_en, is_debt_category fields"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/accounts returns list of all accounts",
-        "steps": [
-            "Step 1: Make GET request to /api/accounts",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains accounts array",
-            "Step 4: Verify accounts are grouped by type (assets vs liabilities)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/periods/{period}/reconciliation returns reconciliation data",
-        "steps": [
-            "Step 1: Make GET request to /api/periods/202501/reconciliation",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains account balances (recorded, computed, variance)",
-            "Step 4: Verify response contains reconciliation status (balanced/unbalanced)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/periods/{period}/balance-sheet returns balance sheet data",
-        "steps": [
-            "Step 1: Make GET request to /api/periods/202501/balance-sheet",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains total_assets, total_liabilities, equity",
-            "Step 4: Verify each is provided in CAD, USD, and COP equivalents"
-        ],
-        "passes": true
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/periods/{period}/budget-vs-actual returns budget comparison",
-        "steps": [
-            "Step 1: Make GET request to /api/periods/202501/budget-vs-actual",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains array of categories with budget, actual, variance, percentage",
-            "Step 4: Verify all 45 categories are included"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API supports filtering transactions by period query parameter",
-        "steps": [
-            "Step 1: Make GET request to /api/transactions?period=202501",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify only transactions from period 202501 are returned",
-            "Step 4: Verify transaction count matches expected"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API supports filtering transactions by category query parameter",
-        "steps": [
-            "Step 1: Make GET request to /api/transactions?category=C001",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify only C001 transactions are returned"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API supports filtering transactions by account query parameter",
-        "steps": [
-            "Step 1: Make GET request to /api/transactions?account=1",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify only transactions for account ID 1 are returned"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API returns 404 for non-existent transaction ID",
-        "steps": [
-            "Step 1: Make GET request to /api/transactions/999999",
-            "Step 2: Verify response status is 404",
-            "Step 3: Verify error message is returned"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API returns 422 validation error for invalid transaction data",
-        "steps": [
-            "Step 1: Make POST request to /api/transactions with missing required field (e.g., date)",
-            "Step 2: Verify response status is 422",
-            "Step 3: Verify response contains validation errors",
-            "Step 4: Verify error message specifies which field is invalid"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API endpoint GET /api/exchange-rates/{period} returns rates for a period",
-        "steps": [
-            "Step 1: Make GET request to /api/exchange-rates/202501",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains usd_cop, usd_cad, cad_cop rates",
-            "Step 4: Verify rates are numeric values"
-        ],
-        "passes": false
-    },
-    {
-        "category": "functional",
-        "description": "API supports pagination for transactions list",
-        "steps": [
-            "Step 1: Make GET request to /api/transactions?page=1&per_page=25",
-            "Step 2: Verify response status is 200",
-            "Step 3: Verify response contains pagination metadata (total, per_page, current_page, last_page)",
-            "Step 4: Verify only 25 transactions are returned",
-            "Step 5: Request page 2 and verify different transactions are returned"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Application has a clean, professional header with logo and navigation",
-        "steps": [
-            "Step 1: Navigate to application home page",
-            "Step 2: Take screenshot",
-            "Step 3: Verify header is present at top of page",
-            "Step 4: Verify logo or app name 'Pockety' is visible",
-            "Step 5: Verify main navigation links are visible and styled consistently"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Navigation menu is responsive and accessible on mobile devices",
-        "steps": [
-            "Step 1: Resize browser to mobile width (e.g., 375px)",
-            "Step 2: Take screenshot",
-            "Step 3: Verify navigation collapses into hamburger menu or similar mobile pattern",
-            "Step 4: Click hamburger icon",
-            "Step 5: Verify menu expands and all navigation items are accessible"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Dashboard cards use consistent spacing, shadows, and borders",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Take screenshot",
-            "Step 3: Verify summary cards (income, expenses, assets, liabilities) are visually consistent",
-            "Step 4: Verify card spacing is uniform",
-            "Step 5: Verify shadows or borders are applied consistently"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Dashboard layout is responsive and adjusts to different screen sizes",
-        "steps": [
-            "Step 1: View dashboard on desktop (1920px width)",
-            "Step 2: Take screenshot",
-            "Step 3: Resize to tablet (768px width)",
-            "Step 4: Take screenshot",
-            "Step 5: Verify cards reflow appropriately",
-            "Step 6: Resize to mobile (375px width)",
-            "Step 7: Verify cards stack vertically and remain readable"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Form inputs have clear labels, proper spacing, and focus states",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Take screenshot",
-            "Step 3: Verify all inputs have visible labels above or beside them",
-            "Step 4: Tab through form fields",
-            "Step 5: Verify focus states are visible (e.g., blue outline or border highlight)",
-            "Step 6: Verify input spacing is consistent"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Buttons use consistent styling with primary and secondary variants",
-        "steps": [
-            "Step 1: Navigate to any page with multiple buttons",
-            "Step 2: Take screenshot",
-            "Step 3: Verify primary action buttons (e.g., Submit, Save) have distinct, prominent styling",
-            "Step 4: Verify secondary/cancel buttons have less prominent styling",
-            "Step 5: Verify button sizes are consistent",
-            "Step 6: Verify hover states are visually distinct"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Data tables have clear column headers, row striping, and hover states",
-        "steps": [
-            "Step 1: Navigate to transactions list",
-            "Step 2: Take screenshot",
-            "Step 3: Verify table has clear column headers with borders or background",
-            "Step 4: Verify alternating row colors for readability",
-            "Step 5: Hover over a row",
-            "Step 6: Verify hover state highlights the row"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Tables are responsive on mobile devices (horizontal scroll or cards)",
-        "steps": [
-            "Step 1: Navigate to transactions list on mobile width",
-            "Step 2: Take screenshot",
-            "Step 3: Verify table either has horizontal scroll OR converts to card/list layout",
-            "Step 4: Verify all data remains accessible",
-            "Step 5: Verify user can interact with all rows"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Currency amounts are formatted with proper thousand separators and decimals",
-        "steps": [
-            "Step 1: Navigate to any page showing currency amounts",
-            "Step 2: Take screenshot",
-            "Step 3: Verify CAD/USD amounts show 2 decimal places (e.g., 1,234.56)",
-            "Step 4: Verify COP amounts show appropriate formatting (e.g., 2,000,000)",
-            "Step 5: Verify thousand separators (commas) are present"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Currency symbols are displayed correctly (CAD, USD, COP or $, US$, $COP)",
-        "steps": [
-            "Step 1: Navigate to dashboard",
-            "Step 2: Take screenshot",
-            "Step 3: Verify currency symbols or codes are shown with amounts",
-            "Step 4: Verify CAD, USD, and COP are distinguishable from each other",
-            "Step 5: Verify symbols are positioned consistently (before or after amount)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Positive and negative amounts are visually distinguished (e.g., green vs red, +/-)",
-        "steps": [
-            "Step 1: Navigate to account transaction history with both deposits and withdrawals",
-            "Step 2: Take screenshot",
-            "Step 3: Verify positive amounts are styled distinctly (e.g., green color)",
-            "Step 4: Verify negative amounts are styled distinctly (e.g., red color)",
-            "Step 5: Verify +/- signs are present"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Error messages are displayed in red with clear icon",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Submit form with missing required field",
-            "Step 3: Take screenshot",
-            "Step 4: Verify error message is displayed in red color",
-            "Step 5: Verify error icon (e.g., exclamation mark) is present",
-            "Step 6: Verify message is positioned near the relevant field"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Success messages are displayed in green with clear icon",
-        "steps": [
-            "Step 1: Create a new transaction successfully",
-            "Step 2: Take screenshot of success message",
-            "Step 3: Verify message is displayed in green color",
-            "Step 4: Verify success icon (e.g., checkmark) is present",
-            "Step 5: Verify message auto-dismisses or has close button"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Warning messages (e.g., unreconciled variance) are displayed in yellow/orange",
-        "steps": [
-            "Step 1: Navigate to reconciliation page with non-zero variance",
-            "Step 2: Take screenshot",
-            "Step 3: Verify warning message or indicator is yellow or orange",
-            "Step 4: Verify warning icon is present",
-            "Step 5: Verify message clearly explains the issue"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Loading states show spinner or skeleton screen",
-        "steps": [
-            "Step 1: Navigate to a page with data fetching (e.g., transactions)",
-            "Step 2: Observe loading state before data appears",
-            "Step 3: Take screenshot if possible",
-            "Step 4: Verify loading indicator (spinner, progress bar, or skeleton) is shown",
-            "Step 5: Verify loading state is removed when data loads"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Empty states show helpful message and call-to-action",
-        "steps": [
-            "Step 1: Navigate to transactions page with no transactions",
-            "Step 2: Take screenshot",
-            "Step 3: Verify empty state message is displayed (e.g., 'No transactions yet')",
-            "Step 4: Verify helpful illustration or icon is shown",
-            "Step 5: Verify call-to-action button (e.g., 'Add First Transaction') is present"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Modal dialogs have backdrop, proper z-index, and are centered",
-        "steps": [
-            "Step 1: Open a modal dialog (e.g., delete confirmation)",
-            "Step 2: Take screenshot",
-            "Step 3: Verify modal is centered on screen",
-            "Step 4: Verify dark backdrop/overlay is behind modal",
-            "Step 5: Verify modal content is on top and clearly visible",
-            "Step 6: Verify clicking backdrop closes modal"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Charts use clear colors, legends, and axis labels",
-        "steps": [
-            "Step 1: Navigate to dashboard with charts",
-            "Step 2: Take screenshot",
-            "Step 3: Verify chart colors are distinct and accessible",
-            "Step 4: Verify legend clearly identifies each data series",
-            "Step 5: Verify axis labels (x and y) are present and readable"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Charts are responsive and readable on mobile devices",
-        "steps": [
-            "Step 1: View dashboard charts on mobile width",
-            "Step 2: Take screenshot",
-            "Step 3: Verify charts scale down appropriately",
-            "Step 4: Verify labels remain readable (not overlapping)",
-            "Step 5: Verify interactive elements (hover/touch) still work"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Date inputs use consistent format and have calendar picker",
-        "steps": [
-            "Step 1: Navigate to add transaction form",
-            "Step 2: Click on date field",
-            "Step 3: Take screenshot",
-            "Step 4: Verify calendar picker appears",
-            "Step 5: Verify date format is clear (e.g., YYYY-MM-DD)",
-            "Step 6: Verify user can type or select from calendar"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Dropdown/select inputs have clear arrow indicator and dropdown styling",
-        "steps": [
-            "Step 1: Navigate to form with select input (e.g., category selector)",
-            "Step 2: Take screenshot",
-            "Step 3: Verify down arrow icon is visible on right side of select",
-            "Step 4: Click select to open dropdown",
-            "Step 5: Verify dropdown list is styled consistently with app",
-            "Step 6: Verify selected item is highlighted"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Checkbox and radio inputs have custom styling consistent with app design",
-        "steps": [
-            "Step 1: Navigate to form with checkboxes (e.g., is_recurring)",
-            "Step 2: Take screenshot",
-            "Step 3: Verify checkboxes use custom styling (not browser default)",
-            "Step 4: Verify checked state is visually clear",
-            "Step 5: Verify labels are clickable"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Tooltips provide helpful context on hover or focus",
-        "steps": [
-            "Step 1: Navigate to page with tooltips (e.g., info icons)",
-            "Step 2: Hover over tooltip trigger",
-            "Step 3: Take screenshot",
-            "Step 4: Verify tooltip appears with helpful text",
-            "Step 5: Verify tooltip is positioned clearly (not overlapping content)",
-            "Step 6: Verify tooltip disappears on mouse out"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Breadcrumbs show current page location in navigation hierarchy",
-        "steps": [
-            "Step 1: Navigate to nested page (e.g., transaction details)",
-            "Step 2: Take screenshot",
-            "Step 3: Verify breadcrumb trail is displayed (e.g., Home > Transactions > Details)",
-            "Step 4: Verify breadcrumbs are clickable to navigate back",
-            "Step 5: Verify current page is highlighted in breadcrumb"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Page titles are prominent and descriptive",
-        "steps": [
-            "Step 1: Navigate to various pages (dashboard, transactions, accounts)",
-            "Step 2: Take screenshots",
-            "Step 3: Verify each page has clear H1 title at top",
-            "Step 4: Verify title describes page content",
-            "Step 5: Verify title styling is consistent across pages"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Spacing between sections is consistent throughout the application",
-        "steps": [
-            "Step 1: Navigate to multiple pages",
-            "Step 2: Take screenshots",
-            "Step 3: Verify spacing between header and content is consistent",
-            "Step 4: Verify spacing between sections/cards is consistent",
-            "Step 5: Verify margins and padding follow a consistent scale"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Typography is hierarchical and readable (font sizes, weights, line height)",
-        "steps": [
-            "Step 1: Navigate to content-heavy page",
-            "Step 2: Take screenshot",
-            "Step 3: Verify heading levels (H1, H2, H3) are visually distinct",
-            "Step 4: Verify body text is readable size (at least 14-16px)",
-            "Step 5: Verify line height provides good readability",
-            "Step 6: Verify font weights distinguish headings from body text"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Color contrast meets accessibility standards (WCAG AA)",
-        "steps": [
-            "Step 1: Navigate to various pages",
-            "Step 2: Take screenshots",
-            "Step 3: Use browser accessibility tools to check contrast ratios",
-            "Step 4: Verify text on backgrounds has at least 4.5:1 contrast ratio",
-            "Step 5: Verify interactive elements meet contrast requirements"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Links are visually distinct from body text",
-        "steps": [
-            "Step 1: Navigate to page with links in content",
-            "Step 2: Take screenshot",
-            "Step 3: Verify links have distinct color or underline",
-            "Step 4: Verify hover state makes links more obvious",
-            "Step 5: Verify visited links are distinguishable (if applicable)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Icons are consistent style and properly aligned with text",
-        "steps": [
-            "Step 1: Navigate to pages with icons",
-            "Step 2: Take screenshot",
-            "Step 3: Verify all icons use consistent style (outline vs solid)",
-            "Step 4: Verify icons are vertically aligned with adjacent text",
-            "Step 5: Verify icon sizes are appropriate and consistent"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Account variance highlighting uses appropriate colors (red for issues, green for balanced)",
-        "steps": [
-            "Step 1: Navigate to reconciliation page",
-            "Step 2: View accounts with variances",
-            "Step 3: Take screenshot",
-            "Step 4: Verify zero or near-zero variance is green or neutral",
-            "Step 5: Verify significant positive variance is highlighted (yellow/orange)",
-            "Step 6: Verify significant negative variance is highlighted (red)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Budget vs actual visualization clearly shows under/over budget",
-        "steps": [
-            "Step 1: Navigate to budget vs actual report",
-            "Step 2: Take screenshot",
-            "Step 3: Verify under-budget categories are visually distinct (green)",
-            "Step 4: Verify over-budget categories are visually distinct (red)",
-            "Step 5: Verify progress bars or visual indicators are clear"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Sidebar or navigation menu is collapsible for more screen space",
-        "steps": [
-            "Step 1: Navigate to application",
-            "Step 2: Locate sidebar navigation",
-            "Step 3: Click collapse/expand button",
-            "Step 4: Take screenshot",
-            "Step 5: Verify sidebar collapses to icons only or narrow strip",
-            "Step 6: Verify main content area expands to use available space",
-            "Step 7: Click expand button and verify sidebar returns to full width"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Footer contains useful links and app version information",
-        "steps": [
-            "Step 1: Scroll to bottom of any page",
-            "Step 2: Take screenshot",
-            "Step 3: Verify footer is present with consistent styling",
-            "Step 4: Verify footer includes copyright or app name",
-            "Step 5: Verify useful links are present (if applicable)"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Print stylesheet exists for printing reports",
-        "steps": [
-            "Step 1: Navigate to balance sheet or report",
-            "Step 2: Open browser print preview",
-            "Step 3: Take screenshot of print preview",
-            "Step 4: Verify navigation and unnecessary elements are hidden in print view",
-            "Step 5: Verify report content is formatted for printing",
-            "Step 6: Verify page breaks are logical"
-        ],
-        "passes": false
-    },
-    {
-        "category": "style",
-        "description": "Application supports dark mode preference",
-        "steps": [
-            "Step 1: Set system/browser to dark mode preference",
-            "Step 2: Navigate to application",
-            "Step 3: Take screenshot",
-            "Step 4: Verify application respects dark mode preference OR has dark mode toggle",
-            "Step 5: Verify colors are inverted appropriately",
-            "Step 6: Verify readability is maintained in dark mode"
-        ],
-        "passes": false
-    }
+  {
+    "category": "functional",
+    "description": "User can access the application dashboard at http://dev.pockety.com:8080/",
+    "steps": [
+      "Step 1: Navigate to http://dev.pockety.com:8080/",
+      "Step 2: Verify the page loads without errors",
+      "Step 3: Verify the dashboard displays main navigation"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System displays all 45 active expense categories (C001-C046, excluding retired C040)",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Verify 45 categories are displayed",
+      "Step 3: Verify C040 is not in the list",
+      "Step 4: Verify C031 (MESADA NIÑAS) appears only once"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Each category displays both Spanish and English names",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Select category C001",
+      "Step 3: Verify Spanish name 'MERCADO' is displayed",
+      "Step 4: Verify English name 'Groceries' is displayed"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Debt categories are marked with a special indicator",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Locate category C009 (CRÉDITO DAVIVIENDA)",
+      "Step 3: Verify it has a debt category indicator",
+      "Step 4: Verify non-debt categories (e.g., C001) do not have this indicator"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can create a new expense transaction with CAD currency",
+    "steps": [
+      "Step 1: Navigate to transactions page",
+      "Step 2: Click 'Add Transaction' button",
+      "Step 3: Fill in date, period (YYYYMM), quincena (Q1), category (C001), CAD amount (100.50), and comments",
+      "Step 4: Submit the form",
+      "Step 5: Verify transaction appears in the list",
+      "Step 6: Verify all fields match the input"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can create a new expense transaction with USD currency",
+    "steps": [
+      "Step 1: Navigate to transactions page",
+      "Step 2: Click 'Add Transaction' button",
+      "Step 3: Fill in date, period, quincena, category, USD amount (50.00)",
+      "Step 4: Submit the form",
+      "Step 5: Verify transaction is created with USD currency",
+      "Step 6: Verify CAD and COP fields are empty/null"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can create a new expense transaction with COP currency",
+    "steps": [
+      "Step 1: Navigate to transactions page",
+      "Step 2: Click 'Add Transaction' button",
+      "Step 3: Fill in date, period, quincena, category, COP amount (500000)",
+      "Step 4: Submit the form",
+      "Step 5: Verify transaction is created with COP currency"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transaction only allows one currency per transaction (not multiple)",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Enter CAD amount (100.00)",
+      "Step 3: Attempt to also enter USD amount",
+      "Step 4: Verify system prevents or warns about multiple currencies",
+      "Step 5: Verify only one currency can be selected at a time"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transaction category is validated against the category catalog",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Attempt to enter an invalid category code (e.g., C999)",
+      "Step 3: Verify system rejects the invalid category",
+      "Step 4: Verify error message is displayed"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transaction displays category description as lookup, not stored value",
+    "steps": [
+      "Step 1: Create a transaction with category C001",
+      "Step 2: View the transaction details",
+      "Step 3: Verify 'MERCADO / Groceries' is displayed",
+      "Step 4: Verify the description is looked up from category table, not stored in transaction"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can mark a transaction as recurring",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Fill in transaction details",
+      "Step 3: Check 'is_recurring' checkbox/toggle",
+      "Step 4: Submit form",
+      "Step 5: Verify transaction is marked as recurring",
+      "Step 6: Verify recurring indicator is visible in transaction list"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can specify debt component as 'principal' for debt payment transactions",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Select a debt category (e.g., C044 - CREDITO FORD ESCAPE)",
+      "Step 3: Select debt_component as 'principal'",
+      "Step 4: Submit transaction",
+      "Step 5: Verify debt_component is saved as 'principal'"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can specify debt component as 'interest' for debt payment transactions",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Select a debt category (e.g., C044 - CREDITO FORD ESCAPE)",
+      "Step 3: Select debt_component as 'interest'",
+      "Step 4: Submit transaction",
+      "Step 5: Verify debt_component is saved as 'interest'"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Non-debt transactions do not require debt_component field",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Select a non-debt category (e.g., C001 - MERCADO)",
+      "Step 3: Verify debt_component field is not required or is hidden",
+      "Step 4: Submit transaction without debt_component",
+      "Step 5: Verify transaction is created successfully"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can edit an existing transaction",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Select a transaction to edit",
+      "Step 3: Modify the amount",
+      "Step 4: Submit changes",
+      "Step 5: Verify transaction is updated",
+      "Step 6: Verify new amount is displayed"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can delete a transaction",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Select a transaction",
+      "Step 3: Click delete button",
+      "Step 4: Confirm deletion",
+      "Step 5: Verify transaction is removed from list"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transactions can be filtered by period (YYYYMM format)",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Select period filter (e.g., 202501)",
+      "Step 3: Verify only transactions from January 2025 are displayed",
+      "Step 4: Change filter to 202602",
+      "Step 5: Verify only transactions from February 2026 are displayed"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transactions can be filtered by category",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Select category filter (e.g., C001 - MERCADO)",
+      "Step 3: Verify only grocery transactions are displayed",
+      "Step 4: Change filter to C004 - TRANSPORTES",
+      "Step 5: Verify only transportation transactions are displayed"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transactions can be filtered by quincena (Q1 or Q2)",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Set period filter to 202501",
+      "Step 3: Set quincena filter to Q1",
+      "Step 4: Verify only Q1 transactions from January 2025 are shown",
+      "Step 5: Change quincena to Q2",
+      "Step 6: Verify only Q2 transactions are shown"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transactions can be filtered by currency (CAD, USD, or COP)",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Apply CAD currency filter",
+      "Step 3: Verify only CAD transactions are displayed",
+      "Step 4: Apply USD filter",
+      "Step 5: Verify only USD transactions are displayed"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can filter transactions by recurring status",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Filter by 'recurring only'",
+      "Step 3: Verify only transactions marked as recurring are shown",
+      "Step 4: Filter by 'non-recurring only'",
+      "Step 5: Verify only non-recurring transactions are shown"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can search transactions by comments/description text",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Enter search text in search box (e.g., 'FORD')",
+      "Step 3: Verify only transactions containing 'FORD' in comments are displayed",
+      "Step 4: Clear search",
+      "Step 5: Verify all transactions are shown again"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System can import historical transactions from gastos_ledger_2025_2026.json",
+    "steps": [
+      "Step 1: Navigate to admin/import page",
+      "Step 2: Select 'Import Transactions' option",
+      "Step 3: Select file plan/extracted/gastos_ledger_2025_2026.json",
+      "Step 4: Confirm import",
+      "Step 5: Verify 2,631 transactions are imported",
+      "Step 6: Verify import summary shows success"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Historical import correctly maps C040 transactions to C031",
+    "steps": [
+      "Step 1: Import historical data",
+      "Step 2: Query for transactions with original category C040",
+      "Step 3: Verify all C040 transactions are mapped to C031",
+      "Step 4: Verify no transaction has category C040",
+      "Step 5: Verify amounts and dates remain unchanged"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Historical import skips template rows (rows without dates)",
+    "steps": [
+      "Step 1: Review gastos_template_rows.json",
+      "Step 2: Perform historical data import",
+      "Step 3: Verify template rows (12 rows with no date) are not imported",
+      "Step 4: Verify only dated transactions are imported"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Historical import correctly tags debt principal transactions",
+    "steps": [
+      "Step 1: Import historical data",
+      "Step 2: Find Ford Escape payment transactions with memo 'FORD ESC CAPITAL'",
+      "Step 3: Verify debt_component is set to 'principal'",
+      "Step 4: Verify category is C044"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Historical import correctly tags debt interest transactions",
+    "steps": [
+      "Step 1: Import historical data",
+      "Step 2: Find Ford Escape payment transactions with memo 'FORD ESC INTERESES'",
+      "Step 3: Verify debt_component is set to 'interest'",
+      "Step 4: Verify category is C044"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can create a bank account (asset account)",
+    "steps": [
+      "Step 1: Navigate to accounts page",
+      "Step 2: Click 'Add Account' button",
+      "Step 3: Select account type 'Bank Account'",
+      "Step 4: Enter account name (e.g., 'RBC Checking')",
+      "Step 5: Select primary currency (CAD)",
+      "Step 6: Submit form",
+      "Step 7: Verify account is created and appears in accounts list"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can create an investment account",
+    "steps": [
+      "Step 1: Navigate to accounts page",
+      "Step 2: Click 'Add Account' button",
+      "Step 3: Select account type 'Investment'",
+      "Step 4: Enter account name",
+      "Step 5: Submit form",
+      "Step 6: Verify investment account is created"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can create a credit card/loan liability account",
+    "steps": [
+      "Step 1: Navigate to accounts page",
+      "Step 2: Click 'Add Account' button",
+      "Step 3: Select account type 'Credit Card/Loan'",
+      "Step 4: Enter account name (e.g., 'CIBC Credit Card')",
+      "Step 5: Submit form",
+      "Step 6: Verify liability account is created"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can create an accounts receivable account",
+    "steps": [
+      "Step 1: Navigate to accounts page",
+      "Step 2: Click 'Add Account' button",
+      "Step 3: Select account type 'Accounts Receivable'",
+      "Step 4: Enter account name",
+      "Step 5: Submit form",
+      "Step 6: Verify receivable account is created"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can enter recorded balance for an account for a specific period",
+    "steps": [
+      "Step 1: Navigate to account details for 'RBC Checking'",
+      "Step 2: Select period 202501 (January 2025)",
+      "Step 3: Enter recorded balance: CAD 3,674.22",
+      "Step 4: Save",
+      "Step 5: Verify recorded balance is saved for that period"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can enter recorded balance in multiple currencies for same account/period",
+    "steps": [
+      "Step 1: Navigate to account details for 'Wise Multi-Currency'",
+      "Step 2: Select period 202501",
+      "Step 3: Enter recorded balance: CAD 1,000.00, USD 500.00, COP 2,000,000",
+      "Step 4: Save",
+      "Step 5: Verify all three currency balances are saved"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System computes expected balance for an account based on transactions",
+    "steps": [
+      "Step 1: Create account 'Test Bank' with recorded balance CAD 1,000.00 for period 202501",
+      "Step 2: Create transaction for period 202501, account 'Test Bank', category C001, amount CAD -100.00",
+      "Step 3: View account reconciliation for period 202501",
+      "Step 4: Verify computed balance is CAD 900.00 (1000 - 100)",
+      "Step 5: Verify variance is 0.00 if recorded balance was also adjusted"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System calculates variance (recorded minus computed) for each account per period",
+    "steps": [
+      "Step 1: Navigate to account reconciliation for period 202501",
+      "Step 2: Find account 'RBC Checking'",
+      "Step 3: Verify recorded balance is displayed",
+      "Step 4: Verify computed balance is displayed",
+      "Step 5: Verify variance = recorded - computed",
+      "Step 6: Verify variance is highlighted if non-zero"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Account reconciliation shows variance in all three currencies (CAD, USD, COP)",
+    "steps": [
+      "Step 1: Navigate to account reconciliation",
+      "Step 2: Select an account with multi-currency balances",
+      "Step 3: Verify recorded, computed, and variance are shown for CAD",
+      "Step 4: Verify recorded, computed, and variance are shown for USD",
+      "Step 5: Verify recorded, computed, and variance are shown for COP"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Transactions must reference an account for reconciliation to work",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Verify account field is present",
+      "Step 3: Fill in transaction details with account 'RBC Checking'",
+      "Step 4: Submit form",
+      "Step 5: Verify transaction is linked to account",
+      "Step 6: Verify account's computed balance includes this transaction"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Account list shows separate sections for assets and liabilities",
+    "steps": [
+      "Step 1: Navigate to accounts page",
+      "Step 2: Verify 'Assets' section header is displayed",
+      "Step 3: Verify bank accounts and investments appear under Assets",
+      "Step 4: Verify 'Liabilities' section header is displayed",
+      "Step 5: Verify credit cards and loans appear under Liabilities"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can view list of all known accounts from source data (RBC, CIBC, TD, Wise, Bancolombia, Davivienda, Nequi, Éxito)",
+    "steps": [
+      "Step 1: Import historical account data",
+      "Step 2: Navigate to accounts page",
+      "Step 3: Verify Canadian accounts are listed: RBC, CIBC, TD Bank, Wise",
+      "Step 4: Verify Colombian accounts are listed: Bancolombia, Davivienda, Nequi, Éxito",
+      "Step 5: Verify each account shows its type and currencies"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Personal Loan CIBC account is correctly named and linked to Ford Escape loan",
+    "steps": [
+      "Step 1: Navigate to accounts page",
+      "Step 2: Find 'Personal LOAN CIBC' account",
+      "Step 3: Verify it is a liability account",
+      "Step 4: Verify it is NOT labeled 'Crédito Móvil **6174' (old stale label)",
+      "Step 5: Verify associated transactions include Ford Escape payments"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can add monthly income line items with description and amount",
+    "steps": [
+      "Step 1: Navigate to income page",
+      "Step 2: Select period 202501",
+      "Step 3: Click 'Add Income' button",
+      "Step 4: Enter description (e.g., 'Salary - Main Job')",
+      "Step 5: Enter amount CAD 5,000.00",
+      "Step 6: Submit",
+      "Step 7: Verify income line item is added to period 202501"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Income line items support multiple currencies per line",
+    "steps": [
+      "Step 1: Navigate to income page for period 202501",
+      "Step 2: Add income line with description 'Mixed Income'",
+      "Step 3: Enter CAD 1,000.00 and USD 500.00 in the same line",
+      "Step 4: Submit",
+      "Step 5: Verify both currency amounts are saved for this income line"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Income page shows up to 6 line items per month as per source system",
+    "steps": [
+      "Step 1: Navigate to income page for period 202501",
+      "Step 2: Attempt to add 6 income line items",
+      "Step 3: Verify all 6 can be added",
+      "Step 4: Verify system allows at least 6 line items"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Income total is computed by summing all line items converted to CAD equivalent",
+    "steps": [
+      "Step 1: Navigate to income page for period 202501",
+      "Step 2: Add income: CAD 3,000.00",
+      "Step 3: Add income: USD 1,000.00",
+      "Step 4: Add income: COP 2,000,000",
+      "Step 5: Verify total income in CAD equivalent is computed using period exchange rates",
+      "Step 6: Verify total is displayed prominently"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can set exchange rate USD/COP for a specific period",
+    "steps": [
+      "Step 1: Navigate to exchange rates page",
+      "Step 2: Select period 202501",
+      "Step 3: Enter USD/COP rate: 4,400",
+      "Step 4: Save",
+      "Step 5: Verify rate is saved for period 202501"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can set exchange rate USD/CAD for a specific period",
+    "steps": [
+      "Step 1: Navigate to exchange rates page",
+      "Step 2: Select period 202501",
+      "Step 3: Enter USD/CAD rate: 0.75",
+      "Step 4: Save",
+      "Step 5: Verify rate is saved for period 202501"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can set exchange rate CAD/COP (COP per 1 CAD) for a specific period",
+    "steps": [
+      "Step 1: Navigate to exchange rates page",
+      "Step 2: Select period 202501",
+      "Step 3: Enter CAD rate (COP per CAD): 3,000",
+      "Step 4: Save",
+      "Step 5: Verify rate is saved for period 202501"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Exchange rates are independently maintained (not derived from each other)",
+    "steps": [
+      "Step 1: Navigate to exchange rates for period 202501",
+      "Step 2: Set USD/COP = 4,400",
+      "Step 3: Set USD/CAD = 0.75",
+      "Step 4: Set CAD = 3,000 (independent value, not 4400/0.75)",
+      "Step 5: Save",
+      "Step 6: Verify all three rates are stored independently",
+      "Step 7: Verify CAD rate is not auto-calculated from the other two"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System can import historical exchange rates from extracted data",
+    "steps": [
+      "Step 1: Navigate to import page",
+      "Step 2: Select 'Import Exchange Rates'",
+      "Step 3: Import from month_sheets JSON files",
+      "Step 4: Verify rates for all 21 months (Jan 2025 - Sep 2026) are imported",
+      "Step 5: Verify three independent rate series are populated"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Historical exchange rates show USD/COP fixed at 4,400 across all 21 months",
+    "steps": [
+      "Step 1: Import historical exchange rates",
+      "Step 2: Navigate to exchange rates page",
+      "Step 3: Verify USD/COP rate is 4,400 for periods 202501 through 202609",
+      "Step 4: Verify rate does not change across periods"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Historical exchange rates show USD/CAD fixed at 0.75 across all 21 months",
+    "steps": [
+      "Step 1: Import historical exchange rates",
+      "Step 2: Navigate to exchange rates page",
+      "Step 3: Verify USD/CAD rate is 0.75 for periods 202501 through 202609",
+      "Step 4: Verify rate does not change across periods"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Historical exchange rates show CAD rate varies (3,000 to 2,200) across 21 months",
+    "steps": [
+      "Step 1: Import historical exchange rates",
+      "Step 2: Navigate to exchange rates page",
+      "Step 3: Verify CAD rate for early 2025 is around 3,000",
+      "Step 4: Verify CAD rate for mid-2026 is around 2,550",
+      "Step 5: Verify CAD rate for Sep 2026 is around 2,200",
+      "Step 6: Verify rate changes over time"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can set monthly budget for a specific category and period",
+    "steps": [
+      "Step 1: Navigate to budgets page",
+      "Step 2: Select period 202501",
+      "Step 3: Select category C001 (MERCADO)",
+      "Step 4: Enter budget amount: CAD 800.00",
+      "Step 5: Save",
+      "Step 6: Verify budget is saved for C001 in period 202501"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System calculates actual spending per category per period from transactions",
+    "steps": [
+      "Step 1: Create transactions for C001 in period 202501 totaling CAD 750.00",
+      "Step 2: Navigate to budget vs actual report for period 202501",
+      "Step 3: Find category C001",
+      "Step 4: Verify actual spending shows CAD 750.00",
+      "Step 5: Verify actual is computed by summing transactions, not stored"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Budget vs actual report shows over/under budget calculation",
+    "steps": [
+      "Step 1: Set budget for C001 in period 202501: CAD 800.00",
+      "Step 2: Create transactions totaling CAD 750.00 for C001 in 202501",
+      "Step 3: Navigate to budget vs actual report",
+      "Step 4: Verify variance = actual - budget = -50.00 (under budget)",
+      "Step 5: Verify percentage = (actual / budget) * 100 = 93.75%"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Budget vs actual report highlights over-budget categories",
+    "steps": [
+      "Step 1: Set budget for C001 in period 202501: CAD 800.00",
+      "Step 2: Create transactions totaling CAD 900.00 for C001 in 202501",
+      "Step 3: Navigate to budget vs actual report",
+      "Step 4: Verify category C001 is highlighted as over-budget",
+      "Step 5: Verify variance = +100.00",
+      "Step 6: Verify percentage = 112.5%"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Budget vs actual report converts multi-currency actuals to CAD equivalent",
+    "steps": [
+      "Step 1: Set budget for C001 in 202501: CAD 800.00",
+      "Step 2: Create transactions: CAD 300.00, USD 200.00, COP 500,000",
+      "Step 3: View budget vs actual report",
+      "Step 4: Verify actuals are converted using period exchange rates",
+      "Step 5: Verify total actual is in CAD equivalent"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System calculates Total Recorded Disbursements (Gasto Total) for a period",
+    "steps": [
+      "Step 1: Navigate to financial summary for period 202501",
+      "Step 2: Verify Total Recorded Disbursements is displayed",
+      "Step 3: Verify it equals sum of all category totals including debt payments",
+      "Step 4: Verify debt payment categories (C009, C010, C027, C038, C039, C044, C046) are included"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System calculates Net Operating Expenses (Gasto Real) for a period",
+    "steps": [
+      "Step 1: Navigate to financial summary for period 202501",
+      "Step 2: Verify Net Operating Expenses is displayed",
+      "Step 3: Verify it equals Total Recorded Disbursements minus debt principal payments",
+      "Step 4: Verify debt interest IS included in Net Operating Expenses",
+      "Step 5: Verify depreciation is excluded"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Net Operating Expenses correctly excludes principal portion of Ford Escape loan",
+    "steps": [
+      "Step 1: Create transaction: C044, amount CAD 500.00, debt_component = 'principal', memo 'FORD ESC CAPITAL'",
+      "Step 2: Create transaction: C044, amount CAD 50.00, debt_component = 'interest', memo 'FORD ESC INTERESES'",
+      "Step 3: View financial summary",
+      "Step 4: Verify Total Recorded Disbursements includes CAD 550.00",
+      "Step 5: Verify Net Operating Expenses includes only CAD 50.00 (interest only, principal excluded)"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System calculates total assets for a period across all accounts and investments",
+    "steps": [
+      "Step 1: Set up accounts with recorded balances for period 202501",
+      "Step 2: Navigate to balance sheet for period 202501",
+      "Step 3: Verify total assets = sum of all bank accounts + investments + receivables + fixed assets",
+      "Step 4: Verify amount is in CAD equivalent"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System calculates total liabilities for a period across all debts and credit cards",
+    "steps": [
+      "Step 1: Set up liability accounts with balances for period 202501",
+      "Step 2: Navigate to balance sheet for period 202501",
+      "Step 3: Verify total liabilities = sum of all credit cards + loans",
+      "Step 4: Verify amount is in CAD equivalent"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System calculates equity as Assets minus Liabilities",
+    "steps": [
+      "Step 1: Navigate to balance sheet for period 202501",
+      "Step 2: Note total assets amount",
+      "Step 3: Note total liabilities amount",
+      "Step 4: Verify equity = assets - liabilities",
+      "Step 5: Verify calculation is displayed correctly"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Balance sheet shows Assets, Liabilities, and Equity in CAD",
+    "steps": [
+      "Step 1: Navigate to balance sheet for period 202501",
+      "Step 2: Verify Assets total is displayed in CAD",
+      "Step 3: Verify Liabilities total is displayed in CAD",
+      "Step 4: Verify Equity total is displayed in CAD"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Balance sheet shows Assets, Liabilities, and Equity in USD equivalent",
+    "steps": [
+      "Step 1: Navigate to balance sheet for period 202501",
+      "Step 2: Verify Assets total is also shown in USD equivalent",
+      "Step 3: Verify Liabilities total is also shown in USD equivalent",
+      "Step 4: Verify Equity total is also shown in USD equivalent",
+      "Step 5: Verify conversion uses period exchange rates"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Balance sheet shows Assets, Liabilities, and Equity in COP equivalent",
+    "steps": [
+      "Step 1: Navigate to balance sheet for period 202501",
+      "Step 2: Verify Assets total is also shown in COP equivalent",
+      "Step 3: Verify Liabilities total is also shown in COP equivalent",
+      "Step 4: Verify Equity total is also shown in COP equivalent",
+      "Step 5: Verify conversion uses period exchange rates"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Balance sheet time series shows historical trend across multiple periods",
+    "steps": [
+      "Step 1: Navigate to balance sheet time series page",
+      "Step 2: Verify data is shown for multiple periods (at least Jan 2025 to Sep 2026)",
+      "Step 3: Verify each period shows Assets, Liabilities, Equity",
+      "Step 4: Verify trend chart or table is displayed",
+      "Step 5: Verify user can see changes over time"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "System can import historical balance sheet data from estado_financiero_2025_2026.json",
+    "steps": [
+      "Step 1: Navigate to import page",
+      "Step 2: Select 'Import Balance Sheet History'",
+      "Step 3: Select estado_financiero_2025_2026.json",
+      "Step 4: Confirm import",
+      "Step 5: Verify balance sheet data for 21 periods is imported",
+      "Step 6: Verify Assets, Liabilities, Equity values match source"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Monthly reconciliation check verifies Assets = Liabilities + Equity",
+    "steps": [
+      "Step 1: Navigate to reconciliation page for period 202501",
+      "Step 2: Verify accounting equation: Assets = Liabilities + Equity",
+      "Step 3: Verify residual/difference is displayed",
+      "Step 4: Verify if residual is near zero, reconciliation passes",
+      "Step 5: Verify if residual is non-zero, warning is shown"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Monthly reconciliation check incorporates income, expenses, and account variances",
+    "steps": [
+      "Step 1: Navigate to reconciliation page for period 202501",
+      "Step 2: Verify income is included in calculation",
+      "Step 3: Verify expenses are included in calculation",
+      "Step 4: Verify account variances are included",
+      "Step 5: Verify final reconciliation result shows balanced or unbalanced status"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can add a fixed asset (e.g., Ford Escape vehicle)",
+    "steps": [
+      "Step 1: Navigate to fixed assets page",
+      "Step 2: Click 'Add Fixed Asset'",
+      "Step 3: Enter asset name: 'Ford Escape'",
+      "Step 4: Enter book value: CAD 25,000.00",
+      "Step 5: Submit",
+      "Step 6: Verify asset is added to fixed assets list"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Fixed asset book value can be set per period",
+    "steps": [
+      "Step 1: Navigate to fixed asset 'Ford Escape'",
+      "Step 2: Set book value for period 202501: CAD 25,000.00",
+      "Step 3: Set book value for period 202502: CAD 24,500.00 (after depreciation)",
+      "Step 4: Verify different book values per period are saved"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Fixed assets are included in total assets calculation",
+    "steps": [
+      "Step 1: Add fixed asset with book value CAD 25,000.00 for period 202501",
+      "Step 2: Navigate to balance sheet for period 202501",
+      "Step 3: Verify total assets includes the fixed asset value",
+      "Step 4: Verify fixed assets section shows the breakdown"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Ford Escape loan balance is tracked separately from asset book value",
+    "steps": [
+      "Step 1: Navigate to fixed assets, verify Ford Escape book value",
+      "Step 2: Navigate to liabilities, find 'Personal LOAN CIBC'",
+      "Step 3: Verify loan balance is tracked separately",
+      "Step 4: Verify loan balance decreases with principal payments",
+      "Step 5: Verify asset book value is independent of loan balance"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Historical import normalizes floating-point noise to zero",
+    "steps": [
+      "Step 1: Review extracted data for near-zero balances (e.g., -1.19e-10)",
+      "Step 2: Import historical account balances",
+      "Step 3: Check imported balances for accounts that had floating-point noise",
+      "Step 4: Verify balances are rounded to 0.00 instead of -1.19e-10",
+      "Step 5: Verify no significant balance data is lost"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can view transaction count per period",
+    "steps": [
+      "Step 1: Navigate to dashboard or reports",
+      "Step 2: Select period 202501",
+      "Step 3: Verify transaction count is displayed",
+      "Step 4: Verify count matches number of transactions in that period"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can export transactions to CSV",
+    "steps": [
+      "Step 1: Navigate to transactions page",
+      "Step 2: Apply filters (e.g., period 202501)",
+      "Step 3: Click 'Export to CSV' button",
+      "Step 4: Verify CSV file is downloaded",
+      "Step 5: Open CSV and verify data matches displayed transactions"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can export budget vs actual report to CSV",
+    "steps": [
+      "Step 1: Navigate to budget vs actual report",
+      "Step 2: Select period 202501",
+      "Step 3: Click 'Export' button",
+      "Step 4: Verify CSV contains category, budget, actual, variance, percentage columns"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Dashboard shows summary cards for current period: total income, total expenses, net",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Verify current period is auto-selected",
+      "Step 3: Verify 'Total Income' card is displayed with CAD amount",
+      "Step 4: Verify 'Total Expenses' card is displayed",
+      "Step 5: Verify 'Net' card shows income - expenses"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Dashboard shows summary of account balances: total assets and total liabilities",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Verify 'Total Assets' card is displayed",
+      "Step 3: Verify 'Total Liabilities' card is displayed",
+      "Step 4: Verify amounts are in CAD equivalent"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "Dashboard shows quick reconciliation status for current period",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Verify reconciliation status widget is displayed",
+      "Step 3: Verify status shows 'Balanced' or 'Unbalanced' with variance",
+      "Step 4: Verify link to detailed reconciliation page"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "User can navigate to different periods using period selector",
+    "steps": [
+      "Step 1: Navigate to any page with period data (e.g., transactions)",
+      "Step 2: Locate period selector dropdown/control",
+      "Step 3: Select a different period (e.g., change from 202501 to 202502)",
+      "Step 4: Verify page updates to show data for selected period",
+      "Step 5: Verify period selection persists across page navigation"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System validates period format as YYYYMM",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Enter invalid period format (e.g., '01/2025' or '2025-01')",
+      "Step 3: Verify validation error is shown",
+      "Step 4: Enter valid format '202501'",
+      "Step 5: Verify form accepts it"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System validates quincena as Q1 or Q2 only",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Attempt to enter invalid quincena value (e.g., 'Q3')",
+      "Step 3: Verify validation error or dropdown only shows Q1 and Q2",
+      "Step 4: Select Q1",
+      "Step 5: Verify form accepts it"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can view list of all periods with data",
+    "steps": [
+      "Step 1: Navigate to periods/history page",
+      "Step 2: Verify list of periods from Jan 2025 to Sep 2026 (at least 21 periods)",
+      "Step 3: Verify each period shows summary stats (transaction count, income, expenses)",
+      "Step 4: Verify periods are sorted chronologically"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category actuals report aggregates by category and period without hardcoded row references",
+    "steps": [
+      "Step 1: Create multiple transactions for C001 in period 202501",
+      "Step 2: Navigate to category actuals report for 202501",
+      "Step 3: Verify C001 actual total equals sum of all C001 transactions",
+      "Step 4: Add another C001 transaction",
+      "Step 5: Refresh report",
+      "Step 6: Verify C001 total automatically includes new transaction"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category actuals report shows all 45 active categories",
+    "steps": [
+      "Step 1: Navigate to category actuals report for period 202501",
+      "Step 2: Verify all 45 categories (C001-C046 except C040) are listed",
+      "Step 3: Verify categories with no transactions show 0.00 actual",
+      "Step 4: Verify categories with transactions show correct totals"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can click on a category in actuals report to see detailed transactions",
+    "steps": [
+      "Step 1: Navigate to category actuals report for period 202501",
+      "Step 2: Click on category C001",
+      "Step 3: Verify detail view shows all C001 transactions for that period",
+      "Step 4: Verify transaction details are complete (date, amount, comments, account)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System prevents deletion of category that has associated transactions",
+    "steps": [
+      "Step 1: Create a transaction with category C001",
+      "Step 2: Navigate to categories page",
+      "Step 3: Attempt to delete category C001",
+      "Step 4: Verify system prevents deletion or shows warning",
+      "Step 5: Verify message indicates transactions exist for this category"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can view account transaction history sorted by date",
+    "steps": [
+      "Step 1: Navigate to account details for 'RBC Checking'",
+      "Step 2: View transaction history",
+      "Step 3: Verify transactions are sorted by date (newest first or oldest first)",
+      "Step 4: Verify each transaction shows date, amount, category, comments",
+      "Step 5: Verify running balance is calculated and displayed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Account transaction history shows running balance after each transaction",
+    "steps": [
+      "Step 1: Navigate to account details with multiple transactions",
+      "Step 2: View transaction history",
+      "Step 3: Verify starting balance is shown",
+      "Step 4: Verify each transaction shows balance after that transaction",
+      "Step 5: Verify final balance matches account's current balance"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can filter account transaction history by date range",
+    "steps": [
+      "Step 1: Navigate to account transaction history",
+      "Step 2: Apply date range filter (e.g., Jan 1 2025 to Jan 31 2025)",
+      "Step 3: Verify only transactions in that date range are shown",
+      "Step 4: Verify starting balance for filtered view is correct"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System supports pagination for large transaction lists",
+    "steps": [
+      "Step 1: Navigate to transactions page",
+      "Step 2: Verify if more than 50 transactions exist, pagination controls are shown",
+      "Step 3: Verify page size options (e.g., 25, 50, 100 per page)",
+      "Step 4: Click next page",
+      "Step 5: Verify next set of transactions is displayed",
+      "Step 6: Verify page number and total pages are shown"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Transaction form validates that amount is a positive number",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Enter negative amount (e.g., -100)",
+      "Step 3: Verify validation error is shown",
+      "Step 4: Enter positive amount (e.g., 100.50)",
+      "Step 5: Verify form accepts it"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Transaction form validates that date is a valid date",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Enter invalid date (e.g., '2025-13-45')",
+      "Step 3: Verify validation error is shown",
+      "Step 4: Enter valid date (e.g., '2025-01-15')",
+      "Step 5: Verify form accepts it"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Account form validates that account name is unique",
+    "steps": [
+      "Step 1: Create account with name 'RBC Checking'",
+      "Step 2: Attempt to create another account with same name",
+      "Step 3: Verify validation error is shown",
+      "Step 4: Change name to 'RBC Savings'",
+      "Step 5: Verify form accepts unique name"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Exchange rate form validates that rates are positive numbers",
+    "steps": [
+      "Step 1: Navigate to exchange rates form",
+      "Step 2: Enter negative or zero rate",
+      "Step 3: Verify validation error is shown",
+      "Step 4: Enter positive rate (e.g., 4400)",
+      "Step 5: Verify form accepts it"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Budget form validates that budget amount is a positive number",
+    "steps": [
+      "Step 1: Navigate to budget form",
+      "Step 2: Enter negative budget amount",
+      "Step 3: Verify validation error is shown",
+      "Step 4: Enter positive amount",
+      "Step 5: Verify form accepts it"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can view all transactions for a specific category across all periods",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Click on category C001",
+      "Step 3: Verify all C001 transactions across all periods are shown",
+      "Step 4: Verify transactions can be filtered by period",
+      "Step 5: Verify total spending for that category is displayed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can view summary statistics for a category: total spent, average per period, period count",
+    "steps": [
+      "Step 1: Navigate to category details for C001",
+      "Step 2: Verify total amount spent across all periods is shown",
+      "Step 3: Verify average spending per period is calculated",
+      "Step 4: Verify number of periods with transactions is shown",
+      "Step 5: Verify number of total transactions is shown"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Dashboard shows chart of income vs expenses over time",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Verify income vs expenses chart is displayed",
+      "Step 3: Verify chart shows last 6-12 months",
+      "Step 4: Verify both income and expenses lines/bars are visible",
+      "Step 5: Verify chart legend is clear"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Dashboard shows chart of assets vs liabilities over time",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Verify assets vs liabilities chart is displayed",
+      "Step 3: Verify chart shows trend over multiple periods",
+      "Step 4: Verify equity can be visualized",
+      "Step 5: Verify chart is interactive (hover for values)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Dashboard shows top spending categories for current period",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Verify 'Top Spending Categories' widget is displayed",
+      "Step 3: Verify top 5-10 categories by spending are shown",
+      "Step 4: Verify amounts are displayed",
+      "Step 5: Verify percentages or chart visualization is included"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can compare two periods side-by-side",
+    "steps": [
+      "Step 1: Navigate to period comparison page",
+      "Step 2: Select first period: 202501",
+      "Step 3: Select second period: 202502",
+      "Step 4: Verify income, expenses, and balances for both periods are shown side-by-side",
+      "Step 5: Verify differences/changes are calculated and highlighted"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can view year-to-date totals for income and expenses",
+    "steps": [
+      "Step 1: Navigate to reports page",
+      "Step 2: Select year 2025",
+      "Step 3: Verify YTD income total is displayed",
+      "Step 4: Verify YTD expense total is displayed",
+      "Step 5: Verify YTD net (income - expenses) is displayed",
+      "Step 6: Verify totals update when year selection changes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System shows warning when variance exceeds acceptable threshold",
+    "steps": [
+      "Step 1: Navigate to account reconciliation",
+      "Step 2: Create variance > $10 for an account",
+      "Step 3: Verify warning icon or highlight is shown",
+      "Step 4: Verify tooltip or message explains the variance",
+      "Step 5: Verify user can click to investigate transactions"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can manually mark an account variance as reviewed/acknowledged",
+    "steps": [
+      "Step 1: Navigate to account with non-zero variance",
+      "Step 2: Click 'Acknowledge Variance' or similar button",
+      "Step 3: Add optional note explaining variance",
+      "Step 4: Submit",
+      "Step 5: Verify variance is marked as reviewed",
+      "Step 6: Verify variance still shows but with 'reviewed' indicator"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Search functionality works across transactions, accounts, and categories",
+    "steps": [
+      "Step 1: Use global search box in header",
+      "Step 2: Enter search term (e.g., 'RBC')",
+      "Step 3: Verify search results include matching accounts",
+      "Step 4: Verify search results include matching transactions (in comments)",
+      "Step 5: Verify results are organized by type"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can bulk edit multiple transactions (e.g., change category)",
+    "steps": [
+      "Step 1: Navigate to transactions page",
+      "Step 2: Select multiple transactions using checkboxes",
+      "Step 3: Click 'Bulk Edit' button",
+      "Step 4: Change category to C002",
+      "Step 5: Confirm changes",
+      "Step 6: Verify all selected transactions have updated category"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can duplicate a transaction",
+    "steps": [
+      "Step 1: Navigate to transaction details",
+      "Step 2: Click 'Duplicate' button",
+      "Step 3: Verify form is pre-filled with same values",
+      "Step 4: Modify date to current date",
+      "Step 5: Submit",
+      "Step 6: Verify new transaction is created with same details"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System shows recent activity feed on dashboard",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Verify recent activity widget is displayed",
+      "Step 3: Verify last 10-20 transactions/changes are shown",
+      "Step 4: Verify each item shows date, type, and summary",
+      "Step 5: Verify user can click to view details"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can set default currency preference for views",
+    "steps": [
+      "Step 1: Navigate to settings/preferences",
+      "Step 2: Set default display currency to CAD",
+      "Step 3: Save",
+      "Step 4: Navigate to dashboard",
+      "Step 5: Verify amounts are displayed in CAD by default",
+      "Step 6: Verify user can toggle to see other currencies"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can toggle between Spanish and English category names",
+    "steps": [
+      "Step 1: Navigate to categories or transactions page",
+      "Step 2: Verify language toggle is available",
+      "Step 3: Switch to Spanish",
+      "Step 4: Verify category names display in Spanish (e.g., MERCADO)",
+      "Step 5: Switch to English",
+      "Step 6: Verify category names display in English (e.g., Groceries)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System auto-calculates period from transaction date",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Enter date: 2025-01-15",
+      "Step 3: Verify period is auto-filled as 202501",
+      "Step 4: Change date to 2026-02-20",
+      "Step 5: Verify period updates to 202602"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can generate PDF report of balance sheet for a period",
+    "steps": [
+      "Step 1: Navigate to balance sheet for period 202501",
+      "Step 2: Click 'Export to PDF' button",
+      "Step 3: Verify PDF is generated and downloaded",
+      "Step 4: Open PDF",
+      "Step 5: Verify it contains assets, liabilities, equity with proper formatting"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can generate PDF report of income statement for a period",
+    "steps": [
+      "Step 1: Navigate to income statement/summary for period 202501",
+      "Step 2: Click 'Export to PDF' button",
+      "Step 3: Verify PDF is generated",
+      "Step 4: Verify it shows income line items, total income, expenses by category, net"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System displays error message when required field is missing",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Leave date field empty",
+      "Step 3: Attempt to submit",
+      "Step 4: Verify error message is displayed near date field",
+      "Step 5: Verify form does not submit",
+      "Step 6: Fill in date and verify error clears"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System displays success message after creating a transaction",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Fill in all required fields",
+      "Step 3: Submit form",
+      "Step 4: Verify success message is displayed (e.g., toast notification)",
+      "Step 5: Verify user is redirected to transaction list or details page"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "System displays confirmation dialog before deleting a transaction",
+    "steps": [
+      "Step 1: Navigate to transaction details",
+      "Step 2: Click 'Delete' button",
+      "Step 3: Verify confirmation dialog appears",
+      "Step 4: Verify dialog shows warning message",
+      "Step 5: Click 'Cancel' and verify transaction is not deleted",
+      "Step 6: Click 'Delete' again and confirm, verify transaction is deleted"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can sort transactions table by date",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Click on 'Date' column header",
+      "Step 3: Verify transactions are sorted by date ascending",
+      "Step 4: Click 'Date' header again",
+      "Step 5: Verify transactions are sorted by date descending"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can sort transactions table by amount",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Click on 'Amount' column header",
+      "Step 3: Verify transactions are sorted by amount ascending",
+      "Step 4: Click again",
+      "Step 5: Verify transactions are sorted by amount descending"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "User can sort transactions table by category",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Click on 'Category' column header",
+      "Step 3: Verify transactions are sorted alphabetically by category",
+      "Step 4: Click again",
+      "Step 5: Verify sort order reverses"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/transactions returns list of transactions",
+    "steps": [
+      "Step 1: Make GET request to /api/transactions",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains array of transactions",
+      "Step 4: Verify each transaction has expected fields (id, date, period, category, amount, currency, etc.)"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint POST /api/transactions creates a new transaction",
+    "steps": [
+      "Step 1: Make POST request to /api/transactions with transaction data",
+      "Step 2: Verify response status is 201",
+      "Step 3: Verify response contains created transaction with ID",
+      "Step 4: Verify transaction is saved in database"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/transactions/{id} returns single transaction",
+    "steps": [
+      "Step 1: Create a transaction",
+      "Step 2: Make GET request to /api/transactions/{id}",
+      "Step 3: Verify response status is 200",
+      "Step 4: Verify response contains transaction details",
+      "Step 5: Verify all fields match created transaction"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint PUT /api/transactions/{id} updates a transaction",
+    "steps": [
+      "Step 1: Create a transaction",
+      "Step 2: Make PUT request to /api/transactions/{id} with updated data",
+      "Step 3: Verify response status is 200",
+      "Step 4: Verify response contains updated transaction",
+      "Step 5: Verify changes are persisted in database"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint DELETE /api/transactions/{id} deletes a transaction",
+    "steps": [
+      "Step 1: Create a transaction",
+      "Step 2: Make DELETE request to /api/transactions/{id}",
+      "Step 3: Verify response status is 204 or 200",
+      "Step 4: Verify transaction is removed from database",
+      "Step 5: Verify GET request for same ID returns 404"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/categories returns list of all categories",
+    "steps": [
+      "Step 1: Make GET request to /api/categories",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains 45 active categories",
+      "Step 4: Verify each category has code, name_es, name_en, is_debt_category fields"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/accounts returns list of all accounts",
+    "steps": [
+      "Step 1: Make GET request to /api/accounts",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains accounts array",
+      "Step 4: Verify accounts are grouped by type (assets vs liabilities)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/periods/{period}/reconciliation returns reconciliation data",
+    "steps": [
+      "Step 1: Make GET request to /api/periods/202501/reconciliation",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains account balances (recorded, computed, variance)",
+      "Step 4: Verify response contains reconciliation status (balanced/unbalanced)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/periods/{period}/balance-sheet returns balance sheet data",
+    "steps": [
+      "Step 1: Make GET request to /api/periods/202501/balance-sheet",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains total_assets, total_liabilities, equity",
+      "Step 4: Verify each is provided in CAD, USD, and COP equivalents"
+    ],
+    "passes": true
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/periods/{period}/budget-vs-actual returns budget comparison",
+    "steps": [
+      "Step 1: Make GET request to /api/periods/202501/budget-vs-actual",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains array of categories with budget, actual, variance, percentage",
+      "Step 4: Verify all 45 categories are included"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API supports filtering transactions by period query parameter",
+    "steps": [
+      "Step 1: Make GET request to /api/transactions?period=202501",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify only transactions from period 202501 are returned",
+      "Step 4: Verify transaction count matches expected"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API supports filtering transactions by category query parameter",
+    "steps": [
+      "Step 1: Make GET request to /api/transactions?category=C001",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify only C001 transactions are returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API supports filtering transactions by account query parameter",
+    "steps": [
+      "Step 1: Make GET request to /api/transactions?account=1",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify only transactions for account ID 1 are returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API returns 404 for non-existent transaction ID",
+    "steps": [
+      "Step 1: Make GET request to /api/transactions/999999",
+      "Step 2: Verify response status is 404",
+      "Step 3: Verify error message is returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API returns 422 validation error for invalid transaction data",
+    "steps": [
+      "Step 1: Make POST request to /api/transactions with missing required field (e.g., date)",
+      "Step 2: Verify response status is 422",
+      "Step 3: Verify response contains validation errors",
+      "Step 4: Verify error message specifies which field is invalid"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API endpoint GET /api/exchange-rates/{period} returns rates for a period",
+    "steps": [
+      "Step 1: Make GET request to /api/exchange-rates/202501",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains usd_cop, usd_cad, cad_cop rates",
+      "Step 4: Verify rates are numeric values"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API supports pagination for transactions list",
+    "steps": [
+      "Step 1: Make GET request to /api/transactions?page=1&per_page=25",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains pagination metadata (total, per_page, current_page, last_page)",
+      "Step 4: Verify only 25 transactions are returned",
+      "Step 5: Request page 2 and verify different transactions are returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Application has a clean, professional header with logo and navigation",
+    "steps": [
+      "Step 1: Navigate to application home page",
+      "Step 2: Take screenshot",
+      "Step 3: Verify header is present at top of page",
+      "Step 4: Verify logo or app name 'Pockety' is visible",
+      "Step 5: Verify main navigation links are visible and styled consistently"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Navigation menu is responsive and accessible on mobile devices",
+    "steps": [
+      "Step 1: Resize browser to mobile width (e.g., 375px)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify navigation collapses into hamburger menu or similar mobile pattern",
+      "Step 4: Click hamburger icon",
+      "Step 5: Verify menu expands and all navigation items are accessible"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Dashboard cards use consistent spacing, shadows, and borders",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Take screenshot",
+      "Step 3: Verify summary cards (income, expenses, assets, liabilities) are visually consistent",
+      "Step 4: Verify card spacing is uniform",
+      "Step 5: Verify shadows or borders are applied consistently"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Dashboard layout is responsive and adjusts to different screen sizes",
+    "steps": [
+      "Step 1: View dashboard on desktop (1920px width)",
+      "Step 2: Take screenshot",
+      "Step 3: Resize to tablet (768px width)",
+      "Step 4: Take screenshot",
+      "Step 5: Verify cards reflow appropriately",
+      "Step 6: Resize to mobile (375px width)",
+      "Step 7: Verify cards stack vertically and remain readable"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Form inputs have clear labels, proper spacing, and focus states",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Take screenshot",
+      "Step 3: Verify all inputs have visible labels above or beside them",
+      "Step 4: Tab through form fields",
+      "Step 5: Verify focus states are visible (e.g., blue outline or border highlight)",
+      "Step 6: Verify input spacing is consistent"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Buttons use consistent styling with primary and secondary variants",
+    "steps": [
+      "Step 1: Navigate to any page with multiple buttons",
+      "Step 2: Take screenshot",
+      "Step 3: Verify primary action buttons (e.g., Submit, Save) have distinct, prominent styling",
+      "Step 4: Verify secondary/cancel buttons have less prominent styling",
+      "Step 5: Verify button sizes are consistent",
+      "Step 6: Verify hover states are visually distinct"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Data tables have clear column headers, row striping, and hover states",
+    "steps": [
+      "Step 1: Navigate to transactions list",
+      "Step 2: Take screenshot",
+      "Step 3: Verify table has clear column headers with borders or background",
+      "Step 4: Verify alternating row colors for readability",
+      "Step 5: Hover over a row",
+      "Step 6: Verify hover state highlights the row"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Tables are responsive on mobile devices (horizontal scroll or cards)",
+    "steps": [
+      "Step 1: Navigate to transactions list on mobile width",
+      "Step 2: Take screenshot",
+      "Step 3: Verify table either has horizontal scroll OR converts to card/list layout",
+      "Step 4: Verify all data remains accessible",
+      "Step 5: Verify user can interact with all rows"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Currency amounts are formatted with proper thousand separators and decimals",
+    "steps": [
+      "Step 1: Navigate to any page showing currency amounts",
+      "Step 2: Take screenshot",
+      "Step 3: Verify CAD/USD amounts show 2 decimal places (e.g., 1,234.56)",
+      "Step 4: Verify COP amounts show appropriate formatting (e.g., 2,000,000)",
+      "Step 5: Verify thousand separators (commas) are present"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Currency symbols are displayed correctly (CAD, USD, COP or $, US$, $COP)",
+    "steps": [
+      "Step 1: Navigate to dashboard",
+      "Step 2: Take screenshot",
+      "Step 3: Verify currency symbols or codes are shown with amounts",
+      "Step 4: Verify CAD, USD, and COP are distinguishable from each other",
+      "Step 5: Verify symbols are positioned consistently (before or after amount)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Positive and negative amounts are visually distinguished (e.g., green vs red, +/-)",
+    "steps": [
+      "Step 1: Navigate to account transaction history with both deposits and withdrawals",
+      "Step 2: Take screenshot",
+      "Step 3: Verify positive amounts are styled distinctly (e.g., green color)",
+      "Step 4: Verify negative amounts are styled distinctly (e.g., red color)",
+      "Step 5: Verify +/- signs are present"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Error messages are displayed in red with clear icon",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Submit form with missing required field",
+      "Step 3: Take screenshot",
+      "Step 4: Verify error message is displayed in red color",
+      "Step 5: Verify error icon (e.g., exclamation mark) is present",
+      "Step 6: Verify message is positioned near the relevant field"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Success messages are displayed in green with clear icon",
+    "steps": [
+      "Step 1: Create a new transaction successfully",
+      "Step 2: Take screenshot of success message",
+      "Step 3: Verify message is displayed in green color",
+      "Step 4: Verify success icon (e.g., checkmark) is present",
+      "Step 5: Verify message auto-dismisses or has close button"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Warning messages (e.g., unreconciled variance) are displayed in yellow/orange",
+    "steps": [
+      "Step 1: Navigate to reconciliation page with non-zero variance",
+      "Step 2: Take screenshot",
+      "Step 3: Verify warning message or indicator is yellow or orange",
+      "Step 4: Verify warning icon is present",
+      "Step 5: Verify message clearly explains the issue"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Loading states show spinner or skeleton screen",
+    "steps": [
+      "Step 1: Navigate to a page with data fetching (e.g., transactions)",
+      "Step 2: Observe loading state before data appears",
+      "Step 3: Take screenshot if possible",
+      "Step 4: Verify loading indicator (spinner, progress bar, or skeleton) is shown",
+      "Step 5: Verify loading state is removed when data loads"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Empty states show helpful message and call-to-action",
+    "steps": [
+      "Step 1: Navigate to transactions page with no transactions",
+      "Step 2: Take screenshot",
+      "Step 3: Verify empty state message is displayed (e.g., 'No transactions yet')",
+      "Step 4: Verify helpful illustration or icon is shown",
+      "Step 5: Verify call-to-action button (e.g., 'Add First Transaction') is present"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Modal dialogs have backdrop, proper z-index, and are centered",
+    "steps": [
+      "Step 1: Open a modal dialog (e.g., delete confirmation)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify modal is centered on screen",
+      "Step 4: Verify dark backdrop/overlay is behind modal",
+      "Step 5: Verify modal content is on top and clearly visible",
+      "Step 6: Verify clicking backdrop closes modal"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Charts use clear colors, legends, and axis labels",
+    "steps": [
+      "Step 1: Navigate to dashboard with charts",
+      "Step 2: Take screenshot",
+      "Step 3: Verify chart colors are distinct and accessible",
+      "Step 4: Verify legend clearly identifies each data series",
+      "Step 5: Verify axis labels (x and y) are present and readable"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Charts are responsive and readable on mobile devices",
+    "steps": [
+      "Step 1: View dashboard charts on mobile width",
+      "Step 2: Take screenshot",
+      "Step 3: Verify charts scale down appropriately",
+      "Step 4: Verify labels remain readable (not overlapping)",
+      "Step 5: Verify interactive elements (hover/touch) still work"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Date inputs use consistent format and have calendar picker",
+    "steps": [
+      "Step 1: Navigate to add transaction form",
+      "Step 2: Click on date field",
+      "Step 3: Take screenshot",
+      "Step 4: Verify calendar picker appears",
+      "Step 5: Verify date format is clear (e.g., YYYY-MM-DD)",
+      "Step 6: Verify user can type or select from calendar"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Dropdown/select inputs have clear arrow indicator and dropdown styling",
+    "steps": [
+      "Step 1: Navigate to form with select input (e.g., category selector)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify down arrow icon is visible on right side of select",
+      "Step 4: Click select to open dropdown",
+      "Step 5: Verify dropdown list is styled consistently with app",
+      "Step 6: Verify selected item is highlighted"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Checkbox and radio inputs have custom styling consistent with app design",
+    "steps": [
+      "Step 1: Navigate to form with checkboxes (e.g., is_recurring)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify checkboxes use custom styling (not browser default)",
+      "Step 4: Verify checked state is visually clear",
+      "Step 5: Verify labels are clickable"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Tooltips provide helpful context on hover or focus",
+    "steps": [
+      "Step 1: Navigate to page with tooltips (e.g., info icons)",
+      "Step 2: Hover over tooltip trigger",
+      "Step 3: Take screenshot",
+      "Step 4: Verify tooltip appears with helpful text",
+      "Step 5: Verify tooltip is positioned clearly (not overlapping content)",
+      "Step 6: Verify tooltip disappears on mouse out"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Breadcrumbs show current page location in navigation hierarchy",
+    "steps": [
+      "Step 1: Navigate to nested page (e.g., transaction details)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify breadcrumb trail is displayed (e.g., Home > Transactions > Details)",
+      "Step 4: Verify breadcrumbs are clickable to navigate back",
+      "Step 5: Verify current page is highlighted in breadcrumb"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Page titles are prominent and descriptive",
+    "steps": [
+      "Step 1: Navigate to various pages (dashboard, transactions, accounts)",
+      "Step 2: Take screenshots",
+      "Step 3: Verify each page has clear H1 title at top",
+      "Step 4: Verify title describes page content",
+      "Step 5: Verify title styling is consistent across pages"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Spacing between sections is consistent throughout the application",
+    "steps": [
+      "Step 1: Navigate to multiple pages",
+      "Step 2: Take screenshots",
+      "Step 3: Verify spacing between header and content is consistent",
+      "Step 4: Verify spacing between sections/cards is consistent",
+      "Step 5: Verify margins and padding follow a consistent scale"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Typography is hierarchical and readable (font sizes, weights, line height)",
+    "steps": [
+      "Step 1: Navigate to content-heavy page",
+      "Step 2: Take screenshot",
+      "Step 3: Verify heading levels (H1, H2, H3) are visually distinct",
+      "Step 4: Verify body text is readable size (at least 14-16px)",
+      "Step 5: Verify line height provides good readability",
+      "Step 6: Verify font weights distinguish headings from body text"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Color contrast meets accessibility standards (WCAG AA)",
+    "steps": [
+      "Step 1: Navigate to various pages",
+      "Step 2: Take screenshots",
+      "Step 3: Use browser accessibility tools to check contrast ratios",
+      "Step 4: Verify text on backgrounds has at least 4.5:1 contrast ratio",
+      "Step 5: Verify interactive elements meet contrast requirements"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Links are visually distinct from body text",
+    "steps": [
+      "Step 1: Navigate to page with links in content",
+      "Step 2: Take screenshot",
+      "Step 3: Verify links have distinct color or underline",
+      "Step 4: Verify hover state makes links more obvious",
+      "Step 5: Verify visited links are distinguishable (if applicable)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Icons are consistent style and properly aligned with text",
+    "steps": [
+      "Step 1: Navigate to pages with icons",
+      "Step 2: Take screenshot",
+      "Step 3: Verify all icons use consistent style (outline vs solid)",
+      "Step 4: Verify icons are vertically aligned with adjacent text",
+      "Step 5: Verify icon sizes are appropriate and consistent"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Account variance highlighting uses appropriate colors (red for issues, green for balanced)",
+    "steps": [
+      "Step 1: Navigate to reconciliation page",
+      "Step 2: View accounts with variances",
+      "Step 3: Take screenshot",
+      "Step 4: Verify zero or near-zero variance is green or neutral",
+      "Step 5: Verify significant positive variance is highlighted (yellow/orange)",
+      "Step 6: Verify significant negative variance is highlighted (red)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Budget vs actual visualization clearly shows under/over budget",
+    "steps": [
+      "Step 1: Navigate to budget vs actual report",
+      "Step 2: Take screenshot",
+      "Step 3: Verify under-budget categories are visually distinct (green)",
+      "Step 4: Verify over-budget categories are visually distinct (red)",
+      "Step 5: Verify progress bars or visual indicators are clear"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Sidebar or navigation menu is collapsible for more screen space",
+    "steps": [
+      "Step 1: Navigate to application",
+      "Step 2: Locate sidebar navigation",
+      "Step 3: Click collapse/expand button",
+      "Step 4: Take screenshot",
+      "Step 5: Verify sidebar collapses to icons only or narrow strip",
+      "Step 6: Verify main content area expands to use available space",
+      "Step 7: Click expand button and verify sidebar returns to full width"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Footer contains useful links and app version information",
+    "steps": [
+      "Step 1: Scroll to bottom of any page",
+      "Step 2: Take screenshot",
+      "Step 3: Verify footer is present with consistent styling",
+      "Step 4: Verify footer includes copyright or app name",
+      "Step 5: Verify useful links are present (if applicable)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Print stylesheet exists for printing reports",
+    "steps": [
+      "Step 1: Navigate to balance sheet or report",
+      "Step 2: Open browser print preview",
+      "Step 3: Take screenshot of print preview",
+      "Step 4: Verify navigation and unnecessary elements are hidden in print view",
+      "Step 5: Verify report content is formatted for printing",
+      "Step 6: Verify page breaks are logical"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Application supports dark mode preference",
+    "steps": [
+      "Step 1: Set system/browser to dark mode preference",
+      "Step 2: Navigate to application",
+      "Step 3: Take screenshot",
+      "Step 4: Verify application respects dark mode preference OR has dark mode toggle",
+      "Step 5: Verify colors are inverted appropriately",
+      "Step 6: Verify readability is maintained in dark mode"
+    ],
+    "passes": false
+  }
 ]
