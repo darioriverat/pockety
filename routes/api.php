@@ -35,6 +35,7 @@ Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.ind
 Route::post('/accounts/import', [AccountImportController::class, 'import'])->name('accounts.import');
 Route::get('/accounts/import/statistics', [AccountImportController::class, 'statistics'])->name('accounts.import.statistics');
 Route::get('/accounts/{id}', [AccountController::class, 'show'])->name('accounts.show')->whereNumber('id');
+Route::get('/accounts/{id}/transactions', [AccountController::class, 'transactions'])->name('accounts.transactions')->whereNumber('id');
 Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
 Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update')->whereNumber('id');
 Route::patch('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.patch')->whereNumber('id');

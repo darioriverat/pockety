@@ -346,14 +346,21 @@ export default function Accounts() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openBalanceDialog(account)}
-                >
-                    <Wallet className="mr-2 h-4 w-4" />
-                    Manage Balances
-                </Button>
+                <div className="flex gap-2">
+                    <Link href={`/accounts/${account.id}`}>
+                        <Button variant="outline" size="sm">
+                            View Transactions
+                        </Button>
+                    </Link>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openBalanceDialog(account)}
+                    >
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Manage Balances
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     );

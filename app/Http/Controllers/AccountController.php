@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Models\Category;
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -173,5 +175,70 @@ class AccountController extends Controller
                 'error' => 'Account not found',
             ], 404);
         }
+    }
+
+    /**
+     * Get transactions for an account.
+     *
+     * GET /api/accounts/{id}/transactions
+     */
+    public function transactions(int $id): JsonResponse
+    {
+        $account = $this->service->getById($id);
+
+        if (! $account) {
+            return response()->json([
+                'error' => 'Account not found',
+            ], 404);
+        }
+
+        // Get all transactions for this account, ordered by date descending (newest first)
+        $transactions = Transaction::forAccount($id)
+            ->with('category')
+            ->orderBy('date', 'desc')
+            ->get();
+
+        // Calculate running balance for each transaction
+        // Start with the oldest transaction and work forward
+        $transactionsWithBalance = [];
+        $runningBalance = 0.0;
+
+        // Reverse to start from oldest
+        $reversed = $transactions->reverse();
+
+        foreach ($reversed as $transaction) {
+            $runningBalance += $transaction->amount ?? 0;
+
+            /** @var Category|null $category */
+            $category = $transaction->category;
+
+            $transactionsWithBalance[] = [
+                'id' => $transaction->id,
+                'date' => $transaction->date->format('Y-m-d'),
+                'period' => $transaction->period,
+                'category_code' => $category?->code,
+                'category_name' => $category?->name_en,
+                'amount' => $transaction->amount,
+                'currency' => $transaction->currency,
+                'comments' => $transaction->comments,
+                'running_balance' => $runningBalance,
+            ];
+        }
+
+        // Reverse back to newest first
+        $transactionsWithBalance = array_reverse($transactionsWithBalance);
+
+        return response()->json([
+            'data' => $transactionsWithBalance,
+            'meta' => [
+                'account_id' => $id,
+                'account_name' => $account->name,
+                'total_count' => count($transactionsWithBalance),
+            ],
+            'links' => [
+                'self' => route('accounts.transactions', $id),
+                'account' => route('accounts.show', $id),
+            ],
+        ]);
     }
 }

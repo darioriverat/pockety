@@ -25,6 +25,7 @@ Route::inertia('/', 'welcome')->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::inertia('accounts', 'accounts')->name('accounts');
+    Route::inertia('accounts/{id}', 'account-detail')->name('accounts.detail')->whereNumber('id');
     Route::inertia('income', 'income')->name('income');
     Route::inertia('reconciliation', 'reconciliation')->name('reconciliation');
     Route::inertia('categories', 'categories')->name('categories');
