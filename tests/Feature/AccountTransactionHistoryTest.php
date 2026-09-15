@@ -119,4 +119,115 @@ class AccountTransactionHistoryTest extends TestCase
         $response->assertJsonPath('data.0.running_balance', -50);
         $response->assertJsonPath('data.0.comments', 'only-tx');
     }
+
+    public function test_date_range_filter_limits_transactions_and_adjusts_starting_balance(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $account = Account::factory()->create([
+            'name' => 'RBC Checking Filter',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+        ]);
+
+        $category = Category::factory()->create([
+            'code' => 'C001',
+            'name_en' => 'Groceries',
+            'is_active' => true,
+        ]);
+
+        // Ledger: start 1000 → after Dec 50 = 950 → after Jan 100 = 850 → after Jan 200 = 650 → after Feb 50 = 600
+        AccountBalance::create([
+            'account_id' => $account->id,
+            'period' => '202502',
+            'recorded_balance_cad' => 600.00,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        Transaction::create([
+            'date' => '2024-12-15',
+            'period' => '202412',
+            'quincena' => 'Q2',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 50.00,
+            'comments' => 'dec-expense',
+            'is_recurring' => false,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-05',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 100.00,
+            'comments' => 'jan-first',
+            'is_recurring' => false,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-20',
+            'period' => '202501',
+            'quincena' => 'Q2',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 200.00,
+            'comments' => 'jan-second',
+            'is_recurring' => false,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-10',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 50.00,
+            'comments' => 'feb-expense',
+            'is_recurring' => false,
+        ]);
+
+        $response = $this->getJson(
+            "/api/accounts/{$account->id}/transactions?start_date=2025-01-01&end_date=2025-01-31"
+        );
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.is_filtered', true);
+        $response->assertJsonPath('meta.filters.start_date', '2025-01-01');
+        $response->assertJsonPath('meta.filters.end_date', '2025-01-31');
+        $response->assertJsonPath('meta.total_count', 2);
+        // Balance at start of Jan = 1000 - 50 (Dec) = 950
+        $response->assertJsonPath('meta.starting_balance', 950);
+        // Balance after last Jan tx = 950 - 100 - 200 = 650
+        $response->assertJsonPath('meta.current_balance', 650);
+
+        $data = $response->json('data');
+        $this->assertCount(2, $data);
+        $this->assertSame('jan-second', $data[0]['comments']);
+        $this->assertEquals(650.0, $data[0]['running_balance']);
+        $this->assertSame('jan-first', $data[1]['comments']);
+        $this->assertEquals(850.0, $data[1]['running_balance']);
+
+        $comments = array_column($data, 'comments');
+        $this->assertNotContains('dec-expense', $comments);
+        $this->assertNotContains('feb-expense', $comments);
+    }
+
+    public function test_date_range_validation_rejects_invalid_range(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $account = Account::factory()->create([
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+        ]);
+
+        $response = $this->getJson(
+            "/api/accounts/{$account->id}/transactions?start_date=2025-02-01&end_date=2025-01-01"
+        );
+
+        $response->assertStatus(422);
+    }
 }

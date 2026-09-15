@@ -3604,3 +3604,61 @@ NEXT SESSION SHOULD:
 
 ================================================================================
 
+
+================================================================================
+SESSION 43 - September 15, 2026
+================================================================================
+
+OBJECTIVE: Implement test #91 - Filter account transaction history by date range
+
+VERIFICATION (pre-work):
+- Frontend unit tests: 37 passing
+- AccountTransactionHistoryTest: 2 tests PASS
+- Playwright feature 90: PASS (regression check)
+- App reachable at http://dev.pockety.com:8080 (HTTP 200)
+- Puppeteer MCP blocked by sandbox/auto-review this session (retried once);
+  browser verification done via Playwright screenshots
+
+IMPLEMENTATION - TEST #91:
+Feature: User can filter account transaction history by date range
+
+Backend (AccountController::transactions):
+- Accepts optional start_date / end_date (Y-m-d) query params
+- Validates end_date >= start_date
+- Computes running balances over full ledger, then returns in-range rows
+- Filtered starting_balance = balance before first in-range transaction
+- Filtered current_balance = balance after last in-range transaction
+- meta.is_filtered + meta.filters exposed for the page
+
+Frontend (account-detail.tsx):
+- Date range filter card with start/end inputs, Apply, Clear
+- Fetches /api/accounts/{id}/transactions?start_date=&end_date=
+- Shows filtered starting/ending balance labels when active
+- data-testid hooks for browser verification
+
+Tests added/updated:
+- AccountTransactionHistoryTest: +2 tests (filter + validation) - 4/4 PASS
+- account-detail.test.tsx: +1 filter unit test - 38 frontend tests PASS
+- tests/browser/account-date-filter.spec.ts (feature 91) PASS
+
+Browser verification:
+- Screenshot: verification/test-91-date-filter/01-filtered-january.png
+- Jan filter shows jan-first/jan-second only; starting CA$950, ending CA$650
+- Zero console errors in browser run
+
+Updated feature_list.json: marked date-range filter test as passes=true
+
+CURRENT STATUS:
+- Tests passing: 94 of 175 (up from 93)
+- Tests remaining: 81
+- Application in clean working state
+
+NEXT SESSION SHOULD:
+1. Pick next highest-priority feature with passes=false
+   (next: pagination for large transaction lists)
+2. Prefer /dev/run-tests and /dev/browser-tests when Docker socket is blocked
+3. Retry Puppeteer MCP; fall back to Playwright screenshots if blocked
+4. Verify with screenshots before flipping passes
+
+================================================================================
+

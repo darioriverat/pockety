@@ -182,13 +182,18 @@ class AccountController extends Controller
      * Get transactions for an account with running balances.
      *
      * GET /api/accounts/{id}/transactions
+     * Query params: start_date (Y-m-d), end_date (Y-m-d)
      *
      * Expense amounts are stored as positive values and reduce the account balance
      * (same convention as reconciliation). Running balance after each transaction
      * is anchored so the newest balance equals the account's current recorded balance
      * when one exists; otherwise the ledger starts at 0.
+     *
+     * When a date range filter is applied, starting_balance is the balance just
+     * before the first in-range transaction (ledger balance at start_date), and
+     * current_balance is the balance after the last in-range transaction.
      */
-    public function transactions(int $id): JsonResponse
+    public function transactions(Request $request, int $id): JsonResponse
     {
         $account = $this->service->getById($id);
 
@@ -197,6 +202,21 @@ class AccountController extends Controller
                 'error' => 'Account not found',
             ], 404);
         }
+
+        try {
+            $validated = $request->validate([
+                'start_date' => 'nullable|date_format:Y-m-d',
+                'end_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_date',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'messages' => $e->errors(),
+            ], 422);
+        }
+
+        $startDate = $validated['start_date'] ?? null;
+        $endDate = $validated['end_date'] ?? null;
 
         $currency = $account->primaryCurrency ?? 'CAD';
         $balanceColumn = match ($currency) {
@@ -212,11 +232,11 @@ class AccountController extends Controller
             ->first();
 
         $hasRecordedBalance = $latestBalance !== null;
-        $currentBalance = $hasRecordedBalance
+        $ledgerCurrentBalance = $hasRecordedBalance
             ? round((float) $latestBalance->{$balanceColumn}, 2)
             : null;
 
-        // Oldest → newest for running balance calculation
+        // Oldest → newest for running balance calculation (full ledger)
         $transactions = Transaction::forAccount($id)
             ->with('category')
             ->orderBy('date')
@@ -229,27 +249,47 @@ class AccountController extends Controller
         );
 
         // If no recorded balance, treat the ledger as starting at 0 and ending at -expenses.
-        if ($currentBalance === null) {
-            $startingBalance = 0.0;
-            $currentBalance = round(0.0 - $totalExpenses, 2);
+        if ($ledgerCurrentBalance === null) {
+            $ledgerStartingBalance = 0.0;
+            $ledgerCurrentBalance = round(0.0 - $totalExpenses, 2);
         } else {
             // Expenses reduce balance: starting = current + sum(expenses)
-            $startingBalance = round($currentBalance + $totalExpenses, 2);
+            $ledgerStartingBalance = round($ledgerCurrentBalance + $totalExpenses, 2);
         }
 
         $transactionsWithBalance = [];
-        $runningBalance = $startingBalance;
+        $runningBalance = $ledgerStartingBalance;
+        $filteredStartingBalance = $ledgerStartingBalance;
+        $filteredStartingCaptured = false;
+        $filteredEndingBalance = $ledgerStartingBalance;
+        $hasInRangeTransaction = false;
 
         foreach ($transactions as $transaction) {
+            $txDate = $transaction->date->format('Y-m-d');
+            $inRange = ($startDate === null || $txDate >= $startDate)
+                && ($endDate === null || $txDate <= $endDate);
+
+            if ($inRange && ! $filteredStartingCaptured) {
+                $filteredStartingBalance = $runningBalance;
+                $filteredStartingCaptured = true;
+            }
+
             $amount = (float) ($transaction->amount ?? 0);
             $runningBalance = round($runningBalance - $amount, 2);
+
+            if (! $inRange) {
+                continue;
+            }
+
+            $hasInRangeTransaction = true;
+            $filteredEndingBalance = $runningBalance;
 
             /** @var Category|null $category */
             $category = $transaction->category;
 
             $transactionsWithBalance[] = [
                 'id' => $transaction->id,
-                'date' => $transaction->date->format('Y-m-d'),
+                'date' => $txDate,
                 'period' => $transaction->period,
                 'category_code' => $category?->code,
                 'category_name' => $category?->name_en,
@@ -260,8 +300,35 @@ class AccountController extends Controller
             ];
         }
 
+        // Empty filtered range with a start_date: starting balance is still
+        // the ledger balance at that date (after all prior transactions).
+        if (! $hasInRangeTransaction && $startDate !== null) {
+            $balanceAtStart = $ledgerStartingBalance;
+            foreach ($transactions as $transaction) {
+                $txDate = $transaction->date->format('Y-m-d');
+                if ($txDate >= $startDate) {
+                    break;
+                }
+                $balanceAtStart = round(
+                    $balanceAtStart - (float) ($transaction->amount ?? 0),
+                    2
+                );
+            }
+            $filteredStartingBalance = $balanceAtStart;
+            $filteredEndingBalance = $balanceAtStart;
+        }
+
+        $isFiltered = $startDate !== null || $endDate !== null;
+        $startingBalance = $isFiltered ? $filteredStartingBalance : $ledgerStartingBalance;
+        $currentBalance = $isFiltered ? $filteredEndingBalance : $ledgerCurrentBalance;
+
         // Newest first for the UI
         $transactionsWithBalance = array_reverse($transactionsWithBalance);
+
+        $query = array_filter([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ], fn ($value) => $value !== null);
 
         return response()->json([
             'data' => $transactionsWithBalance,
@@ -273,9 +340,14 @@ class AccountController extends Controller
                 'current_balance' => $currentBalance,
                 'has_recorded_balance' => $hasRecordedBalance,
                 'total_count' => count($transactionsWithBalance),
+                'filters' => [
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                ],
+                'is_filtered' => $isFiltered,
             ],
             'links' => [
-                'self' => route('accounts.transactions', $id),
+                'self' => route('accounts.transactions', array_merge(['id' => $id], $query)),
                 'account' => route('accounts.show', $id),
             ],
         ]);

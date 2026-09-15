@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -16,6 +16,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 interface Account {
@@ -47,6 +49,11 @@ interface TransactionsResponse {
         current_balance: number;
         has_recorded_balance: boolean;
         total_count: number;
+        is_filtered?: boolean;
+        filters?: {
+            start_date: string | null;
+            end_date: string | null;
+        };
     };
 }
 
@@ -82,8 +89,13 @@ export default function AccountDetail() {
     const [startingBalance, setStartingBalance] = useState(0);
     const [currentBalance, setCurrentBalance] = useState(0);
     const [currency, setCurrency] = useState('CAD');
+    const [isFiltered, setIsFiltered] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [appliedStartDate, setAppliedStartDate] = useState('');
+    const [appliedEndDate, setAppliedEndDate] = useState('');
 
     useEffect(() => {
         if (!accountId) {
@@ -113,12 +125,23 @@ export default function AccountDetail() {
         }
     };
 
-    const fetchTransactions = async () => {
+    const fetchTransactions = async (range?: {
+        startDate?: string;
+        endDate?: string;
+    }) => {
         if (!accountId) return;
+
+        const nextStart = range?.startDate ?? appliedStartDate;
+        const nextEnd = range?.endDate ?? appliedEndDate;
 
         try {
             setLoading(true);
-            const response = await fetch(`/api/accounts/${accountId}/transactions`);
+            const params = new URLSearchParams();
+            if (nextStart) params.set('start_date', nextStart);
+            if (nextEnd) params.set('end_date', nextEnd);
+            const query = params.toString();
+            const url = `/api/accounts/${accountId}/transactions${query ? `?${query}` : ''}`;
+            const response = await fetch(url);
 
             if (!response.ok) {
                 throw new Error('Failed to fetch transactions');
@@ -129,12 +152,28 @@ export default function AccountDetail() {
             setStartingBalance(data.meta.starting_balance ?? 0);
             setCurrentBalance(data.meta.current_balance ?? 0);
             setCurrency(data.meta.currency || account?.primary_currency || 'CAD');
+            setIsFiltered(Boolean(data.meta.is_filtered));
             setError(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleApplyFilter = (event: FormEvent) => {
+        event.preventDefault();
+        setAppliedStartDate(startDate);
+        setAppliedEndDate(endDate);
+        void fetchTransactions({ startDate, endDate });
+    };
+
+    const handleClearFilter = () => {
+        setStartDate('');
+        setEndDate('');
+        setAppliedStartDate('');
+        setAppliedEndDate('');
+        void fetchTransactions({ startDate: '', endDate: '' });
     };
 
     if (error) {
@@ -192,6 +231,65 @@ export default function AccountDetail() {
                     </div>
                 </div>
 
+                <Card data-testid="account-date-filter">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Filter by date range</CardTitle>
+                        <CardDescription>
+                            Show only transactions in a date range. Starting balance
+                            reflects the balance at the start of the filtered view.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form
+                            className="flex flex-col gap-4 sm:flex-row sm:items-end"
+                            onSubmit={handleApplyFilter}
+                        >
+                            <div className="grid w-full gap-2 sm:max-w-xs">
+                                <Label htmlFor="start-date">Start date</Label>
+                                <Input
+                                    id="start-date"
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(event) => setStartDate(event.target.value)}
+                                    data-testid="filter-start-date"
+                                />
+                            </div>
+                            <div className="grid w-full gap-2 sm:max-w-xs">
+                                <Label htmlFor="end-date">End date</Label>
+                                <Input
+                                    id="end-date"
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(event) => setEndDate(event.target.value)}
+                                    data-testid="filter-end-date"
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <Button type="submit" data-testid="apply-date-filter">
+                                    Apply filter
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleClearFilter}
+                                    data-testid="clear-date-filter"
+                                >
+                                    Clear
+                                </Button>
+                            </div>
+                        </form>
+                        {isFiltered && (
+                            <p
+                                className="mt-3 text-sm text-muted-foreground"
+                                data-testid="active-date-filter"
+                            >
+                                Showing{' '}
+                                {appliedStartDate || '…'} to {appliedEndDate || '…'}
+                            </p>
+                        )}
+                    </CardContent>
+                </Card>
+
                 {!loading && (
                     <div
                         className="grid gap-4 sm:grid-cols-2"
@@ -199,7 +297,11 @@ export default function AccountDetail() {
                     >
                         <Card>
                             <CardHeader className="pb-2">
-                                <CardDescription>Starting Balance</CardDescription>
+                                <CardDescription>
+                                    {isFiltered
+                                        ? 'Starting Balance (filtered)'
+                                        : 'Starting Balance'}
+                                </CardDescription>
                                 <CardTitle
                                     className="text-2xl"
                                     data-testid="starting-balance"
@@ -209,13 +311,19 @@ export default function AccountDetail() {
                             </CardHeader>
                             <CardContent>
                                 <p className="text-xs text-muted-foreground">
-                                    Balance before the earliest transaction
+                                    {isFiltered
+                                        ? 'Balance before the first transaction in this date range'
+                                        : 'Balance before the earliest transaction'}
                                 </p>
                             </CardContent>
                         </Card>
                         <Card>
                             <CardHeader className="pb-2">
-                                <CardDescription>Current Balance</CardDescription>
+                                <CardDescription>
+                                    {isFiltered
+                                        ? 'Ending Balance (filtered)'
+                                        : 'Current Balance'}
+                                </CardDescription>
                                 <CardTitle
                                     className="text-2xl"
                                     data-testid="current-balance"
@@ -225,7 +333,9 @@ export default function AccountDetail() {
                             </CardHeader>
                             <CardContent>
                                 <p className="text-xs text-muted-foreground">
-                                    Balance after all transactions
+                                    {isFiltered
+                                        ? 'Balance after the last transaction in this date range'
+                                        : 'Balance after all transactions'}
                                 </p>
                             </CardContent>
                         </Card>
@@ -240,8 +350,13 @@ export default function AccountDetail() {
                     </Card>
                 ) : transactions.length === 0 ? (
                     <Card>
-                        <CardContent className="py-8 text-center text-muted-foreground">
-                            No transactions found for this account.
+                        <CardContent
+                            className="py-8 text-center text-muted-foreground"
+                            data-testid="no-transactions-message"
+                        >
+                            {isFiltered
+                                ? 'No transactions found in this date range.'
+                                : 'No transactions found for this account.'}
                         </CardContent>
                     </Card>
                 ) : (
@@ -250,7 +365,8 @@ export default function AccountDetail() {
                             <CardTitle>Transaction History</CardTitle>
                             <CardDescription>
                                 {transactions.length} transaction
-                                {transactions.length !== 1 ? 's' : ''} · Sorted by
+                                {transactions.length !== 1 ? 's' : ''}
+                                {isFiltered ? ' in selected range' : ''} · Sorted by
                                 date (newest first) · Running balance after each
                                 transaction
                             </CardDescription>
@@ -278,6 +394,7 @@ export default function AccountDetail() {
                                             data-running-balance={
                                                 transaction.running_balance
                                             }
+                                            data-tx-date={transaction.date}
                                         >
                                             <TableCell className="font-medium">
                                                 {formatDate(transaction.date)}

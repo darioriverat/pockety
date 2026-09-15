@@ -1098,7 +1098,7 @@
       "Step 3: Verify only transactions in that date range are shown",
       "Step 4: Verify starting balance for filtered view is correct"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
