@@ -32,7 +32,7 @@ function getDialogCombobox(page: Page, label: string) {
 
 async function selectOption(
     page: Page,
-    label: 'Quincena' | 'Category' | 'Currency' | 'Debt Component',
+    label: 'Quincena' | 'Category' | 'Account' | 'Currency' | 'Debt Component',
     option: string,
 ): Promise<void> {
     await getDialogCombobox(page, label).click();
@@ -46,6 +46,7 @@ async function fillTransactionForm(
         period: string;
         quincena: 'Q1' | 'Q2';
         category: string;
+        account?: string;
         currency: 'CAD' | 'USD' | 'COP';
         amount: string;
         comments?: string;
@@ -57,6 +58,9 @@ async function fillTransactionForm(
     await page.getByLabel('Period (YYYYMM)').fill(values.period);
     await selectOption(page, 'Quincena', values.quincena);
     await selectOption(page, 'Category', values.category);
+    if (values.account) {
+        await selectOption(page, 'Account', values.account);
+    }
     await selectOption(page, 'Currency', values.currency);
     await page.getByLabel('Amount').fill(values.amount);
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
+use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +18,7 @@ class TransactionService implements TransactionServiceInterface
      */
     public function getAll(array $filters = []): array
     {
-        $query = Transaction::with('category');
+        $query = Transaction::with(['category', 'account']);
 
         // Apply filters
         if (isset($filters['period'])) {
@@ -56,7 +57,7 @@ class TransactionService implements TransactionServiceInterface
      */
     public function getById(int $id): ?TransactionEntity
     {
-        $transaction = Transaction::with('category')->find($id);
+        $transaction = Transaction::with(['category', 'account'])->find($id);
 
         if (! $transaction) {
             return null;
@@ -79,7 +80,7 @@ class TransactionService implements TransactionServiceInterface
         $this->validateCategory($data['category_id']);
 
         $transaction = Transaction::create($data);
-        $transaction->load('category');
+        $transaction->load(['category', 'account']);
 
         return $this->toEntity($transaction);
     }
@@ -102,7 +103,7 @@ class TransactionService implements TransactionServiceInterface
         }
 
         $transaction->update($data);
-        $transaction->load('category');
+        $transaction->load(['category', 'account']);
 
         return $this->toEntity($transaction);
     }
@@ -162,6 +163,14 @@ class TransactionService implements TransactionServiceInterface
                 'is_debt_category' => $transaction->category->is_debt_category,
                 'is_active' => $transaction->category->is_active,
                 'status' => $transaction->category->status,
+            ];
+        }
+
+        if ($transaction->relationLoaded('account') && $transaction->account) {
+            $data['account'] = [
+                'id' => $transaction->account->id,
+                'name' => $transaction->account->name,
+                'type' => $transaction->account->type,
             ];
         }
 

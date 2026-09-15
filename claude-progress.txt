@@ -2063,3 +2063,65 @@ NEXT SESSION PRIORITIES
    clear stale values before re-filling - see this session's notes
    above for the exact failure mode and fix.
 ========================
+
+========================
+SESSION 18 - Sep 14, 2026
+Account Reconciliation Report + Transaction Account Linkage
+========================
+
+WHAT WAS DONE
+-------------
+Implemented the account reconciliation feature (backend + frontend) and
+wired transaction-to-account linkage in the UI:
+
+BACKEND
+- ReconciliationService: for each active account/period, computes
+  Recorded (manual balance entry), Computed (prior recorded balance
+  minus sum of period expense transactions), Variance (Recorded -
+  Computed), with 0.01 tolerance for "balanced" status.
+- ReconciliationController: GET /api/periods/{period}/reconciliation
+- Feature tests: ReconciliationTest.php (3 cases - computed balance,
+  prior-period roll-forward, invalid period rejection)
+
+FRONTEND
+- New /reconciliation page: period picker, overall balanced/unbalanced
+  badge, per-account cards showing CAD/USD/COP recorded/computed/
+  variance rows; non-zero variance highlighted red, zero in green.
+- Sidebar nav link added (ScaleIcon).
+- Transaction form: Account select field (fetches /api/accounts), sends
+  account_id on create/update, displays linked account in list cards.
+- TransactionEntity/TransactionService: account relation included in API
+  responses.
+
+BROWSER TEST
+- Added tests/browser/reconciliation.spec.ts (Playwright): seeds account
+  + balance + linked transaction via API, verifies computed=900 on UI.
+
+SIGN CONVENTION FIX
+- Reconciliation subtracts positive expense amounts (matches UI/import
+  convention where expenses are stored as positive values).
+
+VERIFICATION STATUS
+--------------------
+Could NOT run verification this session:
+- Docker daemon inaccessible from agent sandbox (task backend-tests fails)
+- Puppeteer MCP and network curl to dev.pockety.com:8080 rejected
+- Local npm run build/test:unit fail (missing native bindings on host)
+
+feature_list.json NOT updated - tests #36-39 (computed balance, variance,
+multi-currency variance, transaction account linkage) remain passes:false
+pending browser verification in next session with Docker + Puppeteer.
+
+NEXT SESSION PRIORITIES
+-----------------------
+1. Start Docker stack, run `task tests` + Playwright reconciliation spec
+2. Browser-verify reconciliation tests #36-39; mark passes:true if OK
+3. Dashboard summary cards (income/expenses/net)
+4. Income entry + exchange rates features
+
+CURRENT STATE
+-------------
+Tests passing: 35 of 175 (unchanged - not verified this session)
+Reconciliation: code complete, awaiting end-to-end verification
+Backend tests: 42 expected (39 prior + 3 new reconciliation tests)
+========================

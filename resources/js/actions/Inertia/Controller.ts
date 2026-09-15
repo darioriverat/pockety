@@ -242,6 +242,86 @@ Controller577f898b9efe99e2813f63fd231bd8c7.form = Controller577f898b9efe99e2813f
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+const Controller5fbe311172c80aea24e168c1390225a1 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller5fbe311172c80aea24e168c1390225a1.url(options),
+    method: 'get',
+})
+
+Controller5fbe311172c80aea24e168c1390225a1.definition = {
+    methods: ["get","head"],
+    url: '/reconciliation',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+Controller5fbe311172c80aea24e168c1390225a1.url = (options?: RouteQueryOptions) => {
+    return Controller5fbe311172c80aea24e168c1390225a1.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+Controller5fbe311172c80aea24e168c1390225a1.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller5fbe311172c80aea24e168c1390225a1.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+Controller5fbe311172c80aea24e168c1390225a1.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller5fbe311172c80aea24e168c1390225a1.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+const Controller5fbe311172c80aea24e168c1390225a1Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller5fbe311172c80aea24e168c1390225a1.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+Controller5fbe311172c80aea24e168c1390225a1Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller5fbe311172c80aea24e168c1390225a1.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+Controller5fbe311172c80aea24e168c1390225a1Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller5fbe311172c80aea24e168c1390225a1.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controller5fbe311172c80aea24e168c1390225a1.form = Controller5fbe311172c80aea24e168c1390225a1Form
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/categories'
 */
 const Controller7a4f8d9d0be39757f6a1352cf8f1ab45 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -569,6 +649,7 @@ const Controller = {
     '/': Controller980bb49ee7ae63891f1d891d2fbcf1c9,
     '/dashboard': Controller42a740574ecbfbac32f8cc353fc32db9,
     '/accounts': Controller577f898b9efe99e2813f63fd231bd8c7,
+    '/reconciliation': Controller5fbe311172c80aea24e168c1390225a1,
     '/categories': Controller7a4f8d9d0be39757f6a1352cf8f1ab45,
     '/transactions': Controllere5aa2cad321b30063c3b415df5452200,
     '/import': Controller319c434a45921953484cb2f345f6ad0c,

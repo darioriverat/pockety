@@ -463,6 +463,87 @@ accounts.form = accountsForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+export const reconciliation = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: reconciliation.url(options),
+    method: 'get',
+})
+
+reconciliation.definition = {
+    methods: ["get","head"],
+    url: '/reconciliation',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+reconciliation.url = (options?: RouteQueryOptions) => {
+    return reconciliation.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+reconciliation.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: reconciliation.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+reconciliation.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: reconciliation.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+const reconciliationForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: reconciliation.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+reconciliationForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: reconciliation.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/reconciliation'
+*/
+reconciliationForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: reconciliation.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+reconciliation.form = reconciliationForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/categories'
 */
 export const categories = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

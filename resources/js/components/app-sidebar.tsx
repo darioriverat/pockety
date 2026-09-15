@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Tags, Receipt, Upload, Landmark } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Tags, Receipt, Upload, Landmark, ScaleIcon } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -26,6 +26,11 @@ const mainNavItems: NavItem[] = [
         title: 'Accounts',
         href: '/accounts',
         icon: Landmark,
+    },
+    {
+        title: 'Reconciliation',
+        href: '/reconciliation',
+        icon: ScaleIcon,
     },
     {
         title: 'Categories',

@@ -20,6 +20,8 @@ readonly class TransactionEntity
         public bool $isRecurring,
         public ?string $debtComponent,
         public ?CategoryEntity $category = null,
+        /** @var array{id: int, name: string, type: string}|null */
+        public ?array $account = null,
     ) {}
 
     /**
@@ -43,6 +45,7 @@ readonly class TransactionEntity
             isRecurring: (bool) ($data['is_recurring'] ?? false),
             debtComponent: $data['debt_component'] ?? null,
             category: isset($data['category']) && is_array($data['category']) ? CategoryEntity::fromArray($data['category']) : null,
+            account: $data['account'] ?? null,
         );
     }
 
@@ -72,6 +75,10 @@ readonly class TransactionEntity
 
         if ($this->category !== null) {
             $data['category'] = $this->category->toArray();
+        }
+
+        if ($this->account !== null) {
+            $data['account'] = $this->account;
         }
 
         return $data;

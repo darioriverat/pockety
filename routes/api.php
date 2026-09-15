@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionImportController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,9 @@ Route::post('/transactions', [TransactionController::class, 'store'])->name('tra
 Route::put('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
 Route::patch('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.patch');
 Route::delete('/transactions/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+// Reconciliation API
+Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');
 
 // Transaction Import API
 Route::post('/transactions/import', [TransactionImportController::class, 'import'])->name('transactions.import');

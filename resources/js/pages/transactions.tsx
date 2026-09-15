@@ -40,6 +40,12 @@ interface Category {
     is_debt_category: boolean;
 }
 
+interface Account {
+    id: number;
+    name: string;
+    type: string;
+}
+
 interface Transaction {
     id: number;
     date: string;
@@ -47,6 +53,7 @@ interface Transaction {
     quincena: string;
     category_id: number;
     account_id: number | null;
+    account?: Account | null;
     amount_cad: number | null;
     amount_usd: number | null;
     amount_cop: number | null;
@@ -73,6 +80,7 @@ interface TransactionFormData {
     period: string;
     quincena: 'Q1' | 'Q2';
     category_id: string;
+    account_id: string;
     currency: 'CAD' | 'USD' | 'COP';
     amount: string;
     comments: string;
@@ -92,6 +100,7 @@ interface FilterState {
 export default function Transactions() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [accounts, setAccounts] = useState<Account[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -101,6 +110,7 @@ export default function Transactions() {
         period: new Date().toISOString().slice(0, 7).replace('-', ''),
         quincena: 'Q1',
         category_id: '',
+        account_id: '',
         currency: 'CAD',
         amount: '',
         comments: '',
@@ -119,7 +129,19 @@ export default function Transactions() {
     useEffect(() => {
         fetchTransactions();
         fetchCategories();
+        fetchAccounts();
     }, [filters]);
+
+    const fetchAccounts = async () => {
+        try {
+            const response = await fetch('/api/accounts');
+            if (!response.ok) throw new Error('Failed to fetch accounts');
+            const data = await response.json();
+            setAccounts(data.data);
+        } catch (err) {
+            console.error('Error fetching accounts:', err);
+        }
+    };
 
     const fetchCategories = async () => {
         try {
@@ -180,6 +202,9 @@ export default function Transactions() {
             period: formData.period,
             quincena: formData.quincena,
             category_id: parseInt(formData.category_id),
+            account_id: formData.account_id
+                ? parseInt(formData.account_id)
+                : null,
             comments: formData.comments || null,
             is_recurring: formData.is_recurring,
             debt_component: formData.debt_component || null,
@@ -233,6 +258,7 @@ export default function Transactions() {
             period: transaction.period,
             quincena: transaction.quincena as 'Q1' | 'Q2',
             category_id: transaction.category_id.toString(),
+            account_id: transaction.account_id?.toString() ?? '',
             currency: (transaction.currency ?? 'CAD') as
                 | 'CAD'
                 | 'USD'
@@ -267,6 +293,7 @@ export default function Transactions() {
             period: new Date().toISOString().slice(0, 7).replace('-', ''),
             quincena: 'Q1',
             category_id: '',
+            account_id: '',
             currency: 'CAD',
             amount: '',
             comments: '',
@@ -434,6 +461,38 @@ export default function Transactions() {
                                                     >
                                                         {cat.code} -{' '}
                                                         {cat.name_en}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="account">
+                                            Account
+                                        </Label>
+                                        <Select
+                                            value={formData.account_id}
+                                            onValueChange={(value) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    account_id: value,
+                                                })
+                                            }
+                                        >
+                                            <SelectTrigger
+                                                id="account"
+                                                aria-label="Account"
+                                                data-testid="account-field"
+                                            >
+                                                <SelectValue placeholder="Select account" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {accounts.map((account) => (
+                                                    <SelectItem
+                                                        key={account.id}
+                                                        value={account.id.toString()}
+                                                    >
+                                                        {account.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -826,6 +885,18 @@ export default function Transactions() {
                                                                     .name_es
                                                             }
                                                         </div>
+                                                        {transaction.account && (
+                                                            <div>
+                                                                <span className="font-medium">
+                                                                    Account:
+                                                                </span>{' '}
+                                                                {
+                                                                    transaction
+                                                                        .account
+                                                                        .name
+                                                                }
+                                                            </div>
+                                                        )}
                                                         {transaction.debt_component && (
                                                             <div>
                                                                 <span className="font-medium">
