@@ -855,7 +855,7 @@
       "Step 5: Submit",
       "Step 6: Verify asset is added to fixed assets list"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
