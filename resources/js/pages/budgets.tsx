@@ -170,10 +170,11 @@ export default function Budgets() {
 
             const data = await response.json();
             if (!response.ok) {
-                const message =
-                    data.message ||
-                    data.errors?.amount_cad?.[0] ||
-                    'Failed to save budget';
+                const message = data.messages
+                    ? Object.values(data.messages).flat().join(' ')
+                    : data.message ||
+                      data.errors?.amount_cad?.[0] ||
+                      'Failed to save budget';
                 throw new Error(message);
             }
 

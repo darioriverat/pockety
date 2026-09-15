@@ -101,7 +101,7 @@ class BudgetTest extends TestCase
         ]);
     }
 
-    public function test_budget_amount_must_be_positive(): void
+    public function test_budget_amount_validation_rejects_negative(): void
     {
         $response = $this->postJson('/api/budgets', [
             'period' => '202501',
@@ -110,7 +110,69 @@ class BudgetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['amount_cad']);
+            ->assertJsonValidationErrors(['amount_cad'])
+            ->assertJsonFragment([
+                'amount_cad' => ['Budget amount must be a positive number.'],
+            ]);
+
+        $this->assertDatabaseMissing('budgets', [
+            'period' => '202501',
+            'category_id' => $this->category->id,
+        ]);
+    }
+
+    public function test_budget_amount_validation_rejects_zero(): void
+    {
+        $response = $this->postJson('/api/budgets', [
+            'period' => '202501',
+            'category_code' => 'C001',
+            'amount_cad' => 0,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['amount_cad'])
+            ->assertJsonFragment([
+                'amount_cad' => ['Budget amount must be a positive number.'],
+            ]);
+
+        $this->assertDatabaseMissing('budgets', [
+            'period' => '202501',
+            'category_id' => $this->category->id,
+        ]);
+    }
+
+    public function test_budget_amount_validation_accepts_positive(): void
+    {
+        $response = $this->postJson('/api/budgets', [
+            'period' => '202501',
+            'category_code' => 'C001',
+            'amount_cad' => 500.00,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('budgets', [
+            'period' => '202501',
+            'category_id' => $this->category->id,
+            'amount_cad' => 500.00,
+        ]);
+    }
+
+    public function test_budget_amount_validation_accepts_small_positive(): void
+    {
+        $response = $this->postJson('/api/budgets', [
+            'period' => '202501',
+            'category_code' => 'C001',
+            'amount_cad' => 0.01,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('budgets', [
+            'period' => '202501',
+            'category_id' => $this->category->id,
+            'amount_cad' => 0.01,
+        ]);
     }
 
     public function test_can_list_budgets_for_period(): void

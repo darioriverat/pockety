@@ -53,6 +53,8 @@ class BudgetController extends Controller
             'category_code' => 'nullable|string|exists:categories,code',
             'amount_cad' => 'required|numeric|gt:0',
             'notes' => 'nullable|string|max:1000',
+        ], [
+            'amount_cad.gt' => 'Budget amount must be a positive number.',
         ]);
 
         if (empty($validated['category_id']) && empty($validated['category_code'])) {
