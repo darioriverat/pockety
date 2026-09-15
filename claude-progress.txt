@@ -2234,3 +2234,91 @@ Reconciliation: code complete (prior session), also awaiting verification
 Backend tests expected: 48 (42 prior + 6 new)
 Frontend tests expected: existing + dashboard tests
 ========================
+
+========================
+SESSION 20 - Code Review and Bug Fix
+Date: September 14, 2026 (11:02 PM - continuing)
+========================
+
+ENVIRONMENT STATUS
+------------------
+Docker: Not accessible in this session (permission denied on socket)
+Puppeteer: Requires approval not available in local SDK runs
+Backend/Frontend Tests: Cannot run (Docker required)
+Browser Verification: Cannot perform (Puppeteer blocked)
+
+APPROACH TAKEN
+--------------
+Since environment testing is unavailable, performed thorough code review
+of sessions 18-19 implementations (Reconciliation + Dashboard features).
+
+CRITICAL BUG FOUND AND FIXED
+-----------------------------
+Issue: USD to CAD currency conversion was using division instead of multiplication
+
+Location:
+- app/Models/ExchangeRate.php :: usdToCad() method
+- app/Models/Income.php :: getTotalCadEquivalent() method
+
+Per app_spec.txt section on exchange rates:
+"For a rate labeled USD/CAD with value X, 1 USD = X CAD.
+To convert an amount FROM USD into the other currency, multiply the USD amount by the rate."
+
+Example with USD/CAD rate = 0.75:
+- Correct: 100 USD * 0.75 = 75 CAD ✓
+- Previous (wrong): 100 USD / 0.75 = 133.33 CAD ✗
+
+Impact:
+- Dashboard income/expenses calculations (when USD amounts present)
+- Reconciliation computed balances (for USD transactions)
+- Any income line items with USD amounts
+
+Fix: Changed division to multiplication in both methods
+Commit: ba5c24f "fix: correct USD to CAD currency conversion logic"
+
+CODE REVIEW FINDINGS
+--------------------
+✓ DashboardController - properly configured and using DashboardService
+✓ DashboardService - comprehensive, uses ReconciliationService correctly
+✓ DashboardTest - 6 test cases covering all functionality
+✓ dashboard.tsx - well-structured React component with proper TypeScript types
+✓ ReconciliationController - validates period format, returns proper JSON
+✓ ReconciliationService - computes balances correctly with prior period rollover
+✓ ReconciliationTest - 3 test cases for core reconciliation logic
+✓ reconciliation.tsx - interactive UI with proper error handling
+✓ Transaction model - has account_id relationship properly configured
+✓ Account model - has isAsset() and isLiability() methods
+✓ Income model - has forPeriod scope
+✓ Routes - dashboard and reconciliation routes properly registered
+
+All code from sessions 18-19 is well-structured and follows Laravel/React best practices.
+The currency conversion bug would have caused incorrect calculations for any USD transactions.
+
+VERIFICATION STATUS
+-------------------
+Cannot verify in this session due to environment constraints.
+Tests #36-39 (Reconciliation) and #48-56 (Dashboard) remain "passes": false
+pending verification in a session with Docker/browser access.
+
+NEXT SESSION PRIORITIES
+-----------------------
+1. CRITICAL: Verify environment is accessible (Docker + Puppeteer)
+2. Run backend tests (expect 48 tests, may find issues due to currency fix)
+3. Run frontend tests
+4. Browser-verify reconciliation feature (tests #36-39)
+5. Browser-verify dashboard feature (tests #48-56)
+6. If all pass, update feature_list.json accordingly
+7. If failures, debug and fix before moving to new features
+
+IMPORTANT: The currency conversion bug fix means backend tests involving USD
+amounts will now produce DIFFERENT results than before. Review test expectations
+if DashboardTest or any USD-related tests fail.
+
+CURRENT STATE
+-------------
+Tests passing: 35 of 175 (unchanged - verification pending)
+Code quality: High (thorough review completed)
+Known issues: Currency conversion bug FIXED
+Commits: +1 bug fix commit (ba5c24f)
+Next work: Environment verification + test execution
+
