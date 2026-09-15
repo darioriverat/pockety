@@ -3509,3 +3509,40 @@ NOTES:
 - Test infrastructure solid
 
 ================================================================================
+
+
+================================================================================
+SESSION 41 - September 15, 2026
+================================================================================
+
+OBJECTIVE: Implement test #89 - Account transaction history
+
+VERIFICATION TESTS PASSED:
+- Backend tests: 155 passing
+- Frontend tests: 36 passing  
+- Code style (Pint): Clean
+- Static analysis (PHPStan): Clean
+
+IMPLEMENTATION COMPLETE - TEST #89:
+Feature: User can view account transaction history sorted by date
+
+Backend:
+- Created AccountController::transactions() endpoint
+- Route: GET /api/accounts/{id}/transactions
+- Returns transactions sorted by date descending
+- Calculates running balance for each transaction
+
+Frontend:
+- Created account-detail.tsx page component
+- Created table UI component
+- Added route /accounts/{id}
+- Displays transaction history in table format
+- Added View Transactions button on accounts page
+
+CURRENT STATUS:
+- Tests passing: 92 of 175 (up from 91)
+- Tests remaining: 83
+- All tests passing, no regressions
+
+================================================================================
+
