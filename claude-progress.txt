@@ -3772,3 +3772,57 @@ NEXT SESSION SHOULD:
 
 ================================================================================
 
+
+================================================================================
+SESSION 46 - September 15, 2026
+================================================================================
+
+OBJECTIVE: Implement test #94 - transaction date must be a valid date
+
+VERIFICATION (pre-work):
+- Frontend unit tests: 38 passing
+- TransactionValidationTest: 7/7 PASS (before new date tests)
+- Playwright feature 5: PASS (core transactions regression)
+- App reachable at http://dev.pockety.com:8080 (HTTP 200)
+- Puppeteer MCP blocked by sandbox/auto-review this session;
+  verification done via Playwright screenshots
+
+IMPLEMENTATION - TEST #94:
+Feature: Transaction form validates that date is a valid date
+
+Backend:
+- TransactionController store/update: date rule date to date_format:Y-m-d
+- Custom messages: "Date must be a valid date."
+
+Frontend (transactions.tsx):
+- Date field is text input (YYYY-MM-DD) so invalid calendar dates can be entered
+- Client-side isValidTransactionDate rejects bad format / impossible dates
+- Surfaces date API validation errors in formError
+- aria-invalid / aria-describedby on date field
+
+Tests added:
+- TransactionValidationTest: +3 tests (impossible date, non-ISO, valid ISO) -> 10/10 PASS
+- tests/browser/transactions.spec.ts feature 94 PASS
+
+Browser verification:
+- Screenshots: verification/test-94-date-valid/
+  01-invalid-date-rejected.png - error "Date must be a valid date." for 2025-13-45
+  02-valid-date-accepted.png - CA$100.50 created with 2026-01-15
+- Zero console errors in Playwright run
+
+Updated feature_list.json: marked date-valid test as passes=true
+
+CURRENT STATUS:
+- Tests passing: 97 of 175 (up from 96)
+- Tests remaining: 78
+- Application in clean working state
+
+NEXT SESSION SHOULD:
+1. Pick next highest-priority feature with passes=false
+   (next: Account form validates that account name is unique)
+2. Prefer /dev/run-tests and /dev/browser-tests when Docker socket is blocked
+3. Retry Puppeteer MCP; fall back to Playwright screenshots if blocked
+4. Verify with screenshots before flipping passes
+
+================================================================================
+

@@ -137,4 +137,52 @@ class TransactionValidationTest extends TestCase
             ->assertJsonPath('data.amount', 100.5)
             ->assertJsonPath('data.currency', 'CAD');
     }
+
+    public function test_date_must_be_valid_rejects_impossible_calendar_date(): void
+    {
+        $response = $this->postJson('/api/transactions', [
+            'date' => '2025-13-45',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->category->id,
+            'amount_cad' => 100.50,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['date']);
+
+        $this->assertStringContainsString(
+            'valid date',
+            strtolower($response->json('errors.date.0'))
+        );
+    }
+
+    public function test_date_must_be_valid_rejects_non_iso_format(): void
+    {
+        $response = $this->postJson('/api/transactions', [
+            'date' => '15/01/2025',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->category->id,
+            'amount_cad' => 100.50,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['date']);
+    }
+
+    public function test_date_accepts_valid_iso_date(): void
+    {
+        $response = $this->postJson('/api/transactions', [
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->category->id,
+            'amount_cad' => 42.00,
+            'comments' => 'valid-date-ok',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.date', '2025-01-15');
+    }
 }

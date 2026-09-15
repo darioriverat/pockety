@@ -45,8 +45,22 @@ import {
 
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
 const AMOUNT_POSITIVE_ERROR = 'Amount must be a positive number';
+const DATE_VALID_ERROR = 'Date must be a valid date.';
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 50;
+
+function isValidTransactionDate(value: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return false;
+    }
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return (
+        date.getUTCFullYear() === year &&
+        date.getUTCMonth() === month - 1 &&
+        date.getUTCDate() === day
+    );
+}
 
 interface Category {
     id: number;
@@ -301,6 +315,11 @@ export default function Transactions() {
         e.preventDefault();
         setFormError(null);
 
+        if (!isValidTransactionDate(formData.date.trim())) {
+            setFormError(DATE_VALID_ERROR);
+            return;
+        }
+
         if (!isPeriodFormatValid(formData.period.trim())) {
             setFormError(PERIOD_FORMAT_ERROR);
             return;
@@ -313,7 +332,7 @@ export default function Transactions() {
         }
 
         const payload: Record<string, unknown> = {
-            date: formData.date,
+            date: formData.date.trim(),
             period: formData.period.trim(),
             quincena: formData.quincena,
             category_id: parseInt(formData.category_id),
@@ -354,6 +373,11 @@ export default function Transactions() {
 
             if (!response.ok) {
                 const errorData = await response.json();
+                const dateErrors = errorData.errors?.date;
+                if (Array.isArray(dateErrors) && dateErrors.length > 0) {
+                    setFormError(dateErrors[0]);
+                    return;
+                }
                 const periodErrors = errorData.errors?.period;
                 if (Array.isArray(periodErrors) && periodErrors.length > 0) {
                     setFormError(periodErrors[0]);
@@ -550,16 +574,32 @@ export default function Transactions() {
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="date">Date</Label>
+                                        <Label htmlFor="date">
+                                            Date (YYYY-MM-DD)
+                                        </Label>
                                         <Input
                                             id="date"
-                                            type="date"
+                                            type="text"
+                                            inputMode="numeric"
+                                            placeholder="2025-01-15"
                                             value={formData.date}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                setFormError(null);
                                                 setFormData({
                                                     ...formData,
                                                     date: e.target.value,
-                                                })
+                                                });
+                                            }}
+                                            aria-invalid={
+                                                formError !== null &&
+                                                formError
+                                                    .toLowerCase()
+                                                    .includes('date')
+                                            }
+                                            aria-describedby={
+                                                formError
+                                                    ? 'transaction-form-error'
+                                                    : undefined
                                             }
                                             required
                                         />

@@ -61,7 +61,7 @@ async function fillTransactionForm(
         debtComponent?: 'Principal' | 'Interest';
     },
 ): Promise<void> {
-    await page.getByLabel('Date').fill(values.date);
+    await page.getByLabel(/Date/).fill(values.date);
     await page.getByLabel('Period (YYYYMM)').fill(values.period);
     await selectOption(page, 'Quincena', values.quincena);
     await selectOption(page, 'Category', values.category);
@@ -480,7 +480,7 @@ test('feature 14: non-debt transactions do not require a debt component', async 
     await selectOption(page, 'Category', 'C001 - Groceries');
     await expect(page.getByText('Debt Component')).toHaveCount(0);
     await selectOption(page, 'Currency', 'CAD');
-    await page.getByLabel('Date').fill('2026-01-26');
+    await page.getByLabel(/Date/).fill('2026-01-26');
     await page.getByLabel('Period (YYYYMM)').fill('202601');
     await page.getByLabel('Amount').fill('44.00');
     await page.getByLabel('Comments').fill(comments);
@@ -583,7 +583,7 @@ test('feature 93: transaction form validates that amount is a positive number', 
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
 
-    await page.getByLabel('Date').fill('2026-01-15');
+    await page.getByLabel(/Date/).fill('2026-01-15');
     await page.getByLabel('Period (YYYYMM)').fill('202601');
     await selectOption(page, 'Quincena', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
@@ -618,6 +618,50 @@ test('feature 93: transaction form validates that amount is a positive number', 
     expect(consoleErrors).toEqual([]);
 });
 
+test('feature 94: transaction form validates that date is a valid date', async ({
+    page,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const comments = `feature-94-date-${Date.now()}`;
+
+    await openTransactionsPage(page);
+    await openAddTransactionDialog(page);
+
+    await page.getByLabel(/Date/).fill('2025-13-45');
+    await page.getByLabel('Period (YYYYMM)').fill('202601');
+    await selectOption(page, 'Quincena', 'Q1');
+    await selectOption(page, 'Category', 'C001 - Groceries');
+    await selectOption(page, 'Currency', 'CAD');
+    await page.getByLabel('Amount').fill('100.50');
+    await page.getByLabel('Comments').fill(comments);
+
+    await page.getByRole('button', { name: 'Create' }).click();
+
+    const formError = page.getByTestId('transaction-form-error');
+    await expect(formError).toBeVisible();
+    await expect(formError).toContainText(/valid date/i);
+    await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
+
+    await page.screenshot({
+        path: 'verification/test-94-date-valid/01-invalid-date-rejected.png',
+        fullPage: false,
+    });
+
+    await page.getByLabel(/Date/).fill('2026-01-15');
+    await submitTransactionForm(page, 'Create');
+
+    await expect(
+        page.locator('[data-slot="card"]').filter({ hasText: comments }),
+    ).toBeVisible();
+
+    await page.screenshot({
+        path: 'verification/test-94-date-valid/02-valid-date-accepted.png',
+        fullPage: false,
+    });
+
+    expect(consoleErrors).toEqual([]);
+});
+
 test('feature 83: system validates period format as YYYYMM', async ({
     page,
 }) => {
@@ -627,7 +671,7 @@ test('feature 83: system validates period format as YYYYMM', async ({
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
 
-    await page.getByLabel('Date').fill('2025-01-15');
+    await page.getByLabel(/Date/).fill('2025-01-15');
     await page.getByLabel('Period (YYYYMM)').fill('2025-01');
     await selectOption(page, 'Quincena', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
@@ -681,7 +725,7 @@ test('feature 84: system validates quincena as Q1 or Q2 only', async ({
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
 
-    await page.getByLabel('Date').fill('2026-01-16');
+    await page.getByLabel(/Date/).fill('2026-01-16');
     await page.getByLabel('Period (YYYYMM)').fill('202601');
 
     await getDialogCombobox(page, 'Quincena').click();

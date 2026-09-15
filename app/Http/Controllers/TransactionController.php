@@ -115,7 +115,7 @@ class TransactionController extends Controller
     {
         try {
             $validated = $request->validate([
-                'date' => 'required|date',
+                'date' => 'required|date_format:Y-m-d',
                 'period' => 'required|string|size:6|regex:/^\d{6}$/',
                 'quincena' => 'required|in:Q1,Q2',
                 'category_id' => 'required|integer|exists:categories,id',
@@ -127,6 +127,8 @@ class TransactionController extends Controller
                 'is_recurring' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
             ], [
+                'date.required' => 'Date must be a valid date.',
+                'date.date_format' => 'Date must be a valid date.',
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
                 'quincena.in' => 'The quincena must be Q1 or Q2.',
@@ -164,7 +166,7 @@ class TransactionController extends Controller
     {
         try {
             $validated = $request->validate([
-                'date' => 'sometimes|required|date',
+                'date' => 'sometimes|required|date_format:Y-m-d',
                 'period' => 'sometimes|required|string|size:6|regex:/^\d{6}$/',
                 'quincena' => 'sometimes|required|in:Q1,Q2',
                 'category_id' => 'sometimes|required|integer|exists:categories,id',
@@ -176,6 +178,8 @@ class TransactionController extends Controller
                 'is_recurring' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
             ], [
+                'date.required' => 'Date must be a valid date.',
+                'date.date_format' => 'Date must be a valid date.',
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
                 'quincena.in' => 'The quincena must be Q1 or Q2.',
