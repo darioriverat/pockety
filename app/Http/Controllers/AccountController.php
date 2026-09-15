@@ -87,10 +87,12 @@ class AccountController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => 'required|string|max:255|unique:accounts,name',
                 'type' => 'required|in:bank,investment,liability,receivable',
                 'primary_currency' => 'nullable|in:CAD,USD,COP',
                 'notes' => 'nullable|string|max:1000',
+            ], [
+                'name.unique' => 'An account with this name already exists.',
             ]);
 
             $account = $this->service->create($validated);
@@ -122,11 +124,13 @@ class AccountController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'sometimes|required|string|max:255',
+                'name' => "sometimes|required|string|max:255|unique:accounts,name,{$id}",
                 'type' => 'sometimes|required|in:bank,investment,liability,receivable',
                 'primary_currency' => 'nullable|in:CAD,USD,COP',
                 'notes' => 'nullable|string|max:1000',
                 'is_active' => 'sometimes|boolean',
+            ], [
+                'name.unique' => 'An account with this name already exists.',
             ]);
 
             $account = $this->service->update($id, $validated);

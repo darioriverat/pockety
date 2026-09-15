@@ -71,3 +71,66 @@ test('feature 41: Personal LOAN CIBC is correctly named as liability', async ({
 
     expect(consoleErrors).toEqual([]);
 });
+
+test('feature 95: Account form validates that account name is unique', async ({
+    page,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+
+    await loginAsBrowserTestUser(page);
+
+    await page.goto('/accounts');
+    await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible();
+
+    // Step 1: Create account with name 'RBC Checking'
+    await page.getByRole('button', { name: /Add Account/i }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByText('Add Account')).toBeVisible();
+
+    await page.getByLabel('Account Name').fill('RBC Checking');
+    await page.getByLabel('Account Type').click();
+    await page.getByRole('option', { name: 'Bank Account' }).click();
+    await page.getByLabel('Primary Currency').click();
+    await page.getByRole('option', { name: 'CAD' }).click();
+
+    await page.getByRole('button', { name: 'Save Account' }).click();
+    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
+
+    // Verify account was created
+    await expect(page.getByText('RBC Checking')).toBeVisible();
+
+    // Step 2: Attempt to create another account with same name
+    await page.getByRole('button', { name: /Add Account/i }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+
+    await page.getByLabel('Account Name').fill('RBC Checking');
+    await page.getByLabel('Account Type').click();
+    await page.getByRole('option', { name: 'Bank Account' }).click();
+    await page.getByLabel('Primary Currency').click();
+    await page.getByRole('option', { name: 'CAD' }).click();
+
+    await page.getByRole('button', { name: 'Save Account' }).click();
+
+    // Step 3: Verify validation error is shown
+    await expect(
+        page.getByText(/An account with this name already exists/i)
+    ).toBeVisible();
+
+    // Dialog should still be open
+    await expect(page.getByRole('dialog')).toBeVisible();
+
+    // Step 4: Change name to 'RBC Savings'
+    await page.getByLabel('Account Name').clear();
+    await page.getByLabel('Account Name').fill('RBC Savings');
+
+    await page.getByRole('button', { name: 'Save Account' }).click();
+
+    // Step 5: Verify form accepts unique name
+    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('RBC Savings')).toBeVisible();
+
+    // Verify both accounts exist
+    await expect(page.getByText('RBC Checking')).toBeVisible();
+
+    expect(consoleErrors).toEqual([]);
+});
