@@ -12,6 +12,7 @@ use App\Http\Controllers\ExchangeRateImportController;
 use App\Http\Controllers\FinancialSummaryController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\PeriodHistoryController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionImportController;
@@ -74,6 +75,9 @@ Route::post('/income', [IncomeController::class, 'store'])->name('income.store')
 Route::put('/income/{id}', [IncomeController::class, 'update'])->name('income.update');
 Route::patch('/income/{id}', [IncomeController::class, 'update'])->name('income.patch');
 Route::delete('/income/{id}', [IncomeController::class, 'destroy'])->name('income.destroy');
+
+// Periods history API (must be registered before /periods/{period}/...)
+Route::get('/periods/history', [PeriodHistoryController::class, 'index'])->name('periods.history');
 
 // Reconciliation API
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');

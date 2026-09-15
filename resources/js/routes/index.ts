@@ -1273,6 +1273,87 @@ fixedAssets.form = fixedAssetsForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+export const periodsHistory = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: periodsHistory.url(options),
+    method: 'get',
+})
+
+periodsHistory.definition = {
+    methods: ["get","head"],
+    url: '/periods/history',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+periodsHistory.url = (options?: RouteQueryOptions) => {
+    return periodsHistory.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+periodsHistory.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: periodsHistory.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+periodsHistory.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: periodsHistory.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+const periodsHistoryForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodsHistory.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+periodsHistoryForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodsHistory.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+periodsHistoryForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodsHistory.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+periodsHistory.form = periodsHistoryForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

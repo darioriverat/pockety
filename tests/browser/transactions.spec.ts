@@ -598,17 +598,78 @@ test('feature 83: system validates period format as YYYYMM', async ({
     await expect(formError).toContainText(/YYYYMM/i);
     await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
 
+    await page.screenshot({
+        path: 'verification/test-83-period-format/01-invalid-period-2025-01.png',
+        fullPage: false,
+    });
+
     await page.getByLabel('Period (YYYYMM)').fill('01/2025');
     await page.getByRole('button', { name: 'Create' }).click();
     await expect(formError).toBeVisible();
     await expect(formError).toContainText(/YYYYMM/i);
 
-    await page.getByLabel('Period (YYYYMM)').fill('202501');
+    await page.screenshot({
+        path: 'verification/test-83-period-format/02-invalid-period-01-2025.png',
+        fullPage: false,
+    });
+
+    await page.getByLabel('Period (YYYYMM)').fill('202601');
     await submitTransactionForm(page, 'Create');
 
     await expect(
         page.locator('[data-slot="card"]').filter({ hasText: comments }),
     ).toBeVisible();
+
+    await page.screenshot({
+        path: 'verification/test-83-period-format/03-valid-period-accepted.png',
+        fullPage: false,
+    });
+
+    expect(consoleErrors).toEqual([]);
+});
+
+test('feature 84: system validates quincena as Q1 or Q2 only', async ({
+    page,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const comments = `feature-84-quincena-${Date.now()}`;
+
+    await openTransactionsPage(page);
+    await openAddTransactionDialog(page);
+
+    await page.getByLabel('Date').fill('2026-01-16');
+    await page.getByLabel('Period (YYYYMM)').fill('202601');
+
+    await getDialogCombobox(page, 'Quincena').click();
+    const options = page.getByRole('option');
+    await expect(options).toHaveCount(2);
+    await expect(page.getByRole('option', { name: 'Q1', exact: true })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'Q2', exact: true })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'Q3' })).toHaveCount(0);
+
+    await page.screenshot({
+        path: 'verification/test-84-quincena/01-quincena-options.png',
+        fullPage: false,
+    });
+
+    await page.getByRole('option', { name: 'Q1', exact: true }).click();
+    await selectOption(page, 'Category', 'C001 - Groceries');
+    await selectOption(page, 'Currency', 'CAD');
+    await page.getByLabel('Amount').fill('15.00');
+    await page.getByLabel('Comments').fill(comments);
+    await submitTransactionForm(page, 'Create');
+
+    await expect(
+        page.locator('[data-slot="card"]').filter({ hasText: comments }),
+    ).toBeVisible();
+    await expect(
+        page.locator('[data-slot="card"]').filter({ hasText: comments }),
+    ).toContainText('Q1');
+
+    await page.screenshot({
+        path: 'verification/test-84-quincena/02-quincena-q1-accepted.png',
+        fullPage: false,
+    });
 
     expect(consoleErrors).toEqual([]);
 });

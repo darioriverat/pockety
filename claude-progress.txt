@@ -3164,3 +3164,44 @@ NEXT SESSION (PRIORITY)
 3. Run: task backend-tests && task frontend-tests
 4. If screenshots OK, set feature_list.json test #83 passes:true
 5. Then test #84 (quincena Q1/Q2) — backend + dropdown already largely done
+
+========================
+SESSION 35 - Sep 15, 2026
+========================
+
+ENVIRONMENT
+-----------
+- App UP at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP / host Chrome / docker CLI still blocked in Local SDK sandbox
+- Used container HTTP helpers successfully:
+  /dev/build-assets, /dev/run-tests, /dev/frontend-tests, /dev/browser-tests
+
+VERIFICATION
+------------
+- Backend PeriodHistoryTest: 5/5
+- Frontend unit suite: 30/30 (includes periods-history.test.tsx)
+- Playwright feature 83, 84, 85: all passed via /dev/browser-tests
+- Screenshots under verification/test-83-period-format, test-84-quincena, test-85-periods-history
+
+FEATURES COMPLETED
+------------------
+Test #83: Period YYYYMM validation — marked passes:true (UI screenshots + Playwright)
+Test #84: Quincena Q1/Q2 only — marked passes:true (dropdown + Playwright)
+Test #85: Periods history list — NEW feature, marked passes:true
+
+Implementation for #85:
+- Domain: PeriodSummaryEntity + PeriodSummaryCollection + PeriodHistoryServiceInterface
+- Service/Controller: PeriodHistoryService, PeriodHistoryController
+- API: GET /api/periods/history?from=&to= (defaults 202501–202609)
+- Page: /periods/history (Inertia periods-history.tsx) + sidebar Periods link
+- Dev HTML: /dev/verify-periods-history-ui
+
+CURRENT STATE
+-------------
+Tests passing: 87 of 175 (3 new this session)
+Remaining: 88 tests
+
+NEXT SESSION
+------------
+- Test #86: Category actuals report aggregates by category and period
+- Prefer /dev/browser-tests for UI verification when host Chrome/Puppeteer blocked

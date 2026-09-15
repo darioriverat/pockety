@@ -962,6 +962,86 @@ Controller66f8e5b78e1501959ce456384c37e122.form = Controller66f8e5b78e1501959ce4
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+const Controller0087b42306d1a9bfc8523a1efde238a0 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller0087b42306d1a9bfc8523a1efde238a0.url(options),
+    method: 'get',
+})
+
+Controller0087b42306d1a9bfc8523a1efde238a0.definition = {
+    methods: ["get","head"],
+    url: '/periods/history',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+Controller0087b42306d1a9bfc8523a1efde238a0.url = (options?: RouteQueryOptions) => {
+    return Controller0087b42306d1a9bfc8523a1efde238a0.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+Controller0087b42306d1a9bfc8523a1efde238a0.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller0087b42306d1a9bfc8523a1efde238a0.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+Controller0087b42306d1a9bfc8523a1efde238a0.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller0087b42306d1a9bfc8523a1efde238a0.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+const Controller0087b42306d1a9bfc8523a1efde238a0Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller0087b42306d1a9bfc8523a1efde238a0.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+Controller0087b42306d1a9bfc8523a1efde238a0Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller0087b42306d1a9bfc8523a1efde238a0.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/history'
+*/
+Controller0087b42306d1a9bfc8523a1efde238a0Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller0087b42306d1a9bfc8523a1efde238a0.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controller0087b42306d1a9bfc8523a1efde238a0.form = Controller0087b42306d1a9bfc8523a1efde238a0Form
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 const Controller319c434a45921953484cb2f345f6ad0c = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -1138,6 +1218,7 @@ const Controller = {
     '/balance-sheet': Controller2cd4284799517c9d71a5ee276641e546,
     '/balance-sheet/time-series': Controllerc7faafe80c37793e81ea6a8d0f57649e,
     '/fixed-assets': Controller66f8e5b78e1501959ce456384c37e122,
+    '/periods/history': Controller0087b42306d1a9bfc8523a1efde238a0,
     '/import': Controller319c434a45921953484cb2f345f6ad0c,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,
 }

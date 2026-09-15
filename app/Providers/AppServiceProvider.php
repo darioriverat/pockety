@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Domain\Services\Contracts\AccountServiceInterface;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Domain\Services\Contracts\IncomeServiceInterface;
+use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Services\AccountService;
 use App\Services\CategoryService;
 use App\Services\IncomeService;
+use App\Services\PeriodHistoryService;
 use App\Services\TransactionService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -42,6 +44,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             IncomeServiceInterface::class,
             IncomeService::class
+        );
+
+        $this->app->bind(
+            PeriodHistoryServiceInterface::class,
+            PeriodHistoryService::class
         );
     }
 

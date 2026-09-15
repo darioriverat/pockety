@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Account;
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('balance-sheet', 'balance-sheet')->name('balance-sheet');
     Route::inertia('balance-sheet/time-series', 'balance-sheet-time-series')->name('balance-sheet-time-series');
     Route::inertia('fixed-assets', 'fixed-assets')->name('fixed-assets');
+    Route::inertia('periods/history', 'periods-history')->name('periods-history');
     Route::inertia('import', 'import')->name('import');
 });
 
@@ -835,6 +837,74 @@ HTML;
     <tbody>{$rows}</tbody>
   </table>
   <p class="nav"><a href="/import">Open live Import page</a></p>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-periods-history-ui', function () {
+        $service = app(PeriodHistoryServiceInterface::class);
+        $history = $service->getHistory('202501', '202609');
+        $formatCad = fn (float $value): string => '$'.number_format($value, 2);
+
+        $rows = '';
+        foreach ($history->all() as $entity) {
+            $period = e($entity->period);
+            $tx = e((string) $entity->transactionCount);
+            $income = e($formatCad($entity->incomeTotalCad));
+            $expenses = e($formatCad($entity->expensesTotalCad));
+            $rows .= "<tr data-testid=\"period-row-{$period}\" data-period=\"{$period}\">"
+                ."<td data-testid=\"period-code-{$period}\">{$period}</td>"
+                ."<td data-testid=\"period-tx-count-{$period}\">{$tx}</td>"
+                ."<td data-testid=\"period-income-{$period}\">{$income}</td>"
+                ."<td data-testid=\"period-expenses-{$period}\">{$expenses}</td>"
+                ."</tr>\n";
+        }
+
+        $count = $history->count();
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Periods History Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 160px; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat .value { font-size: 1.35rem; display: block; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 1.5rem; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1 data-testid="periods-history-heading">Periods History</h1>
+  <p class="meta">Verification for Jan 2025 → Sep 2026</p>
+  <div class="summary" data-testid="periods-history-summary">
+    <div class="stat">
+      <strong>Periods listed</strong>
+      <span class="value" data-testid="periods-history-count">{$count}</span>
+    </div>
+  </div>
+  <table data-testid="periods-history-table">
+    <thead>
+      <tr>
+        <th>Period</th>
+        <th>Transactions</th>
+        <th>Income (CAD)</th>
+        <th>Expenses (CAD)</th>
+      </tr>
+    </thead>
+    <tbody>{$rows}</tbody>
+  </table>
+  <p class="nav"><a href="/periods/history">Open live Periods History page</a></p>
 </body>
 </html>
 HTML;

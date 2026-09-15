@@ -993,7 +993,7 @@
       "Step 4: Enter valid format '202501'",
       "Step 5: Verify form accepts it"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1005,7 +1005,7 @@
       "Step 4: Select Q1",
       "Step 5: Verify form accepts it"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1016,7 +1016,7 @@
       "Step 3: Verify each period shows summary stats (transaction count, income, expenses)",
       "Step 4: Verify periods are sorted chronologically"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

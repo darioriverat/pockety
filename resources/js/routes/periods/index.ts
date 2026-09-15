@@ -1,5 +1,86 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
+* @see \App\Http\Controllers\PeriodHistoryController::history
+* @see app/Http/Controllers/PeriodHistoryController.php:20
+* @route '/api/periods/history'
+*/
+export const history = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: history.url(options),
+    method: 'get',
+})
+
+history.definition = {
+    methods: ["get","head"],
+    url: '/api/periods/history',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\PeriodHistoryController::history
+* @see app/Http/Controllers/PeriodHistoryController.php:20
+* @route '/api/periods/history'
+*/
+history.url = (options?: RouteQueryOptions) => {
+    return history.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\PeriodHistoryController::history
+* @see app/Http/Controllers/PeriodHistoryController.php:20
+* @route '/api/periods/history'
+*/
+history.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: history.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodHistoryController::history
+* @see app/Http/Controllers/PeriodHistoryController.php:20
+* @route '/api/periods/history'
+*/
+history.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: history.url(options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodHistoryController::history
+* @see app/Http/Controllers/PeriodHistoryController.php:20
+* @route '/api/periods/history'
+*/
+const historyForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: history.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodHistoryController::history
+* @see app/Http/Controllers/PeriodHistoryController.php:20
+* @route '/api/periods/history'
+*/
+historyForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: history.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodHistoryController::history
+* @see app/Http/Controllers/PeriodHistoryController.php:20
+* @route '/api/periods/history'
+*/
+historyForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: history.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+history.form = historyForm
+
+/**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
 * @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
@@ -198,6 +279,7 @@ balanceSheetForm.head = (args: { period: string | number } | [period: string | n
 balanceSheet.form = balanceSheetForm
 
 const periods = {
+    history: Object.assign(history, history),
     reconciliation: Object.assign(reconciliation, reconciliation),
     balanceSheet: Object.assign(balanceSheet, balanceSheet),
 }
