@@ -30,7 +30,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Pencil, Trash2, Filter, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Filter, X, Download } from 'lucide-react';
 
 interface Category {
     id: number;
@@ -286,6 +286,18 @@ export default function Transactions() {
         }
     };
 
+    const handleExportCSV = () => {
+        const params = new URLSearchParams();
+        if (filters.period) params.append('period', filters.period);
+        if (filters.category) params.append('category_id', filters.category);
+        if (filters.quincena) params.append('quincena', filters.quincena);
+        if (filters.currency) params.append('currency', filters.currency);
+        if (filters.recurring !== 'all') params.append('is_recurring', filters.recurring);
+
+        const url = `/api/transactions/export?${params.toString()}`;
+        window.location.href = url;
+    };
+
     const resetForm = () => {
         setEditingId(null);
         setFormData({
@@ -343,19 +355,27 @@ export default function Transactions() {
                             Manage your expense transactions
                         </p>
                     </div>
-                    <Dialog
-                        open={isDialogOpen}
-                        onOpenChange={(open) => {
-                            setIsDialogOpen(open);
-                            if (!open) resetForm();
-                        }}
-                    >
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Transaction
-                            </Button>
-                        </DialogTrigger>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={handleExportCSV}
+                        >
+                            <Download className="mr-2 h-4 w-4" />
+                            Export to CSV
+                        </Button>
+                        <Dialog
+                            open={isDialogOpen}
+                            onOpenChange={(open) => {
+                                setIsDialogOpen(open);
+                                if (!open) resetForm();
+                            }}
+                        >
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add Transaction
+                                </Button>
+                            </DialogTrigger>
                         <DialogContent className="max-w-md">
                             <form onSubmit={handleSubmit}>
                                 <DialogHeader>
@@ -645,6 +665,7 @@ export default function Transactions() {
                             </form>
                         </DialogContent>
                     </Dialog>
+                    </div>
                 </div>
 
                 {/* Filters Section */}

@@ -81,6 +81,87 @@ indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 index.form = indexForm
 
 /**
+* @see \App\Http\Controllers\TransactionController::exportMethod
+* @see app/Http/Controllers/TransactionController.php:189
+* @route '/api/transactions/export'
+*/
+export const exportMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: exportMethod.url(options),
+    method: 'get',
+})
+
+exportMethod.definition = {
+    methods: ["get","head"],
+    url: '/api/transactions/export',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\TransactionController::exportMethod
+* @see app/Http/Controllers/TransactionController.php:189
+* @route '/api/transactions/export'
+*/
+exportMethod.url = (options?: RouteQueryOptions) => {
+    return exportMethod.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\TransactionController::exportMethod
+* @see app/Http/Controllers/TransactionController.php:189
+* @route '/api/transactions/export'
+*/
+exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: exportMethod.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionController::exportMethod
+* @see app/Http/Controllers/TransactionController.php:189
+* @route '/api/transactions/export'
+*/
+exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: exportMethod.url(options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionController::exportMethod
+* @see app/Http/Controllers/TransactionController.php:189
+* @route '/api/transactions/export'
+*/
+const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exportMethod.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionController::exportMethod
+* @see app/Http/Controllers/TransactionController.php:189
+* @route '/api/transactions/export'
+*/
+exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exportMethod.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionController::exportMethod
+* @see app/Http/Controllers/TransactionController.php:189
+* @route '/api/transactions/export'
+*/
+exportMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exportMethod.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+exportMethod.form = exportMethodForm
+
+/**
 * @see \App\Http\Controllers\TransactionController::show
 * @see app/Http/Controllers/TransactionController.php:55
 * @route '/api/transactions/{id}'
@@ -496,6 +577,6 @@ destroyForm.delete = (args: { id: string | number } | [id: string | number ] | s
 
 destroy.form = destroyForm
 
-const TransactionController = { index, show, store, update, destroy }
+const TransactionController = { index, exportMethod, show, store, update, destroy, export: exportMethod }
 
 export default TransactionController

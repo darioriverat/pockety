@@ -924,7 +924,7 @@
       "Step 4: Verify CSV file is downloaded",
       "Step 5: Open CSV and verify data matches displayed transactions"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

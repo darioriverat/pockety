@@ -60,6 +60,7 @@ Route::get('/categories/{code}', [CategoryController::class, 'show'])->name('cat
 
 // Transactions API
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transactions.export');
 Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
 Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 Route::put('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');

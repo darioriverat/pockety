@@ -179,4 +179,78 @@ class TransactionController extends Controller
             ], 404);
         }
     }
+
+    /**
+     * Export transactions to CSV.
+     *
+     * GET /api/transactions/export
+     * Query params: period, category_id, account_id, quincena, currency, is_recurring
+     */
+    public function export(Request $request)
+    {
+        $filters = $request->only([
+            'period',
+            'category_id',
+            'account_id',
+            'quincena',
+            'currency',
+            'is_recurring',
+        ]);
+
+        $transactions = $this->service->getAll($filters);
+
+        $filename = 'transactions_'.($filters['period'] ?? 'all').'_'.date('Y-m-d').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ];
+
+        $callback = function () use ($transactions) {
+            $file = fopen('php://output', 'w');
+
+            // CSV header
+            fputcsv($file, [
+                'Date',
+                'Period',
+                'Quincena',
+                'Category Code',
+                'Category Name',
+                'Account',
+                'Amount CAD',
+                'Amount USD',
+                'Amount COP',
+                'Currency',
+                'Amount',
+                'Comments',
+                'Recurring',
+                'Debt Component',
+            ]);
+
+            // CSV rows
+            foreach ($transactions as $entity) {
+                $data = $entity->toArray();
+                fputcsv($file, [
+                    $data['date'],
+                    $data['period'],
+                    $data['quincena'],
+                    $data['category']['code'] ?? '',
+                    $data['category']['name_en'] ?? '',
+                    $data['account'] ?? '',
+                    $data['amount_cad'] ?? '',
+                    $data['amount_usd'] ?? '',
+                    $data['amount_cop'] ?? '',
+                    $data['currency'] ?? '',
+                    $data['amount'] ?? '',
+                    $data['comments'] ?? '',
+                    $data['is_recurring'] ? 'Yes' : 'No',
+                    $data['debt_component'] ?? '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
