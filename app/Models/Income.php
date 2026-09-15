@@ -39,19 +39,22 @@ class Income extends Model
     /**
      * Get the total amount for this income line in CAD equivalent.
      * This requires exchange rates for the period.
+     * 
+     * Per app spec: "For USD/CAD rate X, 1 USD = X CAD, multiply USD by rate.
+     * For CAD/COP rate, divide COP by rate to get CAD."
      */
     public function getTotalCadEquivalent(ExchangeRate $exchangeRate): float
     {
         $total = (float) $this->amount_cad;
 
         if ($this->amount_usd > 0) {
-            // Convert USD to CAD: USD * (1 / USD_CAD rate)
-            $total += (float) $this->amount_usd / (float) $exchangeRate->usd_cad;
+            // Convert USD to CAD: USD * USD_CAD rate
+            $total += $exchangeRate->usdToCad((float) $this->amount_usd);
         }
 
         if ($this->amount_cop > 0) {
             // Convert COP to CAD: COP / CAD_COP rate
-            $total += (float) $this->amount_cop / (float) $exchangeRate->cad_cop;
+            $total += $exchangeRate->copToCad((float) $this->amount_cop);
         }
 
         return round($total, 2);
