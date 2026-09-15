@@ -3546,3 +3546,61 @@ CURRENT STATUS:
 
 ================================================================================
 
+
+================================================================================
+SESSION 42 - September 15, 2026
+================================================================================
+
+OBJECTIVE: Implement test #90 - Account transaction history running balance
+
+VERIFICATION (pre-work):
+- Frontend unit tests: 36 passing (pre-change)
+- App reachable at http://dev.pockety.com:8080 (HTTP 200)
+- Docker socket blocked in parent sandbox; PHPUnit + Playwright run via
+  /dev/run-tests and /dev/browser-tests helper endpoints
+
+IMPLEMENTATION - TEST #90:
+Feature: Account transaction history shows running balance after each transaction
+
+Backend (AccountController::transactions):
+- Expense amounts reduce balance (matches reconciliation convention)
+- Meta includes starting_balance, current_balance, currency, has_recorded_balance
+- When a recorded balance exists, current_balance anchors newest running balance
+- starting_balance = current + sum(expenses); each row shows balance after that tx
+- Newest-first ordering preserved for the UI
+
+Frontend (account-detail.tsx):
+- Starting Balance + Current Balance summary cards
+- Table column "Balance After" with final-running-balance on newest row
+- Footer "Starting balance" row
+- data-testid hooks for browser verification
+
+Tests added:
+- tests/Feature/AccountTransactionHistoryTest.php (2 tests, 15 assertions) PASS
+- tests/browser/account-running-balance.spec.ts PASS via /dev/browser-tests
+- resources/js/pages/account-detail.test.tsx PASS (37 frontend unit tests total)
+
+UI verification:
+- Screenshots: verification/test-90-running-balance/01-account-running-balance.png
+- Starting CA$1,000.00, Current CA$700.00, Balance After 700 / 900 confirmed
+- Zero console errors in browser run
+
+Also:
+- vite.config.ts: SKIP_WAYFINDER=1 allows host builds without local PHP
+- Frontend rebuilt with SKIP_WAYFINDER=1
+
+Updated feature_list.json: marked running-balance test as passes=true
+
+CURRENT STATUS:
+- Tests passing: 93 of 175 (up from 92)
+- Tests remaining: 82
+- Application in clean working state
+
+NEXT SESSION SHOULD:
+1. Pick next highest-priority feature with passes=false
+   (next: filter account transaction history by date range)
+2. Prefer /dev/run-tests and /dev/browser-tests when Docker socket is blocked
+3. Verify with screenshots before flipping passes
+
+================================================================================
+

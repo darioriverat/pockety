@@ -24,9 +24,14 @@ export default defineConfig({
             presets: [reactCompilerPreset()],
         }),
         tailwindcss(),
-        wayfinder({
-            formVariants: true,
-        }),
+        // Wayfinder requires php artisan; skip when PHP is unavailable on the host.
+        ...(process.env.SKIP_WAYFINDER === '1'
+            ? []
+            : [
+                  wayfinder({
+                      formVariants: true,
+                  }),
+              ]),
     ]),
     server: {
         host: '0.0.0.0',

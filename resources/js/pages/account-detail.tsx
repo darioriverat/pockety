@@ -42,6 +42,10 @@ interface TransactionsResponse {
     meta: {
         account_id: number;
         account_name: string;
+        currency: string;
+        starting_balance: number;
+        current_balance: number;
+        has_recorded_balance: boolean;
         total_count: number;
     };
 }
@@ -75,6 +79,9 @@ export default function AccountDetail() {
 
     const [account, setAccount] = useState<Account | null>(null);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [startingBalance, setStartingBalance] = useState(0);
+    const [currentBalance, setCurrentBalance] = useState(0);
+    const [currency, setCurrency] = useState('CAD');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -99,7 +106,7 @@ export default function AccountDetail() {
                 throw new Error('Failed to fetch account details');
             }
 
-            const data: any = await response.json();
+            const data: { data: Account } = await response.json();
             setAccount(data.data || null);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
@@ -119,6 +126,9 @@ export default function AccountDetail() {
 
             const data: TransactionsResponse = await response.json();
             setTransactions(data.data || []);
+            setStartingBalance(data.meta.starting_balance ?? 0);
+            setCurrentBalance(data.meta.current_balance ?? 0);
+            setCurrency(data.meta.currency || account?.primary_currency || 'CAD');
             setError(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
@@ -151,10 +161,15 @@ export default function AccountDetail() {
         );
     }
 
+    const displayCurrency = currency || account?.primary_currency || 'CAD';
+
     return (
         <>
             <Head title={account ? account.name : 'Account Details'} />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div
+                className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
+                data-testid="account-detail-page"
+            >
                 <div className="mb-4 flex items-center justify-between">
                     <div>
                         <div className="flex items-center gap-2">
@@ -172,10 +187,50 @@ export default function AccountDetail() {
                             </h1>
                         </div>
                         <p className="text-muted-foreground">
-                            Transaction history sorted by date
+                            Transaction history with running balance
                         </p>
                     </div>
                 </div>
+
+                {!loading && (
+                    <div
+                        className="grid gap-4 sm:grid-cols-2"
+                        data-testid="account-balance-summary"
+                    >
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardDescription>Starting Balance</CardDescription>
+                                <CardTitle
+                                    className="text-2xl"
+                                    data-testid="starting-balance"
+                                >
+                                    {formatCurrency(startingBalance, displayCurrency)}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-xs text-muted-foreground">
+                                    Balance before the earliest transaction
+                                </p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardDescription>Current Balance</CardDescription>
+                                <CardTitle
+                                    className="text-2xl"
+                                    data-testid="current-balance"
+                                >
+                                    {formatCurrency(currentBalance, displayCurrency)}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-xs text-muted-foreground">
+                                    Balance after all transactions
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
 
                 {loading ? (
                     <Card>
@@ -196,11 +251,12 @@ export default function AccountDetail() {
                             <CardDescription>
                                 {transactions.length} transaction
                                 {transactions.length !== 1 ? 's' : ''} · Sorted by
-                                date (newest first)
+                                date (newest first) · Running balance after each
+                                transaction
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Table>
+                            <Table data-testid="account-transactions-table">
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Date</TableHead>
@@ -209,14 +265,20 @@ export default function AccountDetail() {
                                             Amount
                                         </TableHead>
                                         <TableHead className="text-right">
-                                            Running Balance
+                                            Balance After
                                         </TableHead>
                                         <TableHead>Comments</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {transactions.map((transaction) => (
-                                        <TableRow key={transaction.id}>
+                                    {transactions.map((transaction, index) => (
+                                        <TableRow
+                                            key={transaction.id}
+                                            data-testid={`account-tx-row-${transaction.id}`}
+                                            data-running-balance={
+                                                transaction.running_balance
+                                            }
+                                        >
                                             <TableCell className="font-medium">
                                                 {formatDate(transaction.date)}
                                             </TableCell>
@@ -238,16 +300,28 @@ export default function AccountDetail() {
                                                     </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right font-medium">
+                                            <TableCell className="text-right font-medium text-destructive">
+                                                −
                                                 {formatCurrency(
                                                     transaction.amount,
-                                                    transaction.currency
+                                                    transaction.currency || displayCurrency
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right font-semibold">
+                                            <TableCell
+                                                className={`text-right font-semibold ${
+                                                    index === 0
+                                                        ? 'text-foreground'
+                                                        : ''
+                                                }`}
+                                                data-testid={
+                                                    index === 0
+                                                        ? 'final-running-balance'
+                                                        : undefined
+                                                }
+                                            >
                                                 {formatCurrency(
                                                     transaction.running_balance,
-                                                    transaction.currency
+                                                    transaction.currency || displayCurrency
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-sm text-muted-foreground">
@@ -255,6 +329,24 @@ export default function AccountDetail() {
                                             </TableCell>
                                         </TableRow>
                                     ))}
+                                    <TableRow
+                                        className="bg-muted/40"
+                                        data-testid="starting-balance-row"
+                                    >
+                                        <TableCell
+                                            colSpan={3}
+                                            className="font-medium text-muted-foreground"
+                                        >
+                                            Starting balance
+                                        </TableCell>
+                                        <TableCell className="text-right font-semibold">
+                                            {formatCurrency(
+                                                startingBalance,
+                                                displayCurrency
+                                            )}
+                                        </TableCell>
+                                        <TableCell />
+                                    </TableRow>
                                 </TableBody>
                             </Table>
                         </CardContent>

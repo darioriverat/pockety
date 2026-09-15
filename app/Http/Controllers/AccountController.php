@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Models\AccountBalance;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -178,9 +179,14 @@ class AccountController extends Controller
     }
 
     /**
-     * Get transactions for an account.
+     * Get transactions for an account with running balances.
      *
      * GET /api/accounts/{id}/transactions
+     *
+     * Expense amounts are stored as positive values and reduce the account balance
+     * (same convention as reconciliation). Running balance after each transaction
+     * is anchored so the newest balance equals the account's current recorded balance
+     * when one exists; otherwise the ledger starts at 0.
      */
     public function transactions(int $id): JsonResponse
     {
@@ -192,22 +198,51 @@ class AccountController extends Controller
             ], 404);
         }
 
-        // Get all transactions for this account, ordered by date descending (newest first)
+        $currency = $account->primaryCurrency ?? 'CAD';
+        $balanceColumn = match ($currency) {
+            'USD' => 'recorded_balance_usd',
+            'COP' => 'recorded_balance_cop',
+            default => 'recorded_balance_cad',
+        };
+
+        /** @var AccountBalance|null $latestBalance */
+        $latestBalance = AccountBalance::query()
+            ->where('account_id', $id)
+            ->orderByDesc('period')
+            ->first();
+
+        $hasRecordedBalance = $latestBalance !== null;
+        $currentBalance = $hasRecordedBalance
+            ? round((float) $latestBalance->{$balanceColumn}, 2)
+            : null;
+
+        // Oldest → newest for running balance calculation
         $transactions = Transaction::forAccount($id)
             ->with('category')
-            ->orderBy('date', 'desc')
+            ->orderBy('date')
+            ->orderBy('id')
             ->get();
 
-        // Calculate running balance for each transaction
-        // Start with the oldest transaction and work forward
+        $totalExpenses = round(
+            (float) $transactions->sum(fn (Transaction $tx) => (float) ($tx->amount ?? 0)),
+            2
+        );
+
+        // If no recorded balance, treat the ledger as starting at 0 and ending at -expenses.
+        if ($currentBalance === null) {
+            $startingBalance = 0.0;
+            $currentBalance = round(0.0 - $totalExpenses, 2);
+        } else {
+            // Expenses reduce balance: starting = current + sum(expenses)
+            $startingBalance = round($currentBalance + $totalExpenses, 2);
+        }
+
         $transactionsWithBalance = [];
-        $runningBalance = 0.0;
+        $runningBalance = $startingBalance;
 
-        // Reverse to start from oldest
-        $reversed = $transactions->reverse();
-
-        foreach ($reversed as $transaction) {
-            $runningBalance += $transaction->amount ?? 0;
+        foreach ($transactions as $transaction) {
+            $amount = (float) ($transaction->amount ?? 0);
+            $runningBalance = round($runningBalance - $amount, 2);
 
             /** @var Category|null $category */
             $category = $transaction->category;
@@ -219,13 +254,13 @@ class AccountController extends Controller
                 'category_code' => $category?->code,
                 'category_name' => $category?->name_en,
                 'amount' => $transaction->amount,
-                'currency' => $transaction->currency,
+                'currency' => $transaction->currency ?? $currency,
                 'comments' => $transaction->comments,
                 'running_balance' => $runningBalance,
             ];
         }
 
-        // Reverse back to newest first
+        // Newest first for the UI
         $transactionsWithBalance = array_reverse($transactionsWithBalance);
 
         return response()->json([
@@ -233,6 +268,10 @@ class AccountController extends Controller
             'meta' => [
                 'account_id' => $id,
                 'account_name' => $account->name,
+                'currency' => $currency,
+                'starting_balance' => $startingBalance,
+                'current_balance' => $currentBalance,
+                'has_recorded_balance' => $hasRecordedBalance,
                 'total_count' => count($transactionsWithBalance),
             ],
             'links' => [

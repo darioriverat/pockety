@@ -1087,7 +1087,7 @@
       "Step 4: Verify each transaction shows balance after that transaction",
       "Step 5: Verify final balance matches account's current balance"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
