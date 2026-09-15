@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionImportController;
@@ -44,6 +45,14 @@ Route::post('/transactions', [TransactionController::class, 'store'])->name('tra
 Route::put('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
 Route::patch('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.patch');
 Route::delete('/transactions/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+// Income API
+Route::get('/income', [IncomeController::class, 'index'])->name('income.index');
+Route::get('/income/{id}', [IncomeController::class, 'show'])->name('income.show');
+Route::post('/income', [IncomeController::class, 'store'])->name('income.store');
+Route::put('/income/{id}', [IncomeController::class, 'update'])->name('income.update');
+Route::patch('/income/{id}', [IncomeController::class, 'update'])->name('income.patch');
+Route::delete('/income/{id}', [IncomeController::class, 'destroy'])->name('income.destroy');
 
 // Reconciliation API
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');

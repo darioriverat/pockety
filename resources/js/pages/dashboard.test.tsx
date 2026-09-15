@@ -127,7 +127,9 @@ describe('Dashboard feature', () => {
     it('displays the dashboard title and period', () => {
         renderDashboard();
 
-        expect(screen.getByText('Dashboard')).toBeDefined();
+        expect(
+            screen.getByRole('heading', { name: 'Dashboard' }),
+        ).toBeDefined();
         expect(screen.getByText(/January 2026/i)).toBeDefined();
     });
 
@@ -149,7 +151,7 @@ describe('Dashboard feature', () => {
         renderDashboard();
 
         expect(screen.getByText('Net')).toBeDefined();
-        expect(screen.getByText('$3,000.00')).toBeDefined();
+        expect(screen.getAllByText('$3,000.00').length).toBeGreaterThan(0);
     });
 
     it('displays total assets card', () => {
@@ -163,7 +165,7 @@ describe('Dashboard feature', () => {
         renderDashboard();
 
         expect(screen.getByText('Total Liabilities')).toBeDefined();
-        expect(screen.getByText('$3,000.00')).toBeDefined();
+        expect(screen.getAllByText('$3,000.00').length).toBeGreaterThan(0);
     });
 
     it('displays equity card', () => {

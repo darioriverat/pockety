@@ -406,7 +406,7 @@
             "Step 4: Verify computed balance is CAD 900.00 (1000 - 100)",
             "Step 5: Verify variance is 0.00 if recorded balance was also adjusted"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -419,7 +419,7 @@
             "Step 5: Verify variance = recorded - computed",
             "Step 6: Verify variance is highlighted if non-zero"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -431,7 +431,7 @@
             "Step 4: Verify recorded, computed, and variance are shown for USD",
             "Step 5: Verify recorded, computed, and variance are shown for COP"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -444,7 +444,7 @@
             "Step 5: Verify transaction is linked to account",
             "Step 6: Verify account's computed balance includes this transaction"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -494,7 +494,7 @@
             "Step 6: Submit",
             "Step 7: Verify income line item is added to period 202501"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -506,7 +506,7 @@
             "Step 4: Submit",
             "Step 5: Verify both currency amounts are saved for this income line"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -517,7 +517,7 @@
             "Step 3: Verify all 6 can be added",
             "Step 4: Verify system allows at least 6 line items"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -530,7 +530,7 @@
             "Step 5: Verify total income in CAD equivalent is computed using period exchange rates",
             "Step 6: Verify total is displayed prominently"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -947,7 +947,7 @@
             "Step 4: Verify 'Total Expenses' card is displayed",
             "Step 5: Verify 'Net' card shows income - expenses"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -958,7 +958,7 @@
             "Step 3: Verify 'Total Liabilities' card is displayed",
             "Step 4: Verify amounts are in CAD equivalent"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -969,7 +969,7 @@
             "Step 3: Verify status shows 'Balanced' or 'Unbalanced' with variance",
             "Step 4: Verify link to detailed reconciliation page"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",

@@ -84,9 +84,9 @@ class DashboardTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('dashboard')
             ->where('summary.period', $period)
-            ->where('summary.total_income_cad', 5000.00)
-            ->where('summary.total_expenses_cad', 1500.00)
-            ->where('summary.net_cad', 3500.00)
+            ->where('summary.total_income_cad', 5000)
+            ->where('summary.total_expenses_cad', 1500)
+            ->where('summary.net_cad', 3500)
         );
     }
 
@@ -136,9 +136,9 @@ class DashboardTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('dashboard')
             ->where('summary.period', $period)
-            ->where('summary.total_assets_cad', 10000.00)
-            ->where('summary.total_liabilities_cad', 2000.00)
-            ->where('summary.equity_cad', 8000.00)
+            ->where('summary.total_assets_cad', 10000)
+            ->where('summary.total_liabilities_cad', 2000)
+            ->where('summary.equity_cad', 8000)
         );
     }
 
