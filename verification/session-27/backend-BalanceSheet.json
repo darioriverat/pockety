@@ -1,0 +1,1 @@
+{"success":true,"exit_code":0,"filter":"BalanceSheet","output":"PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\nRuntime:       PHP 8.4.25\nConfiguration: \/var\/www\/vhosts\/phpunit.xml\n\n............                                                      12 \/ 12 (100%)\n\nTime: 00:01.003, Memory: 60.50 MB\n\n\u001b[30;42mOK (12 tests, 59 assertions)\u001b[0m"}

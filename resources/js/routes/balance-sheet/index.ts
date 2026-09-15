@@ -1,5 +1,86 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
+* @see \App\Http\Controllers\BalanceSheetController::timeSeries
+* @see app/Http/Controllers/BalanceSheetController.php:60
+* @route '/api/balance-sheet/time-series'
+*/
+export const timeSeries = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: timeSeries.url(options),
+    method: 'get',
+})
+
+timeSeries.definition = {
+    methods: ["get","head"],
+    url: '/api/balance-sheet/time-series',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\BalanceSheetController::timeSeries
+* @see app/Http/Controllers/BalanceSheetController.php:60
+* @route '/api/balance-sheet/time-series'
+*/
+timeSeries.url = (options?: RouteQueryOptions) => {
+    return timeSeries.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\BalanceSheetController::timeSeries
+* @see app/Http/Controllers/BalanceSheetController.php:60
+* @route '/api/balance-sheet/time-series'
+*/
+timeSeries.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: timeSeries.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BalanceSheetController::timeSeries
+* @see app/Http/Controllers/BalanceSheetController.php:60
+* @route '/api/balance-sheet/time-series'
+*/
+timeSeries.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: timeSeries.url(options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\BalanceSheetController::timeSeries
+* @see app/Http/Controllers/BalanceSheetController.php:60
+* @route '/api/balance-sheet/time-series'
+*/
+const timeSeriesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: timeSeries.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BalanceSheetController::timeSeries
+* @see app/Http/Controllers/BalanceSheetController.php:60
+* @route '/api/balance-sheet/time-series'
+*/
+timeSeriesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: timeSeries.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BalanceSheetController::timeSeries
+* @see app/Http/Controllers/BalanceSheetController.php:60
+* @route '/api/balance-sheet/time-series'
+*/
+timeSeriesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: timeSeries.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+timeSeries.form = timeSeriesForm
+
+/**
 * @see \App\Http\Controllers\BalanceSheetController::show
 * @see app/Http/Controllers/BalanceSheetController.php:21
 * @route '/api/balance-sheet'

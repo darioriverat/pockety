@@ -1111,6 +1111,87 @@ balanceSheet.form = balanceSheetForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+export const balanceSheetTimeSeries = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: balanceSheetTimeSeries.url(options),
+    method: 'get',
+})
+
+balanceSheetTimeSeries.definition = {
+    methods: ["get","head"],
+    url: '/balance-sheet/time-series',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+balanceSheetTimeSeries.url = (options?: RouteQueryOptions) => {
+    return balanceSheetTimeSeries.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+balanceSheetTimeSeries.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: balanceSheetTimeSeries.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+balanceSheetTimeSeries.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: balanceSheetTimeSeries.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+const balanceSheetTimeSeriesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: balanceSheetTimeSeries.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+balanceSheetTimeSeriesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: balanceSheetTimeSeries.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+balanceSheetTimeSeriesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: balanceSheetTimeSeries.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+balanceSheetTimeSeries.form = balanceSheetTimeSeriesForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

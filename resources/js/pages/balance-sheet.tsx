@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -10,6 +10,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import {
     Select,
     SelectContent,
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import {
     Landmark,
+    LineChart,
     Scale,
     TrendingUp,
     XCircle,
@@ -173,29 +175,40 @@ export default function BalanceSheet() {
                                 equivalents
                             </p>
                         </div>
-                        <div className="w-full max-w-xs space-y-2">
-                            <Label htmlFor="period">Period</Label>
-                            <Select
-                                value={selectedPeriod}
-                                onValueChange={setSelectedPeriod}
-                            >
-                                <SelectTrigger
-                                    id="period"
-                                    data-testid="period-selector"
+                        <div className="flex w-full max-w-md flex-col gap-3 sm:items-end">
+                            <Button variant="outline" asChild>
+                                <Link
+                                    href="/balance-sheet/time-series"
+                                    data-testid="time-series-link"
                                 >
-                                    <SelectValue placeholder="Select period" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {periods.map((period) => (
-                                        <SelectItem
-                                            key={period}
-                                            value={period}
-                                        >
-                                            {formatPeriod(period)}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                    <LineChart className="mr-2 h-4 w-4" />
+                                    Time series
+                                </Link>
+                            </Button>
+                            <div className="w-full max-w-xs space-y-2">
+                                <Label htmlFor="period">Period</Label>
+                                <Select
+                                    value={selectedPeriod}
+                                    onValueChange={setSelectedPeriod}
+                                >
+                                    <SelectTrigger
+                                        id="period"
+                                        data-testid="period-selector"
+                                    >
+                                        <SelectValue placeholder="Select period" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {periods.map((period) => (
+                                            <SelectItem
+                                                key={period}
+                                                value={period}
+                                            >
+                                                {formatPeriod(period)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
 

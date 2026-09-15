@@ -43,9 +43,53 @@ class BalanceSheetController extends Controller
             'links' => [
                 'self' => route('balance-sheet.show', ['period' => $period]),
                 'by_period' => route('periods.balance-sheet', ['period' => $period]),
+                'time_series' => route('balance-sheet.time-series'),
             ],
             'meta' => [
                 'period' => $period,
+                'currencies' => ['CAD', 'USD', 'COP'],
+            ],
+        ]);
+    }
+
+    /**
+     * Balance sheet time series across periods (Estado Financiero trend).
+     *
+     * GET /api/balance-sheet/time-series?from=YYYYMM&to=YYYYMM
+     */
+    public function timeSeries(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'from' => 'sometimes|string|size:6|regex:/^\d{6}$/',
+            'to' => 'sometimes|string|size:6|regex:/^\d{6}$/',
+        ]);
+
+        $from = $validated['from'] ?? '202501';
+        $to = $validated['to'] ?? '202609';
+
+        if ($from > $to) {
+            return response()->json([
+                'message' => 'The from period must be less than or equal to the to period.',
+                'errors' => [
+                    'from' => ['The from period must be less than or equal to the to period.'],
+                ],
+            ], 422);
+        }
+
+        $series = $this->balanceSheetService->getTimeSeries($from, $to);
+
+        return response()->json([
+            'data' => $series,
+            'links' => [
+                'self' => route('balance-sheet.time-series', [
+                    'from' => $from,
+                    'to' => $to,
+                ]),
+            ],
+            'meta' => [
+                'from' => $from,
+                'to' => $to,
+                'period_count' => count($series['periods']),
                 'currencies' => ['CAD', 'USD', 'COP'],
             ],
         ]);

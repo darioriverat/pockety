@@ -5,7 +5,7 @@ import {
     trackConsoleErrors,
 } from './helpers';
 
-test.beforeAll(() => {
+test.beforeEach(() => {
     resetBrowserState();
 });
 
@@ -144,6 +144,124 @@ test('feature 65-70: balance sheet shows assets liabilities equity in CAD USD CO
     await expect(page.getByText('Loan to Diana BS')).toBeVisible();
     await expect(page.getByText('Ford Escape')).toBeVisible();
     await expect(page.getByText('Personal LOAN CIBC BS')).toBeVisible();
+
+    expect(consoleErrors).toEqual([]);
+});
+
+test('feature 71: balance sheet time series shows historical trend across periods', async ({
+    page,
+    request,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+
+    await loginAsBrowserTestUser(page);
+
+    await request.post('/api/exchange-rates', {
+        data: {
+            period: '202501',
+            usd_cop: 4400,
+            usd_cad: 0.75,
+            cad_cop: 3000,
+        },
+    });
+    await request.post('/api/exchange-rates', {
+        data: {
+            period: '202502',
+            usd_cop: 4400,
+            usd_cad: 0.75,
+            cad_cop: 3000,
+        },
+    });
+    await request.post('/api/exchange-rates', {
+        data: {
+            period: '202609',
+            usd_cop: 4400,
+            usd_cad: 0.75,
+            cad_cop: 3000,
+        },
+    });
+
+    const bankResponse = await request.post('/api/accounts', {
+        data: {
+            name: 'RBC Checking TS',
+            type: 'bank',
+            primary_currency: 'CAD',
+        },
+    });
+    expect(bankResponse.ok()).toBeTruthy();
+    const bank = (await bankResponse.json()).data;
+
+    const loanResponse = await request.post('/api/accounts', {
+        data: {
+            name: 'Personal LOAN CIBC TS',
+            type: 'liability',
+            primary_currency: 'CAD',
+        },
+    });
+    expect(loanResponse.ok()).toBeTruthy();
+    const loan = (await loanResponse.json()).data;
+
+    await request.post(`/api/accounts/${bank.id}/balances`, {
+        data: { period: '202501', recorded_balance_cad: 10000 },
+    });
+    await request.post(`/api/accounts/${loan.id}/balances`, {
+        data: { period: '202501', recorded_balance_cad: 4000 },
+    });
+    await request.post(`/api/accounts/${bank.id}/balances`, {
+        data: { period: '202502', recorded_balance_cad: 12000 },
+    });
+    await request.post(`/api/accounts/${loan.id}/balances`, {
+        data: { period: '202502', recorded_balance_cad: 3500 },
+    });
+    await request.post(`/api/accounts/${bank.id}/balances`, {
+        data: { period: '202609', recorded_balance_cad: 15000 },
+    });
+    await request.post(`/api/accounts/${loan.id}/balances`, {
+        data: { period: '202609', recorded_balance_cad: 2000 },
+    });
+
+    await page.goto('/balance-sheet/time-series');
+
+    await expect(
+        page.getByRole('heading', { name: 'Balance Sheet Time Series' }),
+    ).toBeVisible();
+    await expect(page.getByTestId('time-series-summary')).toBeVisible();
+    await expect(page.getByTestId('period-count')).toHaveText('21');
+    await expect(page.getByTestId('time-series-chart')).toBeVisible();
+    await expect(page.getByTestId('time-series-table')).toBeVisible();
+
+    await expect(page.getByTestId('time-series-row-202501')).toBeVisible();
+    await expect(page.getByTestId('assets-202501')).toContainText('10,000');
+    await expect(page.getByTestId('liabilities-202501')).toContainText('4,000');
+    await expect(page.getByTestId('equity-202501')).toContainText('6,000');
+
+    await expect(page.getByTestId('time-series-row-202502')).toBeVisible();
+    await expect(page.getByTestId('assets-202502')).toContainText('12,000');
+    await expect(page.getByTestId('liabilities-202502')).toContainText('3,500');
+    await expect(page.getByTestId('equity-202502')).toContainText('8,500');
+
+    await expect(page.getByTestId('time-series-row-202609')).toBeVisible();
+    await expect(page.getByTestId('assets-202609')).toContainText('15,000');
+    await expect(page.getByTestId('liabilities-202609')).toContainText('2,000');
+    await expect(page.getByTestId('equity-202609')).toContainText('13,000');
+
+    // Equity change: 13000 - 6000 = 7000
+    await expect(page.getByTestId('equity-change')).toContainText('7,000');
+
+    await page.screenshot({
+        path: 'verification/session-27/time-series-full.png',
+        fullPage: true,
+    });
+    await page.getByTestId('time-series-chart').screenshot({
+        path: 'verification/session-27/time-series-chart.png',
+    });
+
+    await page.goto('/balance-sheet');
+    await page.getByTestId('time-series-link').click();
+    await expect(page).toHaveURL(/\/balance-sheet\/time-series/);
+    await expect(
+        page.getByRole('heading', { name: 'Balance Sheet Time Series' }),
+    ).toBeVisible();
 
     expect(consoleErrors).toEqual([]);
 });

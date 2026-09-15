@@ -217,4 +217,91 @@ class BalanceSheetTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_time_series_returns_all_periods_in_default_range(): void
+    {
+        $bank = Account::factory()->create([
+            'name' => 'RBC Checking',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+        ]);
+        $loan = Account::factory()->create([
+            'name' => 'Personal LOAN CIBC',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $bank->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 10000.00,
+        ]);
+        AccountBalance::create([
+            'account_id' => $loan->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 4000.00,
+        ]);
+        AccountBalance::create([
+            'account_id' => $bank->id,
+            'period' => '202502',
+            'recorded_balance_cad' => 11000.00,
+        ]);
+        AccountBalance::create([
+            'account_id' => $loan->id,
+            'period' => '202502',
+            'recorded_balance_cad' => 3800.00,
+        ]);
+
+        ExchangeRate::create([
+            'period' => '202502',
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        $response = $this->getJson('/api/balance-sheet/time-series');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.from', '202501');
+        $response->assertJsonPath('data.to', '202609');
+        $response->assertJsonPath('meta.period_count', 21);
+        $this->assertCount(21, $response->json('data.periods'));
+
+        $response->assertJsonPath('data.periods.0.period', '202501');
+        $response->assertJsonPath('data.periods.0.total_assets.cad', 10000);
+        $response->assertJsonPath('data.periods.0.total_liabilities.cad', 4000);
+        $response->assertJsonPath('data.periods.0.equity.cad', 6000);
+
+        $response->assertJsonPath('data.periods.1.period', '202502');
+        $response->assertJsonPath('data.periods.1.total_assets.cad', 11000);
+        $response->assertJsonPath('data.periods.1.total_liabilities.cad', 3800);
+        $response->assertJsonPath('data.periods.1.equity.cad', 7200);
+
+        $response->assertJsonPath('data.periods.20.period', '202609');
+    }
+
+    public function test_time_series_accepts_custom_from_to_range(): void
+    {
+        $response = $this->getJson('/api/balance-sheet/time-series?from=202501&to=202503');
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.period_count', 3);
+        $response->assertJsonPath('data.periods.0.period', '202501');
+        $response->assertJsonPath('data.periods.2.period', '202503');
+    }
+
+    public function test_time_series_rejects_from_after_to(): void
+    {
+        $response = $this->getJson('/api/balance-sheet/time-series?from=202506&to=202501');
+
+        $response->assertStatus(422);
+    }
+
+    public function test_authenticated_users_can_visit_time_series_page(): void
+    {
+        $response = $this->get(route('balance-sheet-time-series'));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page->component('balance-sheet-time-series'));
+    }
 }

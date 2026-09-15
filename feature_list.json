@@ -805,7 +805,7 @@
             "Step 4: Verify trend chart or table is displayed",
             "Step 5: Verify user can see changes over time"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",

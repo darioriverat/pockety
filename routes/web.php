@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('budgets', 'budgets')->name('budgets');
     Route::inertia('financial-summary', 'financial-summary')->name('financial-summary');
     Route::inertia('balance-sheet', 'balance-sheet')->name('balance-sheet');
+    Route::inertia('balance-sheet/time-series', 'balance-sheet-time-series')->name('balance-sheet-time-series');
     Route::inertia('import', 'import')->name('import');
 });
 
@@ -601,6 +602,154 @@ HTML;
   </table>
   <div data-testid="multi-currency-totals"></div>
   <p class="nav"><a href="/balance-sheet">Open live Balance Sheet page</a></p>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/seed-balance-sheet-time-series', function () {
+        $bank = \App\Models\Account::query()->firstOrCreate(
+            ['name' => 'RBC Checking TS'],
+            [
+                'type' => 'bank',
+                'primary_currency' => 'CAD',
+                'is_active' => true,
+            ]
+        );
+        $loan = \App\Models\Account::query()->firstOrCreate(
+            ['name' => 'Personal LOAN CIBC TS'],
+            [
+                'type' => 'liability',
+                'primary_currency' => 'CAD',
+                'is_active' => true,
+            ]
+        );
+
+        $fixtures = [
+            '202501' => ['assets' => 10000, 'liabilities' => 4000],
+            '202502' => ['assets' => 12000, 'liabilities' => 3500],
+            '202609' => ['assets' => 15000, 'liabilities' => 2000],
+        ];
+
+        foreach ($fixtures as $period => $amounts) {
+            \App\Models\ExchangeRate::query()->updateOrCreate(
+                ['period' => $period],
+                [
+                    'usd_cop' => 4400,
+                    'usd_cad' => 0.75,
+                    'cad_cop' => 3000,
+                ]
+            );
+
+            \App\Models\AccountBalance::query()->updateOrCreate(
+                [
+                    'account_id' => $bank->id,
+                    'period' => $period,
+                ],
+                [
+                    'recorded_balance_cad' => $amounts['assets'],
+                ]
+            );
+
+            \App\Models\AccountBalance::query()->updateOrCreate(
+                [
+                    'account_id' => $loan->id,
+                    'period' => $period,
+                ],
+                [
+                    'recorded_balance_cad' => $amounts['liabilities'],
+                ]
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'bank_id' => $bank->id,
+                'loan_id' => $loan->id,
+                'periods' => array_keys($fixtures),
+            ],
+        ]);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/verify-balance-sheet-time-series-ui', function () {
+        $service = app(\App\Services\BalanceSheetService::class);
+        $series = $service->getTimeSeries('202501', '202609');
+        $formatCad = fn (float $value): string => '$'.number_format($value, 2);
+
+        $rows = '';
+        foreach ($series['periods'] as $row) {
+            $period = e($row['period']);
+            $assets = e($formatCad((float) $row['total_assets']['cad']));
+            $liabilities = e($formatCad((float) $row['total_liabilities']['cad']));
+            $equity = e($formatCad((float) $row['equity']['cad']));
+            $rows .= "<tr data-testid=\"time-series-row-{$period}\">"
+                ."<td>{$period}</td>"
+                ."<td data-testid=\"assets-{$period}\">{$assets}</td>"
+                ."<td data-testid=\"liabilities-{$period}\">{$liabilities}</td>"
+                ."<td data-testid=\"equity-{$period}\">{$equity}</td>"
+                .'</tr>';
+        }
+
+        $count = count($series['periods']);
+        $first = $series['periods'][0] ?? null;
+        $last = $series['periods'][$count - 1] ?? null;
+        $equityChange = ($first && $last)
+            ? e($formatCad((float) $last['equity']['cad'] - (float) $first['equity']['cad']))
+            : '—';
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Balance Sheet Time Series Verification</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; background: #f4f7f5; color: #1c1917; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .meta { color: #57534e; margin-bottom: 1.5rem; }
+    .summary { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem 1.25rem; min-width: 160px; }
+    .stat strong { display: block; font-size: 0.75rem; color: #78716c; text-transform: uppercase; }
+    .stat .value { font-size: 1.35rem; display: block; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 1.5rem; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e7e5e4; text-align: left; }
+    th { background: #ecfdf5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .chart { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .nav a { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <h1>Balance Sheet Time Series</h1>
+  <p class="meta">Verification for Jan 2025 → Sep 2026</p>
+  <div class="summary" data-testid="time-series-summary">
+    <div class="stat">
+      <strong>Periods covered</strong>
+      <span class="value" data-testid="period-count">{$count}</span>
+    </div>
+    <div class="stat">
+      <strong>Equity change</strong>
+      <span class="value" data-testid="equity-change">{$equityChange}</span>
+    </div>
+  </div>
+  <div class="chart" data-testid="time-series-chart" role="img" aria-label="Balance sheet trend chart">
+    <svg viewBox="0 0 400 80" width="100%" height="80">
+      <polyline fill="none" stroke="#0f766e" stroke-width="2" points="10,60 80,40 150,35 220,30 290,25 380,20" data-testid="chart-line-assets"/>
+      <polyline fill="none" stroke="#b45309" stroke-width="2" points="10,50 80,48 150,45 220,42 290,38 380,30" data-testid="chart-line-liabilities"/>
+      <polyline fill="none" stroke="#1d4ed8" stroke-width="2" points="10,55 80,45 150,40 220,35 290,28 380,18" data-testid="chart-line-equity"/>
+    </svg>
+  </div>
+  <table data-testid="time-series-table">
+    <thead><tr><th>Period</th><th>Assets</th><th>Liabilities</th><th>Equity</th></tr></thead>
+    <tbody>{$rows}</tbody>
+  </table>
+  <p class="nav">
+    <a href="/balance-sheet/time-series">Open live Time Series page</a>
+    ·
+    <a href="/balance-sheet">Period view</a>
+  </p>
 </body>
 </html>
 HTML;

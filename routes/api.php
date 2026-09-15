@@ -66,6 +66,7 @@ Route::delete('/income/{id}', [IncomeController::class, 'destroy'])->name('incom
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');
 
 // Balance Sheet API
+Route::get('/balance-sheet/time-series', [BalanceSheetController::class, 'timeSeries'])->name('balance-sheet.time-series');
 Route::get('/balance-sheet', [BalanceSheetController::class, 'show'])->name('balance-sheet.show');
 Route::get('/periods/{period}/balance-sheet', [BalanceSheetController::class, 'show'])->name('periods.balance-sheet');
 

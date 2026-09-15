@@ -146,6 +146,80 @@ class BalanceSheetService
         ];
     }
 
+    /**
+     * Build Assets / Liabilities / Equity totals for every period in a range
+     * (source equivalent: "Estado Financiero" time series).
+     *
+     * Defaults to the in-scope window January 2025 through September 2026.
+     *
+     * @return array{
+     *     from: string,
+     *     to: string,
+     *     periods: list<array{
+     *         period: string,
+     *         total_assets: array{cad: float, usd: float, cop: float},
+     *         total_liabilities: array{cad: float, usd: float, cop: float},
+     *         equity: array{cad: float, usd: float, cop: float}
+     *     }>
+     * }
+     */
+    public function getTimeSeries(string $from = '202501', string $to = '202609'): array
+    {
+        $series = [];
+
+        foreach ($this->periodsBetween($from, $to) as $period) {
+            $sheet = $this->getBalanceSheet($period);
+
+            $series[] = [
+                'period' => $period,
+                'total_assets' => [
+                    'cad' => $sheet['total_assets']['cad'],
+                    'usd' => $sheet['total_assets']['usd'],
+                    'cop' => $sheet['total_assets']['cop'],
+                ],
+                'total_liabilities' => [
+                    'cad' => $sheet['total_liabilities']['cad'],
+                    'usd' => $sheet['total_liabilities']['usd'],
+                    'cop' => $sheet['total_liabilities']['cop'],
+                ],
+                'equity' => [
+                    'cad' => $sheet['equity']['cad'],
+                    'usd' => $sheet['equity']['usd'],
+                    'cop' => $sheet['equity']['cop'],
+                ],
+            ];
+        }
+
+        return [
+            'from' => $from,
+            'to' => $to,
+            'periods' => $series,
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function periodsBetween(string $from, string $to): array
+    {
+        $periods = [];
+        $year = (int) substr($from, 0, 4);
+        $month = (int) substr($from, 4, 2);
+        $endYear = (int) substr($to, 0, 4);
+        $endMonth = (int) substr($to, 4, 2);
+
+        while ($year < $endYear || ($year === $endYear && $month <= $endMonth)) {
+            $periods[] = sprintf('%04d%02d', $year, $month);
+            $month++;
+            if ($month > 12) {
+                $month = 1;
+                $year++;
+            }
+        }
+
+        return $periods;
+    }
+
     private function balanceCadEquivalent(AccountBalance $balance, ExchangeRate $exchangeRate): float
     {
         $cadEquivalent = 0.0;

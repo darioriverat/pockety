@@ -802,6 +802,86 @@ Controller2cd4284799517c9d71a5ee276641e546.form = Controller2cd4284799517c9d71a5
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+const Controllerc7faafe80c37793e81ea6a8d0f57649e = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllerc7faafe80c37793e81ea6a8d0f57649e.url(options),
+    method: 'get',
+})
+
+Controllerc7faafe80c37793e81ea6a8d0f57649e.definition = {
+    methods: ["get","head"],
+    url: '/balance-sheet/time-series',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+Controllerc7faafe80c37793e81ea6a8d0f57649e.url = (options?: RouteQueryOptions) => {
+    return Controllerc7faafe80c37793e81ea6a8d0f57649e.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+Controllerc7faafe80c37793e81ea6a8d0f57649e.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllerc7faafe80c37793e81ea6a8d0f57649e.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+Controllerc7faafe80c37793e81ea6a8d0f57649e.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controllerc7faafe80c37793e81ea6a8d0f57649e.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+const Controllerc7faafe80c37793e81ea6a8d0f57649eForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllerc7faafe80c37793e81ea6a8d0f57649e.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+Controllerc7faafe80c37793e81ea6a8d0f57649eForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllerc7faafe80c37793e81ea6a8d0f57649e.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/balance-sheet/time-series'
+*/
+Controllerc7faafe80c37793e81ea6a8d0f57649eForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllerc7faafe80c37793e81ea6a8d0f57649e.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controllerc7faafe80c37793e81ea6a8d0f57649e.form = Controllerc7faafe80c37793e81ea6a8d0f57649eForm
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/import'
 */
 const Controller319c434a45921953484cb2f345f6ad0c = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -976,6 +1056,7 @@ const Controller = {
     '/budgets': Controllerd65bcf739ad2a9a13b6c3c100ab1c5e2,
     '/financial-summary': Controllerf28969a658a3db543064530fa037e4a0,
     '/balance-sheet': Controller2cd4284799517c9d71a5ee276641e546,
+    '/balance-sheet/time-series': Controllerc7faafe80c37793e81ea6a8d0f57649e,
     '/import': Controller319c434a45921953484cb2f345f6ad0c,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,
 }
