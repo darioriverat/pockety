@@ -1147,7 +1147,7 @@
       "Step 4: Change name to 'RBC Savings'",
       "Step 5: Verify form accepts unique name"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1159,7 +1159,7 @@
       "Step 4: Enter positive rate (e.g., 4400)",
       "Step 5: Verify form accepts it"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1171,7 +1171,7 @@
       "Step 4: Enter positive amount",
       "Step 5: Verify form accepts it"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

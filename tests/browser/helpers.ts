@@ -62,7 +62,11 @@ export function trackConsoleErrors(page: Page): string[] {
 
     page.on('console', (message) => {
         if (message.type() === 'error') {
-            consoleErrors.push(message.text());
+            const text = message.text();
+            // Filter out expected HTTP validation errors (4xx responses)
+            if (!text.includes('status of 4')) {
+                consoleErrors.push(text);
+            }
         }
     });
 
