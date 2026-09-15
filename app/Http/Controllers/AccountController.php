@@ -34,8 +34,8 @@ class AccountController extends Controller
 
         // Group by type for easier frontend display
         $grouped = [
-            'assets' => array_filter($data, fn ($account) => $account['is_asset']),
-            'liabilities' => array_filter($data, fn ($account) => $account['is_liability']),
+            'assets' => array_values(array_filter($data, fn ($account) => $account['is_asset'])),
+            'liabilities' => array_values(array_filter($data, fn ($account) => $account['is_liability'])),
         ];
 
         return response()->json([

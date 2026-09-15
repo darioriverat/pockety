@@ -1,0 +1,116 @@
+{
+  "header": {
+    "title": "JANUARY",
+    "period": {
+      "formula": null,
+      "value": "202501"
+    }
+  },
+  "sections": {
+    "Cuentas": {
+      "items": [
+        {
+          "label": "Bancolombia",
+          "recorded": {
+            "cad": { "value": null },
+            "usd": { "value": null },
+            "cop": { "value": 1500000.0 }
+          }
+        },
+        {
+          "label": "Nequi",
+          "recorded": {
+            "cad": { "value": null },
+            "usd": { "value": null },
+            "cop": { "value": 3456.5899999999965 }
+          }
+        },
+        {
+          "label": "Davivienda",
+          "recorded": {
+            "cad": { "value": null },
+            "usd": { "value": null },
+            "cop": { "value": 250000.0 }
+          }
+        },
+        {
+          "label": "RBC Checking",
+          "recorded": {
+            "cad": { "value": 3674.22 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "RBC Savings",
+          "recorded": {
+            "cad": { "value": 500.0 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "CIBC Checking",
+          "recorded": {
+            "cad": { "value": 1200.0 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "TD Bank Diana",
+          "recorded": {
+            "cad": { "value": 800.0 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "Wise",
+          "recorded": {
+            "cad": { "value": 100.0 },
+            "usd": { "value": 50.0 },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "Total",
+          "recorded": {
+            "cad": { "value": 0 },
+            "usd": { "value": 0 },
+            "cop": { "value": 0 }
+          }
+        }
+      ]
+    },
+    "CREDITOS Y DEUDAS": {
+      "items": [
+        {
+          "label": "Crédito Móvil **6174",
+          "recorded": {
+            "cad": { "value": 18500.0 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "CIBC Mastercard",
+          "recorded": {
+            "cad": { "value": 450.0 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "Total",
+          "recorded": {
+            "cad": { "value": 0 },
+            "usd": { "value": 0 },
+            "cop": { "value": 0 }
+          }
+        }
+      ]
+    }
+  },
+  "sheet_name": "SAMPLE 202501"
+}

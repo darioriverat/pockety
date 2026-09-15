@@ -35,6 +35,7 @@ interface Account {
     name: string;
     type: 'bank' | 'investment' | 'liability' | 'receivable';
     primary_currency: string | null;
+    currencies?: string[];
     notes: string | null;
     is_active: boolean;
     is_asset: boolean;
@@ -321,10 +322,24 @@ export default function Accounts() {
                 </div>
                 <CardDescription>
                     <div className="space-y-1">
-                        {account.primary_currency && (
+                        {(account.currencies?.length
+                            ? account.currencies
+                            : account.primary_currency
+                              ? [account.primary_currency]
+                              : []
+                        ).length > 0 && (
                             <div>
-                                <span className="font-medium">Currency:</span>{' '}
-                                {account.primary_currency}
+                                <span className="font-medium">Currencies:</span>{' '}
+                                {(
+                                    account.currencies?.length
+                                        ? account.currencies
+                                        : [account.primary_currency as string]
+                                ).join(', ')}
+                            </div>
+                        )}
+                        {account.notes && (
+                            <div className="text-xs text-muted-foreground">
+                                {account.notes}
                             </div>
                         )}
                     </div>

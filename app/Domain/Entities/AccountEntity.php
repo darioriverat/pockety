@@ -4,6 +4,9 @@ namespace App\Domain\Entities;
 
 readonly class AccountEntity
 {
+    /**
+     * @param  list<string>  $currencies
+     */
     public function __construct(
         public int $id,
         public string $name,
@@ -13,12 +16,13 @@ readonly class AccountEntity
         public bool $isActive,
         public string $createdAt,
         public string $updatedAt,
+        public array $currencies = [],
     ) {}
 
     /**
      * Create from array (useful for batch creation).
      *
-     * @param  array{id: int, name: string, type: string, primary_currency: string|null, notes: string|null, is_active: bool, created_at: string, updated_at: string}  $data
+     * @param  array{id: int, name: string, type: string, primary_currency: string|null, notes: string|null, is_active: bool, created_at: string, updated_at: string, currencies?: list<string>}  $data
      */
     public static function fromArray(array $data): self
     {
@@ -31,13 +35,14 @@ readonly class AccountEntity
             isActive: $data['is_active'],
             createdAt: $data['created_at'],
             updatedAt: $data['updated_at'],
+            currencies: $data['currencies'] ?? [],
         );
     }
 
     /**
      * Convert to array for JSON serialization.
      *
-     * @return array{id: int, name: string, type: string, primary_currency: string|null, notes: string|null, is_active: bool, is_asset: bool, is_liability: bool, created_at: string, updated_at: string}
+     * @return array{id: int, name: string, type: string, primary_currency: string|null, currencies: list<string>, notes: string|null, is_active: bool, is_asset: bool, is_liability: bool, created_at: string, updated_at: string}
      */
     public function toArray(): array
     {
@@ -46,6 +51,9 @@ readonly class AccountEntity
             'name' => $this->name,
             'type' => $this->type,
             'primary_currency' => $this->primaryCurrency,
+            'currencies' => $this->currencies !== []
+                ? $this->currencies
+                : ($this->primaryCurrency ? [$this->primaryCurrency] : []),
             'notes' => $this->notes,
             'is_active' => $this->isActive,
             'is_asset' => $this->isAsset(),

@@ -17,6 +17,7 @@ class AccountService implements AccountServiceInterface
     public function getAllActive(): array
     {
         $accounts = Account::active()
+            ->with('balances')
             ->orderBy('type')
             ->orderBy('name')
             ->get();
@@ -47,6 +48,7 @@ class AccountService implements AccountServiceInterface
     {
         $accounts = Account::assets()
             ->active()
+            ->with('balances')
             ->orderBy('name')
             ->get();
 
@@ -62,6 +64,7 @@ class AccountService implements AccountServiceInterface
     {
         $accounts = Account::liabilities()
             ->active()
+            ->with('balances')
             ->orderBy('name')
             ->get();
 
@@ -139,7 +142,49 @@ class AccountService implements AccountServiceInterface
             isActive: $account->is_active,
             createdAt: $account->created_at->toIso8601String(),
             updatedAt: $account->updated_at->toIso8601String(),
+            currencies: $this->resolveCurrencies($account),
         );
+    }
+
+    /**
+     * Resolve which currencies an account uses from primary + balance history.
+     *
+     * @return list<string>
+     */
+    private function resolveCurrencies(Account $account): array
+    {
+        $currencies = [];
+
+        if ($account->primary_currency) {
+            $currencies[$account->primary_currency] = true;
+        }
+
+        if ($account->relationLoaded('balances') || $account->balances()->exists()) {
+            $balances = $account->relationLoaded('balances')
+                ? $account->balances
+                : $account->balances()->get();
+
+            foreach ($balances as $balance) {
+                if ((float) $balance->recorded_balance_cad !== 0.0) {
+                    $currencies['CAD'] = true;
+                }
+                if ((float) $balance->recorded_balance_usd !== 0.0) {
+                    $currencies['USD'] = true;
+                }
+                if ((float) $balance->recorded_balance_cop !== 0.0) {
+                    $currencies['COP'] = true;
+                }
+            }
+        }
+
+        $ordered = [];
+        foreach (['CAD', 'USD', 'COP'] as $code) {
+            if (isset($currencies[$code])) {
+                $ordered[] = $code;
+            }
+        }
+
+        return $ordered;
     }
 
     /**

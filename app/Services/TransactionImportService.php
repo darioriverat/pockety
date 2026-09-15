@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
@@ -119,13 +120,16 @@ class TransactionImportService
         // Detect debt component from comments
         $debtComponent = $this->detectDebtComponent($comments, $categoryCode);
 
+        // Link known Ford Escape payments to Personal LOAN CIBC when that account exists
+        $accountId = $this->resolveAccountId($categoryCode, $comments);
+
         // Create transaction
         Transaction::create([
             'date' => $date->format('Y-m-d'),
             'period' => (string) $data['periodo'],
             'quincena' => $data['quincena'],
             'category_id' => $categoryId,
-            'account_id' => null, // Not provided in historical data
+            'account_id' => $accountId,
             'amount_cad' => $amountCad,
             'amount_usd' => $amountUsd,
             'amount_cop' => $amountCop,
@@ -133,6 +137,24 @@ class TransactionImportService
             'is_recurring' => false, // Default to false for historical data
             'debt_component' => $debtComponent,
         ]);
+    }
+
+    /**
+     * Resolve account_id for historical rows when a reliable mapping exists.
+     */
+    private function resolveAccountId(string $categoryCode, ?string $comments): ?int
+    {
+        if ($categoryCode !== 'C044' || $comments === null) {
+            return null;
+        }
+
+        if (! preg_match('/FORD\s*ESC/i', $comments)) {
+            return null;
+        }
+
+        return Account::query()
+            ->where('name', 'Personal LOAN CIBC')
+            ->value('id');
     }
 
     /**

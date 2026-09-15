@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountBalanceController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountImportController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ReconciliationController;
@@ -22,17 +23,19 @@ use Illuminate\Support\Facades\Route;
 
 // Accounts API
 Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
-Route::get('/accounts/{id}', [AccountController::class, 'show'])->name('accounts.show');
+Route::post('/accounts/import', [AccountImportController::class, 'import'])->name('accounts.import');
+Route::get('/accounts/import/statistics', [AccountImportController::class, 'statistics'])->name('accounts.import.statistics');
+Route::get('/accounts/{id}', [AccountController::class, 'show'])->name('accounts.show')->whereNumber('id');
 Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
-Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update');
-Route::patch('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.patch');
-Route::delete('/accounts/{id}', [AccountController::class, 'destroy'])->name('accounts.destroy');
+Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update')->whereNumber('id');
+Route::patch('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.patch')->whereNumber('id');
+Route::delete('/accounts/{id}', [AccountController::class, 'destroy'])->name('accounts.destroy')->whereNumber('id');
 
 // Account Balances API
-Route::get('/accounts/{accountId}/balances', [AccountBalanceController::class, 'index'])->name('accounts.balances.index');
-Route::post('/accounts/{accountId}/balances', [AccountBalanceController::class, 'store'])->name('accounts.balances.store');
-Route::get('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'show'])->name('accounts.balances.show');
-Route::delete('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'destroy'])->name('accounts.balances.destroy');
+Route::get('/accounts/{accountId}/balances', [AccountBalanceController::class, 'index'])->name('accounts.balances.index')->whereNumber('accountId');
+Route::post('/accounts/{accountId}/balances', [AccountBalanceController::class, 'store'])->name('accounts.balances.store')->whereNumber('accountId');
+Route::get('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'show'])->name('accounts.balances.show')->whereNumber(['accountId', 'id']);
+Route::delete('/accounts/{accountId}/balances/{id}', [AccountBalanceController::class, 'destroy'])->name('accounts.balances.destroy')->whereNumber(['accountId', 'id']);
 
 // Categories API
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');

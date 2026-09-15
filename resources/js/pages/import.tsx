@@ -19,6 +19,15 @@ interface ImportResult {
     errors: string[];
 }
 
+interface AccountImportResult {
+    accounts_created: number;
+    accounts_updated: number;
+    balances_imported: number;
+    transactions_linked: number;
+    accounts: string[];
+    errors: string[];
+}
+
 interface ImportStatistics {
     total: number;
     by_period: Record<string, number>;
@@ -29,6 +38,11 @@ interface ImportStatistics {
     };
 }
 
+interface AccountImportStatistics {
+    total: number;
+    by_type: Record<string, number>;
+}
+
 export default function Import() {
     const [importing, setImporting] = useState(false);
     const [result, setResult] = useState<ImportResult | null>(null);
@@ -37,6 +51,14 @@ export default function Import() {
         null,
     );
     const [loadingStats, setLoadingStats] = useState(false);
+
+    const [importingAccounts, setImportingAccounts] = useState(false);
+    const [accountResult, setAccountResult] =
+        useState<AccountImportResult | null>(null);
+    const [accountError, setAccountError] = useState<string | null>(null);
+    const [accountStatistics, setAccountStatistics] =
+        useState<AccountImportStatistics | null>(null);
+    const [loadingAccountStats, setLoadingAccountStats] = useState(false);
 
     const handleImport = async () => {
         setImporting(true);
@@ -121,9 +143,62 @@ export default function Import() {
         }
     };
 
+    const handleAccountImport = async () => {
+        setImportingAccounts(true);
+        setAccountError(null);
+        setAccountResult(null);
+
+        try {
+            const response = await fetch('/api/accounts/import', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    directory: 'month_sheets',
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Account import failed');
+            }
+
+            setAccountResult(data.data);
+            fetchAccountStatistics();
+        } catch (err) {
+            setAccountError(
+                err instanceof Error ? err.message : 'An error occurred',
+            );
+        } finally {
+            setImportingAccounts(false);
+        }
+    };
+
+    const fetchAccountStatistics = async () => {
+        setLoadingAccountStats(true);
+        try {
+            const response = await fetch('/api/accounts/import/statistics', {
+                headers: {
+                    Accept: 'application/json',
+                },
+            });
+
+            const data = await response.json();
+            setAccountStatistics(data.data);
+        } catch (err) {
+            console.error('Failed to fetch account statistics:', err);
+        } finally {
+            setLoadingAccountStats(false);
+        }
+    };
+
     // Load statistics on mount
     useState(() => {
         fetchStatistics();
+        fetchAccountStatistics();
     });
 
     return (
@@ -136,9 +211,149 @@ export default function Import() {
                         Import Historical Data
                     </h1>
                     <p className="text-muted-foreground mt-2">
-                        Import transactions from gastos_ledger_2025_2026.json
+                        Import accounts and transactions from the extracted
+                        spreadsheet data
                     </p>
                 </div>
+
+                {/* Account Import Card */}
+                <Card data-testid="account-import-card">
+                    <CardHeader>
+                        <CardTitle>Historical Account Import</CardTitle>
+                        <CardDescription>
+                            Import known accounts from month_sheets JSON files.
+                            This will:
+                            <ul className="list-disc list-inside mt-2 space-y-1">
+                                <li>
+                                    Collect bank and liability accounts across
+                                    all 21 months
+                                </li>
+                                <li>
+                                    Rename stale &quot;Crédito Móvil **6174&quot;
+                                    to &quot;Personal LOAN CIBC&quot;
+                                </li>
+                                <li>
+                                    Ensure Colombian Éxito liability is present
+                                </li>
+                                <li>
+                                    Import recorded balances and link Ford
+                                    Escape payments
+                                </li>
+                            </ul>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex gap-4">
+                            <Button
+                                onClick={handleAccountImport}
+                                disabled={importingAccounts}
+                                size="lg"
+                                data-testid="import-accounts-button"
+                            >
+                                {importingAccounts ? (
+                                    <>
+                                        <Spinner className="mr-2 h-4 w-4" />
+                                        Importing Accounts...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Import Accounts
+                                    </>
+                                )}
+                            </Button>
+
+                            <Button
+                                onClick={fetchAccountStatistics}
+                                disabled={loadingAccountStats}
+                                variant="outline"
+                                size="lg"
+                            >
+                                {loadingAccountStats ? (
+                                    <Spinner className="mr-2 h-4 w-4" />
+                                ) : (
+                                    <Database className="mr-2 h-4 w-4" />
+                                )}
+                                Refresh Account Stats
+                            </Button>
+                        </div>
+
+                        {accountResult && (
+                            <Alert
+                                className={
+                                    accountResult.errors.length > 0
+                                        ? 'border-yellow-500'
+                                        : 'border-green-500'
+                                }
+                                data-testid="account-import-result"
+                            >
+                                <CheckCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    <div className="space-y-2">
+                                        <p className="font-semibold">
+                                            Account Import Completed
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            <Badge variant="default">
+                                                Created:{' '}
+                                                {accountResult.accounts_created}
+                                            </Badge>
+                                            <Badge variant="secondary">
+                                                Updated:{' '}
+                                                {accountResult.accounts_updated}
+                                            </Badge>
+                                            <Badge variant="outline">
+                                                Balances:{' '}
+                                                {
+                                                    accountResult.balances_imported
+                                                }
+                                            </Badge>
+                                            <Badge variant="outline">
+                                                Linked txs:{' '}
+                                                {
+                                                    accountResult.transactions_linked
+                                                }
+                                            </Badge>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">
+                                            {accountResult.accounts.length}{' '}
+                                            accounts available
+                                        </p>
+                                    </div>
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {accountError && (
+                            <Alert variant="destructive">
+                                <XCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    {accountError}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {accountStatistics && (
+                            <div className="rounded-md border p-4">
+                                <p className="text-2xl font-bold">
+                                    {accountStatistics.total}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    Active Accounts
+                                </p>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                    {Object.entries(
+                                        accountStatistics.by_type,
+                                    ).map(([type, count]) => (
+                                        <Badge key={type} variant="outline">
+                                            {type}: {count}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* Import Card */}
                 <Card>

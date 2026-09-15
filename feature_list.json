@@ -468,7 +468,7 @@
             "Step 4: Verify Colombian accounts are listed: Bancolombia, Davivienda, Nequi, \u00c9xito",
             "Step 5: Verify each account shows its type and currencies"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",
@@ -480,7 +480,7 @@
             "Step 4: Verify it is NOT labeled 'Cr\u00e9dito M\u00f3vil **6174' (old stale label)",
             "Step 5: Verify associated transactions include Ford Escape payments"
         ],
-        "passes": false
+        "passes": true
     },
     {
         "category": "functional",

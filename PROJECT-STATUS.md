@@ -1,15 +1,15 @@
 # Pockety Project Status
 
-**Last Updated:** Session 21 (September 15, 2026)  
+**Last Updated:** Session 22 (September 15, 2026)  
 **Current Branch:** `main` (ahead of origin)
 
 ---
 
 ## Quick Stats
 
-- **Tests Passing:** 46 of 175 (26%)
-- **Tests Remaining:** 129
-- **Recent Sessions:** 19 (Dashboard), 20 (Currency bug fix), 21 (Income UI + verification)
+- **Tests Passing:** 48 of 175 (27%)
+- **Tests Remaining:** 127
+- **Recent Sessions:** 20 (Currency bug fix), 21 (Income UI), 22 (Account import)
 
 ---
 
@@ -20,35 +20,35 @@
 2. ✅ Transactions (full CRUD with filtering)
 3. ✅ Accounts (CRUD for bank/investment/liability/receivable)
 4. ✅ Account Balances (record balances per period)
-5. ✅ Exchange Rates (model + conversion; UI still pending)
-6. ✅ Income tracking (API + entry UI)
+5. ✅ Account import from month_sheets (source institutions + rename map)
+6. ✅ Exchange Rates (model + conversion; UI still pending)
+7. ✅ Income tracking (API + entry UI)
 
 ### Import Features
-7. ✅ Transaction import from historical data
-8. ✅ Import statistics and validation
-9. ✅ Debt component flagging (principal/interest)
+8. ✅ Transaction import from historical data
+9. ✅ Import statistics and validation
+10. ✅ Debt component flagging (principal/interest)
+11. ✅ Account import (Cuentas / CREDITOS) + Ford Escape loan linking
 
 ### Reporting Features
-10. ✅ Account Reconciliation (recorded vs computed with variance)
-11. ✅ Dashboard (income/expenses/assets/liabilities/equity summaries)
+12. ✅ Account Reconciliation (recorded vs computed with variance)
+13. ✅ Dashboard (income/expenses/assets/liabilities/equity summaries)
 
 ---
 
-## Session 21 Notes
+## Session 22 Notes
 
-- Income Entry UI complete and verified via API + authenticated Inertia page + automated tests
-- Reconciliation (#36-39) and dashboard summary cards marked passing after backend/frontend verification
-- Puppeteer MCP unavailable; Docker exec blocked from sandbox — used `/dev/*` local helpers
-- Currency conversion fix from session 20 remains correct (USD→CAD multiply)
+- Imported 18 accounts / 327 balances from month_sheets
+- Personal LOAN CIBC replaces stale Crédito Móvil **6174; Éxito liability ensured
+- Puppeteer MCP unavailable; verified via AccountImportTest + /dev/verify-accounts-ui
 
 ---
 
 ## Next Priority Features (Unimplemented)
 
-1. **Exchange Rates UI** (Tests ~#108+)
-2. **Account List from Source** (Test #40)
-3. **Personal Loan CIBC naming** (Test #41)
-4. **Budget Management** (Tests #57-61)
+1. **Exchange Rates UI** (set rates per period + import from month sheets)
+2. **Budget Management** (Tests ~#57+)
+3. **Balance sheet / financial summary** reports
 
 ---
 
