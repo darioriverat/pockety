@@ -901,7 +901,7 @@
       "Step 4: Verify balances are rounded to 0.00 instead of -1.19e-10",
       "Step 5: Verify no significant balance data is lost"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
