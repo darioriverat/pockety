@@ -51,9 +51,13 @@ class ExchangeRateController extends Controller
     {
         $validated = $request->validate([
             'period' => 'required|string|size:6|regex:/^\d{6}$/',
-            'usd_cop' => 'required|numeric|min:0',
-            'usd_cad' => 'required|numeric|min:0',
-            'cad_cop' => 'required|numeric|min:0',
+            'usd_cop' => 'required|numeric|gt:0',
+            'usd_cad' => 'required|numeric|gt:0',
+            'cad_cop' => 'required|numeric|gt:0',
+        ], [
+            'usd_cop.gt' => 'USD/COP rate must be a positive number.',
+            'usd_cad.gt' => 'USD/CAD rate must be a positive number.',
+            'cad_cop.gt' => 'CAD/COP rate must be a positive number.',
         ]);
 
         $rate = ExchangeRate::updateOrCreate(

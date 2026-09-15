@@ -196,7 +196,10 @@ export default function ExchangeRates() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Failed to save exchange rates');
+                const message = data.messages
+                    ? Object.values(data.messages).flat().join(' ')
+                    : data.message || 'Failed to save exchange rates';
+                throw new Error(message);
             }
 
             setSaveSuccess(true);

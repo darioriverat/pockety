@@ -281,4 +281,92 @@ class ExchangeRateTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['period']);
     }
+
+    public function test_exchange_rate_validation_rejects_negative_rates(): void
+    {
+        $response = $this->postJson('/api/exchange-rates', [
+            'period' => '202501',
+            'usd_cop' => -4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['usd_cop'])
+            ->assertJsonFragment([
+                'usd_cop' => ['USD/COP rate must be a positive number.'],
+            ]);
+
+        $this->assertDatabaseMissing('exchange_rates', [
+            'period' => '202501',
+        ]);
+    }
+
+    public function test_exchange_rate_validation_rejects_zero_rates(): void
+    {
+        $response = $this->postJson('/api/exchange-rates', [
+            'period' => '202501',
+            'usd_cop' => 4400,
+            'usd_cad' => 0,
+            'cad_cop' => 3000,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['usd_cad'])
+            ->assertJsonFragment([
+                'usd_cad' => ['USD/CAD rate must be a positive number.'],
+            ]);
+
+        $this->assertDatabaseMissing('exchange_rates', [
+            'period' => '202501',
+        ]);
+    }
+
+    public function test_exchange_rate_validation_rejects_all_negative_rates(): void
+    {
+        $response = $this->postJson('/api/exchange-rates', [
+            'period' => '202501',
+            'usd_cop' => -4400,
+            'usd_cad' => -0.75,
+            'cad_cop' => -3000,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['usd_cop', 'usd_cad', 'cad_cop']);
+    }
+
+    public function test_exchange_rate_validation_accepts_positive_rates(): void
+    {
+        $response = $this->postJson('/api/exchange-rates', [
+            'period' => '202501',
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('exchange_rates', [
+            'period' => '202501',
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+    }
+
+    public function test_exchange_rate_validation_accepts_small_positive_rates(): void
+    {
+        $response = $this->postJson('/api/exchange-rates', [
+            'period' => '202501',
+            'usd_cop' => 0.01,
+            'usd_cad' => 0.0001,
+            'cad_cop' => 0.5,
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('exchange_rates', [
+            'period' => '202501',
+        ]);
+    }
 }
