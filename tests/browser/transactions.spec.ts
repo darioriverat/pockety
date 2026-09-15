@@ -574,6 +574,50 @@ test('feature 16: users can delete an existing transaction', async ({
     expect(consoleErrors).toEqual([]);
 });
 
+test('feature 93: transaction form validates that amount is a positive number', async ({
+    page,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const comments = `feature-93-amount-${Date.now()}`;
+
+    await openTransactionsPage(page);
+    await openAddTransactionDialog(page);
+
+    await page.getByLabel('Date').fill('2026-01-15');
+    await page.getByLabel('Period (YYYYMM)').fill('202601');
+    await selectOption(page, 'Quincena', 'Q1');
+    await selectOption(page, 'Category', 'C001 - Groceries');
+    await selectOption(page, 'Currency', 'CAD');
+    await page.getByLabel('Amount').fill('-100');
+    await page.getByLabel('Comments').fill(comments);
+
+    await page.getByRole('button', { name: 'Create' }).click();
+
+    const formError = page.getByTestId('transaction-form-error');
+    await expect(formError).toBeVisible();
+    await expect(formError).toContainText(/positive/i);
+    await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
+
+    await page.screenshot({
+        path: 'verification/test-93-amount-positive/01-negative-amount-rejected.png',
+        fullPage: false,
+    });
+
+    await page.getByLabel('Amount').fill('100.50');
+    await submitTransactionForm(page, 'Create');
+
+    await expect(
+        page.locator('[data-slot="card"]').filter({ hasText: comments }),
+    ).toBeVisible();
+
+    await page.screenshot({
+        path: 'verification/test-93-amount-positive/02-positive-amount-accepted.png',
+        fullPage: false,
+    });
+
+    expect(consoleErrors).toEqual([]);
+});
+
 test('feature 83: system validates period format as YYYYMM', async ({
     page,
 }) => {

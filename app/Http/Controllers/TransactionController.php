@@ -120,9 +120,9 @@ class TransactionController extends Controller
                 'quincena' => 'required|in:Q1,Q2',
                 'category_id' => 'required|integer|exists:categories,id',
                 'account_id' => 'nullable|integer|exists:accounts,id',
-                'amount_cad' => 'nullable|numeric|min:0',
-                'amount_usd' => 'nullable|numeric|min:0',
-                'amount_cop' => 'nullable|numeric|min:0',
+                'amount_cad' => 'nullable|numeric|gt:0',
+                'amount_usd' => 'nullable|numeric|gt:0',
+                'amount_cop' => 'nullable|numeric|gt:0',
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
@@ -130,6 +130,9 @@ class TransactionController extends Controller
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
                 'quincena.in' => 'The quincena must be Q1 or Q2.',
+                'amount_cad.gt' => 'Amount must be a positive number.',
+                'amount_usd.gt' => 'Amount must be a positive number.',
+                'amount_cop.gt' => 'Amount must be a positive number.',
             ]);
 
             $transaction = $this->service->create($validated);
@@ -166,9 +169,9 @@ class TransactionController extends Controller
                 'quincena' => 'sometimes|required|in:Q1,Q2',
                 'category_id' => 'sometimes|required|integer|exists:categories,id',
                 'account_id' => 'nullable|integer|exists:accounts,id',
-                'amount_cad' => 'nullable|numeric|min:0',
-                'amount_usd' => 'nullable|numeric|min:0',
-                'amount_cop' => 'nullable|numeric|min:0',
+                'amount_cad' => 'nullable|numeric|gt:0',
+                'amount_usd' => 'nullable|numeric|gt:0',
+                'amount_cop' => 'nullable|numeric|gt:0',
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
@@ -176,6 +179,9 @@ class TransactionController extends Controller
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
                 'quincena.in' => 'The quincena must be Q1 or Q2.',
+                'amount_cad.gt' => 'Amount must be a positive number.',
+                'amount_usd.gt' => 'Amount must be a positive number.',
+                'amount_cop.gt' => 'Amount must be a positive number.',
             ]);
 
             $transaction = $this->service->update($id, $validated);

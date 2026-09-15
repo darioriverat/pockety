@@ -1123,7 +1123,7 @@
       "Step 4: Enter positive amount (e.g., 100.50)",
       "Step 5: Verify form accepts it"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

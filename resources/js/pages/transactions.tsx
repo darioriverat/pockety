@@ -44,6 +44,7 @@ import {
 } from 'lucide-react';
 
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
+const AMOUNT_POSITIVE_ERROR = 'Amount must be a positive number';
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 50;
 
@@ -305,6 +306,12 @@ export default function Transactions() {
             return;
         }
 
+        const amountNum = parseFloat(formData.amount);
+        if (Number.isNaN(amountNum) || amountNum <= 0) {
+            setFormError(AMOUNT_POSITIVE_ERROR);
+            return;
+        }
+
         const payload: Record<string, unknown> = {
             date: formData.date,
             period: formData.period.trim(),
@@ -319,7 +326,6 @@ export default function Transactions() {
         };
 
         // Set the appropriate currency field
-        const amountNum = parseFloat(formData.amount);
         if (formData.currency === 'CAD') {
             payload.amount_cad = amountNum;
             payload.amount_usd = null;
@@ -351,6 +357,14 @@ export default function Transactions() {
                 const periodErrors = errorData.errors?.period;
                 if (Array.isArray(periodErrors) && periodErrors.length > 0) {
                     setFormError(periodErrors[0]);
+                    return;
+                }
+                const amountErrors =
+                    errorData.errors?.amount_cad ||
+                    errorData.errors?.amount_usd ||
+                    errorData.errors?.amount_cop;
+                if (Array.isArray(amountErrors) && amountErrors.length > 0) {
+                    setFormError(amountErrors[0]);
                     return;
                 }
                 const message =
@@ -574,7 +588,7 @@ export default function Transactions() {
                                                 }
                                                 aria-describedby={
                                                     formError
-                                                        ? 'period-error'
+                                                        ? 'transaction-form-error'
                                                         : undefined
                                                 }
                                                 required
@@ -721,11 +735,23 @@ export default function Transactions() {
                                                 type="number"
                                                 step="0.01"
                                                 value={formData.amount}
-                                                onChange={(e) =>
+                                                onChange={(e) => {
+                                                    setFormError(null);
                                                     setFormData({
                                                         ...formData,
                                                         amount: e.target.value,
-                                                    })
+                                                    });
+                                                }}
+                                                aria-invalid={
+                                                    formError !== null &&
+                                                    formError
+                                                        .toLowerCase()
+                                                        .includes('amount')
+                                                }
+                                                aria-describedby={
+                                                    formError
+                                                        ? 'transaction-form-error'
+                                                        : undefined
                                                 }
                                                 required
                                             />
@@ -817,7 +843,7 @@ export default function Transactions() {
                                 </div>
                                 {formError && (
                                     <p
-                                        id="period-error"
+                                        id="transaction-form-error"
                                         className="text-destructive text-sm"
                                         role="alert"
                                         data-testid="transaction-form-error"
