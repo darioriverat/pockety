@@ -17,6 +17,18 @@ type MockPage = {
         summary: {
             period: string;
             total_income_cad: number;
+            total_income_usd: number;
+            total_income_cop: number;
+            total_expenses_usd: number;
+            total_expenses_cop: number;
+            net_usd: number;
+            net_cop: number;
+            total_assets_usd: number;
+            total_assets_cop: number;
+            total_liabilities_usd: number;
+            total_liabilities_cop: number;
+            equity_usd: number;
+            equity_cop: number;
             total_expenses_cad: number;
             net_cad: number;
             total_assets_cad: number;

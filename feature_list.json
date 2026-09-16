@@ -1717,7 +1717,7 @@
       "Step 5: Verify focus states are visible (e.g., blue outline or border highlight)",
       "Step 6: Verify input spacing is consistent"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

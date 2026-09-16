@@ -27,7 +27,7 @@ class DashboardController extends Controller
         }
 
         $user = $request->user();
-        $defaultCurrency = $user?->default_currency ?? 'CAD';
+        $defaultCurrency = $user->default_currency ?? 'CAD';
         if (! in_array($defaultCurrency, ['CAD', 'USD', 'COP'], true)) {
             $defaultCurrency = 'CAD';
         }

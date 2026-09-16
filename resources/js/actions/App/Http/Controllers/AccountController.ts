@@ -339,22 +339,22 @@ store.form = storeForm
 * @see app/Http/Controllers/AccountController.php:123
 * @route '/api/accounts/{id}'
 */
-const updated894e4fc412cb6b91ba023f99ce05822 = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: updated894e4fc412cb6b91ba023f99ce05822.url(args, options),
+export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
-updated894e4fc412cb6b91ba023f99ce05822.definition = {
-    methods: ["put"],
+update.definition = {
+    methods: ["put","patch"],
     url: '/api/accounts/{id}',
-} satisfies RouteDefinition<["put"]>
+} satisfies RouteDefinition<["put","patch"]>
 
 /**
 * @see \App\Http\Controllers\AccountController::update
 * @see app/Http/Controllers/AccountController.php:123
 * @route '/api/accounts/{id}'
 */
-updated894e4fc412cb6b91ba023f99ce05822.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
+update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { id: args }
     }
@@ -371,7 +371,7 @@ updated894e4fc412cb6b91ba023f99ce05822.url = (args: { id: string | number } | [i
         id: args.id,
     }
 
-    return updated894e4fc412cb6b91ba023f99ce05822.definition.url
+    return update.definition.url
             .replace('{id}', parsedArgs.id.toString())
             .replace(/\/+$/, '') + queryParams(options)
 }
@@ -381,8 +381,8 @@ updated894e4fc412cb6b91ba023f99ce05822.url = (args: { id: string | number } | [i
 * @see app/Http/Controllers/AccountController.php:123
 * @route '/api/accounts/{id}'
 */
-updated894e4fc412cb6b91ba023f99ce05822.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: updated894e4fc412cb6b91ba023f99ce05822.url(args, options),
+update.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
@@ -391,8 +391,18 @@ updated894e4fc412cb6b91ba023f99ce05822.put = (args: { id: string | number } | [i
 * @see app/Http/Controllers/AccountController.php:123
 * @route '/api/accounts/{id}'
 */
-const updated894e4fc412cb6b91ba023f99ce05822Form = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updated894e4fc412cb6b91ba023f99ce05822.url(args, {
+update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: update.url(args, options),
+    method: 'patch',
+})
+
+/**
+* @see \App\Http\Controllers\AccountController::update
+* @see app/Http/Controllers/AccountController.php:123
+* @route '/api/accounts/{id}'
+*/
+const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -406,8 +416,8 @@ const updated894e4fc412cb6b91ba023f99ce05822Form = (args: { id: string | number 
 * @see app/Http/Controllers/AccountController.php:123
 * @route '/api/accounts/{id}'
 */
-updated894e4fc412cb6b91ba023f99ce05822Form.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updated894e4fc412cb6b91ba023f99ce05822.url(args, {
+updateForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -416,66 +426,13 @@ updated894e4fc412cb6b91ba023f99ce05822Form.put = (args: { id: string | number } 
     method: 'post',
 })
 
-updated894e4fc412cb6b91ba023f99ce05822.form = updated894e4fc412cb6b91ba023f99ce05822Form
 /**
 * @see \App\Http\Controllers\AccountController::update
 * @see app/Http/Controllers/AccountController.php:123
 * @route '/api/accounts/{id}'
 */
-const updated894e4fc412cb6b91ba023f99ce05822 = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: updated894e4fc412cb6b91ba023f99ce05822.url(args, options),
-    method: 'patch',
-})
-
-updated894e4fc412cb6b91ba023f99ce05822.definition = {
-    methods: ["patch"],
-    url: '/api/accounts/{id}',
-} satisfies RouteDefinition<["patch"]>
-
-/**
-* @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:123
-* @route '/api/accounts/{id}'
-*/
-updated894e4fc412cb6b91ba023f99ce05822.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { id: args }
-    }
-
-    if (Array.isArray(args)) {
-        args = {
-            id: args[0],
-        }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-        id: args.id,
-    }
-
-    return updated894e4fc412cb6b91ba023f99ce05822.definition.url
-            .replace('{id}', parsedArgs.id.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:123
-* @route '/api/accounts/{id}'
-*/
-updated894e4fc412cb6b91ba023f99ce05822.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: updated894e4fc412cb6b91ba023f99ce05822.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:123
-* @route '/api/accounts/{id}'
-*/
-const updated894e4fc412cb6b91ba023f99ce05822Form = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updated894e4fc412cb6b91ba023f99ce05822.url(args, {
+updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -484,32 +441,7 @@ const updated894e4fc412cb6b91ba023f99ce05822Form = (args: { id: string | number 
     method: 'post',
 })
 
-/**
-* @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:123
-* @route '/api/accounts/{id}'
-*/
-updated894e4fc412cb6b91ba023f99ce05822Form.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updated894e4fc412cb6b91ba023f99ce05822.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-updated894e4fc412cb6b91ba023f99ce05822.form = updated894e4fc412cb6b91ba023f99ce05822Form
-
-/**
-* Multiple routes resolve to \App\Http\Controllers\AccountController::update, so this export is a
-* dictionary keyed by URI rather than a callable. Call a specific route with `update['<uri>'](...)`,
-* or import the route by name from your generated `routes/` directory.
-*/
-export const update = {
-    '/api/accounts/{id}': updated894e4fc412cb6b91ba023f99ce05822,
-    '/api/accounts/{id}': updated894e4fc412cb6b91ba023f99ce05822,
-}
+update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\AccountController::destroy

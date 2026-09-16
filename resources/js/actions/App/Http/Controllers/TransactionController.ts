@@ -451,22 +451,22 @@ store.form = storeForm
 * @see app/Http/Controllers/TransactionController.php:184
 * @route '/api/transactions/{id}'
 */
-const updatedd096f5c5ca87c3e8674653cca06fefe = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, options),
+export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
-updatedd096f5c5ca87c3e8674653cca06fefe.definition = {
-    methods: ["put"],
+update.definition = {
+    methods: ["put","patch"],
     url: '/api/transactions/{id}',
-} satisfies RouteDefinition<["put"]>
+} satisfies RouteDefinition<["put","patch"]>
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
 * @see app/Http/Controllers/TransactionController.php:184
 * @route '/api/transactions/{id}'
 */
-updatedd096f5c5ca87c3e8674653cca06fefe.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
+update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { id: args }
     }
@@ -483,7 +483,7 @@ updatedd096f5c5ca87c3e8674653cca06fefe.url = (args: { id: string | number } | [i
         id: args.id,
     }
 
-    return updatedd096f5c5ca87c3e8674653cca06fefe.definition.url
+    return update.definition.url
             .replace('{id}', parsedArgs.id.toString())
             .replace(/\/+$/, '') + queryParams(options)
 }
@@ -493,8 +493,8 @@ updatedd096f5c5ca87c3e8674653cca06fefe.url = (args: { id: string | number } | [i
 * @see app/Http/Controllers/TransactionController.php:184
 * @route '/api/transactions/{id}'
 */
-updatedd096f5c5ca87c3e8674653cca06fefe.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, options),
+update.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
@@ -503,8 +503,18 @@ updatedd096f5c5ca87c3e8674653cca06fefe.put = (args: { id: string | number } | [i
 * @see app/Http/Controllers/TransactionController.php:184
 * @route '/api/transactions/{id}'
 */
-const updatedd096f5c5ca87c3e8674653cca06fefeForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, {
+update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: update.url(args, options),
+    method: 'patch',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionController::update
+* @see app/Http/Controllers/TransactionController.php:184
+* @route '/api/transactions/{id}'
+*/
+const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -518,8 +528,8 @@ const updatedd096f5c5ca87c3e8674653cca06fefeForm = (args: { id: string | number 
 * @see app/Http/Controllers/TransactionController.php:184
 * @route '/api/transactions/{id}'
 */
-updatedd096f5c5ca87c3e8674653cca06fefeForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, {
+updateForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -528,66 +538,13 @@ updatedd096f5c5ca87c3e8674653cca06fefeForm.put = (args: { id: string | number } 
     method: 'post',
 })
 
-updatedd096f5c5ca87c3e8674653cca06fefe.form = updatedd096f5c5ca87c3e8674653cca06fefeForm
 /**
 * @see \App\Http\Controllers\TransactionController::update
 * @see app/Http/Controllers/TransactionController.php:184
 * @route '/api/transactions/{id}'
 */
-const updatedd096f5c5ca87c3e8674653cca06fefe = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, options),
-    method: 'patch',
-})
-
-updatedd096f5c5ca87c3e8674653cca06fefe.definition = {
-    methods: ["patch"],
-    url: '/api/transactions/{id}',
-} satisfies RouteDefinition<["patch"]>
-
-/**
-* @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-updatedd096f5c5ca87c3e8674653cca06fefe.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { id: args }
-    }
-
-    if (Array.isArray(args)) {
-        args = {
-            id: args[0],
-        }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-        id: args.id,
-    }
-
-    return updatedd096f5c5ca87c3e8674653cca06fefe.definition.url
-            .replace('{id}', parsedArgs.id.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-updatedd096f5c5ca87c3e8674653cca06fefe.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-const updatedd096f5c5ca87c3e8674653cca06fefeForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, {
+updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -596,32 +553,7 @@ const updatedd096f5c5ca87c3e8674653cca06fefeForm = (args: { id: string | number 
     method: 'post',
 })
 
-/**
-* @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-updatedd096f5c5ca87c3e8674653cca06fefeForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatedd096f5c5ca87c3e8674653cca06fefe.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-updatedd096f5c5ca87c3e8674653cca06fefe.form = updatedd096f5c5ca87c3e8674653cca06fefeForm
-
-/**
-* Multiple routes resolve to \App\Http\Controllers\TransactionController::update, so this export is a
-* dictionary keyed by URI rather than a callable. Call a specific route with `update['<uri>'](...)`,
-* or import the route by name from your generated `routes/` directory.
-*/
-export const update = {
-    '/api/transactions/{id}': updatedd096f5c5ca87c3e8674653cca06fefe,
-    '/api/transactions/{id}': updatedd096f5c5ca87c3e8674653cca06fefe,
-}
+update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\TransactionController::destroy

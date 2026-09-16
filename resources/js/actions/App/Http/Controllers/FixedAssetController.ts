@@ -240,22 +240,22 @@ store.form = storeForm
 * @see app/Http/Controllers/FixedAssetController.php:117
 * @route '/api/fixed-assets/{id}'
 */
-const updatec5db8a9b23cba531c5f6440aced636c9 = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: updatec5db8a9b23cba531c5f6440aced636c9.url(args, options),
+export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
-updatec5db8a9b23cba531c5f6440aced636c9.definition = {
-    methods: ["put"],
+update.definition = {
+    methods: ["put","patch"],
     url: '/api/fixed-assets/{id}',
-} satisfies RouteDefinition<["put"]>
+} satisfies RouteDefinition<["put","patch"]>
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
 * @see app/Http/Controllers/FixedAssetController.php:117
 * @route '/api/fixed-assets/{id}'
 */
-updatec5db8a9b23cba531c5f6440aced636c9.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
+update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { id: args }
     }
@@ -272,7 +272,7 @@ updatec5db8a9b23cba531c5f6440aced636c9.url = (args: { id: string | number } | [i
         id: args.id,
     }
 
-    return updatec5db8a9b23cba531c5f6440aced636c9.definition.url
+    return update.definition.url
             .replace('{id}', parsedArgs.id.toString())
             .replace(/\/+$/, '') + queryParams(options)
 }
@@ -282,8 +282,8 @@ updatec5db8a9b23cba531c5f6440aced636c9.url = (args: { id: string | number } | [i
 * @see app/Http/Controllers/FixedAssetController.php:117
 * @route '/api/fixed-assets/{id}'
 */
-updatec5db8a9b23cba531c5f6440aced636c9.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: updatec5db8a9b23cba531c5f6440aced636c9.url(args, options),
+update.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
@@ -292,8 +292,18 @@ updatec5db8a9b23cba531c5f6440aced636c9.put = (args: { id: string | number } | [i
 * @see app/Http/Controllers/FixedAssetController.php:117
 * @route '/api/fixed-assets/{id}'
 */
-const updatec5db8a9b23cba531c5f6440aced636c9Form = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatec5db8a9b23cba531c5f6440aced636c9.url(args, {
+update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: update.url(args, options),
+    method: 'patch',
+})
+
+/**
+* @see \App\Http\Controllers\FixedAssetController::update
+* @see app/Http/Controllers/FixedAssetController.php:117
+* @route '/api/fixed-assets/{id}'
+*/
+const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -307,8 +317,8 @@ const updatec5db8a9b23cba531c5f6440aced636c9Form = (args: { id: string | number 
 * @see app/Http/Controllers/FixedAssetController.php:117
 * @route '/api/fixed-assets/{id}'
 */
-updatec5db8a9b23cba531c5f6440aced636c9Form.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatec5db8a9b23cba531c5f6440aced636c9.url(args, {
+updateForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -317,66 +327,13 @@ updatec5db8a9b23cba531c5f6440aced636c9Form.put = (args: { id: string | number } 
     method: 'post',
 })
 
-updatec5db8a9b23cba531c5f6440aced636c9.form = updatec5db8a9b23cba531c5f6440aced636c9Form
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
 * @see app/Http/Controllers/FixedAssetController.php:117
 * @route '/api/fixed-assets/{id}'
 */
-const updatec5db8a9b23cba531c5f6440aced636c9 = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: updatec5db8a9b23cba531c5f6440aced636c9.url(args, options),
-    method: 'patch',
-})
-
-updatec5db8a9b23cba531c5f6440aced636c9.definition = {
-    methods: ["patch"],
-    url: '/api/fixed-assets/{id}',
-} satisfies RouteDefinition<["patch"]>
-
-/**
-* @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
-* @route '/api/fixed-assets/{id}'
-*/
-updatec5db8a9b23cba531c5f6440aced636c9.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { id: args }
-    }
-
-    if (Array.isArray(args)) {
-        args = {
-            id: args[0],
-        }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-        id: args.id,
-    }
-
-    return updatec5db8a9b23cba531c5f6440aced636c9.definition.url
-            .replace('{id}', parsedArgs.id.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
-* @route '/api/fixed-assets/{id}'
-*/
-updatec5db8a9b23cba531c5f6440aced636c9.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: updatec5db8a9b23cba531c5f6440aced636c9.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
-* @route '/api/fixed-assets/{id}'
-*/
-const updatec5db8a9b23cba531c5f6440aced636c9Form = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatec5db8a9b23cba531c5f6440aced636c9.url(args, {
+updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -385,32 +342,7 @@ const updatec5db8a9b23cba531c5f6440aced636c9Form = (args: { id: string | number 
     method: 'post',
 })
 
-/**
-* @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
-* @route '/api/fixed-assets/{id}'
-*/
-updatec5db8a9b23cba531c5f6440aced636c9Form.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: updatec5db8a9b23cba531c5f6440aced636c9.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-updatec5db8a9b23cba531c5f6440aced636c9.form = updatec5db8a9b23cba531c5f6440aced636c9Form
-
-/**
-* Multiple routes resolve to \App\Http\Controllers\FixedAssetController::update, so this export is a
-* dictionary keyed by URI rather than a callable. Call a specific route with `update['<uri>'](...)`,
-* or import the route by name from your generated `routes/` directory.
-*/
-export const update = {
-    '/api/fixed-assets/{id}': updatec5db8a9b23cba531c5f6440aced636c9,
-    '/api/fixed-assets/{id}': updatec5db8a9b23cba531c5f6440aced636c9,
-}
+update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::destroy

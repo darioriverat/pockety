@@ -457,9 +457,9 @@ export const update = (args: { id: string | number } | [id: string | number ] | 
 })
 
 update.definition = {
-    methods: ["put"],
+    methods: ["put","patch"],
     url: '/api/transactions/{id}',
-} satisfies RouteDefinition<["put"]>
+} satisfies RouteDefinition<["put","patch"]>
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
@@ -503,6 +503,16 @@ update.put = (args: { id: string | number } | [id: string | number ] | string | 
 * @see app/Http/Controllers/TransactionController.php:184
 * @route '/api/transactions/{id}'
 */
+update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: update.url(args, options),
+    method: 'patch',
+})
+
+/**
+* @see \App\Http\Controllers\TransactionController::update
+* @see app/Http/Controllers/TransactionController.php:184
+* @route '/api/transactions/{id}'
+*/
 const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
@@ -528,91 +538,22 @@ updateForm.put = (args: { id: string | number } | [id: string | number ] | strin
     method: 'post',
 })
 
+/**
+* @see \App\Http\Controllers\TransactionController::update
+* @see app/Http/Controllers/TransactionController.php:184
+* @route '/api/transactions/{id}'
+*/
+updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PATCH',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
 update.form = updateForm
-
-/**
-* @see \App\Http\Controllers\TransactionController::patch
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-export const patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: patch.url(args, options),
-    method: 'patch',
-})
-
-patch.definition = {
-    methods: ["patch"],
-    url: '/api/transactions/{id}',
-} satisfies RouteDefinition<["patch"]>
-
-/**
-* @see \App\Http\Controllers\TransactionController::patch
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-patch.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { id: args }
-    }
-
-    if (Array.isArray(args)) {
-        args = {
-            id: args[0],
-        }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-        id: args.id,
-    }
-
-    return patch.definition.url
-            .replace('{id}', parsedArgs.id.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\TransactionController::patch
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-patch.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: patch.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\TransactionController::patch
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-const patchForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: patch.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-/**
-* @see \App\Http\Controllers\TransactionController::patch
-* @see app/Http/Controllers/TransactionController.php:184
-* @route '/api/transactions/{id}'
-*/
-patchForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: patch.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-patch.form = patchForm
 
 /**
 * @see \App\Http\Controllers\TransactionController::destroy

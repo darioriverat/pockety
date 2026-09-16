@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class TransactionCrudTest extends TestCase
@@ -73,7 +74,9 @@ class TransactionCrudTest extends TestCase
             ->assertJsonPath('data.period', '202609');
     }
 
-    public function test_put_updates_transaction(): void
+    #[TestWith(['PUT'])]
+    #[TestWith(['PATCH'])]
+    public function test_update_verbs_persist_transaction_changes(string $method): void
     {
         $created = $this->postJson('/api/transactions', [
             'date' => '2026-09-15',
@@ -84,7 +87,7 @@ class TransactionCrudTest extends TestCase
             'comments' => 'crud-before',
         ])->json('data');
 
-        $response = $this->putJson('/api/transactions/'.$created['id'], [
+        $response = $this->json($method, '/api/transactions/'.$created['id'], [
             'date' => '2026-09-16',
             'period' => '202609',
             'quincena' => 'Q2',

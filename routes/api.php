@@ -42,8 +42,7 @@ Route::get('/accounts/import/statistics', [AccountImportController::class, 'stat
 Route::get('/accounts/{id}', [AccountController::class, 'show'])->name('accounts.show')->whereNumber('id');
 Route::get('/accounts/{id}/transactions', [AccountController::class, 'transactions'])->name('accounts.transactions')->whereNumber('id');
 Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
-Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update')->whereNumber('id');
-Route::patch('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.patch')->whereNumber('id');
+Route::match(['put', 'patch'], '/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update')->whereNumber('id');
 Route::delete('/accounts/{id}', [AccountController::class, 'destroy'])->name('accounts.destroy')->whereNumber('id');
 
 // Account Balances API
@@ -56,8 +55,7 @@ Route::delete('/accounts/{accountId}/balances/{id}', [AccountBalanceController::
 Route::get('/fixed-assets', [FixedAssetController::class, 'index'])->name('fixed-assets.index');
 Route::get('/fixed-assets/{id}', [FixedAssetController::class, 'show'])->name('fixed-assets.show')->whereNumber('id');
 Route::post('/fixed-assets', [FixedAssetController::class, 'store'])->name('fixed-assets.store');
-Route::put('/fixed-assets/{id}', [FixedAssetController::class, 'update'])->name('fixed-assets.update')->whereNumber('id');
-Route::patch('/fixed-assets/{id}', [FixedAssetController::class, 'update'])->name('fixed-assets.patch')->whereNumber('id');
+Route::match(['put', 'patch'], '/fixed-assets/{id}', [FixedAssetController::class, 'update'])->name('fixed-assets.update')->whereNumber('id');
 Route::delete('/fixed-assets/{id}', [FixedAssetController::class, 'destroy'])->name('fixed-assets.destroy')->whereNumber('id');
 Route::get('/fixed-assets/{id}/valuations', [FixedAssetController::class, 'valuations'])->name('fixed-assets.valuations')->whereNumber('id');
 Route::post('/fixed-assets/{id}/valuations', [FixedAssetController::class, 'storeValuation'])->name('fixed-assets.valuations.store')->whereNumber('id');
@@ -75,16 +73,14 @@ Route::post('/transactions/bulk', [TransactionController::class, 'bulkUpdate'])-
 Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
 Route::post('/transactions/{id}/duplicate', [TransactionController::class, 'duplicate'])->name('transactions.duplicate')->whereNumber('id');
 Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
-Route::put('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
-Route::patch('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.patch');
+Route::match(['put', 'patch'], '/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
 Route::delete('/transactions/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
 
 // Income API
 Route::get('/income', [IncomeController::class, 'index'])->name('income.index');
 Route::get('/income/{id}', [IncomeController::class, 'show'])->name('income.show');
 Route::post('/income', [IncomeController::class, 'store'])->name('income.store');
-Route::put('/income/{id}', [IncomeController::class, 'update'])->name('income.update');
-Route::patch('/income/{id}', [IncomeController::class, 'update'])->name('income.patch');
+Route::match(['put', 'patch'], '/income/{id}', [IncomeController::class, 'update'])->name('income.update');
 Route::delete('/income/{id}', [IncomeController::class, 'destroy'])->name('income.destroy');
 
 // Periods history / comparison APIs (must be registered before /periods/{period}/...)

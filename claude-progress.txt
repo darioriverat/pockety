@@ -5091,3 +5091,51 @@ NEXT SESSION:
 - Then button hierarchy, table styles
 
 STATUS: App healthy; dashboard card polish verified with screenshots
+
+=== Session 75 (2026-09-16) ===
+
+GOAL: Complete form labels, spacing, and focus states (feature index 143).
+
+ORIENTATION / ENVIRONMENT:
+- Started at 143/175 passing; 32 pending.
+- Read specification, feature list, recent progress, and git history.
+- Puppeteer navigation and screenshots work in this session.
+- init.sh initially hit sandbox Docker socket denial; elevated execution succeeded.
+- Existing web_app container serves http://dev.pockety.com:8080/.
+- Run Docker commands through task tests; builds via docker exec in /var/www/vhosts.
+
+REGRESSIONS FOUND AND FIXED FIRST:
+- Seven PHPStan errors: dashboard dynamic array keys, nullsafe access, sorting PHPDoc.
+- Authentication throttle test failed because testing used local's 60-attempt limit.
+- Testing now exercises the normal five-attempt limit; local retains 60.
+- Dashboard header period disagreed with displayed summary; temporarily marked index 78 false.
+- Header now displays the dashboard's actual period and reloads its data on selection.
+- TypeScript exposed old currency payload/fixture types and inferred validation-map errors.
+- Separate PUT/PATCH declarations generated duplicate action keys in Wayfinder.
+- Combined each update route's verbs; regenerated helpers. HTTP URLs/verbs preserved.
+- Internal unused *.patch route names are replaced by update.patch helpers.
+
+FORM FEATURE:
+- Align paired fields at the top with consistent 16px column gaps.
+- Use full-width select triggers and consistent label-to-control spacing.
+- Bound dialog height to the viewport and enable internal scrolling on small screens.
+- Retain and verify focus rings on text, select, checkbox, and conditional debt controls.
+- Added accessible-label component test and Playwright presentation/regression tests.
+
+VERIFICATION:
+- Final checks: 256 backend tests / 1475 assertions; 102 frontend tests passed.
+- Expanded transaction update regression to exercise both PUT and PATCH persistence.
+- PHP lint and PHPStan passed; npm run types:check passed; production build passed.
+- Existing required-field browser smoke: 1/1 passed, without reseeding/resetting data.
+- New form-presentation browser spec: 3/3 passed, zero console/page errors.
+- Verified light/dark desktop, 375x667 mobile, keyboard scrolling, and debt field.
+- Screenshots: verification/test-143-form-presentation/ and verification/session-75/.
+- Resize tests wait for transitions; screenshots disable animations for settled evidence.
+- A request during build briefly saw a missing Vite manifest; retry after build returned 200.
+
+STATUS / NEXT:
+- Index 78 restored to passing after dashboard UI verification.
+- Index 143 (144th feature) marked passing; only passes fields changed.
+- Completion: 144/175 passing, 31 pending.
+- Next: index 144, consistent primary/secondary button styles.
+- Development data preserved; no database resets or imports were needed.

@@ -246,9 +246,9 @@ export const update = (args: { id: string | number } | [id: string | number ] | 
 })
 
 update.definition = {
-    methods: ["put"],
+    methods: ["put","patch"],
     url: '/api/income/{id}',
-} satisfies RouteDefinition<["put"]>
+} satisfies RouteDefinition<["put","patch"]>
 
 /**
 * @see \App\Http\Controllers\IncomeController::update
@@ -292,6 +292,16 @@ update.put = (args: { id: string | number } | [id: string | number ] | string | 
 * @see app/Http/Controllers/IncomeController.php:117
 * @route '/api/income/{id}'
 */
+update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: update.url(args, options),
+    method: 'patch',
+})
+
+/**
+* @see \App\Http\Controllers\IncomeController::update
+* @see app/Http/Controllers/IncomeController.php:117
+* @route '/api/income/{id}'
+*/
 const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
@@ -317,91 +327,22 @@ updateForm.put = (args: { id: string | number } | [id: string | number ] | strin
     method: 'post',
 })
 
+/**
+* @see \App\Http\Controllers\IncomeController::update
+* @see app/Http/Controllers/IncomeController.php:117
+* @route '/api/income/{id}'
+*/
+updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PATCH',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
 update.form = updateForm
-
-/**
-* @see \App\Http\Controllers\IncomeController::patch
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-export const patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: patch.url(args, options),
-    method: 'patch',
-})
-
-patch.definition = {
-    methods: ["patch"],
-    url: '/api/income/{id}',
-} satisfies RouteDefinition<["patch"]>
-
-/**
-* @see \App\Http\Controllers\IncomeController::patch
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-patch.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { id: args }
-    }
-
-    if (Array.isArray(args)) {
-        args = {
-            id: args[0],
-        }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-        id: args.id,
-    }
-
-    return patch.definition.url
-            .replace('{id}', parsedArgs.id.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\IncomeController::patch
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-patch.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: patch.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\IncomeController::patch
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-const patchForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: patch.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-/**
-* @see \App\Http\Controllers\IncomeController::patch
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-patchForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: patch.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-patch.form = patchForm
 
 /**
 * @see \App\Http\Controllers\IncomeController::destroy

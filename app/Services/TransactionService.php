@@ -94,7 +94,7 @@ class TransactionService implements TransactionServiceInterface
      * Apply sort_by / sort_dir from filters onto the query.
      *
      * @param  Builder<Transaction>  $query
-     * @param  array{sort_by?: string, sort_dir?: string}  $filters
+     * @param  array{sort_by?: mixed, sort_dir?: mixed}  $filters
      */
     private function applySorting(Builder $query, array $filters): void
     {

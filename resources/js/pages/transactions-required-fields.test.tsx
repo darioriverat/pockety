@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import Transactions from './transactions';
 
 // Mock Inertia
@@ -84,6 +84,22 @@ describe('Transactions - Required Field Validation', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(mockFetch);
+    });
+
+    it('gives every transaction control a visible associated label', async () => {
+        render(<Transactions />);
+        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        const dialog = await screen.findByTestId('transaction-form-dialog');
+        for (const name of [
+            'Date (YYYY-MM-DD)', 'Period (YYYYMM)', 'Quincena', 'Category',
+            'Account', 'Currency', 'Amount', 'Comments', 'Recurring transaction',
+        ]) {
+            const control = within(dialog).getByLabelText(name, { exact: true });
+            expect(control).toHaveAccessibleName(name);
+            expect(dialog.querySelector(`label[for="${control.id}"]`)).toBeVisible();
+        }
+        fireEvent.click(within(dialog).getByText('Recurring transaction'));
+        expect(within(dialog).getByRole('checkbox')).toBeChecked();
     });
 
     it('displays error when date field is empty on submit', async () => {

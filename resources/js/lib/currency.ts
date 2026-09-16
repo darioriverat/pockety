@@ -21,12 +21,13 @@ export function formatDisplayCurrency(
     }).format(amount);
 }
 
-export function amountForCurrency(
-    row: Record<string, number | null | undefined>,
-    prefix: string,
+export function amountForCurrency<Prefix extends string>(
+    row: Partial<Record<`${Prefix}_${Lowercase<DisplayCurrency>}`, number | null>>,
+    prefix: Prefix,
     currency: DisplayCurrency,
 ): number {
-    const specificKey = `${prefix}_${currency.toLowerCase()}`;
+    const specificKey =
+        `${prefix}_${currency.toLowerCase()}` as `${Prefix}_${Lowercase<DisplayCurrency>}`;
     const specific = row[specificKey];
 
     if (typeof specific === 'number') {
@@ -34,7 +35,7 @@ export function amountForCurrency(
     }
 
     // Fall back to CAD when a currency-specific amount is absent (partial payloads / tests)
-    const cad = row[`${prefix}_cad`];
+    const cad = row[`${prefix}_cad` as `${Prefix}_cad`];
 
     return typeof cad === 'number' ? cad : 0;
 }

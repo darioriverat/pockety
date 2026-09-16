@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { GlobalSearch } from '@/components/global-search';
@@ -12,7 +12,11 @@ export function AppSidebarHeader({
 }: {
     breadcrumbs?: BreadcrumbItemType[];
 }) {
-    const { name } = usePage().props;
+    const page = usePage();
+    const { name } = page.props;
+    const summary = page.props.summary as { period?: string } | undefined;
+    const dashboardPeriod =
+        page.component === 'dashboard' ? summary?.period : undefined;
     const brandName = name && name !== 'Laravel' ? name : 'Pockety';
 
     return (
@@ -51,6 +55,18 @@ export function AppSidebarHeader({
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
                 <GlobalSearch className="px-2 sm:px-3" />
                 <PeriodSelector
+                    value={dashboardPeriod}
+                    onValueChange={
+                        dashboardPeriod
+                            ? (period) => {
+                                  router.get(
+                                      '/dashboard',
+                                      { period },
+                                      { preserveScroll: true },
+                                  );
+                              }
+                            : undefined
+                    }
                     id="global-period"
                     showLabel={false}
                     testId="period-selector"

@@ -104,7 +104,7 @@ class FortifyServiceProvider extends ServiceProvider
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
             // Local/browser suites log in many times; keep production throttle tight.
-            if (app()->environment(['local', 'testing'])) {
+            if (app()->environment('local')) {
                 return Limit::perMinute(60)->by($throttleKey);
             }
 

@@ -11,6 +11,8 @@ import { formatPeriod, generatePeriods } from '@/lib/periods';
 import { cn } from '@/lib/utils';
 
 type PeriodSelectorProps = {
+    value?: string;
+    onValueChange?: (period: string) => void;
     id?: string;
     label?: string;
     className?: string;
@@ -19,6 +21,8 @@ type PeriodSelectorProps = {
 };
 
 export function PeriodSelector({
+    value,
+    onValueChange,
     id = 'period',
     label = 'Period',
     className,
@@ -31,8 +35,14 @@ export function PeriodSelector({
     return (
         <div className={cn('w-full max-w-xs space-y-2', className)}>
             {showLabel ? <Label htmlFor={id}>{label}</Label> : null}
-            <Select value={period} onValueChange={setPeriod}>
-                <SelectTrigger id={id} data-testid={testId}>
+            <Select
+                value={value ?? period}
+                onValueChange={(next) => {
+                    setPeriod(next);
+                    onValueChange?.(next);
+                }}
+            >
+                <SelectTrigger id={id} data-testid={testId} aria-label={label}>
                     <SelectValue placeholder="Select period" />
                 </SelectTrigger>
                 <SelectContent>

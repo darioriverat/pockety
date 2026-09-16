@@ -240,22 +240,22 @@ store.form = storeForm
 * @see app/Http/Controllers/IncomeController.php:117
 * @route '/api/income/{id}'
 */
-const update43b96a1523f720a03e7b37f5e2c608bd = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: update43b96a1523f720a03e7b37f5e2c608bd.url(args, options),
+export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
-update43b96a1523f720a03e7b37f5e2c608bd.definition = {
-    methods: ["put"],
+update.definition = {
+    methods: ["put","patch"],
     url: '/api/income/{id}',
-} satisfies RouteDefinition<["put"]>
+} satisfies RouteDefinition<["put","patch"]>
 
 /**
 * @see \App\Http\Controllers\IncomeController::update
 * @see app/Http/Controllers/IncomeController.php:117
 * @route '/api/income/{id}'
 */
-update43b96a1523f720a03e7b37f5e2c608bd.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
+update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { id: args }
     }
@@ -272,7 +272,7 @@ update43b96a1523f720a03e7b37f5e2c608bd.url = (args: { id: string | number } | [i
         id: args.id,
     }
 
-    return update43b96a1523f720a03e7b37f5e2c608bd.definition.url
+    return update.definition.url
             .replace('{id}', parsedArgs.id.toString())
             .replace(/\/+$/, '') + queryParams(options)
 }
@@ -282,8 +282,8 @@ update43b96a1523f720a03e7b37f5e2c608bd.url = (args: { id: string | number } | [i
 * @see app/Http/Controllers/IncomeController.php:117
 * @route '/api/income/{id}'
 */
-update43b96a1523f720a03e7b37f5e2c608bd.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
-    url: update43b96a1523f720a03e7b37f5e2c608bd.url(args, options),
+update.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
     method: 'put',
 })
 
@@ -292,8 +292,18 @@ update43b96a1523f720a03e7b37f5e2c608bd.put = (args: { id: string | number } | [i
 * @see app/Http/Controllers/IncomeController.php:117
 * @route '/api/income/{id}'
 */
-const update43b96a1523f720a03e7b37f5e2c608bdForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update43b96a1523f720a03e7b37f5e2c608bd.url(args, {
+update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: update.url(args, options),
+    method: 'patch',
+})
+
+/**
+* @see \App\Http\Controllers\IncomeController::update
+* @see app/Http/Controllers/IncomeController.php:117
+* @route '/api/income/{id}'
+*/
+const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -307,8 +317,8 @@ const update43b96a1523f720a03e7b37f5e2c608bdForm = (args: { id: string | number 
 * @see app/Http/Controllers/IncomeController.php:117
 * @route '/api/income/{id}'
 */
-update43b96a1523f720a03e7b37f5e2c608bdForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update43b96a1523f720a03e7b37f5e2c608bd.url(args, {
+updateForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -317,66 +327,13 @@ update43b96a1523f720a03e7b37f5e2c608bdForm.put = (args: { id: string | number } 
     method: 'post',
 })
 
-update43b96a1523f720a03e7b37f5e2c608bd.form = update43b96a1523f720a03e7b37f5e2c608bdForm
 /**
 * @see \App\Http\Controllers\IncomeController::update
 * @see app/Http/Controllers/IncomeController.php:117
 * @route '/api/income/{id}'
 */
-const update43b96a1523f720a03e7b37f5e2c608bd = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: update43b96a1523f720a03e7b37f5e2c608bd.url(args, options),
-    method: 'patch',
-})
-
-update43b96a1523f720a03e7b37f5e2c608bd.definition = {
-    methods: ["patch"],
-    url: '/api/income/{id}',
-} satisfies RouteDefinition<["patch"]>
-
-/**
-* @see \App\Http\Controllers\IncomeController::update
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-update43b96a1523f720a03e7b37f5e2c608bd.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { id: args }
-    }
-
-    if (Array.isArray(args)) {
-        args = {
-            id: args[0],
-        }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-        id: args.id,
-    }
-
-    return update43b96a1523f720a03e7b37f5e2c608bd.definition.url
-            .replace('{id}', parsedArgs.id.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\IncomeController::update
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-update43b96a1523f720a03e7b37f5e2c608bd.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: update43b96a1523f720a03e7b37f5e2c608bd.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\IncomeController::update
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-const update43b96a1523f720a03e7b37f5e2c608bdForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update43b96a1523f720a03e7b37f5e2c608bd.url(args, {
+updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -385,32 +342,7 @@ const update43b96a1523f720a03e7b37f5e2c608bdForm = (args: { id: string | number 
     method: 'post',
 })
 
-/**
-* @see \App\Http\Controllers\IncomeController::update
-* @see app/Http/Controllers/IncomeController.php:117
-* @route '/api/income/{id}'
-*/
-update43b96a1523f720a03e7b37f5e2c608bdForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update43b96a1523f720a03e7b37f5e2c608bd.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
-update43b96a1523f720a03e7b37f5e2c608bd.form = update43b96a1523f720a03e7b37f5e2c608bdForm
-
-/**
-* Multiple routes resolve to \App\Http\Controllers\IncomeController::update, so this export is a
-* dictionary keyed by URI rather than a callable. Call a specific route with `update['<uri>'](...)`,
-* or import the route by name from your generated `routes/` directory.
-*/
-export const update = {
-    '/api/income/{id}': update43b96a1523f720a03e7b37f5e2c608bd,
-    '/api/income/{id}': update43b96a1523f720a03e7b37f5e2c608bd,
-}
+update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\IncomeController::destroy

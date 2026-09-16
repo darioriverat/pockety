@@ -61,12 +61,24 @@ class DashboardService
 
         return [
             'period' => $period,
-            ...$this->cadEquivalents('total_income', $totalIncome, $exchangeRate),
-            ...$this->cadEquivalents('total_expenses', $totalExpenses, $exchangeRate),
-            ...$this->cadEquivalents('net', $net, $exchangeRate),
-            ...$this->cadEquivalents('total_assets', $totalAssets, $exchangeRate),
-            ...$this->cadEquivalents('total_liabilities', $totalLiabilities, $exchangeRate),
-            ...$this->cadEquivalents('equity', $equity, $exchangeRate),
+            'total_income_cad' => round($totalIncome, 2),
+            'total_income_usd' => $exchangeRate->cadToUsd($totalIncome),
+            'total_income_cop' => $exchangeRate->cadToCop($totalIncome),
+            'total_expenses_cad' => round($totalExpenses, 2),
+            'total_expenses_usd' => $exchangeRate->cadToUsd($totalExpenses),
+            'total_expenses_cop' => $exchangeRate->cadToCop($totalExpenses),
+            'net_cad' => round($net, 2),
+            'net_usd' => $exchangeRate->cadToUsd($net),
+            'net_cop' => $exchangeRate->cadToCop($net),
+            'total_assets_cad' => round($totalAssets, 2),
+            'total_assets_usd' => $exchangeRate->cadToUsd($totalAssets),
+            'total_assets_cop' => $exchangeRate->cadToCop($totalAssets),
+            'total_liabilities_cad' => round($totalLiabilities, 2),
+            'total_liabilities_usd' => $exchangeRate->cadToUsd($totalLiabilities),
+            'total_liabilities_cop' => $exchangeRate->cadToCop($totalLiabilities),
+            'equity_cad' => round($equity, 2),
+            'equity_usd' => $exchangeRate->cadToUsd($equity),
+            'equity_cop' => $exchangeRate->cadToCop($equity),
             'exchange_rates' => [
                 'usd_cop' => (float) $exchangeRate->usd_cop,
                 'usd_cad' => (float) $exchangeRate->usd_cad,
@@ -103,8 +115,12 @@ class DashboardService
 
             $periodRows[] = [
                 'period' => $period,
-                ...$this->cadEquivalents('income', $income, $exchangeRate),
-                ...$this->cadEquivalents('expenses', $expenses, $exchangeRate),
+                'income_cad' => round($income, 2),
+                'income_usd' => $exchangeRate->cadToUsd($income),
+                'income_cop' => $exchangeRate->cadToCop($income),
+                'expenses_cad' => round($expenses, 2),
+                'expenses_usd' => $exchangeRate->cadToUsd($expenses),
+                'expenses_cop' => $exchangeRate->cadToCop($expenses),
             ];
         }
 
@@ -152,9 +168,15 @@ class DashboardService
 
             $periodRows[] = [
                 'period' => $period,
-                ...$this->cadEquivalents('assets', $assets, $exchangeRate),
-                ...$this->cadEquivalents('liabilities', $liabilities, $exchangeRate),
-                ...$this->cadEquivalents('equity', $equity, $exchangeRate),
+                'assets_cad' => round($assets, 2),
+                'assets_usd' => $exchangeRate->cadToUsd($assets),
+                'assets_cop' => $exchangeRate->cadToCop($assets),
+                'liabilities_cad' => round($liabilities, 2),
+                'liabilities_usd' => $exchangeRate->cadToUsd($liabilities),
+                'liabilities_cop' => $exchangeRate->cadToCop($liabilities),
+                'equity_cad' => round($equity, 2),
+                'equity_usd' => $exchangeRate->cadToUsd($equity),
+                'equity_cop' => $exchangeRate->cadToCop($equity),
             ];
         }
 
@@ -182,22 +204,6 @@ class DashboardService
         }
 
         return $exchangeRate;
-    }
-
-    /**
-     * Expand a CAD amount into CAD/USD/COP keys for API payloads.
-     *
-     * @return array{string: float}
-     */
-    private function cadEquivalents(string $prefix, float $cadAmount, ExchangeRate $exchangeRate): array
-    {
-        $cad = round($cadAmount, 2);
-
-        return [
-            "{$prefix}_cad" => $cad,
-            "{$prefix}_usd" => $exchangeRate->cadToUsd($cadAmount),
-            "{$prefix}_cop" => $exchangeRate->cadToCop($cadAmount),
-        ];
     }
 
     /**

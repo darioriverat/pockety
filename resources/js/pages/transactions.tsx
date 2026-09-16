@@ -713,7 +713,7 @@ export default function Transactions() {
         setFormError(null);
         const derivedPeriod = periodFromDate(date);
         setFieldErrors((prev) => {
-            const next = { ...prev, date: '' };
+            const next: Record<string, string> = { ...prev, date: '' };
             if (derivedPeriod) {
                 next.period = '';
             }
@@ -942,7 +942,7 @@ export default function Transactions() {
                                 </Button>
                             </DialogTrigger>
                         <DialogContent
-                            className="max-w-md"
+                            className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md"
                             data-testid="transaction-form-dialog"
                         >
                             <form onSubmit={handleSubmit} noValidate>
@@ -961,7 +961,7 @@ export default function Transactions() {
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
-                                    <div className="grid gap-2">
+                                    <div className="grid content-start gap-2">
                                         <Label htmlFor="date">
                                             Date (YYYY-MM-DD)
                                         </Label>
@@ -994,8 +994,8 @@ export default function Transactions() {
                                             </p>
                                         )}
                                     </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="grid gap-2">
+                                    <div className="grid grid-cols-2 items-start gap-4">
+                                        <div className="grid content-start gap-2">
                                             <Label htmlFor="period">
                                                 Period (YYYYMM)
                                             </Label>
@@ -1038,7 +1038,7 @@ export default function Transactions() {
                                                 Auto-filled from date
                                             </p>
                                         </div>
-                                        <div className="grid gap-2">
+                                        <div className="grid content-start gap-2">
                                             <Label htmlFor="quincena">
                                                 Quincena
                                             </Label>
@@ -1054,6 +1054,7 @@ export default function Transactions() {
                                                 }
                                             >
                                                 <SelectTrigger
+                                                    className="w-full"
                                                     id="quincena"
                                                     aria-label="Quincena"
                                                 >
@@ -1070,7 +1071,7 @@ export default function Transactions() {
                                             </Select>
                                         </div>
                                     </div>
-                                    <div className="grid gap-2">
+                                    <div className="grid content-start gap-2">
                                         <Label htmlFor="category">
                                             Category
                                         </Label>
@@ -1085,6 +1086,7 @@ export default function Transactions() {
                                             }}
                                         >
                                             <SelectTrigger
+                                                className="w-full"
                                                 id="category"
                                                 aria-label="Category"
                                                 aria-invalid={!!fieldErrors.category_id}
@@ -1119,7 +1121,7 @@ export default function Transactions() {
                                             </p>
                                         )}
                                     </div>
-                                    <div className="grid gap-2">
+                                    <div className="grid content-start gap-2">
                                         <Label htmlFor="account">
                                             Account
                                         </Label>
@@ -1133,6 +1135,7 @@ export default function Transactions() {
                                             }
                                         >
                                             <SelectTrigger
+                                                className="w-full"
                                                 id="account"
                                                 aria-label="Account"
                                                 data-testid="account-field"
@@ -1151,8 +1154,8 @@ export default function Transactions() {
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="grid gap-2">
+                                    <div className="grid grid-cols-2 items-start gap-4">
+                                        <div className="grid content-start gap-2">
                                             <Label htmlFor="currency">
                                                 Currency
                                             </Label>
@@ -1169,6 +1172,7 @@ export default function Transactions() {
                                                 }
                                             >
                                                 <SelectTrigger
+                                                    className="w-full"
                                                     id="currency"
                                                     aria-label="Currency"
                                                 >
@@ -1187,7 +1191,7 @@ export default function Transactions() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="grid gap-2">
+                                        <div className="grid content-start gap-2">
                                             <Label htmlFor="amount">
                                                 Amount
                                             </Label>
@@ -1225,7 +1229,7 @@ export default function Transactions() {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="grid gap-2">
+                                    <div className="grid content-start gap-2">
                                         <Label htmlFor="comments">
                                             Comments
                                         </Label>
@@ -1265,7 +1269,7 @@ export default function Transactions() {
                                                 c.id.toString() ===
                                                 formData.category_id
                                         )?.is_debt_category && (
-                                            <div className="grid gap-2">
+                                            <div className="grid content-start gap-2">
                                                 <Label htmlFor="debt_component">
                                                     Debt Component
                                                 </Label>
@@ -1289,6 +1293,7 @@ export default function Transactions() {
                                                     }
                                                 >
                                                     <SelectTrigger
+                                                        className="w-full"
                                                         id="debt_component"
                                                         aria-label="Debt Component"
                                                     >
