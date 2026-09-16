@@ -1,10 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Transactions from './transactions';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 
 // Mock Inertia
 vi.mock('@inertiajs/react', () => ({
+    usePage: () => ({ props: { auth: { user: { currency: 'CAD' } } } }),
     Head: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
     Link: ({
         children,

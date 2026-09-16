@@ -5371,3 +5371,41 @@ NEXT SESSION MUST:
 5. ONLY THEN mark test #150 (index 150) as passing in feature_list.json
 
 STATUS: 150/175 passing (unchanged - verification required before update)
+
+=== Session 83 (2026-09-16) ===
+
+GOAL: Finish feature index 150, red error messages with clear icons.
+
+ENVIRONMENT:
+- Puppeteer navigation, login, clicks, fill, and screenshots worked this session.
+- Docker socket needs sandbox escalation; approved execution succeeded.
+- Ran ./init.sh successfully; migrations current and frontend assets rebuilt.
+- Application remains running at http://dev.pockety.com:8080/.
+
+BASELINE / ISSUES FIXED:
+- Backend: 256 tests passed, 1475 assertions.
+- Composer formatting check: 188 files passed; PHPStan: no errors.
+- Existing table-styles light browser regression passed (one sampled case).
+- Previous error-message unit suite failed to load: expect was undefined.
+- Fixed Vitest matcher import and missing Inertia usePage mock.
+- Manual Puppeteer inspection found dark-mode error text too dim.
+- Increased dark-mode error text brightness in transactions, accounts,
+  income, and reconciliation while retaining the red icon presentation.
+- Feature 150 stayed false until final browser and visual verification.
+
+FEATURE VERIFICATION:
+- Reworked browser test to authenticate through the login form and use baseURL.
+- Tested missing date/category and negative amount via ordinary form controls.
+- Both light and dark cases passed: icons, text, placement, and contrast >= 4.5:1.
+- Corrected inputs remove corresponding errors on resubmission.
+- Browser console errors and uncaught exceptions: none in both cases.
+- Reviewed light-errors.png and dark-errors.png visually.
+- Six screenshots saved in verification/test-150-error-messages/.
+- Full frontend suite: 119 tests passed across 31 files.
+- TypeScript check passed; git diff --check passed.
+- No backend behavior changed in this session.
+
+STATUS / NEXT:
+- Changed only passes for feature_list.json index 150.
+- Completion: 151/175 passing; 24 pending.
+- Next: index 151, green success messages with clear icon and dismissal.

@@ -1804,7 +1804,7 @@
       "Step 5: Verify error icon (e.g., exclamation mark) is present",
       "Step 6: Verify message is positioned near the relevant field"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

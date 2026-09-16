@@ -362,7 +362,7 @@ export default function Income() {
 
                                     {formError && (
                                         <p
-                                            className="flex items-center gap-1.5 text-destructive text-sm"
+                                            className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
                                             role="alert"
                                         >
                                             <AlertCircle className="h-4 w-4 shrink-0" />

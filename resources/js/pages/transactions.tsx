@@ -891,7 +891,7 @@ export default function Transactions() {
                                     </div>
                                     {bulkError && (
                                         <p
-                                            className="flex items-center gap-1.5 text-destructive text-sm"
+                                            className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
                                             role="alert"
                                             data-testid="bulk-edit-error"
                                         >
@@ -980,7 +980,7 @@ export default function Transactions() {
                                         {fieldErrors.date && (
                                             <p
                                                 id="date-error"
-                                                className="flex items-center gap-1.5 text-destructive text-sm"
+                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
                                                 role="alert"
                                                 data-testid="date-error"
                                             >
@@ -1018,7 +1018,7 @@ export default function Transactions() {
                                             {fieldErrors.period && (
                                                 <p
                                                     id="period-error"
-                                                    className="flex items-center gap-1.5 text-destructive text-sm"
+                                                    className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
                                                     role="alert"
                                                     data-testid="period-error"
                                                 >
@@ -1109,7 +1109,7 @@ export default function Transactions() {
                                         {fieldErrors.category_id && (
                                             <p
                                                 id="category-error"
-                                                className="flex items-center gap-1.5 text-destructive text-sm"
+                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
                                                 role="alert"
                                                 data-testid="category-error"
                                             >
@@ -1217,7 +1217,7 @@ export default function Transactions() {
                                             {fieldErrors.amount && (
                                                 <p
                                                     id="amount-error"
-                                                    className="flex items-center gap-1.5 text-destructive text-sm"
+                                                    className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
                                                     role="alert"
                                                     data-testid="amount-error"
                                                 >
@@ -1315,7 +1315,7 @@ export default function Transactions() {
                                 {formError && (
                                     <p
                                         id="transaction-form-error"
-                                        className="flex items-center gap-1.5 text-destructive text-sm"
+                                        className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
                                         role="alert"
                                         data-testid="transaction-form-error"
                                     >

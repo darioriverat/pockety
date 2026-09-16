@@ -1,112 +1,76 @@
 import { test, expect } from '@playwright/test';
-import * as path from 'path';
-import * as fs from 'fs';
+import { loginAsBrowserTestUser } from './helpers';
 
-test.describe('Error messages with icons', () => {
-    test.beforeEach(async ({ page }) => {
-        // Navigate to the application
-        await page.goto('http://dev.pockety.com:8080/transactions');
-        await page.waitForLoadState('networkidle');
-    });
+const evidence = 'verification/test-150-error-messages';
 
-    test('error messages are displayed in red with clear icon', async ({
-        page,
-    }) => {
-        // Click Add Transaction button
-        await page.click('button:has-text("Add Transaction")');
-
-        // Wait for dialog to appear
-        await page.waitForSelector('[data-testid="transaction-form-dialog"]');
-
-        // Clear the date field (it may have a default value)
-        await page.fill('[data-testid="transaction-date-input"]', '');
-
-        // Set an invalid amount (negative)
-        await page.fill('[data-testid="transaction-amount-input"]', '-100');
-
-        // Click submit button to trigger validation
-        await page.click('[data-testid="transaction-form-submit"]');
-
-        // Wait for error messages to appear
-        await page.waitForSelector('[data-testid="date-error"]');
-        await page.waitForSelector('[data-testid="amount-error"]');
-        await page.waitForSelector('[data-testid="category-error"]');
-
-        // Verify date error message
-        const dateError = page.locator('[data-testid="date-error"]');
-        await expect(dateError).toBeVisible();
-        await expect(dateError).toHaveText(/Date is required/);
-
-        // Verify the error has an icon (svg element)
-        const dateErrorIcon = dateError.locator('svg').first();
-        await expect(dateErrorIcon).toBeVisible();
-
-        // Verify amount error message
-        const amountError = page.locator('[data-testid="amount-error"]');
-        await expect(amountError).toBeVisible();
-        await expect(amountError).toHaveText(
-            /Amount must be a positive number/,
-        );
-
-        // Verify the error has an icon
-        const amountErrorIcon = amountError.locator('svg').first();
-        await expect(amountErrorIcon).toBeVisible();
-
-        // Verify category error message
-        const categoryError = page.locator('[data-testid="category-error"]');
-        await expect(categoryError).toBeVisible();
-        await expect(categoryError).toHaveText(/Category is required/);
-
-        // Verify the error has an icon
-        const categoryErrorIcon = categoryError.locator('svg').first();
-        await expect(categoryErrorIcon).toBeVisible();
-
-        // Take a screenshot
-        const verificationDir = path.join(
-            process.cwd(),
-            'verification',
-            'test-150-error-messages',
-        );
-        if (!fs.existsSync(verificationDir)) {
-            fs.mkdirSync(verificationDir, { recursive: true });
-        }
-
-        await page.screenshot({
-            path: path.join(verificationDir, 'error-messages-with-icons.png'),
-            fullPage: true,
+for (const theme of ['light', 'dark'] as const) {
+    test(`validation errors are readable with icons in ${theme}`, async ({ page }) => {
+        const errors: string[] = [];
+        page.on('console', message => {
+            if (message.type() === 'error') errors.push(message.text());
         });
+        page.on('pageerror', error => errors.push(error.message));
+        await page.emulateMedia({ colorScheme: theme });
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        await loginAsBrowserTestUser(page);
+        await page.goto('/transactions');
+        await page.getByRole('button', { name: 'Add Transaction', exact: true }).click();
+        const dialog = page.getByTestId('transaction-form-dialog');
+        await expect(dialog).toBeVisible();
+        await page.screenshot({ path: `${evidence}/${theme}-form.png` });
+        await page.getByTestId('transaction-date-input').fill('');
+        await page.getByTestId('transaction-amount-input').fill('-100');
+        await page.getByTestId('transaction-form-submit').click();
 
-        // Verify error messages are displayed in red (text-destructive class)
-        // In Tailwind, text-destructive is typically a red color
-        const dateErrorClass = await dateError.getAttribute('class');
-        expect(dateErrorClass).toContain('text-destructive');
-
-        const amountErrorClass = await amountError.getAttribute('class');
-        expect(amountErrorClass).toContain('text-destructive');
-
-        const categoryErrorClass = await categoryError.getAttribute('class');
-        expect(categoryErrorClass).toContain('text-destructive');
-
-        // Verify icons have proper sizing classes
-        const dateIconClass = await dateErrorIcon.getAttribute('class');
-        expect(dateIconClass).toContain('h-4');
-        expect(dateIconClass).toContain('w-4');
-
-        // Verify error messages are positioned near the relevant field
-        // Date error should be below date input
-        const dateInput = page.locator('[data-testid="transaction-date-input"]');
-        const dateInputBox = await dateInput.boundingBox();
-        const dateErrorBox = await dateError.boundingBox();
-
-        if (dateInputBox && dateErrorBox) {
-            // Error should be below the input (y position greater)
-            expect(dateErrorBox.y).toBeGreaterThan(dateInputBox.y);
-            // Error should be relatively close (within 100px)
-            expect(dateErrorBox.y - dateInputBox.y).toBeLessThan(100);
+        for (const [field, message] of [
+            ['date', 'Date is required'],
+            ['category', 'Category is required'],
+            ['amount', 'Amount must be a positive number'],
+        ]) {
+            const error = page.getByTestId(`${field}-error`);
+            await expect(error).toBeVisible();
+            await expect(error).toContainText(message);
+            await expect(error.locator('svg')).toBeVisible();
+            const input = field === 'category' ? dialog.getByRole('combobox', { name: 'Category', exact: true }) : page.getByTestId(`transaction-${field}-input`);
+            const inputBox = await input.boundingBox();
+            const errorBox = await error.boundingBox();
+            expect(inputBox).not.toBeNull();
+            expect(errorBox).not.toBeNull();
+            expect(errorBox!.y).toBeGreaterThanOrEqual(inputBox!.y + inputBox!.height);
+            expect(errorBox!.y - inputBox!.y - inputBox!.height).toBeLessThan(20);
+            // Read rendered colors only; all form interactions use normal UI controls.
+            const colors = await error.evaluate(element => {
+                const canvas = document.createElement('canvas');
+                canvas.width = canvas.height = 1;
+                const context = canvas.getContext('2d')!;
+                const rgb = (color: string) => {
+                    context.fillStyle = color;
+                    context.fillRect(0, 0, 1, 1);
+                    return Array.from(context.getImageData(0, 0, 1, 1).data).slice(0, 3);
+                };
+                return {
+                    text: rgb(getComputedStyle(element).color),
+                    background: rgb(getComputedStyle(element.closest('[role="dialog"]')!).backgroundColor),
+                };
+            });
+            expect(colors.text[0]).toBeGreaterThan(colors.text[1]);
+            expect(colors.text[0]).toBeGreaterThan(colors.text[2]);
+            const luminance = (rgb: number[]) => rgb.map(value => {
+                const channel = value / 255;
+                return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+            }).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+            const values = [luminance(colors.text), luminance(colors.background)];
+            expect((Math.max(...values) + 0.05) / (Math.min(...values) + 0.05)).toBeGreaterThanOrEqual(4.5);
         }
-
-        console.log('✓ Error messages displayed in red with clear icons');
-        console.log('✓ Icons are present and visible');
-        console.log('✓ Error messages are positioned near relevant fields');
+        await page.screenshot({ path: `${evidence}/${theme}-errors.png` });
+        // Correct the inputs and resubmit to verify stale errors disappear.
+        await page.getByTestId('transaction-date-input').fill('2026-09-16');
+        await page.getByTestId('transaction-amount-input').fill('100');
+        await page.getByTestId('transaction-form-submit').click();
+        await expect(page.getByTestId('date-error')).toHaveCount(0);
+        await expect(page.getByTestId('amount-error')).toHaveCount(0);
+        await expect(page.getByTestId('category-error')).toBeVisible();
+        await page.screenshot({ path: `${evidence}/${theme}-corrected.png` });
+        expect(errors).toEqual([]);
     });
-});
+}

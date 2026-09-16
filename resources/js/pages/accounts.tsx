@@ -503,7 +503,7 @@ export default function Accounts() {
                                     </div>
 
                                     {formError && (
-                                        <p className="flex items-center gap-1.5 text-sm text-destructive">
+                                        <p className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400">
                                             <AlertCircle className="h-4 w-4 shrink-0" />
                                             <span>{formError}</span>
                                         </p>
@@ -711,7 +711,7 @@ export default function Accounts() {
                                 </div>
 
                                 {balanceFormError && (
-                                    <p className="flex items-center gap-1.5 text-sm text-destructive">
+                                    <p className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400">
                                         <AlertCircle className="h-4 w-4 shrink-0" />
                                         <span>{balanceFormError}</span>
                                     </p>

@@ -673,7 +673,7 @@ export default function Reconciliation() {
                             </div>
                             {acknowledgeError && (
                                 <p
-                                    className="flex items-center gap-1.5 text-sm text-destructive"
+                                    className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400"
                                     role="alert"
                                     data-testid="acknowledge-error"
                                 >
