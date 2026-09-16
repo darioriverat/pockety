@@ -1816,7 +1816,7 @@
       "Step 4: Verify success icon (e.g., checkmark) is present",
       "Step 5: Verify message auto-dismisses or has close button"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
