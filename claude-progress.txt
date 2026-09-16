@@ -5276,3 +5276,34 @@ STATUS / NEXT:
 - Index 147 marked passing; only passes field changed in feature_list.json.
 - Completion: 148/175 passing; 27 pending.
 - Next: index 148, currency symbols displayed correctly (CAD, USD, COP or $, US$, $COP).
+
+=== Session 80 (2026-09-16) ===
+
+GOAL: Complete currency symbols (feature index 148).
+
+ENVIRONMENT / BASELINE:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200).
+- Puppeteer MCP blocked by Local SDK approval; Playwright via /dev/browser-tests.
+- Baseline: DashboardTest 14/14; frontend 111 → 113 after symbol unit tests.
+- table-styles regression 2/2 after seed-browser.
+
+FEATURE 148:
+- Updated resources/js/lib/currency.ts to use explicit distinguishable symbols
+  instead of Intl narrow $ for both CAD and USD:
+  CAD → $1,234.56; USD → US$1,234.56; COP → COP 2,000,000.
+- Added currencySymbol() helper; negatives keep leading minus before symbol.
+- Matches backend verify helpers ($ / US$ / COP ).
+- Unit tests expanded to 7 cases (symbols + negatives).
+- Added tests/browser/currency-symbols.spec.ts (dashboard, transactions, balance sheet).
+
+VERIFICATION:
+- Frontend: 113 tests passed.
+- Browser: currency-symbols 1/1; currency-format regression 2/2.
+- Screenshots: verification/test-148-currency-symbols/
+  (CAD $, USD US$, COP COP; transactions + balance sheet + dashboard).
+- Assets rebuilt via /dev/build-assets.
+
+STATUS / NEXT:
+- Index 148 marked passing; only passes field changed in feature_list.json.
+- Completion: 149/175 passing; 26 pending.
+- Next: index 149, positive/negative amounts visually distinguished (green/red, +/-).

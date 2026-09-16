@@ -1779,7 +1779,7 @@
       "Step 4: Verify CAD, USD, and COP are distinguishable from each other",
       "Step 5: Verify symbols are positioned consistently (before or after amount)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

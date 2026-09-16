@@ -1,14 +1,20 @@
 export type DisplayCurrency = 'CAD' | 'USD' | 'COP';
 
 /**
- * Use English locales so thousand separators are commas (1,234.56 / 2,000,000).
+ * Distinct symbols so CAD / USD / COP never look identical in the UI.
+ * Matches product rules: $, US$, COP (also accepts $COP as a COP form).
+ */
+const CURRENCY_SYMBOLS: Record<DisplayCurrency, string> = {
+    CAD: '$',
+    USD: 'US$',
+    COP: 'COP',
+};
+
+/**
+ * Use English locale so thousand separators are commas (1,234.56 / 2,000,000).
  * es-CO would use period grouping, which fails the product formatting requirement.
  */
-const LOCALES: Record<DisplayCurrency, string> = {
-    CAD: 'en-CA',
-    USD: 'en-US',
-    COP: 'en-US',
-};
+const NUMBER_LOCALE = 'en-US';
 
 const FRACTION_DIGITS: Record<DisplayCurrency, number> = {
     CAD: 2,
@@ -21,21 +27,45 @@ export function isDisplayCurrency(value: string): value is DisplayCurrency {
 }
 
 /**
- * Format a currency amount with thousand separators and currency-appropriate decimals.
- * CAD/USD → 2 decimals (e.g. $1,234.56); COP → 0 decimals (e.g. COP 2,000,000).
+ * Return the display symbol/code for a currency ($, US$, COP).
  */
-export function formatDisplayCurrency(
+export function currencySymbol(currency: DisplayCurrency): string {
+    return CURRENCY_SYMBOLS[currency];
+}
+
+/**
+ * Format the numeric portion only (thousand separators + currency-appropriate decimals).
+ */
+export function formatCurrencyNumber(
     amount: number,
     currency: DisplayCurrency,
 ): string {
     const digits = FRACTION_DIGITS[currency];
 
-    return new Intl.NumberFormat(LOCALES[currency], {
-        style: 'currency',
-        currency,
+    return new Intl.NumberFormat(NUMBER_LOCALE, {
         minimumFractionDigits: digits,
         maximumFractionDigits: digits,
-    }).format(amount);
+    }).format(Math.abs(amount));
+}
+
+/**
+ * Format a currency amount with a distinguishable symbol and thousand separators.
+ * CAD → $1,234.56; USD → US$1,234.56; COP → COP 2,000,000.
+ * Negative amounts keep a leading minus: -$1,234.56 / -US$1,234.56 / -COP 2,000,000.
+ */
+export function formatDisplayCurrency(
+    amount: number,
+    currency: DisplayCurrency,
+): string {
+    const symbol = CURRENCY_SYMBOLS[currency];
+    const number = formatCurrencyNumber(amount, currency);
+    const sign = amount < 0 ? '-' : '';
+
+    if (currency === 'COP') {
+        return `${sign}${symbol} ${number}`;
+    }
+
+    return `${sign}${symbol}${number}`;
 }
 
 /**
