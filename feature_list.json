@@ -1690,7 +1690,7 @@
       "Step 4: Verify card spacing is uniform",
       "Step 5: Verify shadows or borders are applied consistently"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1704,7 +1704,7 @@
       "Step 6: Resize to mobile (375px width)",
       "Step 7: Verify cards stack vertically and remain readable"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

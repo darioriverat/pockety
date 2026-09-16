@@ -5048,3 +5048,46 @@ NEXT SESSION:
 - Then responsive cards, form labels/focus, button hierarchy
 
 STATUS: App healthy; header branding + mobile nav verified with screenshots
+
+
+=== Session 74 (2026-09-15) ===
+
+GOAL: UI polish — consistent dashboard card spacing/shadows + responsive layout
+
+ORIENTATION:
+- Started at 141/175 passing; 34 remaining
+- App healthy at http://dev.pockety.com:8080/
+- Next failing: style suite #141 (dashboard cards), #142 (responsive)
+
+VERIFICATION SMOKE:
+- Frontend unit: app-sidebar-header 1/1 pass
+- Browser smoke: app-header.spec.ts 2/2 pass
+- Puppeteer MCP blocked by sandbox approval; used /dev/browser-tests
+
+IMPLEMENTED:
+- DashboardSummaryCard shared component (uniform border, shadow-sm, hover:shadow-md, padding, tones)
+- Dashboard summary grids: income/expenses/net + assets/liabilities/equity
+- Responsive grid: 1 col mobile → 2 col sm → 3 col lg; uniform gap-4
+- data-testid hooks for cards and grids
+- Unit tests: dashboard-summary-card.test.tsx (2)
+- Playwright: tests/browser/dashboard-cards.spec.ts (features 141 + 142)
+
+VERIFIED:
+- /dev/frontend-tests?filter=dashboard-summary-card → 2/2
+- /dev/frontend-tests?filter=dashboard.test → 21/21
+- /dev/browser-tests?spec=tests/browser/dashboard-cards.spec.ts → 2/2
+- Screenshots:
+  - verification/test-141-dashboard-cards/
+  - verification/test-142-dashboard-responsive/
+- Reseeded via /dev/seed-browser + /dev/import-accounts after browser suite
+
+PASSES UPDATED:
+- #141 dashboard cards consistent spacing/shadows/borders → true
+- #142 dashboard layout responsive → true
+
+PROGRESS: 143/175 passing; 32 remaining
+NEXT SESSION:
+- Continue UI polish at #143 (form labels, spacing, focus states)
+- Then button hierarchy, table styles
+
+STATUS: App healthy; dashboard card polish verified with screenshots

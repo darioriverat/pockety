@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { DashboardSummaryCard } from '@/components/dashboard-summary-card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {
     amountForCurrency,
@@ -823,7 +824,10 @@ export default function Dashboard({
     return (
         <>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6">
+            <div
+                className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6"
+                data-testid="dashboard-page"
+            >
                 {/* Period Header */}
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
@@ -883,66 +887,44 @@ export default function Dashboard({
                 </div>
 
                 {/* Income, Expenses, Net Cards */}
-                <div className="grid gap-4 md:grid-cols-3">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-                            <TrendingUpIcon className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="text-2xl font-bold text-green-600"
-                                data-testid="dashboard-total-income"
-                            >
-                                {formatCurrency(
-                                    amountForCurrency(summary, 'total_income', currency),
-                                )}
-                            </div>
-                            <p className="text-muted-foreground text-xs mt-1">
-                                All income sources · {currency}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-                            <TrendingDownIcon className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="text-2xl font-bold text-red-600"
-                                data-testid="dashboard-total-expenses"
-                            >
-                                {formatCurrency(
-                                    amountForCurrency(summary, 'total_expenses', currency),
-                                )}
-                            </div>
-                            <p className="text-muted-foreground text-xs mt-1">
-                                All expense categories · {currency}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Net</CardTitle>
-                            <ScaleIcon className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className={`text-2xl font-bold ${netIsPositive ? 'text-green-600' : 'text-red-600'}`}
-                                data-testid="dashboard-net"
-                            >
-                                {formatCurrency(
-                                    amountForCurrency(summary, 'net', currency),
-                                )}
-                            </div>
-                            <p className="text-muted-foreground text-xs mt-1">
-                                Income - Expenses · {currency}
-                            </p>
-                        </CardContent>
-                    </Card>
+                <div
+                    className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    data-testid="dashboard-summary-cards-income"
+                >
+                    <DashboardSummaryCard
+                        title="Total Income"
+                        value={formatCurrency(
+                            amountForCurrency(summary, 'total_income', currency),
+                        )}
+                        description={`All income sources · ${currency}`}
+                        icon={TrendingUpIcon}
+                        tone="positive"
+                        testId="dashboard-card-income"
+                        valueTestId="dashboard-total-income"
+                    />
+                    <DashboardSummaryCard
+                        title="Total Expenses"
+                        value={formatCurrency(
+                            amountForCurrency(summary, 'total_expenses', currency),
+                        )}
+                        description={`All expense categories · ${currency}`}
+                        icon={TrendingDownIcon}
+                        tone="negative"
+                        testId="dashboard-card-expenses"
+                        valueTestId="dashboard-total-expenses"
+                    />
+                    <DashboardSummaryCard
+                        title="Net"
+                        value={formatCurrency(
+                            amountForCurrency(summary, 'net', currency),
+                        )}
+                        description={`Income - Expenses · ${currency}`}
+                        icon={ScaleIcon}
+                        tone={netIsPositive ? 'positive' : 'negative'}
+                        testId="dashboard-card-net"
+                        valueTestId="dashboard-net"
+                        className="sm:col-span-2 lg:col-span-1"
+                    />
                 </div>
 
                 {/* Income vs Expenses Chart */}
@@ -988,70 +970,48 @@ export default function Dashboard({
                 </Card>
 
                 {/* Assets, Liabilities, Equity Cards */}
-                <div className="grid gap-4 md:grid-cols-3">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
-                            <WalletIcon className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="text-2xl font-bold"
-                                data-testid="dashboard-total-assets"
-                            >
-                                {formatCurrency(
-                                    amountForCurrency(summary, 'total_assets', currency),
-                                )}
-                            </div>
-                            <p className="text-muted-foreground text-xs mt-1">
-                                All bank accounts & investments · {currency}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Liabilities</CardTitle>
-                            <CreditCardIcon className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="text-2xl font-bold text-orange-600"
-                                data-testid="dashboard-total-liabilities"
-                            >
-                                {formatCurrency(
-                                    amountForCurrency(
-                                        summary,
-                                        'total_liabilities',
-                                        currency,
-                                    ),
-                                )}
-                            </div>
-                            <p className="text-muted-foreground text-xs mt-1">
-                                Credit cards & loans · {currency}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Equity</CardTitle>
-                            <ScaleIcon className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="text-2xl font-bold text-blue-600"
-                                data-testid="dashboard-equity"
-                            >
-                                {formatCurrency(
-                                    amountForCurrency(summary, 'equity', currency),
-                                )}
-                            </div>
-                            <p className="text-muted-foreground text-xs mt-1">
-                                Assets - Liabilities · {currency}
-                            </p>
-                        </CardContent>
-                    </Card>
+                <div
+                    className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    data-testid="dashboard-summary-cards-balance"
+                >
+                    <DashboardSummaryCard
+                        title="Total Assets"
+                        value={formatCurrency(
+                            amountForCurrency(summary, 'total_assets', currency),
+                        )}
+                        description={`All bank accounts & investments · ${currency}`}
+                        icon={WalletIcon}
+                        tone="default"
+                        testId="dashboard-card-assets"
+                        valueTestId="dashboard-total-assets"
+                    />
+                    <DashboardSummaryCard
+                        title="Total Liabilities"
+                        value={formatCurrency(
+                            amountForCurrency(
+                                summary,
+                                'total_liabilities',
+                                currency,
+                            ),
+                        )}
+                        description={`Credit cards & loans · ${currency}`}
+                        icon={CreditCardIcon}
+                        tone="warning"
+                        testId="dashboard-card-liabilities"
+                        valueTestId="dashboard-total-liabilities"
+                    />
+                    <DashboardSummaryCard
+                        title="Equity"
+                        value={formatCurrency(
+                            amountForCurrency(summary, 'equity', currency),
+                        )}
+                        description={`Assets - Liabilities · ${currency}`}
+                        icon={ScaleIcon}
+                        tone="info"
+                        testId="dashboard-card-equity"
+                        valueTestId="dashboard-equity"
+                        className="sm:col-span-2 lg:col-span-1"
+                    />
                 </div>
 
                 {/* Assets vs Liabilities Chart */}
