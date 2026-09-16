@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label';
 import { formatCurrencyAmount, formatSignedCurrencyAmount, amountToneClass } from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 interface Account {
@@ -185,7 +186,7 @@ export default function AccountDetail() {
         return (
             <>
                 <Head title="Account Details" />
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <PageContainer className="overflow-x-auto">
                     <Card className="border-destructive">
                         <CardHeader>
                             <CardTitle className="text-destructive">Error</CardTitle>
@@ -200,7 +201,7 @@ export default function AccountDetail() {
                             </Link>
                         </CardContent>
                     </Card>
-                </div>
+                </PageContainer>
             </>
         );
     }
@@ -210,8 +211,8 @@ export default function AccountDetail() {
     return (
         <>
             <Head title={account ? account.name : 'Account Details'} />
-            <div
-                className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
+            <PageContainer
+                className="overflow-x-auto"
                 data-testid="account-detail-page"
             >
                 <div className="mb-4 flex items-center justify-between">
@@ -485,7 +486,7 @@ export default function AccountDetail() {
                         </CardContent>
                     </Card>
                 )}
-            </div>
+            </PageContainer>
         </>
     );
 }

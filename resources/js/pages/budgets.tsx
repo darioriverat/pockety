@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import {
@@ -197,8 +198,7 @@ export default function Budgets() {
         <>
             <Head title="Budgets" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <PageContainer>
                     <div className="mb-8">
                         <PageTitle
                             title="Budgets"
@@ -531,8 +531,7 @@ export default function Budgets() {
                             )}
                         </CardContent>
                     </Card>
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

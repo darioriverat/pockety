@@ -18,6 +18,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2 } from 'lucide-react';
 import { update as updatePreferences } from '@/routes/preferences';
+import { PageContainer } from '@/components/page-container';
 
 interface User {
     id: number;
@@ -57,8 +58,7 @@ export default function Preferences({
         <>
             <Head title="Preferences" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+            <PageContainer>
                     <Card data-testid="preferences-card">
                         <CardHeader>
                             <CardTitle>User Preferences</CardTitle>
@@ -176,8 +176,7 @@ export default function Preferences({
                             </form>
                         </CardContent>
                     </Card>
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

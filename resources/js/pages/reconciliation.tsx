@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/alert';
 import { usePeriod } from '@/hooks/use-period';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
     ScaleIcon,
@@ -286,7 +287,7 @@ export default function Reconciliation() {
     return (
         <>
             <Head title="Reconciliation" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <PageContainer className="overflow-x-auto">
                 <div className="mb-2 flex items-center justify-between">
                     <PageTitle
                         title="Reconciliation"
@@ -693,7 +694,7 @@ export default function Reconciliation() {
                             </CardContent>
                         </Card>
                     ))}
-            </div>
+            </PageContainer>
 
             <Dialog
                 open={acknowledgeAccount !== null}

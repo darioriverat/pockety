@@ -5924,3 +5924,50 @@ NEXT:
 3. Verify + mark Feature #163 page titles
 4. Feature #164 consistent section spacing
 
+
+
+=== Session 95 (2026-09-16) ===
+
+GOAL: Orient, verify stack, implement next failing feature (#164 section spacing)
+
+STACK STATUS (THIS SESSION — VERIFIED):
+- App HTTP 500: getaddrinfo for web_app_db failed (Docker DNS between web_app and DB)
+- Lima instance "docker" reports Broken; docker.sock and ha.sock return EPERM in agent sandbox
+- limactl start / docker restart / unsandboxed "all" permissions all blocked by Local SDK
+- Puppeteer MCP navigate rejected (interactive approval unavailable)
+- Host has no PHP; Playwright CLI available; vitest works on host
+- MySQL not published on localhost:3306/3307
+
+VERIFICATION ATTEMPTED:
+- curl homepage → 500 (QueryException web_app_db DNS)
+- node scripts/probe-stack.mjs → port 8080 up, Docker API EPERM
+- limactl list → docker Broken; start fails on ha.sock EPERM
+- puppeteer_navigate → rejected
+- Host vitest: page-container + page-title + breadcrumbs PASSED
+
+FEATURE #164 IMPLEMENTED (not marked passing — no browser verification):
+- New shared PageContainer / PageSection (p-4 sm:p-6 + gap-6; nested gap-4)
+- data-page-container attribute for reliable Playwright selection
+- Replaced inconsistent wrappers (py-12/max-w-7xl, gap-4 p-4, container py-8, space-y-6)
+  across 20 main pages (dashboard, transactions, accounts, categories, income, budgets,
+  reconciliation, balance sheet + time series, financial summary, exchange rates,
+  fixed assets, import, reports YTD, period comparison/history, category actuals,
+  preferences, account/category detail)
+- Tests: page-container.test.tsx (3 unit), tests/browser/section-spacing.spec.ts
+- feature_list.json UNCHANGED (passes still false for #162/#163/#164)
+
+STATUS: 162/175 still (13 remaining); no feature_list passes flips this session
+
+TO RECOVER (run in a normal terminal with Docker/Lima access):
+  limactl start docker
+  ./scripts/recover-stack.sh
+  node scripts/session-helpers.mjs build
+  node scripts/session-helpers.mjs browser breadcrumbs.spec.ts
+  node scripts/session-helpers.mjs browser page-titles.spec.ts
+  node scripts/session-helpers.mjs browser section-spacing.spec.ts
+  # Then mark feature_list indexes 162, 163, 164 passes:true after screenshots
+
+NEXT:
+1. Recover Lima/Docker DB network
+2. Verify + mark Features #162 breadcrumbs, #163 page titles, #164 section spacing
+3. Feature #165 typography hierarchy

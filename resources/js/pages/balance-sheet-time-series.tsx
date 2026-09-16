@@ -19,6 +19,7 @@ import {
 import { formatCurrencyAmount } from '@/lib/currency';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import {
     ArrowLeft,
     LineChart,
@@ -273,8 +274,7 @@ export default function BalanceSheetTimeSeries() {
         <>
             <Head title="Balance Sheet Time Series" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
                             title="Balance Sheet Time Series"
@@ -515,8 +515,7 @@ export default function BalanceSheetTimeSeries() {
                             </Card>
                         </>
                     )}
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

@@ -13,6 +13,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { Upload, CheckCircle, XCircle, Database } from 'lucide-react';
 
 interface ImportResult {
@@ -316,7 +317,7 @@ export default function Import() {
         <>
             <Head title="Import Historical Data" />
 
-            <div className="container mx-auto py-8 space-y-6">
+            <PageContainer>
                 <PageTitle
                     title="Import Historical Data"
                     description="Import accounts and transactions from the extracted spreadsheet data"
@@ -888,7 +889,7 @@ export default function Import() {
                         </CardContent>
                     </Card>
                 )}
-            </div>
+            </PageContainer>
         </>
     );
 }

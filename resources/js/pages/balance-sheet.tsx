@@ -10,6 +10,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoadingState } from '@/components/ui/loading-state';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import {
@@ -138,8 +139,7 @@ export default function BalanceSheet() {
         <>
             <Head title="Balance Sheet" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
                             title="Balance Sheet"
@@ -586,8 +586,7 @@ export default function BalanceSheet() {
                             </Card>
                         </>
                     )}
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

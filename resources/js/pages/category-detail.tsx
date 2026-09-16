@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { ArrowLeft, Tags } from 'lucide-react';
 
 interface Category {
@@ -169,7 +170,7 @@ export default function CategoryDetail() {
         return (
             <>
                 <Head title="Category Details" />
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <PageContainer className="overflow-x-auto">
                     <Card className="border-destructive">
                         <CardHeader>
                             <CardTitle className="text-destructive">Error</CardTitle>
@@ -184,7 +185,7 @@ export default function CategoryDetail() {
                             </Link>
                         </CardContent>
                     </Card>
-                </div>
+                </PageContainer>
             </>
         );
     }
@@ -198,8 +199,8 @@ export default function CategoryDetail() {
                         : 'Category Details'
                 }
             />
-            <div
-                className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
+            <PageContainer
+                className="overflow-x-auto"
                 data-testid="category-detail-page"
             >
                 <div className="mb-4">
@@ -448,7 +449,7 @@ export default function CategoryDetail() {
                         </CardContent>
                     </Card>
                 )}
-            </div>
+            </PageContainer>
         </>
     );
 }

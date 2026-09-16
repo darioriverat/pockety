@@ -31,6 +31,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { PlusIcon, Building2, Wallet, AlertCircle } from 'lucide-react';
 
@@ -369,7 +370,7 @@ export default function Accounts() {
     return (
         <>
             <Head title="Accounts" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <PageContainer className="overflow-x-auto">
                 <div className="mb-4 flex items-center justify-between">
                     <PageTitle
                         title="Accounts"
@@ -793,7 +794,7 @@ export default function Accounts() {
                         </div>
                     </DialogContent>
                 </Dialog>
-            </div>
+            </PageContainer>
         </>
     );
 }

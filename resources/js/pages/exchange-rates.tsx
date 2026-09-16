@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -261,8 +262,7 @@ export default function ExchangeRates() {
         <>
             <Head title="Exchange Rates" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <PageContainer>
                     <div className="mb-8">
                         <PageTitle
                             title="Exchange Rates"
@@ -534,8 +534,7 @@ export default function ExchangeRates() {
                             )}
                         </CardContent>
                     </Card>
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

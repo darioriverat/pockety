@@ -16,6 +16,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DashboardSummaryCard } from '@/components/dashboard-summary-card';
+import { PageContainer } from '@/components/page-container';
 import { PageTitle } from '@/components/page-title';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { ChartAxisLabels } from '@/components/charts/chart-axis-labels';
@@ -905,10 +906,7 @@ export default function Dashboard({
     return (
         <>
             <Head title="Dashboard" />
-            <div
-                className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6"
-                data-testid="dashboard-page"
-            >
+            <PageContainer data-testid="dashboard-page">
                 {/* Period Header */}
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <PageTitle
@@ -1223,7 +1221,7 @@ export default function Dashboard({
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </PageContainer>
         </>
     );
 }

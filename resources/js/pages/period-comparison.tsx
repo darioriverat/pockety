@@ -21,6 +21,7 @@ import {
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import {
     ArrowLeftRight,
     CalendarRange,
@@ -168,8 +169,7 @@ export default function PeriodComparison() {
         <>
             <Head title="Period Comparison" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
                             title="Period Comparison"
@@ -531,8 +531,7 @@ export default function PeriodComparison() {
                             </Card>
                         </>
                     ) : null}
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

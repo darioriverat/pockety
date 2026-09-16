@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod } from '@/lib/periods';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { CalendarRange, Receipt, XCircle, ArrowLeftRight } from 'lucide-react';
 
 interface PeriodSummary {
@@ -68,8 +69,7 @@ export default function PeriodsHistory() {
         <>
             <Head title="Periods History" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
                             title="Periods History"
@@ -251,8 +251,7 @@ export default function PeriodsHistory() {
                             </Card>
                         </>
                     )}
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

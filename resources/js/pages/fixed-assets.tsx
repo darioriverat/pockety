@@ -24,6 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { PlusIcon, Car, Calendar } from 'lucide-react';
 
 interface FixedAsset {
@@ -253,7 +254,7 @@ export default function FixedAssets() {
         <>
             <Head title="Fixed Assets" />
 
-            <div className="space-y-6">
+            <PageContainer>
                 <div className="flex items-center justify-between">
                     <PageTitle
                         title="Fixed Assets"
@@ -622,7 +623,7 @@ export default function FixedAssets() {
                         </div>
                     </DialogContent>
                 </Dialog>
-            </div>
+            </PageContainer>
         </>
     );
 }

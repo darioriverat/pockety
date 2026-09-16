@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { useCategoryLanguage } from '@/hooks/use-category-language';
 import type { Auth } from '@/types';
 
@@ -115,7 +116,7 @@ export default function Categories() {
     return (
         <>
             <Head title="Categories" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <PageContainer className="overflow-x-auto">
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                     <PageTitle
                         title="Expense Categories"
@@ -251,7 +252,7 @@ export default function Categories() {
                         )}
                     </>
                 )}
-            </div>
+            </PageContainer>
         </>
     );
 }

@@ -22,6 +22,7 @@ import { usePeriod } from '@/hooks/use-period';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { ChartColumn, RefreshCw, XCircle } from 'lucide-react';
 
 interface CategoryActualRow {
@@ -91,8 +92,7 @@ export default function CategoryActuals() {
         <>
             <Head title="Category Actuals" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
                             title="Category Actuals"
@@ -288,8 +288,7 @@ export default function CategoryActuals() {
                             </CardContent>
                         </Card>
                     )}
-                </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

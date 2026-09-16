@@ -27,6 +27,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { PlusIcon, Banknote, Trash2, AlertCircle } from 'lucide-react';
 
 interface IncomeLine {
@@ -224,7 +225,7 @@ export default function Income() {
         <>
             <Head title="Income" />
 
-            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+            <PageContainer>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <PageTitle
                         title="Income"
@@ -577,7 +578,7 @@ export default function Income() {
                         </table>
                     </div>
                 )}
-            </div>
+            </PageContainer>
         </>
     );
 }

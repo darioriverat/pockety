@@ -35,6 +35,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
 import { PageTitle } from '@/components/page-title';
+import { PageContainer } from '@/components/page-container';
 import { useCategoryLanguage } from '@/hooks/use-category-language';
 import { usePeriod } from '@/hooks/use-period';
 import { formatCurrencyAmount } from '@/lib/currency';
@@ -791,8 +792,8 @@ export default function Transactions() {
     return (
         <>
             <Head title="Transactions" />
-            <div
-                className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
+            <PageContainer
+                className="overflow-x-auto"
                 data-testid="transactions-page"
             >
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -2026,7 +2027,7 @@ export default function Transactions() {
                         )}
                     </>
                 )}
-            </div>
+            </PageContainer>
         </>
     );
 }
