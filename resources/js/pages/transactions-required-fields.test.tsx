@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import Transactions from './transactions';
 
 // Mock Inertia
@@ -9,6 +8,26 @@ vi.mock('@inertiajs/react', () => ({
     Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
         <a href={href}>{children}</a>
     ),
+    usePage: () => ({
+        props: {
+            auth: {
+                user: {
+                    id: 1,
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    category_language: 'en',
+                },
+            },
+        },
+    }),
+}));
+
+// Mock use-period hook
+vi.mock('@/hooks/use-period', () => ({
+    usePeriod: () => ({
+        period: '202501',
+        setPeriod: vi.fn(),
+    }),
 }));
 
 // Mock fetch
@@ -68,7 +87,6 @@ describe('Transactions - Required Field Validation', () => {
     });
 
     it('displays error when date field is empty on submit', async () => {
-        const user = userEvent.setup();
         render(<Transactions />);
 
         // Wait for data to load
@@ -78,7 +96,7 @@ describe('Transactions - Required Field Validation', () => {
 
         // Open the add transaction dialog
         const addButton = screen.getByRole('button', { name: /add transaction/i });
-        await user.click(addButton);
+        fireEvent.click(addButton);
 
         // Wait for dialog to open
         await waitFor(() =>
@@ -87,11 +105,11 @@ describe('Transactions - Required Field Validation', () => {
 
         // Clear the date field (it's pre-filled with today's date)
         const dateInput = screen.getByTestId('transaction-date-input');
-        await user.clear(dateInput);
+        fireEvent.change(dateInput, { target: { value: '' } });
 
         // Try to submit
         const submitButton = screen.getByTestId('transaction-form-submit');
-        await user.click(submitButton);
+        fireEvent.click(submitButton);
 
         // Verify error message is displayed near date field
         await waitFor(() => {
@@ -105,7 +123,6 @@ describe('Transactions - Required Field Validation', () => {
     });
 
     it('displays error when period field is empty on submit', async () => {
-        const user = userEvent.setup();
         render(<Transactions />);
 
         await waitFor(() =>
@@ -113,7 +130,7 @@ describe('Transactions - Required Field Validation', () => {
         );
 
         const addButton = screen.getByRole('button', { name: /add transaction/i });
-        await user.click(addButton);
+        fireEvent.click(addButton);
 
         await waitFor(() =>
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
@@ -121,11 +138,11 @@ describe('Transactions - Required Field Validation', () => {
 
         // Clear the period field
         const periodInput = screen.getByTestId('transaction-period-input');
-        await user.clear(periodInput);
+        fireEvent.change(periodInput, { target: { value: '' } });
 
         // Try to submit
         const submitButton = screen.getByTestId('transaction-form-submit');
-        await user.click(submitButton);
+        fireEvent.click(submitButton);
 
         // Verify error message
         await waitFor(() => {
@@ -136,7 +153,6 @@ describe('Transactions - Required Field Validation', () => {
     });
 
     it('displays error when category is not selected on submit', async () => {
-        const user = userEvent.setup();
         render(<Transactions />);
 
         await waitFor(() =>
@@ -144,7 +160,7 @@ describe('Transactions - Required Field Validation', () => {
         );
 
         const addButton = screen.getByRole('button', { name: /add transaction/i });
-        await user.click(addButton);
+        fireEvent.click(addButton);
 
         await waitFor(() =>
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
@@ -153,7 +169,7 @@ describe('Transactions - Required Field Validation', () => {
         // Category is empty by default
         // Try to submit
         const submitButton = screen.getByTestId('transaction-form-submit');
-        await user.click(submitButton);
+        fireEvent.click(submitButton);
 
         // Verify error message
         await waitFor(() => {
@@ -164,7 +180,6 @@ describe('Transactions - Required Field Validation', () => {
     });
 
     it('displays error when amount field is empty on submit', async () => {
-        const user = userEvent.setup();
         render(<Transactions />);
 
         await waitFor(() =>
@@ -172,7 +187,7 @@ describe('Transactions - Required Field Validation', () => {
         );
 
         const addButton = screen.getByRole('button', { name: /add transaction/i });
-        await user.click(addButton);
+        fireEvent.click(addButton);
 
         await waitFor(() =>
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
@@ -181,7 +196,7 @@ describe('Transactions - Required Field Validation', () => {
         // Amount is empty by default
         // Try to submit
         const submitButton = screen.getByTestId('transaction-form-submit');
-        await user.click(submitButton);
+        fireEvent.click(submitButton);
 
         // Verify error message
         await waitFor(() => {
@@ -192,7 +207,6 @@ describe('Transactions - Required Field Validation', () => {
     });
 
     it('clears date error when user fills in the field', async () => {
-        const user = userEvent.setup();
         render(<Transactions />);
 
         await waitFor(() =>
@@ -200,7 +214,7 @@ describe('Transactions - Required Field Validation', () => {
         );
 
         const addButton = screen.getByRole('button', { name: /add transaction/i });
-        await user.click(addButton);
+        fireEvent.click(addButton);
 
         await waitFor(() =>
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
@@ -208,10 +222,10 @@ describe('Transactions - Required Field Validation', () => {
 
         // Clear date and submit to trigger error
         const dateInput = screen.getByTestId('transaction-date-input');
-        await user.clear(dateInput);
+        fireEvent.change(dateInput, { target: { value: '' } });
 
         const submitButton = screen.getByTestId('transaction-form-submit');
-        await user.click(submitButton);
+        fireEvent.click(submitButton);
 
         // Wait for error to appear
         await waitFor(() => {
@@ -219,7 +233,7 @@ describe('Transactions - Required Field Validation', () => {
         });
 
         // Fill in the date
-        await user.type(dateInput, '2025-01-15');
+        fireEvent.change(dateInput, { target: { value: '2025-01-15' } });
 
         // Verify error is cleared
         await waitFor(() => {
@@ -228,7 +242,6 @@ describe('Transactions - Required Field Validation', () => {
     });
 
     it('displays multiple errors when multiple required fields are empty', async () => {
-        const user = userEvent.setup();
         render(<Transactions />);
 
         await waitFor(() =>
@@ -236,7 +249,7 @@ describe('Transactions - Required Field Validation', () => {
         );
 
         const addButton = screen.getByRole('button', { name: /add transaction/i });
-        await user.click(addButton);
+        fireEvent.click(addButton);
 
         await waitFor(() =>
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
@@ -245,12 +258,12 @@ describe('Transactions - Required Field Validation', () => {
         // Clear date and period
         const dateInput = screen.getByTestId('transaction-date-input');
         const periodInput = screen.getByTestId('transaction-period-input');
-        await user.clear(dateInput);
-        await user.clear(periodInput);
+        fireEvent.change(dateInput, { target: { value: '' } });
+        fireEvent.change(periodInput, { target: { value: '' } });
 
         // Try to submit (date, period, category, amount all invalid/empty)
         const submitButton = screen.getByTestId('transaction-form-submit');
-        await user.click(submitButton);
+        fireEvent.click(submitButton);
 
         // Verify all error messages are displayed
         await waitFor(() => {
