@@ -42,6 +42,7 @@ import {
     X,
     Download,
     PencilLine,
+    Copy,
 } from 'lucide-react';
 
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
@@ -149,6 +150,7 @@ export default function Transactions() {
     const [formError, setFormError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [isDuplicating, setIsDuplicating] = useState(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
     const [bulkCategoryId, setBulkCategoryId] = useState('');
@@ -418,6 +420,7 @@ export default function Transactions() {
 
     const handleEdit = (transaction: Transaction) => {
         setFormError(null);
+        setIsDuplicating(false);
         setEditingId(transaction.id);
         setFormData({
             date: transaction.date,
@@ -433,6 +436,31 @@ export default function Transactions() {
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
             debt_component: (transaction.debt_component || '') as 'principal' | 'interest' | '',
+        });
+        setIsDialogOpen(true);
+    };
+
+    const handleDuplicate = (transaction: Transaction) => {
+        setFormError(null);
+        setEditingId(null);
+        setIsDuplicating(true);
+        setFormData({
+            date: transaction.date,
+            period: transaction.period,
+            quincena: transaction.quincena as 'Q1' | 'Q2',
+            category_id: transaction.category_id.toString(),
+            account_id: transaction.account_id?.toString() ?? '',
+            currency: (transaction.currency ?? 'CAD') as
+                | 'CAD'
+                | 'USD'
+                | 'COP',
+            amount: (transaction.amount ?? 0).toString(),
+            comments: transaction.comments || '',
+            is_recurring: transaction.is_recurring,
+            debt_component: (transaction.debt_component || '') as
+                | 'principal'
+                | 'interest'
+                | '',
         });
         setIsDialogOpen(true);
     };
@@ -532,6 +560,7 @@ export default function Transactions() {
 
     const resetForm = () => {
         setEditingId(null);
+        setIsDuplicating(false);
         setFormError(null);
         setFormData({
             date: new Date().toISOString().split('T')[0],
@@ -736,16 +765,23 @@ export default function Transactions() {
                                     Add Transaction
                                 </Button>
                             </DialogTrigger>
-                        <DialogContent className="max-w-md">
+                        <DialogContent
+                            className="max-w-md"
+                            data-testid="transaction-form-dialog"
+                        >
                             <form onSubmit={handleSubmit}>
                                 <DialogHeader>
-                                    <DialogTitle>
+                                    <DialogTitle data-testid="transaction-form-title">
                                         {editingId
                                             ? 'Edit Transaction'
-                                            : 'Add Transaction'}
+                                            : isDuplicating
+                                              ? 'Duplicate Transaction'
+                                              : 'Add Transaction'}
                                     </DialogTitle>
                                     <DialogDescription>
-                                        Fill in the transaction details below
+                                        {isDuplicating
+                                            ? 'Review the copied values, update the date if needed, then save'
+                                            : 'Fill in the transaction details below'}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
@@ -759,6 +795,7 @@ export default function Transactions() {
                                             inputMode="numeric"
                                             placeholder="2025-01-15"
                                             value={formData.date}
+                                            data-testid="transaction-date-input"
                                             onChange={(e) => {
                                                 setFormError(null);
                                                 setFormData({
@@ -788,6 +825,7 @@ export default function Transactions() {
                                             <Input
                                                 id="period"
                                                 value={formData.period}
+                                                data-testid="transaction-period-input"
                                                 onChange={(e) => {
                                                     setFormError(null);
                                                     setFormData({
@@ -951,6 +989,7 @@ export default function Transactions() {
                                                 type="number"
                                                 step="0.01"
                                                 value={formData.amount}
+                                                data-testid="transaction-amount-input"
                                                 onChange={(e) => {
                                                     setFormError(null);
                                                     setFormData({
@@ -1068,8 +1107,15 @@ export default function Transactions() {
                                     </p>
                                 )}
                                 <DialogFooter>
-                                    <Button type="submit">
-                                        {editingId ? 'Update' : 'Create'}
+                                    <Button
+                                        type="submit"
+                                        data-testid="transaction-form-submit"
+                                    >
+                                        {editingId
+                                            ? 'Update'
+                                            : isDuplicating
+                                              ? 'Create Duplicate'
+                                              : 'Create'}
                                     </Button>
                                 </DialogFooter>
                             </form>
@@ -1591,6 +1637,19 @@ export default function Transactions() {
                                             </div>
                                             </div>
                                             <div className="flex gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    aria-label="Duplicate transaction"
+                                                    data-testid={`duplicate-transaction-${transaction.id}`}
+                                                    onClick={() =>
+                                                        handleDuplicate(
+                                                            transaction,
+                                                        )
+                                                    }
+                                                >
+                                                    <Copy className="h-4 w-4" />
+                                                </Button>
                                                 <Button
                                                     variant="outline"
                                                     size="icon"

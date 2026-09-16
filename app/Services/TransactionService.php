@@ -258,6 +258,32 @@ class TransactionService implements TransactionServiceInterface
     }
 
     /**
+     * Duplicate an existing transaction.
+     *
+     * @param  array{date?: string, period?: string, quincena?: string}  $overrides
+     */
+    public function duplicate(int $id, array $overrides = []): TransactionEntity
+    {
+        $source = Transaction::query()->findOrFail($id);
+
+        $data = [
+            'date' => $overrides['date'] ?? $source->date,
+            'period' => $overrides['period'] ?? $source->period,
+            'quincena' => $overrides['quincena'] ?? $source->quincena,
+            'category_id' => $source->category_id,
+            'account_id' => $source->account_id,
+            'amount_cad' => $source->amount_cad,
+            'amount_usd' => $source->amount_usd,
+            'amount_cop' => $source->amount_cop,
+            'comments' => $source->comments,
+            'is_recurring' => $source->is_recurring,
+            'debt_component' => $source->debt_component,
+        ];
+
+        return $this->create($data);
+    }
+
+    /**
      * Get transactions for a specific period.
      */
     public function getForPeriod(string $period): array

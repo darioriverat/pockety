@@ -63,6 +63,13 @@ interface TransactionServiceInterface
     public function bulkUpdate(array $ids, array $data): TransactionCollection;
 
     /**
+     * Duplicate an existing transaction, optionally overriding date/period.
+     *
+     * @param  array{date?: string, period?: string, quincena?: string}  $overrides
+     */
+    public function duplicate(int $id, array $overrides = []): TransactionEntity;
+
+    /**
      * Get transactions for a specific period.
      *
      * @param  string  $period  Period in YYYYMM format

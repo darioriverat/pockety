@@ -4524,3 +4524,45 @@ NEXT SESSION:
 PROGRESS: 111/175 passing; 64 remaining
 STATUS: App healthy; bulk edit live on transactions page
 
+================================================================================
+SESSION 60 - Sep 15, 2026, ~9:45 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked (interactive approval rejected) — used /dev/browser-tests
+- Frontend/backend/browser via /dev/frontend-tests, /dev/run-tests, /dev/browser-tests
+
+VERIFICATION (before new work):
+- Frontend unit tests: 67/67 pass
+- Browser smoke: bulk edit 1/1 pass
+
+IMPLEMENTED THIS SESSION:
+Test #110 — Duplicate a transaction
+- POST /api/transactions/{id}/duplicate (optional date/period/quincena overrides)
+- TransactionService::duplicate
+- Transactions UI: Copy button opens "Duplicate Transaction" dialog pre-filled
+- Submit creates new txn via existing POST /api/transactions
+- Feature tests (3), frontend unit test (1), Playwright browser spec
+
+BROWSER VERIFIED (screenshots in verification/session-60/):
+- 01-transactions-before-duplicate.png
+- 02-duplicate-form-prefilled.png
+- 03-duplicate-form-date-updated.png
+- 04-transactions-after-duplicate.png
+
+NOTES:
+- Needed /dev/seed-browser + /dev/reset-test-user before browser test (empty categories / login)
+- Built assets via /dev/build-assets after UI changes
+
+PASSES UPDATED:
+- #110 → passes: true
+
+NEXT SESSION:
+1. Implement test #111 — recent activity feed on dashboard
+2. Or #112 default currency preference
+3. Prefer /dev/reset-test-user + /dev/seed-browser if login/categories fail
+
+PROGRESS: 112/175 passing; 63 remaining
+STATUS: App healthy; duplicate live on transactions page
+

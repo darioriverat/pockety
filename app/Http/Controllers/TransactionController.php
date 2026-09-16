@@ -257,6 +257,49 @@ class TransactionController extends Controller
     }
 
     /**
+     * Duplicate an existing transaction.
+     *
+     * POST /api/transactions/{id}/duplicate
+     */
+    public function duplicate(Request $request, int $id): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'date' => 'sometimes|required|date_format:Y-m-d',
+                'period' => 'sometimes|required|string|size:6|regex:/^\d{6}$/',
+                'quincena' => 'sometimes|required|in:Q1,Q2',
+            ], [
+                'date.date_format' => 'Date must be a valid date.',
+                'period.size' => 'The period must be in YYYYMM format.',
+                'period.regex' => 'The period must be in YYYYMM format.',
+                'quincena.in' => 'The quincena must be Q1 or Q2.',
+            ]);
+
+            $transaction = $this->service->duplicate($id, $validated);
+
+            return response()->json([
+                'data' => $transaction->toArray(),
+                'links' => [
+                    'self' => route('transactions.show', $transaction->id),
+                    'source' => route('transactions.show', $id),
+                    'index' => route('transactions.index'),
+                ],
+                'message' => 'Transaction duplicated successfully',
+            ], 201);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 422);
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Transaction not found',
+            ], 404);
+        }
+    }
+
+    /**
      * Delete a transaction.
      *
      * DELETE /api/transactions/{id}

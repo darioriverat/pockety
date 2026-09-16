@@ -1319,7 +1319,7 @@
       "Step 5: Submit",
       "Step 6: Verify new transaction is created with same details"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

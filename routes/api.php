@@ -73,6 +73,7 @@ Route::get('/transactions', [TransactionController::class, 'index'])->name('tran
 Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transactions.export');
 Route::post('/transactions/bulk', [TransactionController::class, 'bulkUpdate'])->name('transactions.bulk');
 Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+Route::post('/transactions/{id}/duplicate', [TransactionController::class, 'duplicate'])->name('transactions.duplicate')->whereNumber('id');
 Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 Route::put('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
 Route::patch('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.patch');
