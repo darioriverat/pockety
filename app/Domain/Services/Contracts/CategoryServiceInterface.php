@@ -44,4 +44,25 @@ interface CategoryServiceInterface
      * Check if a category has associated transactions.
      */
     public function hasTransactions(string $code): bool;
+
+    /**
+     * Get transaction history for a category, optionally filtered by period.
+     *
+     * @return array{
+     *     category: CategoryEntity,
+     *     transactions: list<\App\Domain\Entities\TransactionEntity>,
+     *     meta: array{
+     *         total_spending_cad: float,
+     *         total_spending_usd: float,
+     *         total_spending_cop: float,
+     *         total_count: int,
+     *         period_count: int,
+     *         average_per_period_cad: float,
+     *         available_periods: list<string>,
+     *         is_filtered: bool,
+     *         filters: array{period: string|null}
+     *     }
+     * }|null
+     */
+    public function getTransactionHistory(string $code, ?string $period = null): ?array;
 }

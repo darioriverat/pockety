@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -152,13 +152,20 @@ export default function Categories() {
                                     className={
                                         !category.is_active
                                             ? 'opacity-50'
-                                            : ''
+                                            : 'transition-colors hover:bg-muted/40'
                                     }
+                                    data-testid={`category-card-${category.code}`}
                                 >
                                     <CardHeader>
                                         <div className="flex items-start justify-between">
                                             <CardTitle className="text-lg">
-                                                {category.code}
+                                                <Link
+                                                    href={`/categories/${category.code}`}
+                                                    className="hover:underline"
+                                                    data-testid={`category-link-${category.code}`}
+                                                >
+                                                    {category.code}
+                                                </Link>
                                             </CardTitle>
                                             <div className="flex gap-2 items-center">
                                                 {category.is_debt_category && (
@@ -174,16 +181,24 @@ export default function Categories() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleDelete(category.code, category.name_en)}
+                                                    onClick={(event) => {
+                                                        event.preventDefault();
+                                                        event.stopPropagation();
+                                                        handleDelete(category.code, category.name_en);
+                                                    }}
                                                     disabled={deletingId === category.id}
                                                     className="h-8 w-8 p-0"
+                                                    aria-label={`Delete ${category.code}`}
                                                 >
                                                     <Trash2 className="h-4 w-4 text-destructive" />
                                                 </Button>
                                             </div>
                                         </div>
                                         <CardDescription>
-                                            <div className="space-y-1">
+                                            <Link
+                                                href={`/categories/${category.code}`}
+                                                className="block space-y-1 hover:opacity-90"
+                                            >
                                                 <div>
                                                     <span className="font-medium">
                                                         ES:
@@ -201,7 +216,7 @@ export default function Categories() {
                                                         {category.status}
                                                     </div>
                                                 )}
-                                            </div>
+                                            </Link>
                                         </CardDescription>
                                     </CardHeader>
                                 </Card>

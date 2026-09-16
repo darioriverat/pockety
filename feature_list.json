@@ -1183,7 +1183,7 @@
       "Step 4: Verify transactions can be filtered by period",
       "Step 5: Verify total spending for that category is displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1195,7 +1195,7 @@
       "Step 4: Verify number of periods with transactions is shown",
       "Step 5: Verify number of total transactions is shown"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

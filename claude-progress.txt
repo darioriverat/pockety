@@ -4108,3 +4108,29 @@ TESTS VERIFIED: #95, #96, #97 - All passing with browser automation
 PROGRESS: 100 of 175 tests passing (75 remaining)
 STATUS: Clean, stable, no broken features. See SESSION-49-SUMMARY.md for details.
 
+================================================================================
+SESSION 50 - Category Transaction History (2026-09-15)
+================================================================================
+
+SMOKE VERIFICATION (before new work):
+- Backend BudgetTest: 13/13 ✅ (via /dev/run-tests)
+- Frontend unit tests: all passing ✅ (via /dev/frontend-tests)
+- Browser smoke: feature 2 categories ✅ (via /dev/browser-tests)
+
+IMPLEMENTED & VERIFIED:
+- Test #98: Category transaction history across all periods
+  - Click C001 on categories → /categories/C001
+  - Shows all txs across periods; period filter; total spending
+- Test #99: Category summary statistics
+  - Total spent, avg/period, period count, transaction count
+
+KEY CHANGES:
+- GET /api/categories/{code}/transactions (+ optional period filter)
+- CategoryService::getTransactionHistory()
+- category-detail.tsx + categories.tsx links
+- Backend/FE/browser tests + screenshots in verification/test-98-category-history/
+
+PROGRESS: 102 of 175 tests passing (73 remaining)
+NEXT: Test #100 — Dashboard income vs expenses chart
+STATUS: Clean, stable. See SESSION-50-SUMMARY.md.
+

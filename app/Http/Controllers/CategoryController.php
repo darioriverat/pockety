@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
@@ -53,7 +55,58 @@ class CategoryController extends Controller
             'links' => [
                 'self' => route('categories.show', $code),
                 'index' => route('categories.index'),
+                'transactions' => route('categories.transactions', $code),
             ],
+        ]);
+    }
+
+    /**
+     * Get transactions for a category across periods.
+     *
+     * GET /api/categories/{code}/transactions
+     */
+    public function transactions(Request $request, string $code): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'period' => 'nullable|string|size:6|regex:/^\d{6}$/',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'messages' => $e->errors(),
+            ], 422);
+        }
+
+        $period = $validated['period'] ?? null;
+        $history = $this->service->getTransactionHistory($code, $period);
+
+        if ($history === null) {
+            return response()->json([
+                'error' => 'Category not found',
+            ], 404);
+        }
+
+        $data = array_map(
+            fn ($entity) => $entity->toArray(),
+            $history['transactions']
+        );
+
+        $selfParams = ['code' => $code];
+        if ($period !== null && $period !== '') {
+            $selfParams['period'] = $period;
+        }
+
+        return response()->json([
+            'data' => $data,
+            'links' => [
+                'self' => route('categories.transactions', $selfParams),
+                'category' => route('categories.show', $code),
+                'index' => route('categories.index'),
+            ],
+            'meta' => array_merge($history['meta'], [
+                'category' => $history['category']->toArray(),
+            ]),
         ]);
     }
 

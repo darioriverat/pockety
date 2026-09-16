@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Domain\Entities\CategoryEntity;
+use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Models\Category;
+use App\Models\Transaction;
 
 class CategoryService implements CategoryServiceInterface
 {
@@ -138,5 +140,128 @@ class CategoryService implements CategoryServiceInterface
         }
 
         return $category->transactions()->exists();
+    }
+
+    /**
+     * Get transaction history for a category, optionally filtered by period.
+     *
+     * @return array{
+     *     category: CategoryEntity,
+     *     transactions: list<TransactionEntity>,
+     *     meta: array{
+     *         total_spending_cad: float,
+     *         total_spending_usd: float,
+     *         total_spending_cop: float,
+     *         total_count: int,
+     *         period_count: int,
+     *         average_per_period_cad: float,
+     *         available_periods: list<string>,
+     *         is_filtered: bool,
+     *         filters: array{period: string|null}
+     *     }
+     * }|null
+     */
+    public function getTransactionHistory(string $code, ?string $period = null): ?array
+    {
+        $category = Category::where('code', $code)->first();
+
+        if (! $category) {
+            return null;
+        }
+
+        $categoryEntity = new CategoryEntity(
+            id: $category->id,
+            code: $category->code,
+            nameEs: $category->name_es,
+            nameEn: $category->name_en,
+            isDebtCategory: $category->is_debt_category,
+            isActive: $category->is_active,
+            status: $category->status,
+        );
+
+        /** @var list<string> $availablePeriods */
+        $availablePeriods = Transaction::query()
+            ->where('category_id', $category->id)
+            ->distinct()
+            ->orderByDesc('period')
+            ->pluck('period')
+            ->map(fn ($value) => (string) $value)
+            ->values()
+            ->all();
+
+        $query = Transaction::query()
+            ->with('account')
+            ->where('category_id', $category->id)
+            ->orderByDesc('date')
+            ->orderByDesc('id');
+
+        $isFiltered = $period !== null && $period !== '';
+        if ($isFiltered) {
+            $query->where('period', $period);
+        }
+
+        $transactions = $query->get();
+
+        $totalCad = 0.0;
+        $totalUsd = 0.0;
+        $totalCop = 0.0;
+        $periodsInResult = [];
+        $entities = [];
+
+        foreach ($transactions as $transaction) {
+            $totalCad += (float) ($transaction->amount_cad ?? 0);
+            $totalUsd += (float) ($transaction->amount_usd ?? 0);
+            $totalCop += (float) ($transaction->amount_cop ?? 0);
+            $periodsInResult[$transaction->period] = true;
+
+            $data = [
+                'id' => $transaction->id,
+                'date' => $transaction->date,
+                'period' => $transaction->period,
+                'quincena' => $transaction->quincena,
+                'category_id' => $transaction->category_id,
+                'account_id' => $transaction->account_id,
+                'amount_cad' => $transaction->amount_cad !== null ? (float) $transaction->amount_cad : null,
+                'amount_usd' => $transaction->amount_usd !== null ? (float) $transaction->amount_usd : null,
+                'amount_cop' => $transaction->amount_cop !== null ? (float) $transaction->amount_cop : null,
+                'comments' => $transaction->comments,
+                'is_recurring' => $transaction->is_recurring,
+                'debt_component' => $transaction->debt_component,
+            ];
+
+            if ($transaction->relationLoaded('account') && $transaction->account) {
+                $data['account'] = [
+                    'id' => $transaction->account->id,
+                    'name' => $transaction->account->name,
+                    'type' => $transaction->account->type,
+                ];
+            }
+
+            $entities[] = TransactionEntity::fromArray($data);
+        }
+
+        $periodCount = count($periodsInResult);
+        $totalCad = round($totalCad, 2);
+        $averagePerPeriodCad = $periodCount > 0
+            ? round($totalCad / $periodCount, 2)
+            : 0.0;
+
+        return [
+            'category' => $categoryEntity,
+            'transactions' => $entities,
+            'meta' => [
+                'total_spending_cad' => $totalCad,
+                'total_spending_usd' => round($totalUsd, 2),
+                'total_spending_cop' => round($totalCop, 2),
+                'total_count' => count($entities),
+                'period_count' => $periodCount,
+                'average_per_period_cad' => $averagePerPeriodCad,
+                'available_periods' => $availablePeriods,
+                'is_filtered' => $isFiltered,
+                'filters' => [
+                    'period' => $isFiltered ? $period : null,
+                ],
+            ],
+        ];
     }
 }

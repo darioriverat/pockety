@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('income', 'income')->name('income');
     Route::inertia('reconciliation', 'reconciliation')->name('reconciliation');
     Route::inertia('categories', 'categories')->name('categories');
+    Route::inertia('categories/{code}', 'category-detail')->name('categories.detail');
     Route::inertia('transactions', 'transactions')->name('transactions');
     Route::inertia('exchange-rates', 'exchange-rates')->name('exchange-rates');
     Route::inertia('budgets', 'budgets')->name('budgets');

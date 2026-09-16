@@ -500,6 +500,104 @@ Controller7a4f8d9d0be39757f6a1352cf8f1ab45.form = Controller7a4f8d9d0be39757f6a1
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories/{code}'
+*/
+const Controller8761b515857d9aa710966a56bfacd6e2 = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller8761b515857d9aa710966a56bfacd6e2.url(args, options),
+    method: 'get',
+})
+
+Controller8761b515857d9aa710966a56bfacd6e2.definition = {
+    methods: ["get","head"],
+    url: '/categories/{code}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories/{code}'
+*/
+Controller8761b515857d9aa710966a56bfacd6e2.url = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { code: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            code: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        code: args.code,
+    }
+
+    return Controller8761b515857d9aa710966a56bfacd6e2.definition.url
+            .replace('{code}', parsedArgs.code.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories/{code}'
+*/
+Controller8761b515857d9aa710966a56bfacd6e2.get = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller8761b515857d9aa710966a56bfacd6e2.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories/{code}'
+*/
+Controller8761b515857d9aa710966a56bfacd6e2.head = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller8761b515857d9aa710966a56bfacd6e2.url(args, options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories/{code}'
+*/
+const Controller8761b515857d9aa710966a56bfacd6e2Form = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller8761b515857d9aa710966a56bfacd6e2.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories/{code}'
+*/
+Controller8761b515857d9aa710966a56bfacd6e2Form.get = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller8761b515857d9aa710966a56bfacd6e2.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/categories/{code}'
+*/
+Controller8761b515857d9aa710966a56bfacd6e2Form.head = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller8761b515857d9aa710966a56bfacd6e2.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controller8761b515857d9aa710966a56bfacd6e2.form = Controller8761b515857d9aa710966a56bfacd6e2Form
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/transactions'
 */
 const Controllere5aa2cad321b30063c3b415df5452200 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -1390,6 +1488,7 @@ const Controller = {
     '/income': Controller8697b0142b391538b910a8d7291265c2,
     '/reconciliation': Controller5fbe311172c80aea24e168c1390225a1,
     '/categories': Controller7a4f8d9d0be39757f6a1352cf8f1ab45,
+    '/categories/{code}': Controller8761b515857d9aa710966a56bfacd6e2,
     '/transactions': Controllere5aa2cad321b30063c3b415df5452200,
     '/exchange-rates': Controller9ec6ff571c4d5816f375bbafc9964ac9,
     '/budgets': Controllerd65bcf739ad2a9a13b6c3c100ab1c5e2,
