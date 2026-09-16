@@ -1,6 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { initializePeriod } from '@/hooks/use-period';
 import Income from '@/pages/income';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { User } from '@/types';
@@ -90,6 +91,8 @@ function renderIncome() {
 
 describe('Income page', () => {
     beforeEach(() => {
+        localStorage.setItem('pockety.selectedPeriod', '202501');
+        initializePeriod();
         fetchMock.mockReset();
         global.fetch = fetchMock as unknown as typeof fetch;
 
@@ -110,6 +113,20 @@ describe('Income page', () => {
     it('renders the income page without crashing', async () => {
         renderIncome();
         expect(await screen.findByText('Income')).toBeDefined();
+    });
+
+    it('loads the shared period and publishes a submitted period change', async () => {
+        localStorage.setItem('pockety.selectedPeriod', '202608');
+        initializePeriod();
+        renderIncome();
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/income?period=202608'));
+        const input = screen.getByLabelText('Period', { exact: true });
+        expect(input).toHaveValue('202608');
+        fireEvent.change(input, { target: { value: '202607' } });
+        expect(localStorage.getItem('pockety.selectedPeriod')).toBe('202608');
+        fireEvent.click(screen.getByRole('button', { name: 'Load Period' }));
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/income?period=202607'));
+        expect(localStorage.getItem('pockety.selectedPeriod')).toBe('202607');
     });
 
     it('shows Add Income button', async () => {

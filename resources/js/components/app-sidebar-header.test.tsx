@@ -6,6 +6,7 @@ vi.mock('@inertiajs/react', () => ({
     Link: ({
         children,
         href,
+        prefetch: _prefetch,
         ...props
     }: {
         children: React.ReactNode;

@@ -7,7 +7,7 @@ global.fetch = vi.fn();
 
 // Mock Inertia Head component
 vi.mock('@inertiajs/react', () => ({
-    Head: ({ title }: { title: string }) => <head><title>{title}</title></head>,
+    Head: ({ title }: { title: string }) => <title>{title}</title>,
     Link: ({
         href,
         children,

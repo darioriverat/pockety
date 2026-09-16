@@ -5139,3 +5139,46 @@ STATUS / NEXT:
 - Completion: 144/175 passing, 31 pending.
 - Next: index 144, consistent primary/secondary button styles.
 - Development data preserved; no database resets or imports were needed.
+
+=== Session 76 (2026-09-16) ===
+
+GOAL: Complete consistent primary/secondary buttons (feature index 144).
+
+ENVIRONMENT / BASELINE:
+- Read specification, feature list, recent progress, and git history.
+- Puppeteer navigation, clicks, input, and screenshots worked this session.
+- init.sh succeeded with Docker access; web_app was already running.
+- Builds and tests ran inside /var/www/vhosts in web_app.
+- Initial task tests: 256 backend tests / 1475 assertions; 102 frontend tests passed.
+- PHP lint and PHPStan passed as part of task tests.
+- Existing dashboard-period browser smoke passed (one targeted case, no reset).
+
+REGRESSIONS FIXED:
+- Income initialized to the current month while the shared header showed January.
+- Temporarily marked period-navigation index 81 false on discovery.
+- Income now reads the shared selected period and reloads when it changes.
+- The manual period input remains a draft until Load Period is clicked.
+- Loading a valid period updates the header and persists across navigation.
+- Corrected test-only Head/Link mocks producing React DOM warnings.
+- Final frontend suite emits no React warnings.
+
+BUTTON FEATURE:
+- Shared Button animates background, border, foreground, shadow, and opacity.
+- Reduced-motion preference disables these transitions.
+- Outlined buttons explicitly use the theme foreground color.
+- Verified primary/secondary/outline hierarchy, 36px action heights, hover,
+  keyboard focus, cancel behavior, disabled state, and link semantics.
+- Added button component tests and income shared-period regression coverage.
+- Added tests/browser/button-styles.spec.ts; all three cases pass.
+- Browser measurements wait for dialog opening/reopening animations to settle.
+
+FINAL VERIFICATION / STATUS:
+- 105 frontend tests passed; TypeScript check and production build passed.
+- New browser checks passed in light/dark themes with zero console/page errors.
+- Screenshots inspected in verification/test-144-button-styles/.
+- No backend behavior changed; baseline backend suite remained green.
+- Index 81 restored after UI verification; index 144 marked passing.
+- Only passes fields modified in feature_list.json.
+- Completion: 145/175 passing; 30 pending.
+- Next: index 145, table column headers, row striping, and hover states.
+- Development data preserved; no database reset, import, or seed was needed.

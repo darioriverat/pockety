@@ -60,9 +60,11 @@ vi.mock('@inertiajs/react', () => ({
     Link: ({
         href,
         children,
+        prefetch: _prefetch,
         ...props
     }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
         href: string;
+        prefetch?: boolean;
     }) => (
         <a href={href} {...props}>
             {children}

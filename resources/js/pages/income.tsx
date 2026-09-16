@@ -1,3 +1,5 @@
+import { usePeriod } from '@/hooks/use-period';
+import { isValidPeriod } from '@/lib/periods';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
@@ -62,13 +64,6 @@ const formatCurrency = (value: number, currency: string): string => {
     }
 };
 
-const currentPeriod = (): string => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    return `${year}${month}`;
-};
-
 const formatPeriodLabel = (period: string): string => {
     if (!/^\d{6}$/.test(period)) {
         return period;
@@ -80,7 +75,8 @@ const formatPeriodLabel = (period: string): string => {
 };
 
 export default function Income() {
-    const [period, setPeriod] = useState<string>(currentPeriod());
+    const { period, setPeriod } = usePeriod();
+    const [periodInput, setPeriodInput] = useState(period);
     const [lines, setLines] = useState<IncomeLine[]>([]);
     const [totalCad, setTotalCad] = useState<number>(0);
     const [maxLines, setMaxLines] = useState<number>(6);
@@ -124,12 +120,21 @@ export default function Income() {
     };
 
     useEffect(() => {
+        setPeriodInput(period);
         fetchIncome(period);
-    }, []);
+    }, [period]);
 
     const handlePeriodSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        fetchIncome(period);
+        if (!isValidPeriod(periodInput)) {
+            setError('Select a supported period from January 2025 through September 2026.');
+            return;
+        }
+        if (periodInput === period) {
+            fetchIncome(period);
+        } else {
+            setPeriod(periodInput);
+        }
     };
 
     const resetForm = () => {
@@ -406,8 +411,8 @@ export default function Income() {
                                 <Label htmlFor="period">Period (YYYYMM)</Label>
                                 <Input
                                     id="period"
-                                    value={period}
-                                    onChange={(e) => setPeriod(e.target.value)}
+                                    value={periodInput}
+                                    onChange={(e) => setPeriodInput(e.target.value)}
                                     placeholder="202501"
                                     maxLength={6}
                                     aria-label="Period"
