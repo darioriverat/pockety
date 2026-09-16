@@ -1915,7 +1915,7 @@
       "Step 5: Verify dropdown list is styled consistently with app",
       "Step 6: Verify selected item is highlighted"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
