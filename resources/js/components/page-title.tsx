@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { TYPOGRAPHY } from '@/lib/typography';
 import { cn } from '@/lib/utils';
 
 interface PageTitleProps {
@@ -26,17 +27,14 @@ export function PageTitle({
         <div className={cn(className)} data-testid="page-header">
             <div className="flex flex-wrap items-center gap-2">
                 {leading}
-                <h1
-                    className="text-foreground text-3xl font-bold tracking-tight"
-                    data-testid={testId}
-                >
+                <h1 className={TYPOGRAPHY.h1} data-testid={testId}>
                     {title}
                 </h1>
                 {trailing}
             </div>
             {description ? (
                 <p
-                    className="text-muted-foreground mt-1 text-sm sm:text-base"
+                    className={cn(TYPOGRAPHY.bodyMuted, 'mt-1 text-sm sm:text-base')}
                     data-testid="page-title-description"
                 >
                     {description}

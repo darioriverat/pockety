@@ -5971,3 +5971,43 @@ NEXT:
 1. Recover Lima/Docker DB network
 2. Verify + mark Features #162 breadcrumbs, #163 page titles, #164 section spacing
 3. Feature #165 typography hierarchy
+
+
+=== Session 96 (2026-09-16) ===
+
+GOAL: Recover stack, verify pending #162–#164, implement #165 typography hierarchy
+
+STACK RECOVERY (THIS SESSION):
+- App was HTTP 500: getaddrinfo web_app_db failed (Docker sock still EPERM from agent)
+- Fixed locally without Docker restart by switching .env to:
+  SESSION_DRIVER=file, CACHE_STORE=file, QUEUE_CONNECTION=sync, DB_CONNECTION=sqlite
+- Created database/database.sqlite; /dev/migrate + /dev/seed-browser + /dev/reset-test-user → 200
+- /dev/build-assets → success; container Playwright via session-helpers works
+- Host Playwright Chrome launch still sandboxed (SIGABRT); Puppeteer MCP still rejected
+- .env is gitignored — local recovery only; restore mysql when web_app_db DNS is healthy
+
+VERIFICATION:
+- Host vitest: section-heading, page-title, breadcrumbs PASSED
+- Sample browser: empty-states.spec.ts PASSED (3)
+- breadcrumbs.spec.ts PASSED (fixed BreadcrumbPage role="link" false positive)
+- page-titles.spec.ts PASSED
+- section-spacing.spec.ts PASSED
+- typography.spec.ts PASSED
+- Screenshots: verification/test-165-typography/, test-162-breadcrumbs/, etc.
+
+FEATURE #165 IMPLEMENTED + VERIFIED:
+- TYPOGRAPHY tokens + SectionHeading (H2) / SubsectionHeading (H3)
+- PageTitle uses H1 token; body text-base leading-relaxed
+- CardTitle default text-lg font-semibold leading-snug
+- Accounts: SectionHeading Assets/Liabilities + SubsectionHeading card titles
+- Dashboard widget titles → SubsectionHeading
+- Tests: section-heading.test.tsx, tests/browser/typography.spec.ts
+
+FEATURES MARKED PASSING: #162, #163, #164, #165
+
+STATUS: 166/175 (9 remaining)
+
+NEXT:
+1. Feature #166 WCAG AA color contrast
+2. Feature #167 distinct link styling
+3. Optionally restore MySQL when Lima/Docker DNS works (./scripts/recover-stack.sh)

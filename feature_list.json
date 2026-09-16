@@ -1952,7 +1952,7 @@
       "Step 4: Verify breadcrumbs are clickable to navigate back",
       "Step 5: Verify current page is highlighted in breadcrumb"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1964,7 +1964,7 @@
       "Step 4: Verify title describes page content",
       "Step 5: Verify title styling is consistent across pages"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1976,7 +1976,7 @@
       "Step 4: Verify spacing between sections/cards is consistent",
       "Step 5: Verify margins and padding follow a consistent scale"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1989,7 +1989,7 @@
       "Step 5: Verify line height provides good readability",
       "Step 6: Verify font weights distinguish headings from body text"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

@@ -13,11 +13,12 @@ import {
     PieChartIcon,
     ActivityIcon,
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DashboardSummaryCard } from '@/components/dashboard-summary-card';
 import { PageContainer } from '@/components/page-container';
 import { PageTitle } from '@/components/page-title';
+import { SubsectionHeading } from '@/components/section-heading';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { ChartAxisLabels } from '@/components/charts/chart-axis-labels';
 import { CHART_COLORS } from '@/lib/chart-colors';
@@ -667,10 +668,10 @@ function TopSpendingCategoriesWidget({
     return (
         <Card data-testid="top-spending-categories-card">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <SubsectionHeading className="flex items-center gap-2">
                     <PieChartIcon className="h-5 w-5" />
                     Top Spending Categories
-                </CardTitle>
+                </SubsectionHeading>
                 <CardDescription data-testid="top-spending-categories-subtitle">
                     Top {data.categories.length} categories for the selected period ·{' '}
                     {currency}
@@ -790,10 +791,10 @@ function RecentActivityWidget({ data }: { data: RecentActivity }) {
     return (
         <Card data-testid="recent-activity-card">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <SubsectionHeading className="flex items-center gap-2">
                     <ActivityIcon className="h-5 w-5" />
                     Recent Activity
-                </CardTitle>
+                </SubsectionHeading>
                 <CardDescription data-testid="recent-activity-description">
                     Latest {data.limit} transactions and income changes
                 </CardDescription>
@@ -1007,10 +1008,10 @@ export default function Dashboard({
                 {/* Income vs Expenses Chart */}
                 <Card data-testid="income-expense-chart-card">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <SubsectionHeading className="flex items-center gap-2">
                             <LineChart className="h-5 w-5" />
                             Income vs Expenses
-                        </CardTitle>
+                        </SubsectionHeading>
                         <CardDescription data-testid="income-expense-chart-range">
                             Last {income_expense_chart.months} months (
                             {formatPeriodShort(income_expense_chart.from)} →{' '}
@@ -1110,10 +1111,10 @@ export default function Dashboard({
                 {/* Assets vs Liabilities Chart */}
                 <Card data-testid="assets-liabilities-chart-card">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <SubsectionHeading className="flex items-center gap-2">
                             <LineChart className="h-5 w-5" />
                             Assets vs Liabilities
-                        </CardTitle>
+                        </SubsectionHeading>
                         <CardDescription data-testid="assets-liabilities-chart-range">
                             Last {assets_liabilities_chart.months} months (
                             {formatPeriodShort(assets_liabilities_chart.from)} →{' '}
@@ -1192,10 +1193,10 @@ export default function Dashboard({
                 {/* Reconciliation Status Card */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <SubsectionHeading className="flex items-center gap-2">
                             <ScaleIcon className="h-5 w-5" />
                             Reconciliation Status
-                        </CardTitle>
+                        </SubsectionHeading>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-center justify-between">

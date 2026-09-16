@@ -137,7 +137,12 @@
         @apply border-border;
     }
 
+    /*
+     * Readable default body copy: 16px (text-base) with relaxed line-height.
+     * Heading hierarchy is provided by PageTitle (H1), SectionHeading (H2),
+     * and SubsectionHeading / CardTitle (H3).
+     */
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground text-base font-normal leading-relaxed;
     }
 }

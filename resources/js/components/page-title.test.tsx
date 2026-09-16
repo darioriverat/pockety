@@ -14,7 +14,12 @@ describe('PageTitle', () => {
 
         const heading = screen.getByRole('heading', { level: 1 });
         expect(heading).toHaveTextContent('Dashboard');
-        expect(heading).toHaveClass('text-3xl', 'font-bold', 'tracking-tight');
+        expect(heading).toHaveClass(
+            'text-3xl',
+            'font-bold',
+            'tracking-tight',
+            'leading-tight',
+        );
         expect(screen.getByTestId('page-title')).toBe(heading);
         expect(screen.getByTestId('page-title-description')).toHaveTextContent(
             'Financial overview for the selected period',

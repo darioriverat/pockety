@@ -32,6 +32,10 @@ import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
+import {
+    SectionHeading,
+    SubsectionHeading,
+} from '@/components/section-heading';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { PlusIcon, Building2, Wallet, AlertCircle } from 'lucide-react';
 
@@ -308,10 +312,10 @@ export default function Accounts() {
             <CardHeader>
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4" />
-                        <CardTitle className="text-lg">
+                        <Building2 className="h-4 w-4 shrink-0" />
+                        <SubsectionHeading data-testid="account-card-title">
                             {account.name}
-                        </CardTitle>
+                        </SubsectionHeading>
                     </div>
                     <Badge variant={account.is_asset ? 'default' : 'secondary'}>
                         {getAccountTypeLabel(account.type)}
@@ -558,9 +562,9 @@ export default function Accounts() {
                 ) : (
                     <>
                         <div className="space-y-4">
-                            <h2 className="text-2xl font-semibold tracking-tight">
+                            <SectionHeading data-testid="accounts-assets-heading">
                                 Assets
-                            </h2>
+                            </SectionHeading>
                             {assetAccounts.length === 0 ? (
                                 <Card>
                                     <CardContent className="py-8 text-center text-muted-foreground">
@@ -575,9 +579,9 @@ export default function Accounts() {
                         </div>
 
                         <div className="space-y-4">
-                            <h2 className="text-2xl font-semibold tracking-tight">
+                            <SectionHeading data-testid="accounts-liabilities-heading">
                                 Liabilities
-                            </h2>
+                            </SectionHeading>
                             {liabilityAccounts.length === 0 ? (
                                 <Card>
                                     <CardContent className="py-8 text-center text-muted-foreground">

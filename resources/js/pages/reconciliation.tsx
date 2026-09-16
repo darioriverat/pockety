@@ -34,6 +34,7 @@ import {
 import { usePeriod } from '@/hooks/use-period';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
+import { SubsectionHeading } from '@/components/section-heading';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
     ScaleIcon,
@@ -378,7 +379,9 @@ export default function Reconciliation() {
                 {report && (
                     <Card data-testid="accounting-equation-card">
                         <CardHeader>
-                            <CardTitle>Accounting Equation</CardTitle>
+                            <SubsectionHeading data-testid="accounting-equation-heading">
+                                Accounting Equation
+                            </SubsectionHeading>
                             <CardDescription>
                                 Assets = Liabilities + Equity for{' '}
                                 {report.period}
