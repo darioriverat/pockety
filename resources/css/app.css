@@ -180,3 +180,144 @@
         flex-shrink: 0;
     }
 }
+
+/*
+ * Print stylesheet (feature #174)
+ * Optimizes pages for printing: hides navigation, formats content,
+ * and applies logical page breaks for reports.
+ */
+@media print {
+    /* Hide navigation and UI chrome */
+    [data-slot='sidebar'],
+    [data-testid='app-sidebar'],
+    [data-testid='app-header'],
+    header,
+    footer,
+    nav,
+    .sidebar,
+    .app-header,
+    .no-print {
+        display: none !important;
+    }
+
+    /* Reset page margins and sizing */
+    @page {
+        margin: 1.5cm;
+        size: letter;
+    }
+
+    /* Main content takes full width when sidebar is hidden */
+    [data-slot='sidebar-inset'],
+    main {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* Optimize text for print */
+    body {
+        color: #000 !important;
+        background: #fff !important;
+        font-size: 11pt;
+        line-height: 1.4;
+    }
+
+    /* Reset backgrounds for print */
+    * {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    /* Preserve table borders */
+    table,
+    th,
+    td {
+        border: 1px solid #000 !important;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    /* Page break rules */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+
+    table,
+    figure,
+    img,
+    pre,
+    blockquote {
+        page-break-inside: avoid;
+    }
+
+    tr,
+    th,
+    td {
+        page-break-inside: avoid;
+    }
+
+    /* Ensure links show URLs */
+    a[href]:after {
+        content: ' (' attr(href) ')';
+        font-size: 0.8em;
+    }
+
+    /* Don't show URLs for internal links or anchors */
+    a[href^='#']:after,
+    a[href^='javascript:']:after,
+    a[href^='/']:after {
+        content: '';
+    }
+
+    /* Print charts and images properly */
+    img,
+    svg,
+    canvas {
+        max-width: 100%;
+        page-break-inside: avoid;
+    }
+
+    /* Preserve card structure but remove decorative styling */
+    [data-slot='card'],
+    .card {
+        border: 1px solid #ccc !important;
+        margin-bottom: 1rem;
+        padding: 1rem !important;
+    }
+
+    /* Table of contents / dashboard cards should break logically */
+    [data-slot='dashboard-card'] {
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+
+    /* Ensure data tables are readable */
+    .data-table,
+    [data-slot='table'] {
+        font-size: 10pt;
+    }
+
+    /* Show all table rows (disable virtual scrolling effects) */
+    .table-row {
+        display: table-row !important;
+        visibility: visible !important;
+    }
+
+    /* Buttons and interactive elements are less important in print */
+    button:not(.print-button),
+    .action-button,
+    [data-slot='action'] {
+        display: none !important;
+    }
+}
