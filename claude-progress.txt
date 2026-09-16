@@ -4685,3 +4685,40 @@ NEXT SESSION:
 PROGRESS: 115/175 passing; 60 remaining
 STATUS: App healthy; category language toggle live on categories + transactions
 
+================================================================================
+SESSION 65 - Sep 15, 2026, ~10:35 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked (interactive approval rejected) — used /dev/browser-tests
+- Frontend/backend/browser via /dev/frontend-tests, /dev/run-tests, /dev/browser-tests
+
+VERIFICATION (before new work):
+- Frontend unit tests: 75/75 pass
+- Browser smoke (feature 111): pass
+
+IMPLEMENTED THIS SESSION:
+Test #114 — Auto-calculate period from transaction date (COMPLETED)
+- Added periodFromDate() helper in resources/js/lib/periods.ts
+- Transaction form date onChange auto-fills/updates Period (YYYYMM)
+- Hint text: "Auto-filled from date" under period field
+- Period remains manually editable for overrides
+- Frontend unit tests: periods.test.ts (+2), transactions-period-auto.test.tsx
+- Duplicate flow now relies on auto-fill when date changes
+- Playwright: tests/browser/period-auto-fill.spec.ts
+
+BROWSER VERIFIED (screenshots in verification/session-65/):
+- 01-period-from-jan-date.png (2025-01-15 → 202501)
+- 02-period-from-feb-date.png (2026-02-20 → 202602)
+
+PASSES UPDATED:
+- #114 → passes: true
+
+NEXT SESSION:
+1. Implement test #115 — PDF report of balance sheet for a period
+2. Prefer /dev/reset-test-user + /dev/seed-browser if login fails
+
+PROGRESS: 116/175 passing; 59 remaining
+STATUS: App healthy; period auto-fills from transaction date on add form
+

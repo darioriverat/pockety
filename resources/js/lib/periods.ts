@@ -49,3 +49,34 @@ export function isValidPeriod(period: string): boolean {
 export function isPeriodFormatValid(period: string): boolean {
     return /^\d{6}$/.test(period);
 }
+
+/**
+ * Derives an accounting period (YYYYMM) from a transaction date (YYYY-MM-DD).
+ * Returns null when the date is incomplete or invalid.
+ */
+export function periodFromDate(date: string): string | null {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
+    if (!match) {
+        return null;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+        return null;
+    }
+
+    const parsed = new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00`);
+    if (
+        Number.isNaN(parsed.getTime()) ||
+        parsed.getFullYear() !== year ||
+        parsed.getMonth() + 1 !== month ||
+        parsed.getDate() !== day
+    ) {
+        return null;
+    }
+
+    return `${match[1]}${match[2]}`;
+}

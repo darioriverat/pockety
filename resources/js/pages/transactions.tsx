@@ -33,7 +33,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
 import { useCategoryLanguage } from '@/hooks/use-category-language';
 import { usePeriod } from '@/hooks/use-period';
-import { formatPeriod, generatePeriods, isPeriodFormatValid } from '@/lib/periods';
+import {
+    formatPeriod,
+    generatePeriods,
+    isPeriodFormatValid,
+    periodFromDate,
+} from '@/lib/periods';
 import {
     ChevronLeft,
     ChevronRight,
@@ -172,17 +177,20 @@ export default function Transactions() {
     const [detailCategoryCode, setDetailCategoryCode] = useState<string | null>(
         null,
     );
-    const [formData, setFormData] = useState<TransactionFormData>({
-        date: new Date().toISOString().split('T')[0],
-        period: new Date().toISOString().slice(0, 7).replace('-', ''),
-        quincena: 'Q1',
-        category_id: '',
-        account_id: '',
-        currency: 'CAD',
-        amount: '',
-        comments: '',
-        is_recurring: false,
-        debt_component: '',
+    const [formData, setFormData] = useState<TransactionFormData>(() => {
+        const today = new Date().toISOString().split('T')[0];
+        return {
+            date: today,
+            period: periodFromDate(today) ?? '',
+            quincena: 'Q1',
+            category_id: '',
+            account_id: '',
+            currency: 'CAD',
+            amount: '',
+            comments: '',
+            is_recurring: false,
+            debt_component: '',
+        };
     });
     const [filters, setFilters] = useState<FilterState>(() => {
         const params =
@@ -619,9 +627,10 @@ export default function Transactions() {
         setEditingId(null);
         setIsDuplicating(false);
         setFormError(null);
+        const today = new Date().toISOString().split('T')[0];
         setFormData({
-            date: new Date().toISOString().split('T')[0],
-            period: new Date().toISOString().slice(0, 7).replace('-', ''),
+            date: today,
+            period: periodFromDate(today) ?? '',
             quincena: 'Q1',
             category_id: '',
             account_id: '',
@@ -631,6 +640,16 @@ export default function Transactions() {
             is_recurring: false,
             debt_component: '',
         });
+    };
+
+    const handleDateChange = (date: string) => {
+        setFormError(null);
+        const derivedPeriod = periodFromDate(date);
+        setFormData((prev) => ({
+            ...prev,
+            date,
+            ...(derivedPeriod ? { period: derivedPeriod } : {}),
+        }));
     };
 
     const formatCurrency = (
@@ -858,13 +877,9 @@ export default function Transactions() {
                                             placeholder="2025-01-15"
                                             value={formData.date}
                                             data-testid="transaction-date-input"
-                                            onChange={(e) => {
-                                                setFormError(null);
-                                                setFormData({
-                                                    ...formData,
-                                                    date: e.target.value,
-                                                });
-                                            }}
+                                            onChange={(e) =>
+                                                handleDateChange(e.target.value)
+                                            }
                                             aria-invalid={
                                                 formError !== null &&
                                                 formError
@@ -904,11 +919,18 @@ export default function Transactions() {
                                                 }
                                                 aria-describedby={
                                                     formError
-                                                        ? 'transaction-form-error'
-                                                        : undefined
+                                                        ? 'transaction-form-error transaction-period-hint'
+                                                        : 'transaction-period-hint'
                                                 }
                                                 required
                                             />
+                                            <p
+                                                id="transaction-period-hint"
+                                                className="text-muted-foreground text-xs"
+                                                data-testid="transaction-period-hint"
+                                            >
+                                                Auto-filled from date
+                                            </p>
                                         </div>
                                         <div className="grid gap-2">
                                             <Label htmlFor="quincena">

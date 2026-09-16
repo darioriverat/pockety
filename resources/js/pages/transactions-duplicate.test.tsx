@@ -153,9 +153,9 @@ describe('Transactions duplicate', () => {
         fireEvent.change(screen.getByTestId('transaction-date-input'), {
             target: { value: '2026-09-15' },
         });
-        fireEvent.change(screen.getByTestId('transaction-period-input'), {
-            target: { value: '202609' },
-        });
+        expect(screen.getByTestId('transaction-period-input')).toHaveValue(
+            '202609',
+        );
 
         fireEvent.click(screen.getByTestId('transaction-form-submit'));
 

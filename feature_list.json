@@ -1369,7 +1369,7 @@
       "Step 4: Change date to 2026-02-20",
       "Step 5: Verify period updates to 202602"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

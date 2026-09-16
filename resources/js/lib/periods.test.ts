@@ -5,6 +5,7 @@ import {
     generatePeriods,
     isPeriodFormatValid,
     isValidPeriod,
+    periodFromDate,
 } from '@/lib/periods';
 
 describe('generatePeriods', () => {
@@ -55,5 +56,23 @@ describe('isPeriodFormatValid', () => {
         expect(isPeriodFormatValid('2025010')).toBe(false);
         expect(isPeriodFormatValid('abcdef')).toBe(false);
         expect(isPeriodFormatValid('')).toBe(false);
+    });
+});
+
+describe('periodFromDate', () => {
+    it('derives YYYYMM from a valid YYYY-MM-DD date', () => {
+        expect(periodFromDate('2025-01-15')).toBe('202501');
+        expect(periodFromDate('2026-02-20')).toBe('202602');
+        expect(periodFromDate('2025-12-31')).toBe('202512');
+    });
+
+    it('returns null for incomplete or invalid dates', () => {
+        expect(periodFromDate('2025-01')).toBeNull();
+        expect(periodFromDate('2025-01-1')).toBeNull();
+        expect(periodFromDate('01/15/2025')).toBeNull();
+        expect(periodFromDate('2025-13-01')).toBeNull();
+        expect(periodFromDate('2025-02-30')).toBeNull();
+        expect(periodFromDate('')).toBeNull();
+        expect(periodFromDate('not-a-date')).toBeNull();
     });
 });
