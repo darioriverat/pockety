@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\PreferencesController::update
-* @see app/Http/Controllers/PreferencesController.php:26
+* @see app/Http/Controllers/PreferencesController.php:27
 * @route '/preferences'
 */
 export const update = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\PreferencesController::update
-* @see app/Http/Controllers/PreferencesController.php:26
+* @see app/Http/Controllers/PreferencesController.php:27
 * @route '/preferences'
 */
 update.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ update.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\PreferencesController::update
-* @see app/Http/Controllers/PreferencesController.php:26
+* @see app/Http/Controllers/PreferencesController.php:27
 * @route '/preferences'
 */
 update.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ update.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\PreferencesController::update
-* @see app/Http/Controllers/PreferencesController.php:26
+* @see app/Http/Controllers/PreferencesController.php:27
 * @route '/preferences'
 */
 const updateForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const updateForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =>
 
 /**
 * @see \App\Http\Controllers\PreferencesController::update
-* @see app/Http/Controllers/PreferencesController.php:26
+* @see app/Http/Controllers/PreferencesController.php:27
 * @route '/preferences'
 */
 updateForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

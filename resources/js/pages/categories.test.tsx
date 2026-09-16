@@ -22,6 +22,18 @@ vi.mock('@inertiajs/react', () => ({
             {children}
         </a>
     ),
+    usePage: () => ({
+        props: {
+            auth: {
+                user: {
+                    id: 1,
+                    name: 'Test',
+                    email: 'test@example.com',
+                    category_language: 'en',
+                },
+            },
+        },
+    }),
 }));
 
 describe('Categories Page', () => {
@@ -66,15 +78,82 @@ describe('Categories Page', () => {
 
         await waitFor(() => {
             expect(screen.getByText('C001')).toBeInTheDocument();
-            expect(screen.getByText('MERCADO')).toBeInTheDocument();
-            expect(screen.getByText('Groceries')).toBeInTheDocument();
+            expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
+                'Groceries',
+            );
             expect(screen.getByText('C004')).toBeInTheDocument();
-            expect(screen.getByText('TRANSPORTES')).toBeInTheDocument();
+            expect(screen.getByTestId('category-name-C004')).toHaveTextContent(
+                'Transportation',
+            );
+        });
+
+        // Language toggle is available
+        expect(screen.getByTestId('category-language-toggle')).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId('category-language-toggle-es'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
+                'MERCADO',
+            );
+            expect(screen.getByTestId('category-name-C004')).toHaveTextContent(
+                'TRANSPORTES',
+            );
+        });
+
+        fireEvent.click(screen.getByTestId('category-language-toggle-en'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
+                'Groceries',
+            );
         });
 
         // Should have delete buttons
         const deleteButtons = screen.getAllByRole('button');
         expect(deleteButtons.length).toBeGreaterThan(0);
+    });
+
+    it('toggles category names between Spanish and English', async () => {
+        const mockCategories = {
+            data: [
+                {
+                    id: 1,
+                    code: 'C001',
+                    name_es: 'MERCADO',
+                    name_en: 'Groceries',
+                    is_debt_category: false,
+                    is_active: true,
+                    status: null,
+                },
+            ],
+            links: { self: '/api/categories' },
+            meta: { total: 1 },
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => mockCategories,
+        });
+
+        render(<Categories />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
+                'Groceries',
+            );
+        });
+
+        fireEvent.click(screen.getByTestId('category-language-toggle-es'));
+        expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
+            'MERCADO',
+        );
+        expect(screen.queryByText('Groceries')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('category-language-toggle-en'));
+        expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
+            'Groceries',
+        );
+        expect(screen.queryByText('MERCADO')).not.toBeInTheDocument();
     });
 
     it('prevents deletion of category with transactions', async () => {

@@ -24,16 +24,28 @@ interface User {
     name: string;
     email: string;
     default_currency: string;
+    category_language: string;
 }
 
 interface PreferencesProps {
     user: User;
     available_currencies: string[];
+    available_category_languages: string[];
 }
 
-export default function Preferences({ user, available_currencies }: PreferencesProps) {
+const LANGUAGE_LABELS: Record<string, string> = {
+    es: 'Spanish',
+    en: 'English',
+};
+
+export default function Preferences({
+    user,
+    available_currencies,
+    available_category_languages,
+}: PreferencesProps) {
     const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         default_currency: user.default_currency || 'CAD',
+        category_language: user.category_language || 'en',
     });
 
     function submit(e: React.FormEvent) {
@@ -97,6 +109,49 @@ export default function Preferences({ user, available_currencies }: PreferencesP
                                         Choose your preferred currency for displaying amounts
                                         throughout the application. You can still toggle
                                         currencies on the dashboard at any time.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="category_language">
+                                        Category Name Language
+                                    </Label>
+                                    <Select
+                                        value={data.category_language}
+                                        onValueChange={(value) =>
+                                            setData('category_language', value)
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            id="category_language"
+                                            data-testid="category-language-select"
+                                        >
+                                            <SelectValue placeholder="Select language" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {available_category_languages.map(
+                                                (language) => (
+                                                    <SelectItem
+                                                        key={language}
+                                                        value={language}
+                                                        data-testid={`category-language-option-${language}`}
+                                                    >
+                                                        {LANGUAGE_LABELS[language] ??
+                                                            language}
+                                                    </SelectItem>
+                                                ),
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.category_language && (
+                                        <p className="text-sm text-red-600">
+                                            {errors.category_language}
+                                        </p>
+                                    )}
+                                    <p className="text-sm text-muted-foreground">
+                                        Choose whether category names default to Spanish or
+                                        English. You can still toggle the language on the
+                                        categories and transactions pages.
                                     </p>
                                 </div>
 

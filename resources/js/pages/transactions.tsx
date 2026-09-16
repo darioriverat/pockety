@@ -30,6 +30,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { CategoryLanguageToggle } from '@/components/category-language-toggle';
+import { useCategoryLanguage } from '@/hooks/use-category-language';
 import { usePeriod } from '@/hooks/use-period';
 import { formatPeriod, generatePeriods, isPeriodFormatValid } from '@/lib/periods';
 import {
@@ -141,6 +143,7 @@ interface FilterState {
 
 export default function Transactions() {
     const { period, setPeriod } = usePeriod();
+    const { language, setLanguage, getCategoryName } = useCategoryLanguage();
     const periods = generatePeriods();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -681,7 +684,7 @@ export default function Transactions() {
                 className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
                 data-testid="transactions-page"
             >
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
                     <div>
                         <h1
                             className="text-3xl font-bold tracking-tight"
@@ -693,7 +696,12 @@ export default function Transactions() {
                             Manage your expense transactions
                         </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <CategoryLanguageToggle
+                            value={language}
+                            onChange={setLanguage}
+                        />
+                        <div className="flex gap-2">
                         <Button
                             variant="outline"
                             onClick={handleExportCSV}
@@ -767,7 +775,7 @@ export default function Transactions() {
                                                             data-testid={`bulk-category-option-${cat.code}`}
                                                         >
                                                             {cat.code} -{' '}
-                                                            {cat.name_en}
+                                                            {getCategoryName(cat)}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -960,7 +968,7 @@ export default function Transactions() {
                                                         value={cat.id.toString()}
                                                     >
                                                         {cat.code} -{' '}
-                                                        {cat.name_en}
+                                                        {getCategoryName(cat)}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -1175,6 +1183,7 @@ export default function Transactions() {
                             </form>
                         </DialogContent>
                     </Dialog>
+                        </div>
                     </div>
                 </div>
 
@@ -1189,8 +1198,7 @@ export default function Transactions() {
                                 data-testid="category-detail-heading"
                             >
                                 {detailCategory.code} —{' '}
-                                {detailCategory.name_es} /{' '}
-                                {detailCategory.name_en}
+                                {getCategoryName(detailCategory)}
                             </CardTitle>
                             <CardDescription>
                                 Detailed transactions for period{' '}
@@ -1311,7 +1319,7 @@ export default function Transactions() {
                                                 key={cat.id}
                                                 value={cat.id.toString()}
                                             >
-                                                {cat.code} - {cat.name_en}
+                                                {cat.code} - {getCategoryName(cat)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -1648,17 +1656,9 @@ export default function Transactions() {
                                                                     .category.code
                                                             }{' '}
                                                             -{' '}
-                                                            {
-                                                                transaction
-                                                                    .category
-                                                                    .name_en
-                                                            }
-                                                            {' / '}
-                                                            {
-                                                                transaction
-                                                                    .category
-                                                                    .name_es
-                                                            }
+                                                            {getCategoryName(
+                                                                transaction.category,
+                                                            )}
                                                         </div>
                                                         <div
                                                             data-testid={`transaction-account-${transaction.id}`}

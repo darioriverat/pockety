@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -11,6 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
+import { CategoryLanguageToggle } from '@/components/category-language-toggle';
+import { useCategoryLanguage } from '@/hooks/use-category-language';
+import type { Auth } from '@/types';
 
 interface Category {
     id: number;
@@ -32,7 +35,18 @@ interface ApiResponse {
     };
 }
 
+type PageProps = {
+    auth?: Auth;
+};
+
 export default function Categories() {
+    const { auth } = usePage<PageProps>().props;
+    const { language, setLanguage, getCategoryName } = useCategoryLanguage(
+        auth?.user?.category_language === 'es' ||
+            auth?.user?.category_language === 'en'
+            ? auth.user.category_language
+            : undefined,
+    );
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -101,13 +115,19 @@ export default function Categories() {
         <>
             <Head title="Categories" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="mb-4">
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        Expense Categories
-                    </h1>
-                    <p className="text-muted-foreground">
-                        View all active expense categories for your finance tracking
-                    </p>
+                <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">
+                            Expense Categories
+                        </h1>
+                        <p className="text-muted-foreground">
+                            View all active expense categories for your finance tracking
+                        </p>
+                    </div>
+                    <CategoryLanguageToggle
+                        value={language}
+                        onChange={setLanguage}
+                    />
                 </div>
 
                 {error && (
@@ -146,7 +166,10 @@ export default function Categories() {
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {categories.map((category) => (
+                            {categories.map((category) => {
+                                const displayName = getCategoryName(category);
+
+                                return (
                                 <Card
                                     key={category.id}
                                     className={
@@ -184,7 +207,10 @@ export default function Categories() {
                                                     onClick={(event) => {
                                                         event.preventDefault();
                                                         event.stopPropagation();
-                                                        handleDelete(category.code, category.name_en);
+                                                        handleDelete(
+                                                            category.code,
+                                                            displayName,
+                                                        );
                                                     }}
                                                     disabled={deletingId === category.id}
                                                     className="h-8 w-8 p-0"
@@ -199,17 +225,15 @@ export default function Categories() {
                                                 href={`/categories/${category.code}`}
                                                 className="block space-y-1 hover:opacity-90"
                                             >
-                                                <div>
+                                                <div
+                                                    data-testid={`category-name-${category.code}`}
+                                                >
                                                     <span className="font-medium">
-                                                        ES:
+                                                        {language === 'es'
+                                                            ? 'ES:'
+                                                            : 'EN:'}
                                                     </span>{' '}
-                                                    {category.name_es}
-                                                </div>
-                                                <div>
-                                                    <span className="font-medium">
-                                                        EN:
-                                                    </span>{' '}
-                                                    {category.name_en}
+                                                    {displayName}
                                                 </div>
                                                 {category.status && (
                                                     <div className="text-xs text-muted-foreground mt-2">
@@ -220,7 +244,8 @@ export default function Categories() {
                                         </CardDescription>
                                     </CardHeader>
                                 </Card>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         {categories.length === 0 && !loading && (

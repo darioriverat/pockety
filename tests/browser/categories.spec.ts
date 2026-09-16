@@ -36,10 +36,15 @@ test('feature 3: categories show both Spanish and English names', async ({
 
     await page.goto('/categories');
 
-    await expect(page.locator('[data-slot="card"]').filter({ hasText: 'C001' }).getByText('ES:')).toBeVisible();
-    await expect(page.getByText('MERCADO')).toBeVisible();
-    await expect(page.locator('[data-slot="card"]').filter({ hasText: 'C001' }).getByText('EN:')).toBeVisible();
-    await expect(page.getByText('Groceries')).toBeVisible();
+    await expect(page.getByTestId('category-language-toggle')).toBeVisible();
+
+    await page.getByTestId('category-language-toggle-es').click();
+    await expect(page.getByTestId('category-name-C001')).toContainText('MERCADO');
+    await expect(page.getByTestId('category-name-C001')).toContainText('ES:');
+
+    await page.getByTestId('category-language-toggle-en').click();
+    await expect(page.getByTestId('category-name-C001')).toContainText('Groceries');
+    await expect(page.getByTestId('category-name-C001')).toContainText('EN:');
 
     expect(consoleErrors).toEqual([]);
 });

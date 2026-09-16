@@ -28,6 +28,8 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'default_currency' => 'CAD',
+            'category_language' => 'en',
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             /* @chisel-2fa */

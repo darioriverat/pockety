@@ -17,6 +17,7 @@ class PreferencesController extends Controller
         return Inertia::render('preferences', [
             'user' => auth()->user(),
             'available_currencies' => ['CAD', 'USD', 'COP'],
+            'available_category_languages' => ['es', 'en'],
         ]);
     }
 
@@ -27,6 +28,7 @@ class PreferencesController extends Controller
     {
         $validated = $request->validate([
             'default_currency' => 'required|in:CAD,USD,COP',
+            'category_language' => 'required|in:es,en',
         ]);
 
         $request->user()->update($validated);

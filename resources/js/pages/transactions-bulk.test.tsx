@@ -16,6 +16,18 @@ vi.mock('@inertiajs/react', () => ({
             {children}
         </a>
     ),
+    usePage: () => ({
+        props: {
+            auth: {
+                user: {
+                    id: 1,
+                    name: 'Test',
+                    email: 'test@example.com',
+                    category_language: 'en',
+                },
+            },
+        },
+    }),
 }));
 
 vi.mock('@/hooks/use-period', () => ({

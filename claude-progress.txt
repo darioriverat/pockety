@@ -4646,3 +4646,42 @@ NEXT SESSION:
 PROGRESS: 114/175 passing; 61 remaining
 STATUS: App healthy; currency preference + dashboard toggle live
 
+================================================================================
+SESSION 64 - Sep 15, 2026, ~10:30 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked (interactive approval rejected) — used /dev/browser-tests
+- Frontend unit tests run locally (npm run test:unit); backend via /dev/run-tests
+
+VERIFICATION (before new work):
+- Frontend unit tests: 72/72
+- Browser smoke (feature 111): pass
+
+IMPLEMENTED THIS SESSION:
+Test #113 — Spanish/English category name toggle (COMPLETED)
+- Migration: users.category_language (es|en, default en)
+- Preferences: Category Name Language setting + validation
+- Shared helpers: category-language.ts, useCategoryLanguage, CategoryLanguageToggle
+- Categories + Transactions pages: ES|EN toggle; names switch (MERCADO ↔ Groceries)
+- Feature tests: PreferencesTest (+5 language tests = 14)
+- Frontend unit tests: toggle behavior + lib helpers
+- Playwright: tests/browser/category-language.spec.ts; updated feature 3 spec
+
+BROWSER VERIFIED (screenshots in verification/session-64/):
+- 01-categories-language-toggle.png
+- 02-categories-spanish.png
+- 03-categories-english.png
+- 04-transactions-spanish-toggle.png
+
+PASSES UPDATED:
+- #113 → passes: true
+
+NEXT SESSION:
+1. Implement test #114 — auto-calculate period from transaction date
+2. Prefer /dev/reset-test-user + /dev/seed-browser if login/categories fail
+
+PROGRESS: 115/175 passing; 60 remaining
+STATUS: App healthy; category language toggle live on categories + transactions
+

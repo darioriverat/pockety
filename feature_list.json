@@ -1357,7 +1357,7 @@
       "Step 5: Switch to English",
       "Step 6: Verify category names display in English (e.g., Groceries)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
