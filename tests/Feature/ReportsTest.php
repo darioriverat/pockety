@@ -126,9 +126,9 @@ class ReportsTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('reports-ytd')
             ->where('ytd_totals.year', $year)
-            ->where('ytd_totals.ytd_income_cad', 15000.00)
-            ->where('ytd_totals.ytd_expenses_cad', 4500.00)
-            ->where('ytd_totals.ytd_net_cad', 10500.00)
+            ->where('ytd_totals.ytd_income_cad', 15000)
+            ->where('ytd_totals.ytd_expenses_cad', 4500)
+            ->where('ytd_totals.ytd_net_cad', 10500)
             ->where('ytd_totals.period_count', 12) // Full year from January to December
         );
     }
@@ -219,9 +219,9 @@ class ReportsTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('reports-ytd')
             ->where('ytd_totals.year', $year)
-            ->where('ytd_totals.ytd_income_cad', 4330.00) // 3000 CAD + 1330 CAD (from USD)
-            ->where('ytd_totals.ytd_expenses_cad', 500.00) // 500 CAD (from COP)
-            ->where('ytd_totals.ytd_net_cad', 3830.00)
+            ->where('ytd_totals.ytd_income_cad', 4330) // 3000 CAD + 1330 CAD (from USD)
+            ->where('ytd_totals.ytd_expenses_cad', 500) // 500 CAD (from COP)
+            ->where('ytd_totals.ytd_net_cad', 3830)
         );
     }
 
@@ -236,7 +236,9 @@ class ReportsTest extends TestCase
             ->component('reports-ytd')
             ->has('available_years')
             ->where('available_years', function ($years) use ($currentYear) {
-                return in_array($currentYear, $years) && in_array(2020, $years);
+                $yearsArray = is_array($years) ? $years : $years->toArray();
+
+                return in_array($currentYear, $yearsArray) && in_array(2020, $yearsArray);
             })
         );
     }

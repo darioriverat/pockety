@@ -3,6 +3,7 @@
 namespace App\Domain\Services\Contracts;
 
 use App\Domain\Entities\CategoryEntity;
+use App\Domain\Entities\TransactionEntity;
 
 interface CategoryServiceInterface
 {
@@ -50,7 +51,7 @@ interface CategoryServiceInterface
      *
      * @return array{
      *     category: CategoryEntity,
-     *     transactions: list<\App\Domain\Entities\TransactionEntity>,
+     *     transactions: list<TransactionEntity>,
      *     meta: array{
      *         total_spending_cad: float,
      *         total_spending_usd: float,

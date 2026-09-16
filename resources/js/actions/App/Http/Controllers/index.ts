@@ -19,6 +19,7 @@ import BudgetController from './BudgetController'
 import FinancialSummaryController from './FinancialSummaryController'
 import DashboardController from './DashboardController'
 import ReportsController from './ReportsController'
+import PreferencesController from './PreferencesController'
 import Settings from './Settings'
 
 const Controllers = {
@@ -43,6 +44,7 @@ const Controllers = {
     FinancialSummaryController: Object.assign(FinancialSummaryController, FinancialSummaryController),
     DashboardController: Object.assign(DashboardController, DashboardController),
     ReportsController: Object.assign(ReportsController, ReportsController),
+    PreferencesController: Object.assign(PreferencesController, PreferencesController),
     Settings: Object.assign(Settings, Settings),
 }
 

@@ -5,6 +5,7 @@ use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Account;
@@ -19,6 +20,7 @@ use App\Services\BalanceSheetImportService;
 use App\Services\BalanceSheetService;
 use App\Services\BudgetService;
 use App\Services\FinancialSummaryService;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -43,6 +45,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('category-actuals', 'category-actuals')->name('category-actuals');
     Route::get('reports/year-to-date', [ReportsController::class, 'yearToDate'])->name('reports.ytd');
     Route::inertia('import', 'import')->name('import');
+    Route::get('preferences', [PreferencesController::class, 'index'])->name('preferences.index');
+    Route::post('preferences', [PreferencesController::class, 'update'])->name('preferences.update');
 });
 
 // Development routes (remove in production)
@@ -137,7 +141,7 @@ if (app()->environment('local')) {
             'success' => true,
             'email' => $user->email,
             'id' => $user->id,
-            'password_check' => \Illuminate\Support\Facades\Hash::check('password', $user->fresh()->password),
+            'password_check' => Hash::check('password', $user->fresh()->password),
         ]);
     })->withoutMiddleware([VerifyCsrfToken::class]);
 

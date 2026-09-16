@@ -90,7 +90,7 @@ class SearchService implements SearchServiceInterface
                 : null;
 
             $subtitleParts = array_filter([
-                $transaction->date?->format('Y-m-d'),
+                $transaction->date->format('Y-m-d'),
                 $transaction->category?->code,
                 $amountLabel,
             ]);
@@ -99,7 +99,7 @@ class SearchService implements SearchServiceInterface
                 type: 'transaction',
                 id: $transaction->id,
                 title: $transaction->comments ?: 'Transaction #'.$transaction->id,
-                subtitle: $subtitleParts !== [] ? implode(' · ', $subtitleParts) : null,
+                subtitle: count($subtitleParts) > 0 ? implode(' · ', $subtitleParts) : null,
                 url: '/transactions?search='.urlencode($term),
             ));
         }

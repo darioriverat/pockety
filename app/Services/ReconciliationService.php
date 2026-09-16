@@ -157,7 +157,7 @@ class ReconciliationService
             'period' => $period,
             'is_reviewed' => true,
             'review_note' => $acknowledgment->note,
-            'reviewed_at' => $acknowledgment->acknowledged_at?->toIso8601String(),
+            'reviewed_at' => $acknowledgment->acknowledged_at->toIso8601String(),
         ];
     }
 

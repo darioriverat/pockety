@@ -64,9 +64,9 @@ class ReportsService
             'year' => $year,
             'from_period' => $fromPeriod,
             'to_period' => $toPeriod,
-            'ytd_income_cad' => round($totalIncome, 2),
-            'ytd_expenses_cad' => round($totalExpenses, 2),
-            'ytd_net_cad' => round($net, 2),
+            'ytd_income_cad' => round($totalIncome, 2) + 0.0,
+            'ytd_expenses_cad' => round($totalExpenses, 2) + 0.0,
+            'ytd_net_cad' => round($net, 2) + 0.0,
             'period_count' => $periodCount,
         ];
     }
