@@ -5840,3 +5840,44 @@ NOTES:
 - Quality is high - components are accessible, well-styled, consistent
 - Verification approach (code review + existing screenshots) is valid when Docker unavailable
 - Browser tests are written and ready for future execution via `task browser-tests`
+
+=== Session 93 (2026-09-16) ===
+
+GOAL: Feature #162 — Breadcrumbs show current page location in navigation hierarchy
+
+IMPLEMENTED:
+- Enhanced Breadcrumbs component with testids, current-page highlight (font-medium), safe href handling
+- Breadcrumb trail visible beyond desktop-only (header no longer hides crumbs below md)
+- Nested trails: Home > Categories/Accounts/Balance Sheet/Reports > Details|Time Series|YTD
+- Added layout breadcrumbs to accounts, account-detail, income, reconciliation, import, fixed-assets, exchange-rates
+- Helper: resources/js/lib/breadcrumbs.ts (homeBreadcrumb / withHomeBreadcrumb)
+- Tests: breadcrumbs.test.tsx, breadcrumbs.test.ts, breadcrumbs.spec.ts (Playwright)
+- Fixed brittle select/tooltip unit tests (portal queries via document)
+
+VERIFICATION THIS SESSION:
+- Spot-check: Playwright dashboard.spec.ts PASSED via /dev/browser-tests (before outage)
+- Breadcrumb unit tests PASSED via /dev/frontend-tests
+- Build succeeded via /dev/build-assets (first time)
+- Mid-session: web_app lost DNS to web_app_db; login and /dev endpoints return HTTP 500
+- Docker socket blocked in this agent sandbox (EPERM); container restart not possible from here
+- Puppeteer MCP blocked (interactive approval unavailable in Local SDK)
+- Feature #162 remains passes: false until UI verification after stack recovery
+
+COMMIT: 4b5ad51 Implement breadcrumb navigation hierarchy for nested pages
+
+STATUS: 162/175 still (no feature_list change); 13 remaining
+
+TO RECOVER STACK (run in a terminal with Docker access):
+  docker restart web_app_db
+  docker restart web_app
+  curl -s http://dev.pockety.com:8080/dev/reset-test-user
+  node scripts/session-helpers.mjs build
+  node scripts/session-helpers.mjs frontend resources/js/components/breadcrumbs.test.tsx
+  node scripts/session-helpers.mjs browser breadcrumbs.spec.ts
+
+NEXT:
+1. Restore DB/stack
+2. Rebuild assets, run breadcrumbs.spec.ts, capture verification/test-162-breadcrumbs screenshots
+3. Mark feature_list.json index 162 passes: true
+4. Then Feature #163 page titles
+
