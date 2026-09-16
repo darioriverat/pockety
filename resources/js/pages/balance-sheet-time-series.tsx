@@ -10,6 +10,11 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
+import {
+    ChartAxisLabels,
+    CHART_PADDING_WITH_AXIS_LABELS,
+} from '@/components/charts/chart-axis-labels';
+import { CHART_COLORS } from '@/lib/chart-colors';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
     ArrowLeft,
@@ -63,8 +68,8 @@ function formatCad(value: number | null | undefined): string {
 
 function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
     const width = 900;
-    const height = 280;
-    const padding = { top: 24, right: 24, bottom: 40, left: 64 };
+    const height = 300;
+    const padding = CHART_PADDING_WITH_AXIS_LABELS;
     const innerWidth = width - padding.left - padding.right;
     const innerHeight = height - padding.top - padding.bottom;
 
@@ -129,7 +134,7 @@ function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
                             x={padding.left - 8}
                             y={y + 4}
                             textAnchor="end"
-                            className="fill-gray-500"
+                            className="fill-muted-foreground"
                             fontSize="11"
                         >
                             {new Intl.NumberFormat('en-CA', {
@@ -143,21 +148,21 @@ function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
             <path
                 d={buildPath((p) => p.total_assets.cad)}
                 fill="none"
-                stroke="#0f766e"
+                stroke={CHART_COLORS.assets}
                 strokeWidth="2.5"
                 data-testid="chart-line-assets"
             />
             <path
                 d={buildPath((p) => p.total_liabilities.cad)}
                 fill="none"
-                stroke="#b45309"
+                stroke={CHART_COLORS.liabilities}
                 strokeWidth="2.5"
                 data-testid="chart-line-liabilities"
             />
             <path
                 d={buildPath((p) => p.equity.cad)}
                 fill="none"
-                stroke="#1d4ed8"
+                stroke={CHART_COLORS.equity}
                 strokeWidth="2.5"
                 data-testid="chart-line-equity"
             />
@@ -166,15 +171,23 @@ function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
                     <text
                         key={period.period}
                         x={xFor(index)}
-                        y={height - 12}
+                        y={height - padding.bottom + 16}
                         textAnchor="middle"
-                        className="fill-gray-500"
+                        className="fill-muted-foreground"
                         fontSize="11"
                     >
                         {formatPeriod(period.period)}
                     </text>
                 ) : null,
             )}
+            <ChartAxisLabels
+                width={width}
+                height={height}
+                padding={padding}
+                xLabel="Period"
+                yLabel="Amount (CAD)"
+                testIdPrefix="time-series-chart"
+            />
         </svg>
     );
 }
@@ -344,17 +357,48 @@ export default function BalanceSheetTimeSeries() {
                                         <LineChart className="h-5 w-5" />
                                         Trend chart (CAD)
                                     </CardTitle>
-                                    <CardDescription>
-                                        <span className="mr-3 inline-flex items-center gap-1">
-                                            <span className="inline-block h-2 w-2 rounded-full bg-teal-700" />
+                                    <CardDescription
+                                        data-testid="time-series-chart-legend"
+                                        role="list"
+                                        aria-label="Balance sheet chart legend"
+                                    >
+                                        <span
+                                            className="mr-3 inline-flex items-center gap-1"
+                                            role="listitem"
+                                        >
+                                            <span
+                                                className="inline-block h-2 w-2 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        CHART_COLORS.assets,
+                                                }}
+                                            />
                                             Assets
                                         </span>
-                                        <span className="mr-3 inline-flex items-center gap-1">
-                                            <span className="inline-block h-2 w-2 rounded-full bg-amber-700" />
+                                        <span
+                                            className="mr-3 inline-flex items-center gap-1"
+                                            role="listitem"
+                                        >
+                                            <span
+                                                className="inline-block h-2 w-2 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        CHART_COLORS.liabilities,
+                                                }}
+                                            />
                                             Liabilities
                                         </span>
-                                        <span className="inline-flex items-center gap-1">
-                                            <span className="inline-block h-2 w-2 rounded-full bg-blue-700" />
+                                        <span
+                                            className="inline-flex items-center gap-1"
+                                            role="listitem"
+                                        >
+                                            <span
+                                                className="inline-block h-2 w-2 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        CHART_COLORS.equity,
+                                                }}
+                                            />
                                             Equity
                                         </span>
                                     </CardDescription>

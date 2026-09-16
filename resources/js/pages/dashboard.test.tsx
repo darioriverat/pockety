@@ -487,6 +487,12 @@ describe('Dashboard feature', () => {
         expect(
             screen.getByTestId('income-expense-chart-legend').textContent,
         ).toMatch(/Expenses/);
+        expect(
+            screen.getByTestId('income-expense-chart-y-axis-label').textContent,
+        ).toMatch(/Amount \(CAD\)/);
+        expect(
+            screen.getByTestId('income-expense-chart-x-axis-label').textContent,
+        ).toBe('Period');
     });
 
     it('displays assets vs liabilities chart with equity and hover values', () => {
@@ -503,6 +509,12 @@ describe('Dashboard feature', () => {
         ).toMatch(/Last 12 months/i);
         expect(screen.getByTestId('al-chart-period-202601')).toBeDefined();
         expect(screen.getByTestId('al-chart-point-equity-202601')).toBeDefined();
+        expect(
+            screen.getByTestId('assets-liabilities-chart-y-axis-label').textContent,
+        ).toMatch(/Amount \(CAD\)/);
+        expect(
+            screen.getByTestId('assets-liabilities-chart-x-axis-label').textContent,
+        ).toBe('Period');
 
         fireEvent.mouseEnter(screen.getByTestId('al-chart-hit-202601'));
         expect(screen.getByTestId('assets-liabilities-hover-tooltip')).toBeDefined();

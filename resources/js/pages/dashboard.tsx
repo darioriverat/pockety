@@ -18,6 +18,11 @@ import { Badge } from '@/components/ui/badge';
 import { DashboardSummaryCard } from '@/components/dashboard-summary-card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {
+    ChartAxisLabels,
+    CHART_PADDING_WITH_AXIS_LABELS,
+} from '@/components/charts/chart-axis-labels';
+import { CHART_COLORS } from '@/lib/chart-colors';
+import {
     amountForCurrency,
     formatDisplayCurrency,
     isDisplayCurrency,
@@ -175,8 +180,8 @@ function IncomeExpenseTrendChart({
     currency: DisplayCurrency;
 }) {
     const width = 900;
-    const height = 280;
-    const padding = { top: 24, right: 24, bottom: 40, left: 64 };
+    const height = 300;
+    const padding = CHART_PADDING_WITH_AXIS_LABELS;
     const innerWidth = width - padding.left - padding.right;
     const innerHeight = height - padding.top - padding.bottom;
     const periods = chart.periods;
@@ -215,7 +220,7 @@ function IncomeExpenseTrendChart({
             {yTicks.map((tick) => {
                 const y = yFor(tick);
                 return (
-                    <g key={tick}>
+                    <g key={tick} data-testid="income-expense-chart-y-tick">
                         <line
                             x1={padding.left}
                             x2={width - padding.right}
@@ -255,7 +260,7 @@ function IncomeExpenseTrendChart({
                             y={yFor(incomeValue)}
                             width={barWidth}
                             height={incomeH}
-                            fill="#16a34a"
+                            fill={CHART_COLORS.income}
                             rx={2}
                             data-testid={`chart-bar-income-${period.period}`}
                         >
@@ -269,7 +274,7 @@ function IncomeExpenseTrendChart({
                             y={yFor(expenseValue)}
                             width={barWidth}
                             height={expenseH}
-                            fill="#dc2626"
+                            fill={CHART_COLORS.expenses}
                             rx={2}
                             data-testid={`chart-bar-expenses-${period.period}`}
                         >
@@ -282,10 +287,11 @@ function IncomeExpenseTrendChart({
                             index === periods.length - 1) && (
                             <text
                                 x={centerX}
-                                y={height - 12}
+                                y={height - padding.bottom + 16}
                                 textAnchor="middle"
                                 className="fill-muted-foreground"
                                 fontSize="11"
+                                data-testid="income-expense-chart-x-tick"
                             >
                                 {formatPeriodShort(period.period)}
                             </text>
@@ -303,7 +309,7 @@ function IncomeExpenseTrendChart({
                     })
                     .join(' ')}
                 fill="none"
-                stroke="#15803d"
+                stroke={CHART_COLORS.incomeLine}
                 strokeWidth="2"
                 strokeOpacity={0.55}
                 data-testid="chart-line-income"
@@ -317,10 +323,18 @@ function IncomeExpenseTrendChart({
                     })
                     .join(' ')}
                 fill="none"
-                stroke="#b91c1c"
+                stroke={CHART_COLORS.expensesLine}
                 strokeWidth="2"
                 strokeOpacity={0.55}
                 data-testid="chart-line-expenses"
+            />
+            <ChartAxisLabels
+                width={width}
+                height={height}
+                padding={padding}
+                xLabel="Period"
+                yLabel={`Amount (${currency})`}
+                testIdPrefix="income-expense-chart"
             />
         </svg>
     );
@@ -336,8 +350,8 @@ function AssetsLiabilitiesTrendChart({
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
     const width = 900;
-    const height = 300;
-    const padding = { top: 24, right: 24, bottom: 40, left: 64 };
+    const height = 320;
+    const padding = CHART_PADDING_WITH_AXIS_LABELS;
     const innerWidth = width - padding.left - padding.right;
     const innerHeight = height - padding.top - padding.bottom;
     const periods = chart.periods;
@@ -420,7 +434,7 @@ function AssetsLiabilitiesTrendChart({
                 {yTicks.map((tick) => {
                     const y = yFor(tick);
                     return (
-                        <g key={tick}>
+                        <g key={tick} data-testid="assets-liabilities-chart-y-tick">
                             <line
                                 x1={padding.left}
                                 x2={width - padding.right}
@@ -447,7 +461,7 @@ function AssetsLiabilitiesTrendChart({
                 <path
                     d={buildPath((p) => amountForCurrency(p, 'assets', currency))}
                     fill="none"
-                    stroke="#0f766e"
+                    stroke={CHART_COLORS.assets}
                     strokeWidth="2.5"
                     data-testid="al-chart-line-assets"
                 />
@@ -456,14 +470,14 @@ function AssetsLiabilitiesTrendChart({
                         amountForCurrency(p, 'liabilities', currency),
                     )}
                     fill="none"
-                    stroke="#b45309"
+                    stroke={CHART_COLORS.liabilities}
                     strokeWidth="2.5"
                     data-testid="al-chart-line-liabilities"
                 />
                 <path
                     d={buildPath((p) => amountForCurrency(p, 'equity', currency))}
                     fill="none"
-                    stroke="#1d4ed8"
+                    stroke={CHART_COLORS.equity}
                     strokeWidth="2.5"
                     data-testid="al-chart-line-equity"
                 />
@@ -487,21 +501,21 @@ function AssetsLiabilitiesTrendChart({
                                 cx={x}
                                 cy={yFor(assetsValue)}
                                 r={isHovered ? 5 : 3}
-                                fill="#0f766e"
+                                fill={CHART_COLORS.assets}
                                 data-testid={`al-chart-point-assets-${period.period}`}
                             />
                             <circle
                                 cx={x}
                                 cy={yFor(liabilitiesValue)}
                                 r={isHovered ? 5 : 3}
-                                fill="#b45309"
+                                fill={CHART_COLORS.liabilities}
                                 data-testid={`al-chart-point-liabilities-${period.period}`}
                             />
                             <circle
                                 cx={x}
                                 cy={yFor(equityValue)}
                                 r={isHovered ? 5 : 3}
-                                fill="#1d4ed8"
+                                fill={CHART_COLORS.equity}
                                 data-testid={`al-chart-point-equity-${period.period}`}
                             />
                             <rect
@@ -527,10 +541,11 @@ function AssetsLiabilitiesTrendChart({
                                 index === periods.length - 1) && (
                                 <text
                                     x={x}
-                                    y={height - 12}
+                                    y={height - padding.bottom + 16}
                                     textAnchor="middle"
                                     className="fill-muted-foreground"
                                     fontSize="11"
+                                    data-testid="assets-liabilities-chart-x-tick"
                                 >
                                     {formatPeriodShort(period.period)}
                                 </text>
@@ -538,6 +553,14 @@ function AssetsLiabilitiesTrendChart({
                         </g>
                     );
                 })}
+                <ChartAxisLabels
+                    width={width}
+                    height={height}
+                    padding={padding}
+                    xLabel="Period"
+                    yLabel={`Amount (${currency})`}
+                    testIdPrefix="assets-liabilities-chart"
+                />
             </svg>
         </div>
     );
@@ -936,12 +959,28 @@ export default function Dashboard({
                             role="list"
                             aria-label="Chart legend"
                         >
-                            <span className="inline-flex items-center gap-2" role="listitem">
-                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-green-600" />
+                            <span
+                                className="inline-flex items-center gap-2"
+                                role="listitem"
+                                data-testid="legend-income"
+                            >
+                                <span
+                                    className="inline-block h-2.5 w-2.5 rounded-sm"
+                                    style={{ backgroundColor: CHART_COLORS.income }}
+                                    data-testid="legend-swatch-income"
+                                />
                                 Income
                             </span>
-                            <span className="inline-flex items-center gap-2" role="listitem">
-                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-red-600" />
+                            <span
+                                className="inline-flex items-center gap-2"
+                                role="listitem"
+                                data-testid="legend-expenses"
+                            >
+                                <span
+                                    className="inline-block h-2.5 w-2.5 rounded-sm"
+                                    style={{ backgroundColor: CHART_COLORS.expenses }}
+                                    data-testid="legend-swatch-expenses"
+                                />
                                 Expenses
                             </span>
                         </div>
@@ -1023,16 +1062,42 @@ export default function Dashboard({
                             role="list"
                             aria-label="Assets liabilities chart legend"
                         >
-                            <span className="inline-flex items-center gap-2" role="listitem">
-                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-teal-700" />
+                            <span
+                                className="inline-flex items-center gap-2"
+                                role="listitem"
+                                data-testid="legend-assets"
+                            >
+                                <span
+                                    className="inline-block h-2.5 w-2.5 rounded-sm"
+                                    style={{ backgroundColor: CHART_COLORS.assets }}
+                                    data-testid="legend-swatch-assets"
+                                />
                                 Assets
                             </span>
-                            <span className="inline-flex items-center gap-2" role="listitem">
-                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-700" />
+                            <span
+                                className="inline-flex items-center gap-2"
+                                role="listitem"
+                                data-testid="legend-liabilities"
+                            >
+                                <span
+                                    className="inline-block h-2.5 w-2.5 rounded-sm"
+                                    style={{
+                                        backgroundColor: CHART_COLORS.liabilities,
+                                    }}
+                                    data-testid="legend-swatch-liabilities"
+                                />
                                 Liabilities
                             </span>
-                            <span className="inline-flex items-center gap-2" role="listitem">
-                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-blue-700" />
+                            <span
+                                className="inline-flex items-center gap-2"
+                                role="listitem"
+                                data-testid="legend-equity"
+                            >
+                                <span
+                                    className="inline-block h-2.5 w-2.5 rounded-sm"
+                                    style={{ backgroundColor: CHART_COLORS.equity }}
+                                    data-testid="legend-swatch-equity"
+                                />
                                 Equity
                             </span>
                         </div>
