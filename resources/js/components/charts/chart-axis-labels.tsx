@@ -1,9 +1,4 @@
-interface ChartPadding {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-}
+import type { ChartPadding } from '@/lib/chart-layout';
 
 interface ChartAxisLabelsProps {
     width: number;
@@ -12,6 +7,7 @@ interface ChartAxisLabelsProps {
     xLabel: string;
     yLabel: string;
     testIdPrefix?: string;
+    fontSize?: number;
 }
 
 /**
@@ -25,21 +21,23 @@ export function ChartAxisLabels({
     xLabel,
     yLabel,
     testIdPrefix = 'chart',
+    fontSize = 12,
 }: ChartAxisLabelsProps) {
     const plotCenterY = padding.top + (height - padding.top - padding.bottom) / 2;
     const plotCenterX = padding.left + (width - padding.left - padding.right) / 2;
+    const yAxisX = Math.max(10, Math.min(14, padding.left * 0.22));
 
     return (
         <g data-testid={`${testIdPrefix}-axis-labels`} aria-hidden="true">
             <text
                 data-testid={`${testIdPrefix}-y-axis-label`}
-                transform={`rotate(-90 ${12} ${plotCenterY})`}
-                x={12}
+                transform={`rotate(-90 ${yAxisX} ${plotCenterY})`}
+                x={yAxisX}
                 y={plotCenterY}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 className="fill-muted-foreground"
-                fontSize="12"
+                fontSize={fontSize}
                 fontWeight={500}
             >
                 {yLabel}
@@ -47,10 +45,10 @@ export function ChartAxisLabels({
             <text
                 data-testid={`${testIdPrefix}-x-axis-label`}
                 x={plotCenterX}
-                y={height - 6}
+                y={height - 8}
                 textAnchor="middle"
                 className="fill-muted-foreground"
-                fontSize="12"
+                fontSize={fontSize}
                 fontWeight={500}
             >
                 {xLabel}

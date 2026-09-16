@@ -10,12 +10,14 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
-import {
-    ChartAxisLabels,
-    CHART_PADDING_WITH_AXIS_LABELS,
-} from '@/components/charts/chart-axis-labels';
+import { ChartAxisLabels } from '@/components/charts/chart-axis-labels';
 import { CHART_COLORS } from '@/lib/chart-colors';
+import {
+    getChartLayout,
+    shouldShowXLabel,
+} from '@/lib/chart-layout';
 import { formatCurrencyAmount } from '@/lib/currency';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
     ArrowLeft,
     LineChart,
@@ -66,10 +68,18 @@ function formatCad(value: number | null | undefined): string {
     return formatCurrencyAmount(value, 'CAD');
 }
 
+function formatPeriodShort(period: string): string {
+    const year = period.substring(0, 4);
+    const month = period.substring(4, 6);
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1);
+    return date.toLocaleDateString('en-US', { year: '2-digit', month: 'short' });
+}
+
 function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
-    const width = 900;
-    const height = 300;
-    const padding = CHART_PADDING_WITH_AXIS_LABELS;
+    const isMobile = useIsMobile();
+    const layout = getChartLayout(isMobile, { height: isMobile ? 260 : 300 });
+    const { width, height, padding, tickFontSize, axisFontSize, maxXLabels } =
+        layout;
     const innerWidth = width - padding.left - padding.right;
     const innerHeight = height - padding.top - padding.bottom;
 
@@ -101,94 +111,112 @@ function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
 
     const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => minValue + range * t);
 
-    const labelStep = Math.max(1, Math.ceil(periods.length / 8));
-
     return (
-        <svg
-            viewBox={`0 0 ${width} ${height}`}
-            role="img"
-            aria-label="Balance sheet trend chart"
-            data-testid="time-series-chart"
-            className="h-auto w-full"
+        <div
+            className="w-full min-w-0"
+            data-testid="time-series-chart-responsive"
+            data-responsive={layout.mode}
         >
-            <rect
-                x={0}
-                y={0}
-                width={width}
-                height={height}
-                fill="transparent"
-            />
-            {yTicks.map((tick) => {
-                const y = yFor(tick);
-                return (
-                    <g key={tick}>
-                        <line
-                            x1={padding.left}
-                            x2={width - padding.right}
-                            y1={y}
-                            y2={y}
-                            stroke="currentColor"
-                            strokeOpacity={0.12}
-                        />
+            <svg
+                viewBox={`0 0 ${width} ${height}`}
+                role="img"
+                aria-label="Balance sheet trend chart"
+                data-testid="time-series-chart"
+                className="h-auto w-full max-w-full"
+                preserveAspectRatio="xMidYMid meet"
+            >
+                <rect
+                    x={0}
+                    y={0}
+                    width={width}
+                    height={height}
+                    fill="transparent"
+                />
+                {yTicks.map((tick) => {
+                    const y = yFor(tick);
+                    return (
+                        <g key={tick}>
+                            <line
+                                x1={padding.left}
+                                x2={width - padding.right}
+                                y1={y}
+                                y2={y}
+                                stroke="currentColor"
+                                strokeOpacity={0.12}
+                            />
+                            <text
+                                x={padding.left - 6}
+                                y={y + 4}
+                                textAnchor="end"
+                                className="fill-muted-foreground"
+                                fontSize={tickFontSize}
+                            >
+                                {new Intl.NumberFormat('en-CA', {
+                                    notation: 'compact',
+                                    maximumFractionDigits: 1,
+                                }).format(tick)}
+                            </text>
+                        </g>
+                    );
+                })}
+                <path
+                    d={buildPath((p) => p.total_assets.cad)}
+                    fill="none"
+                    stroke={CHART_COLORS.assets}
+                    strokeWidth="2.5"
+                    data-testid="chart-line-assets"
+                />
+                <path
+                    d={buildPath((p) => p.total_liabilities.cad)}
+                    fill="none"
+                    stroke={CHART_COLORS.liabilities}
+                    strokeWidth="2.5"
+                    data-testid="chart-line-liabilities"
+                />
+                <path
+                    d={buildPath((p) => p.equity.cad)}
+                    fill="none"
+                    stroke={CHART_COLORS.equity}
+                    strokeWidth="2.5"
+                    data-testid="chart-line-equity"
+                />
+                {periods.map((period, index) =>
+                    shouldShowXLabel(index, periods.length, maxXLabels) ? (
                         <text
-                            x={padding.left - 8}
-                            y={y + 4}
-                            textAnchor="end"
+                            key={period.period}
+                            x={xFor(index)}
+                            y={
+                                layout.rotateXLabels
+                                    ? height - padding.bottom + 10
+                                    : height - padding.bottom + 16
+                            }
+                            textAnchor={layout.rotateXLabels ? 'end' : 'middle'}
+                            transform={
+                                layout.rotateXLabels
+                                    ? `rotate(-40 ${xFor(index)} ${height - padding.bottom + 10})`
+                                    : undefined
+                            }
                             className="fill-muted-foreground"
-                            fontSize="11"
+                            fontSize={tickFontSize}
+                            data-testid="time-series-chart-x-tick"
                         >
-                            {new Intl.NumberFormat('en-CA', {
-                                notation: 'compact',
-                                maximumFractionDigits: 1,
-                            }).format(tick)}
+                            {isMobile
+                                ? formatPeriodShort(period.period)
+                                : formatPeriod(period.period)}
                         </text>
-                    </g>
-                );
-            })}
-            <path
-                d={buildPath((p) => p.total_assets.cad)}
-                fill="none"
-                stroke={CHART_COLORS.assets}
-                strokeWidth="2.5"
-                data-testid="chart-line-assets"
-            />
-            <path
-                d={buildPath((p) => p.total_liabilities.cad)}
-                fill="none"
-                stroke={CHART_COLORS.liabilities}
-                strokeWidth="2.5"
-                data-testid="chart-line-liabilities"
-            />
-            <path
-                d={buildPath((p) => p.equity.cad)}
-                fill="none"
-                stroke={CHART_COLORS.equity}
-                strokeWidth="2.5"
-                data-testid="chart-line-equity"
-            />
-            {periods.map((period, index) =>
-                index % labelStep === 0 || index === periods.length - 1 ? (
-                    <text
-                        key={period.period}
-                        x={xFor(index)}
-                        y={height - padding.bottom + 16}
-                        textAnchor="middle"
-                        className="fill-muted-foreground"
-                        fontSize="11"
-                    >
-                        {formatPeriod(period.period)}
-                    </text>
-                ) : null,
-            )}
-            <ChartAxisLabels
-                width={width}
-                height={height}
-                padding={padding}
-                xLabel="Period"
-                yLabel="Amount (CAD)"
-                testIdPrefix="time-series-chart"
-            />
-        </svg>
+                    ) : null,
+                )}
+                <ChartAxisLabels
+                    width={width}
+                    height={height}
+                    padding={padding}
+                    xLabel="Period"
+                    yLabel="Amount (CAD)"
+                    testIdPrefix="time-series-chart"
+                    fontSize={axisFontSize}
+                />
+            </svg>
+        </div>
     );
 }
 

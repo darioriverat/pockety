@@ -1,10 +1,15 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AppLayout from '@/layouts/app-layout';
 import Dashboard from '@/pages/dashboard';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { User } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
+
+vi.mock('@/hooks/use-mobile', () => ({
+    useIsMobile: vi.fn(() => false),
+}));
 
 type MockPage = {
     url: string;
@@ -360,6 +365,10 @@ function renderDashboard(
 }
 
 describe('Dashboard feature', () => {
+    beforeEach(() => {
+        vi.mocked(useIsMobile).mockReturnValue(false);
+    });
+
     it('renders the dashboard page without crashing', () => {
         expect(() => renderDashboard()).not.toThrow();
     });
@@ -527,6 +536,34 @@ describe('Dashboard feature', () => {
         expect(
             screen.getByTestId('assets-liabilities-hover-tooltip').textContent,
         ).toMatch(/Equity/i);
+    });
+
+    it('uses a compact mobile chart layout with fewer x-axis labels', () => {
+        vi.mocked(useIsMobile).mockReturnValue(true);
+        renderDashboard();
+
+        expect(
+            screen.getByTestId('income-expense-chart-responsive'),
+        ).toHaveAttribute('data-responsive', 'mobile');
+        expect(
+            screen.getByTestId('assets-liabilities-chart-wrap'),
+        ).toHaveAttribute('data-responsive', 'mobile');
+
+        const incomeChart = screen.getByTestId('income-expense-chart');
+        expect(incomeChart.getAttribute('viewBox')).toBe('0 0 360 260');
+
+        const incomeTicks = screen.getAllByTestId('income-expense-chart-x-tick');
+        expect(incomeTicks.length).toBeGreaterThanOrEqual(2);
+        expect(incomeTicks.length).toBeLessThanOrEqual(5);
+        expect(incomeTicks[0].getAttribute('transform')).toMatch(/rotate\(-40/);
+
+        const assetsChart = screen.getByTestId('assets-liabilities-chart');
+        expect(assetsChart.getAttribute('viewBox')).toBe('0 0 360 280');
+
+        fireEvent.pointerDown(screen.getByTestId('al-chart-hit-202601'));
+        expect(
+            screen.getByTestId('assets-liabilities-hover-tooltip').textContent,
+        ).toMatch(/Assets/i);
     });
 
     it('displays top spending categories with amounts and percentages', () => {

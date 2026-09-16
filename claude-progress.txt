@@ -5621,3 +5621,39 @@ STATUS / NEXT:
 - Changed only passes for feature_list.json index 156.
 - Completion: 157/175 passing; 18 pending.
 - Next: index 157, charts responsive and readable on mobile devices.
+
+=== Session 90 (2026-09-16) ===
+
+GOAL: Charts responsive and readable on mobile (feature index 157).
+
+ENVIRONMENT:
+- App running at http://dev.pockety.com:8080/ (HTTP 200).
+- Puppeteer MCP blocked this session (Local SDK cannot request interactive
+  approval). Used /dev/* HTTP helpers + Playwright screenshots (same pattern
+  as Sessions 84-89).
+- Baseline: chart-axis-labels 2/2; chart-styles light sample 1/1; assets rebuilt.
+
+IMPLEMENTATION:
+1. resources/js/lib/chart-layout.ts
+   - Mobile/desktop presets: narrower viewBox (360), denser padding, larger
+     tick/axis fonts, max 4 X labels, rotated labels on mobile
+2. dashboard.tsx + balance-sheet-time-series.tsx
+   - useIsMobile() drives layout; data-responsive=mobile|desktop
+   - Touch/pointer handlers on assets-liabilities hit areas for tooltips
+3. ChartAxisLabels accepts fontSize for mobile readability
+4. Unit: chart-layout.test.ts (3) + dashboard mobile layout case
+5. Browser: tests/browser/responsive-charts.spec.ts
+   - Light/dark @375px: scale, non-overlapping labels, touch tooltip
+   - Desktop layout assertion @1280px
+
+VERIFICATION:
+- Frontend suite: 137 passed / 38 files.
+- Playwright responsive-charts: 3/3 passed; chart-styles light regression 1/1.
+- Screenshots: verification/test-157-responsive-charts/
+  (light/dark mobile charts + tooltip; desktop charts).
+- Asserted mobile viewBox, <=5 non-overlapping x-ticks, tooltip on pointerdown.
+
+STATUS / NEXT:
+- Changed only passes for feature_list.json index 157.
+- Completion: 158/175 passing; 17 pending.
+- Next: index 158, date inputs with calendar picker and consistent format.

@@ -17,17 +17,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { DashboardSummaryCard } from '@/components/dashboard-summary-card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import {
-    ChartAxisLabels,
-    CHART_PADDING_WITH_AXIS_LABELS,
-} from '@/components/charts/chart-axis-labels';
+import { ChartAxisLabels } from '@/components/charts/chart-axis-labels';
 import { CHART_COLORS } from '@/lib/chart-colors';
+import {
+    getChartLayout,
+    shouldShowXLabel,
+} from '@/lib/chart-layout';
 import {
     amountForCurrency,
     formatDisplayCurrency,
     isDisplayCurrency,
     type DisplayCurrency,
 } from '@/lib/currency';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DashboardSummary {
     period: string;
@@ -179,9 +181,10 @@ function IncomeExpenseTrendChart({
     chart: IncomeExpenseChart;
     currency: DisplayCurrency;
 }) {
-    const width = 900;
-    const height = 300;
-    const padding = CHART_PADDING_WITH_AXIS_LABELS;
+    const isMobile = useIsMobile();
+    const layout = getChartLayout(isMobile, { height: isMobile ? 260 : 300 });
+    const { width, height, padding, tickFontSize, axisFontSize, maxXLabels } =
+        layout;
     const innerWidth = width - padding.left - padding.right;
     const innerHeight = height - padding.top - padding.bottom;
     const periods = chart.periods;
@@ -195,8 +198,11 @@ function IncomeExpenseTrendChart({
     const range = maxValue - minValue || 1;
 
     const groupWidth = periods.length > 0 ? innerWidth / periods.length : innerWidth;
-    const barWidth = Math.max(4, Math.min(18, groupWidth * 0.32));
-    const gap = 4;
+    const barWidth = Math.max(
+        isMobile ? 5 : 4,
+        Math.min(isMobile ? 12 : 18, groupWidth * 0.32),
+    );
+    const gap = isMobile ? 2 : 4;
 
     const xForGroup = (index: number) =>
         padding.left + index * groupWidth + groupWidth / 2;
@@ -206,137 +212,170 @@ function IncomeExpenseTrendChart({
         Math.max(0, ((value - minValue) / range) * innerHeight);
 
     const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => minValue + range * t);
-    const labelStep = Math.max(1, Math.ceil(periods.length / 8));
 
     return (
-        <svg
-            viewBox={`0 0 ${width} ${height}`}
-            role="img"
-            aria-label={`Income versus expenses chart for the last 12 months in ${currency}`}
-            data-testid="income-expense-chart"
-            className="h-auto w-full"
+        <div
+            className="w-full min-w-0"
+            data-testid="income-expense-chart-responsive"
+            data-responsive={layout.mode}
         >
-            <rect x={0} y={0} width={width} height={height} fill="transparent" />
-            {yTicks.map((tick) => {
-                const y = yFor(tick);
-                return (
-                    <g key={tick} data-testid="income-expense-chart-y-tick">
-                        <line
-                            x1={padding.left}
-                            x2={width - padding.right}
-                            y1={y}
-                            y2={y}
-                            stroke="currentColor"
-                            strokeOpacity={0.12}
-                        />
-                        <text
-                            x={padding.left - 8}
-                            y={y + 4}
-                            textAnchor="end"
-                            className="fill-muted-foreground"
-                            fontSize="11"
-                        >
-                            {new Intl.NumberFormat('en-CA', {
-                                notation: 'compact',
-                                maximumFractionDigits: 1,
-                            }).format(tick)}
-                        </text>
-                    </g>
-                );
-            })}
-            {periods.map((period, index) => {
-                const centerX = xForGroup(index);
-                const incomeX = centerX - barWidth - gap / 2;
-                const expenseX = centerX + gap / 2;
-                const incomeValue = amountForCurrency(period, 'income', currency);
-                const expenseValue = amountForCurrency(period, 'expenses', currency);
-                const incomeH = barHeight(incomeValue);
-                const expenseH = barHeight(expenseValue);
-
-                return (
-                    <g key={period.period} data-testid={`chart-period-${period.period}`}>
-                        <rect
-                            x={incomeX}
-                            y={yFor(incomeValue)}
-                            width={barWidth}
-                            height={incomeH}
-                            fill={CHART_COLORS.income}
-                            rx={2}
-                            data-testid={`chart-bar-income-${period.period}`}
-                        >
-                            <title>
-                                {formatPeriodShort(period.period)} Income:{' '}
-                                {formatDisplayCurrency(incomeValue, currency)}
-                            </title>
-                        </rect>
-                        <rect
-                            x={expenseX}
-                            y={yFor(expenseValue)}
-                            width={barWidth}
-                            height={expenseH}
-                            fill={CHART_COLORS.expenses}
-                            rx={2}
-                            data-testid={`chart-bar-expenses-${period.period}`}
-                        >
-                            <title>
-                                {formatPeriodShort(period.period)} Expenses:{' '}
-                                {formatDisplayCurrency(expenseValue, currency)}
-                            </title>
-                        </rect>
-                        {(index % labelStep === 0 ||
-                            index === periods.length - 1) && (
+            <svg
+                viewBox={`0 0 ${width} ${height}`}
+                role="img"
+                aria-label={`Income versus expenses chart for the last 12 months in ${currency}`}
+                data-testid="income-expense-chart"
+                className="h-auto w-full max-w-full"
+                preserveAspectRatio="xMidYMid meet"
+            >
+                <rect x={0} y={0} width={width} height={height} fill="transparent" />
+                {yTicks.map((tick) => {
+                    const y = yFor(tick);
+                    return (
+                        <g key={tick} data-testid="income-expense-chart-y-tick">
+                            <line
+                                x1={padding.left}
+                                x2={width - padding.right}
+                                y1={y}
+                                y2={y}
+                                stroke="currentColor"
+                                strokeOpacity={0.12}
+                            />
                             <text
-                                x={centerX}
-                                y={height - padding.bottom + 16}
-                                textAnchor="middle"
+                                x={padding.left - 6}
+                                y={y + 4}
+                                textAnchor="end"
                                 className="fill-muted-foreground"
-                                fontSize="11"
-                                data-testid="income-expense-chart-x-tick"
+                                fontSize={tickFontSize}
                             >
-                                {formatPeriodShort(period.period)}
+                                {new Intl.NumberFormat('en-CA', {
+                                    notation: 'compact',
+                                    maximumFractionDigits: 1,
+                                }).format(tick)}
                             </text>
-                        )}
-                    </g>
-                );
-            })}
-            {/* Line overlays for trend readability */}
-            <path
-                d={periods
-                    .map((period, index) => {
-                        const x = xForGroup(index);
-                        const y = yFor(amountForCurrency(period, 'income', currency));
-                        return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-                    })
-                    .join(' ')}
-                fill="none"
-                stroke={CHART_COLORS.incomeLine}
-                strokeWidth="2"
-                strokeOpacity={0.55}
-                data-testid="chart-line-income"
-            />
-            <path
-                d={periods
-                    .map((period, index) => {
-                        const x = xForGroup(index);
-                        const y = yFor(amountForCurrency(period, 'expenses', currency));
-                        return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-                    })
-                    .join(' ')}
-                fill="none"
-                stroke={CHART_COLORS.expensesLine}
-                strokeWidth="2"
-                strokeOpacity={0.55}
-                data-testid="chart-line-expenses"
-            />
-            <ChartAxisLabels
-                width={width}
-                height={height}
-                padding={padding}
-                xLabel="Period"
-                yLabel={`Amount (${currency})`}
-                testIdPrefix="income-expense-chart"
-            />
-        </svg>
+                        </g>
+                    );
+                })}
+                {periods.map((period, index) => {
+                    const centerX = xForGroup(index);
+                    const incomeX = centerX - barWidth - gap / 2;
+                    const expenseX = centerX + gap / 2;
+                    const incomeValue = amountForCurrency(period, 'income', currency);
+                    const expenseValue = amountForCurrency(
+                        period,
+                        'expenses',
+                        currency,
+                    );
+                    const incomeH = barHeight(incomeValue);
+                    const expenseH = barHeight(expenseValue);
+                    const showLabel = shouldShowXLabel(
+                        index,
+                        periods.length,
+                        maxXLabels,
+                    );
+
+                    return (
+                        <g
+                            key={period.period}
+                            data-testid={`chart-period-${period.period}`}
+                        >
+                            <rect
+                                x={incomeX}
+                                y={yFor(incomeValue)}
+                                width={barWidth}
+                                height={incomeH}
+                                fill={CHART_COLORS.income}
+                                rx={2}
+                                data-testid={`chart-bar-income-${period.period}`}
+                            >
+                                <title>
+                                    {formatPeriodShort(period.period)} Income:{' '}
+                                    {formatDisplayCurrency(incomeValue, currency)}
+                                </title>
+                            </rect>
+                            <rect
+                                x={expenseX}
+                                y={yFor(expenseValue)}
+                                width={barWidth}
+                                height={expenseH}
+                                fill={CHART_COLORS.expenses}
+                                rx={2}
+                                data-testid={`chart-bar-expenses-${period.period}`}
+                            >
+                                <title>
+                                    {formatPeriodShort(period.period)} Expenses:{' '}
+                                    {formatDisplayCurrency(expenseValue, currency)}
+                                </title>
+                            </rect>
+                            {showLabel && (
+                                <text
+                                    x={centerX}
+                                    y={
+                                        layout.rotateXLabels
+                                            ? height - padding.bottom + 10
+                                            : height - padding.bottom + 16
+                                    }
+                                    textAnchor={
+                                        layout.rotateXLabels ? 'end' : 'middle'
+                                    }
+                                    transform={
+                                        layout.rotateXLabels
+                                            ? `rotate(-40 ${centerX} ${height - padding.bottom + 10})`
+                                            : undefined
+                                    }
+                                    className="fill-muted-foreground"
+                                    fontSize={tickFontSize}
+                                    data-testid="income-expense-chart-x-tick"
+                                >
+                                    {formatPeriodShort(period.period)}
+                                </text>
+                            )}
+                        </g>
+                    );
+                })}
+                {/* Line overlays for trend readability */}
+                <path
+                    d={periods
+                        .map((period, index) => {
+                            const x = xForGroup(index);
+                            const y = yFor(
+                                amountForCurrency(period, 'income', currency),
+                            );
+                            return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+                        })
+                        .join(' ')}
+                    fill="none"
+                    stroke={CHART_COLORS.incomeLine}
+                    strokeWidth="2"
+                    strokeOpacity={0.55}
+                    data-testid="chart-line-income"
+                />
+                <path
+                    d={periods
+                        .map((period, index) => {
+                            const x = xForGroup(index);
+                            const y = yFor(
+                                amountForCurrency(period, 'expenses', currency),
+                            );
+                            return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+                        })
+                        .join(' ')}
+                    fill="none"
+                    stroke={CHART_COLORS.expensesLine}
+                    strokeWidth="2"
+                    strokeOpacity={0.55}
+                    data-testid="chart-line-expenses"
+                />
+                <ChartAxisLabels
+                    width={width}
+                    height={height}
+                    padding={padding}
+                    xLabel="Period"
+                    yLabel={`Amount (${currency})`}
+                    testIdPrefix="income-expense-chart"
+                    fontSize={axisFontSize}
+                />
+            </svg>
+        </div>
     );
 }
 
@@ -347,11 +386,12 @@ function AssetsLiabilitiesTrendChart({
     chart: AssetsLiabilitiesChart;
     currency: DisplayCurrency;
 }) {
+    const isMobile = useIsMobile();
+    const layout = getChartLayout(isMobile, { height: isMobile ? 280 : 320 });
+    const { width, height, padding, tickFontSize, axisFontSize, maxXLabels } =
+        layout;
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-    const width = 900;
-    const height = 320;
-    const padding = CHART_PADDING_WITH_AXIS_LABELS;
     const innerWidth = width - padding.left - padding.right;
     const innerHeight = height - padding.top - padding.bottom;
     const periods = chart.periods;
@@ -372,7 +412,6 @@ function AssetsLiabilitiesTrendChart({
         padding.top + ((maxValue - value) / range) * innerHeight;
 
     const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => minValue + range * t);
-    const labelStep = Math.max(1, Math.ceil(periods.length / 8));
     const hovered = hoveredIndex !== null ? periods[hoveredIndex] : null;
 
     const buildPath = (selector: (p: AssetsLiabilitiesPeriod) => number) =>
@@ -385,13 +424,17 @@ function AssetsLiabilitiesTrendChart({
             .join(' ');
 
     return (
-        <div className="relative" data-testid="assets-liabilities-chart-wrap">
+        <div
+            className="relative w-full min-w-0"
+            data-testid="assets-liabilities-chart-wrap"
+            data-responsive={layout.mode}
+        >
             {hovered && hoveredIndex !== null && (
                 <div
-                    className="pointer-events-none absolute z-10 rounded-md border bg-background px-3 py-2 text-xs shadow-md"
+                    className="pointer-events-none absolute z-10 max-w-[min(100%,14rem)] rounded-md border bg-background px-3 py-2 text-xs shadow-md"
                     data-testid="assets-liabilities-hover-tooltip"
                     style={{
-                        left: `${Math.min(92, Math.max(8, (xFor(hoveredIndex) / width) * 100))}%`,
+                        left: `${Math.min(88, Math.max(12, (xFor(hoveredIndex) / width) * 100))}%`,
                         top: 8,
                         transform: 'translateX(-50%)',
                     }}
@@ -427,8 +470,10 @@ function AssetsLiabilitiesTrendChart({
                 role="img"
                 aria-label={`Assets versus liabilities and equity chart for the last 12 months in ${currency}`}
                 data-testid="assets-liabilities-chart"
-                className="h-auto w-full"
+                className="h-auto w-full max-w-full touch-manipulation"
+                preserveAspectRatio="xMidYMid meet"
                 onMouseLeave={() => setHoveredIndex(null)}
+                onPointerLeave={() => setHoveredIndex(null)}
             >
                 <rect x={0} y={0} width={width} height={height} fill="transparent" />
                 {yTicks.map((tick) => {
@@ -444,11 +489,11 @@ function AssetsLiabilitiesTrendChart({
                                 strokeOpacity={0.12}
                             />
                             <text
-                                x={padding.left - 8}
+                                x={padding.left - 6}
                                 y={y + 4}
                                 textAnchor="end"
                                 className="fill-muted-foreground"
-                                fontSize="11"
+                                fontSize={tickFontSize}
                             >
                                 {new Intl.NumberFormat('en-CA', {
                                     notation: 'compact',
@@ -491,6 +536,11 @@ function AssetsLiabilitiesTrendChart({
                         currency,
                     );
                     const equityValue = amountForCurrency(period, 'equity', currency);
+                    const showLabel = shouldShowXLabel(
+                        index,
+                        periods.length,
+                        maxXLabels,
+                    );
 
                     return (
                         <g
@@ -527,6 +577,11 @@ function AssetsLiabilitiesTrendChart({
                                 className="cursor-crosshair"
                                 data-testid={`al-chart-hit-${period.period}`}
                                 onMouseEnter={() => setHoveredIndex(index)}
+                                onPointerDown={(event) => {
+                                    event.preventDefault();
+                                    setHoveredIndex(index);
+                                }}
+                                onTouchStart={() => setHoveredIndex(index)}
                             >
                                 <title>
                                     {formatPeriodShort(period.period)} — Assets:{' '}
@@ -537,14 +592,24 @@ function AssetsLiabilitiesTrendChart({
                                     {formatDisplayCurrency(equityValue, currency)}
                                 </title>
                             </rect>
-                            {(index % labelStep === 0 ||
-                                index === periods.length - 1) && (
+                            {showLabel && (
                                 <text
                                     x={x}
-                                    y={height - padding.bottom + 16}
-                                    textAnchor="middle"
+                                    y={
+                                        layout.rotateXLabels
+                                            ? height - padding.bottom + 10
+                                            : height - padding.bottom + 16
+                                    }
+                                    textAnchor={
+                                        layout.rotateXLabels ? 'end' : 'middle'
+                                    }
+                                    transform={
+                                        layout.rotateXLabels
+                                            ? `rotate(-40 ${x} ${height - padding.bottom + 10})`
+                                            : undefined
+                                    }
                                     className="fill-muted-foreground"
-                                    fontSize="11"
+                                    fontSize={tickFontSize}
                                     data-testid="assets-liabilities-chart-x-tick"
                                 >
                                     {formatPeriodShort(period.period)}
@@ -560,6 +625,7 @@ function AssetsLiabilitiesTrendChart({
                     xLabel="Period"
                     yLabel={`Amount (${currency})`}
                     testIdPrefix="assets-liabilities-chart"
+                    fontSize={axisFontSize}
                 />
             </svg>
         </div>
