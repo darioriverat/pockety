@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { formatPeriod } from '@/lib/periods';
-import { CalendarRange, Receipt, XCircle } from 'lucide-react';
+import { CalendarRange, Receipt, XCircle, ArrowLeftRight } from 'lucide-react';
 
 interface PeriodSummary {
     period: string;
@@ -84,12 +84,20 @@ export default function PeriodsHistory() {
                                 through September 2026
                             </p>
                         </div>
-                        <Button variant="outline" asChild>
-                            <Link href="/transactions">
-                                <Receipt className="mr-2 h-4 w-4" />
-                                Transactions
-                            </Link>
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button variant="outline" asChild>
+                                <Link href="/periods/compare">
+                                    <ArrowLeftRight className="mr-2 h-4 w-4" />
+                                    Compare Periods
+                                </Link>
+                            </Button>
+                            <Button variant="outline" asChild>
+                                <Link href="/transactions">
+                                    <Receipt className="mr-2 h-4 w-4" />
+                                    Transactions
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
 
                     {error && (

@@ -13,6 +13,7 @@ use App\Http\Controllers\ExchangeRateImportController;
 use App\Http\Controllers\FinancialSummaryController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\PeriodComparisonController;
 use App\Http\Controllers\PeriodHistoryController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\TransactionController;
@@ -80,8 +81,9 @@ Route::put('/income/{id}', [IncomeController::class, 'update'])->name('income.up
 Route::patch('/income/{id}', [IncomeController::class, 'update'])->name('income.patch');
 Route::delete('/income/{id}', [IncomeController::class, 'destroy'])->name('income.destroy');
 
-// Periods history API (must be registered before /periods/{period}/...)
+// Periods history / comparison APIs (must be registered before /periods/{period}/...)
 Route::get('/periods/history', [PeriodHistoryController::class, 'index'])->name('periods.history');
+Route::get('/periods/compare', [PeriodComparisonController::class, 'show'])->name('periods.compare');
 
 // Category actuals report (ledger aggregation by category + period)
 Route::get('/category-actuals', [CategoryActualsController::class, 'index'])->name('category-actuals.index');

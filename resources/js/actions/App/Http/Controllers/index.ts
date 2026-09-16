@@ -6,6 +6,7 @@ import CategoryController from './CategoryController'
 import TransactionController from './TransactionController'
 import IncomeController from './IncomeController'
 import PeriodHistoryController from './PeriodHistoryController'
+import PeriodComparisonController from './PeriodComparisonController'
 import CategoryActualsController from './CategoryActualsController'
 import ReconciliationController from './ReconciliationController'
 import BalanceSheetController from './BalanceSheetController'
@@ -27,6 +28,7 @@ const Controllers = {
     TransactionController: Object.assign(TransactionController, TransactionController),
     IncomeController: Object.assign(IncomeController, IncomeController),
     PeriodHistoryController: Object.assign(PeriodHistoryController, PeriodHistoryController),
+    PeriodComparisonController: Object.assign(PeriodComparisonController, PeriodComparisonController),
     CategoryActualsController: Object.assign(CategoryActualsController, CategoryActualsController),
     ReconciliationController: Object.assign(ReconciliationController, ReconciliationController),
     BalanceSheetController: Object.assign(BalanceSheetController, BalanceSheetController),

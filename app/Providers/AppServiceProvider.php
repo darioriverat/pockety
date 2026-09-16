@@ -6,12 +6,14 @@ use App\Domain\Services\Contracts\AccountServiceInterface;
 use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Domain\Services\Contracts\IncomeServiceInterface;
+use App\Domain\Services\Contracts\PeriodComparisonServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Services\AccountService;
 use App\Services\CategoryActualsService;
 use App\Services\CategoryService;
 use App\Services\IncomeService;
+use App\Services\PeriodComparisonService;
 use App\Services\PeriodHistoryService;
 use App\Services\TransactionService;
 use Carbon\CarbonImmutable;
@@ -51,6 +53,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             PeriodHistoryServiceInterface::class,
             PeriodHistoryService::class
+        );
+
+        $this->app->bind(
+            PeriodComparisonServiceInterface::class,
+            PeriodComparisonService::class
         );
 
         $this->app->bind(

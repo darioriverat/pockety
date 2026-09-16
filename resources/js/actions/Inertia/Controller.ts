@@ -1238,6 +1238,86 @@ Controller0087b42306d1a9bfc8523a1efde238a0.form = Controller0087b42306d1a9bfc852
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+const Controllereb6b8dc4f7bc12115549aa561f3758e5 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllereb6b8dc4f7bc12115549aa561f3758e5.url(options),
+    method: 'get',
+})
+
+Controllereb6b8dc4f7bc12115549aa561f3758e5.definition = {
+    methods: ["get","head"],
+    url: '/periods/compare',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+Controllereb6b8dc4f7bc12115549aa561f3758e5.url = (options?: RouteQueryOptions) => {
+    return Controllereb6b8dc4f7bc12115549aa561f3758e5.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+Controllereb6b8dc4f7bc12115549aa561f3758e5.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controllereb6b8dc4f7bc12115549aa561f3758e5.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+Controllereb6b8dc4f7bc12115549aa561f3758e5.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controllereb6b8dc4f7bc12115549aa561f3758e5.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+const Controllereb6b8dc4f7bc12115549aa561f3758e5Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllereb6b8dc4f7bc12115549aa561f3758e5.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+Controllereb6b8dc4f7bc12115549aa561f3758e5Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllereb6b8dc4f7bc12115549aa561f3758e5.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+Controllereb6b8dc4f7bc12115549aa561f3758e5Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controllereb6b8dc4f7bc12115549aa561f3758e5.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controllereb6b8dc4f7bc12115549aa561f3758e5.form = Controllereb6b8dc4f7bc12115549aa561f3758e5Form
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/category-actuals'
 */
 const Controllerafd35e6743e57afe5575e28c0e0c9919 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -1497,6 +1577,7 @@ const Controller = {
     '/balance-sheet/time-series': Controllerc7faafe80c37793e81ea6a8d0f57649e,
     '/fixed-assets': Controller66f8e5b78e1501959ce456384c37e122,
     '/periods/history': Controller0087b42306d1a9bfc8523a1efde238a0,
+    '/periods/compare': Controllereb6b8dc4f7bc12115549aa561f3758e5,
     '/category-actuals': Controllerafd35e6743e57afe5575e28c0e0c9919,
     '/import': Controller319c434a45921953484cb2f345f6ad0c,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,

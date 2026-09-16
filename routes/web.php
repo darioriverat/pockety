@@ -38,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('balance-sheet/time-series', 'balance-sheet-time-series')->name('balance-sheet-time-series');
     Route::inertia('fixed-assets', 'fixed-assets')->name('fixed-assets');
     Route::inertia('periods/history', 'periods-history')->name('periods-history');
+    Route::inertia('periods/compare', 'period-comparison')->name('periods-compare');
     Route::inertia('category-actuals', 'category-actuals')->name('category-actuals');
     Route::inertia('import', 'import')->name('import');
 });

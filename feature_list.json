@@ -1243,7 +1243,7 @@
       "Step 4: Verify income, expenses, and balances for both periods are shown side-by-side",
       "Step 5: Verify differences/changes are calculated and highlighted"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

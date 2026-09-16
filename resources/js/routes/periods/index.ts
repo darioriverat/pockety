@@ -81,6 +81,87 @@ historyForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 history.form = historyForm
 
 /**
+* @see \App\Http\Controllers\PeriodComparisonController::compare
+* @see app/Http/Controllers/PeriodComparisonController.php:20
+* @route '/api/periods/compare'
+*/
+export const compare = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: compare.url(options),
+    method: 'get',
+})
+
+compare.definition = {
+    methods: ["get","head"],
+    url: '/api/periods/compare',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\PeriodComparisonController::compare
+* @see app/Http/Controllers/PeriodComparisonController.php:20
+* @route '/api/periods/compare'
+*/
+compare.url = (options?: RouteQueryOptions) => {
+    return compare.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\PeriodComparisonController::compare
+* @see app/Http/Controllers/PeriodComparisonController.php:20
+* @route '/api/periods/compare'
+*/
+compare.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: compare.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodComparisonController::compare
+* @see app/Http/Controllers/PeriodComparisonController.php:20
+* @route '/api/periods/compare'
+*/
+compare.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: compare.url(options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodComparisonController::compare
+* @see app/Http/Controllers/PeriodComparisonController.php:20
+* @route '/api/periods/compare'
+*/
+const compareForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: compare.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodComparisonController::compare
+* @see app/Http/Controllers/PeriodComparisonController.php:20
+* @route '/api/periods/compare'
+*/
+compareForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: compare.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\PeriodComparisonController::compare
+* @see app/Http/Controllers/PeriodComparisonController.php:20
+* @route '/api/periods/compare'
+*/
+compareForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: compare.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+compare.form = compareForm
+
+/**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
 * @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
@@ -280,6 +361,7 @@ balanceSheet.form = balanceSheetForm
 
 const periods = {
     history: Object.assign(history, history),
+    compare: Object.assign(compare, compare),
     reconciliation: Object.assign(reconciliation, reconciliation),
     balanceSheet: Object.assign(balanceSheet, balanceSheet),
 }

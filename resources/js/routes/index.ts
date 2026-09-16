@@ -1354,6 +1354,87 @@ periodsHistory.form = periodsHistoryForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+export const periodsCompare = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: periodsCompare.url(options),
+    method: 'get',
+})
+
+periodsCompare.definition = {
+    methods: ["get","head"],
+    url: '/periods/compare',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+periodsCompare.url = (options?: RouteQueryOptions) => {
+    return periodsCompare.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+periodsCompare.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: periodsCompare.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+periodsCompare.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: periodsCompare.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+const periodsCompareForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodsCompare.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+periodsCompareForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodsCompare.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/periods/compare'
+*/
+periodsCompareForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodsCompare.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+periodsCompare.form = periodsCompareForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/category-actuals'
 */
 export const categoryActuals = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
