@@ -338,6 +338,128 @@ class DashboardService
         ];
     }
 
+    /**
+     * Recent activity feed: latest transactions and income lines (10–20 items).
+     *
+     * @return array{
+     *     limit: int,
+     *     items: list<array{
+     *         id: int,
+     *         type: string,
+     *         date: string,
+     *         period: string,
+     *         summary: string,
+     *         amount_cad: float|null,
+     *         amount_usd: float|null,
+     *         amount_cop: float|null,
+     *         category_code: string|null,
+     *         category_name_en: string|null,
+     *         category_name_es: string|null,
+     *         account_name: string|null,
+     *         comments: string|null,
+     *         detail_url: string
+     *     }>
+     * }
+     */
+    public function getRecentActivity(int $limit = 15): array
+    {
+        $limit = max(10, min(20, $limit));
+
+        $transactions = Transaction::query()
+            ->with(['category', 'account'])
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get();
+
+        $incomeLines = Income::query()
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get();
+
+        $items = [];
+
+        foreach ($transactions as $transaction) {
+            $category = $transaction->category;
+            $account = $transaction->account;
+            $date = $transaction->date?->format('Y-m-d') ?? '';
+            $comments = $transaction->comments ? trim((string) $transaction->comments) : '';
+            $categoryLabel = $category
+                ? trim($category->name_en.' / '.$category->name_es)
+                : 'Expense';
+            $summaryParts = array_filter([
+                $categoryLabel,
+                $account?->name ? 'via '.$account->name : null,
+                $comments !== '' ? $comments : null,
+            ]);
+
+            $items[] = [
+                'id' => (int) $transaction->id,
+                'type' => 'expense',
+                'date' => $date,
+                'period' => (string) $transaction->period,
+                'summary' => implode(' · ', $summaryParts),
+                'amount_cad' => $transaction->amount_cad !== null ? (float) $transaction->amount_cad : null,
+                'amount_usd' => $transaction->amount_usd !== null ? (float) $transaction->amount_usd : null,
+                'amount_cop' => $transaction->amount_cop !== null ? (float) $transaction->amount_cop : null,
+                'category_code' => $category?->code,
+                'category_name_en' => $category?->name_en,
+                'category_name_es' => $category?->name_es,
+                'account_name' => $account?->name,
+                'comments' => $comments !== '' ? $comments : null,
+                'detail_url' => '/transactions?period='.urlencode((string) $transaction->period).'&highlight='.$transaction->id,
+                'sort_at' => ($transaction->updated_at ?? $transaction->created_at)?->format('Y-m-d H:i:s.u')
+                    ?? $date,
+            ];
+        }
+
+        foreach ($incomeLines as $income) {
+            $period = (string) $income->period;
+            $date = preg_match('/^\d{6}$/', $period)
+                ? Carbon::createFromFormat('Ym', $period)->endOfMonth()->format('Y-m-d')
+                : ($income->updated_at?->format('Y-m-d') ?? '');
+            $description = trim((string) $income->description);
+            $notes = $income->notes ? trim((string) $income->notes) : '';
+            $summaryParts = array_filter([
+                $description !== '' ? $description : 'Income',
+                $notes !== '' ? $notes : null,
+            ]);
+
+            $items[] = [
+                'id' => (int) $income->id,
+                'type' => 'income',
+                'date' => $date,
+                'period' => $period,
+                'summary' => implode(' · ', $summaryParts),
+                'amount_cad' => $income->amount_cad !== null ? (float) $income->amount_cad : null,
+                'amount_usd' => $income->amount_usd !== null ? (float) $income->amount_usd : null,
+                'amount_cop' => $income->amount_cop !== null ? (float) $income->amount_cop : null,
+                'category_code' => null,
+                'category_name_en' => null,
+                'category_name_es' => null,
+                'account_name' => null,
+                'comments' => $notes !== '' ? $notes : null,
+                'detail_url' => '/income',
+                'sort_at' => ($income->updated_at ?? $income->created_at)?->format('Y-m-d H:i:s.u')
+                    ?? $date,
+            ];
+        }
+
+        usort($items, fn (array $a, array $b) => strcmp($b['sort_at'], $a['sort_at']));
+        $items = array_slice($items, 0, $limit);
+
+        foreach ($items as &$item) {
+            unset($item['sort_at']);
+        }
+        unset($item);
+
+        return [
+            'limit' => $limit,
+            'items' => array_values($items),
+        ];
+    }
+
     private function transactionToCad(Transaction $transaction, ExchangeRate $exchangeRate): float
     {
         $cadEquivalent = 0.0;

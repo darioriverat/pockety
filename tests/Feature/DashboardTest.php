@@ -490,4 +490,111 @@ class DashboardTest extends TestCase
             ->where('top_spending_categories.categories.5.amount_cad', 50)
         );
     }
+
+    public function test_dashboard_displays_recent_activity_feed(): void
+    {
+        $period = '202601';
+
+        ExchangeRate::create([
+            'period' => $period,
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        $account = Account::factory()->create([
+            'type' => 'bank',
+            'name' => 'RBC Chequing',
+        ]);
+        $category = Category::factory()->create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+        ]);
+
+        $older = Transaction::create([
+            'date' => '2026-01-10',
+            'period' => $period,
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 20.00,
+            'amount_usd' => null,
+            'amount_cop' => null,
+            'comments' => 'Older activity',
+        ]);
+
+        $newer = Transaction::create([
+            'date' => '2026-01-22',
+            'period' => $period,
+            'quincena' => 'Q2',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 55.25,
+            'amount_usd' => null,
+            'amount_cop' => null,
+            'comments' => 'Recent activity seed',
+        ]);
+
+        $income = Income::create([
+            'period' => $period,
+            'description' => 'Salary',
+            'line_number' => 1,
+            'amount_cad' => 5000.00,
+            'amount_usd' => 0,
+            'amount_cop' => 0,
+        ]);
+
+        $response = $this->get(route('dashboard', ['period' => $period]));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard')
+            ->where('recent_activity.limit', 15)
+            ->has('recent_activity.items', 3)
+            ->where('recent_activity.items', function ($items) use ($newer, $older, $income) {
+                $byKey = collect($items)->keyBy(fn ($item) => $item['type'].'-'.$item['id']);
+
+                return $byKey->has('expense-'.$newer->id)
+                    && $byKey->has('expense-'.$older->id)
+                    && $byKey->has('income-'.$income->id)
+                    && str_contains((string) $byKey['expense-'.$newer->id]['summary'], 'Recent activity seed')
+                    && $byKey['expense-'.$newer->id]['date'] === '2026-01-22'
+                    && $byKey['expense-'.$newer->id]['detail_url'] === '/transactions?period=202601&highlight='.$newer->id
+                    && $byKey['income-'.$income->id]['type'] === 'income'
+                    && $byKey['income-'.$income->id]['summary'] === 'Salary'
+                    && $byKey['income-'.$income->id]['detail_url'] === '/income';
+            })
+        );
+    }
+
+    public function test_dashboard_recent_activity_respects_limit_between_10_and_20(): void
+    {
+        $period = '202601';
+        $account = Account::factory()->create(['type' => 'bank']);
+        $category = Category::factory()->create(['code' => 'C001']);
+
+        for ($i = 1; $i <= 25; $i++) {
+            Transaction::create([
+                'date' => sprintf('2026-01-%02d', min($i, 28)),
+                'period' => $period,
+                'quincena' => $i <= 15 ? 'Q1' : 'Q2',
+                'category_id' => $category->id,
+                'account_id' => $account->id,
+                'amount_cad' => 10 + $i,
+                'amount_usd' => null,
+                'amount_cop' => null,
+                'comments' => "Activity item {$i}",
+            ]);
+        }
+
+        $response = $this->get(route('dashboard', ['period' => $period]));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard')
+            ->where('recent_activity.limit', 15)
+            ->has('recent_activity.items', 15)
+        );
+    }
 }

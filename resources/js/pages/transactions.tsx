@@ -165,6 +165,7 @@ export default function Transactions() {
         last_page: 1,
     });
     const urlFiltersApplied = useRef(false);
+    const highlightApplied = useRef(false);
     const [detailCategoryCode, setDetailCategoryCode] = useState<string | null>(
         null,
     );
@@ -255,6 +256,59 @@ export default function Transactions() {
     useEffect(() => {
         fetchTransactions();
     }, [filters, page, perPage]);
+
+    useEffect(() => {
+        if (highlightApplied.current || loading || transactions.length === 0) {
+            return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const highlightParam = params.get('highlight');
+        if (!highlightParam) {
+            highlightApplied.current = true;
+            return;
+        }
+
+        const highlightId = Number.parseInt(highlightParam, 10);
+        if (Number.isNaN(highlightId)) {
+            highlightApplied.current = true;
+            return;
+        }
+
+        const target = transactions.find(
+            (transaction) => transaction.id === highlightId,
+        );
+        if (!target) {
+            return;
+        }
+
+        highlightApplied.current = true;
+        setFormError(null);
+        setIsDuplicating(false);
+        setEditingId(target.id);
+        setFormData({
+            date: target.date,
+            period: target.period,
+            quincena: target.quincena as 'Q1' | 'Q2',
+            category_id: target.category_id.toString(),
+            account_id: target.account_id?.toString() ?? '',
+            currency: (target.currency ?? 'CAD') as 'CAD' | 'USD' | 'COP',
+            amount: (target.amount ?? 0).toString(),
+            comments: target.comments || '',
+            is_recurring: target.is_recurring,
+            debt_component: (target.debt_component || '') as
+                | 'principal'
+                | 'interest'
+                | '',
+        });
+        setIsDialogOpen(true);
+
+        requestAnimationFrame(() => {
+            document
+                .querySelector(`[data-testid="transaction-row-${highlightId}"]`)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    }, [transactions, loading]);
 
     const fetchAccounts = async () => {
         try {

@@ -64,6 +64,25 @@ type MockPage = {
                 transaction_count: number;
             }>;
         };
+        recent_activity: {
+            limit: number;
+            items: Array<{
+                id: number;
+                type: 'expense' | 'income';
+                date: string;
+                period: string;
+                summary: string;
+                amount_cad: number | null;
+                amount_usd: number | null;
+                amount_cop: number | null;
+                category_code: string | null;
+                category_name_en: string | null;
+                category_name_es: string | null;
+                account_name: string | null;
+                comments: string | null;
+                detail_url: string;
+            }>;
+        };
     };
 };
 
@@ -187,6 +206,59 @@ const mockPage: MockPage = {
                 },
             ],
         },
+        recent_activity: {
+            limit: 15,
+            items: [
+                {
+                    id: 101,
+                    type: 'expense',
+                    date: '2026-01-20',
+                    period: '202601',
+                    summary: 'Groceries / MERCADO · via RBC Chequing · Weekly shop',
+                    amount_cad: 85.5,
+                    amount_usd: null,
+                    amount_cop: null,
+                    category_code: 'C001',
+                    category_name_en: 'Groceries',
+                    category_name_es: 'MERCADO',
+                    account_name: 'RBC Chequing',
+                    comments: 'Weekly shop',
+                    detail_url: '/transactions?period=202601&highlight=101',
+                },
+                {
+                    id: 12,
+                    type: 'income',
+                    date: '2026-01-31',
+                    period: '202601',
+                    summary: 'Salary',
+                    amount_cad: 5000,
+                    amount_usd: null,
+                    amount_cop: null,
+                    category_code: null,
+                    category_name_en: null,
+                    category_name_es: null,
+                    account_name: null,
+                    comments: null,
+                    detail_url: '/income',
+                },
+                {
+                    id: 99,
+                    type: 'expense',
+                    date: '2026-01-18',
+                    period: '202601',
+                    summary: 'Transportation / TRANSPORTES · via Wise',
+                    amount_cad: 42,
+                    amount_usd: null,
+                    amount_cop: null,
+                    category_code: 'C004',
+                    category_name_en: 'Transportation',
+                    category_name_es: 'TRANSPORTES',
+                    account_name: 'Wise',
+                    comments: null,
+                    detail_url: '/transactions?period=202601&highlight=99',
+                },
+            ],
+        },
     },
 };
 
@@ -239,6 +311,7 @@ function renderDashboard(
     incomeExpenseChart = mockPage.props.income_expense_chart,
     assetsLiabilitiesChart = mockPage.props.assets_liabilities_chart,
     topSpendingCategories = mockPage.props.top_spending_categories,
+    recentActivity = mockPage.props.recent_activity,
 ) {
     return render(
         <TooltipProvider delayDuration={0}>
@@ -248,6 +321,7 @@ function renderDashboard(
                     income_expense_chart={incomeExpenseChart}
                     assets_liabilities_chart={assetsLiabilitiesChart}
                     top_spending_categories={topSpendingCategories}
+                    recent_activity={recentActivity}
                 />
             </AppLayout>
         </TooltipProvider>,
@@ -272,7 +346,7 @@ describe('Dashboard feature', () => {
         renderDashboard();
 
         expect(screen.getByText('Total Income')).toBeDefined();
-        expect(screen.getByText('$5,000.00')).toBeDefined();
+        expect(screen.getAllByText('$5,000.00').length).toBeGreaterThan(0);
     });
 
     it('displays total expenses card', () => {
@@ -426,8 +500,8 @@ describe('Dashboard feature', () => {
             /40\.0%/,
         );
         expect(screen.getByTestId('top-spending-bar-C001')).toBeDefined();
-        expect(screen.getByText(/MERCADO/)).toBeDefined();
-        expect(screen.getByText(/Groceries/)).toBeDefined();
+        expect(screen.getAllByText(/MERCADO/).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Groceries/).length).toBeGreaterThan(0);
         expect(screen.getByTestId('top-spending-row-C006')).toBeDefined();
         expect(screen.getByTestId('top-spending-row-C005')).toBeDefined();
     });
@@ -447,5 +521,51 @@ describe('Dashboard feature', () => {
 
         expect(screen.getByTestId('top-spending-categories-empty')).toBeDefined();
         expect(screen.getByText(/No spending recorded/i)).toBeDefined();
+    });
+
+    it('displays recent activity feed with date, type, and summary', () => {
+        renderDashboard();
+
+        expect(screen.getByText('Recent Activity')).toBeDefined();
+        expect(screen.getByTestId('recent-activity-card')).toBeDefined();
+        expect(screen.getByTestId('recent-activity-list')).toBeDefined();
+        expect(screen.getByTestId('recent-activity-item-expense-101')).toBeDefined();
+        expect(screen.getByTestId('recent-activity-type-expense-101').textContent).toMatch(
+            /Expense/i,
+        );
+        expect(screen.getByTestId('recent-activity-date-expense-101').textContent).toMatch(
+            /Jan/i,
+        );
+        expect(
+            screen.getByTestId('recent-activity-summary-expense-101').textContent,
+        ).toMatch(/Weekly shop/);
+        expect(
+            screen.getByTestId('recent-activity-amount-expense-101').textContent,
+        ).toMatch(/\$85\.50/);
+        expect(screen.getByTestId('recent-activity-item-income-12')).toBeDefined();
+        expect(screen.getByTestId('recent-activity-type-income-12').textContent).toMatch(
+            /Income/i,
+        );
+
+        const expenseLink = screen
+            .getByTestId('recent-activity-item-expense-101')
+            .closest('a');
+        expect(expenseLink).toHaveAttribute(
+            'href',
+            '/transactions?period=202601&highlight=101',
+        );
+    });
+
+    it('shows empty state when there is no recent activity', () => {
+        renderDashboard(
+            mockPage.props.summary,
+            mockPage.props.income_expense_chart,
+            mockPage.props.assets_liabilities_chart,
+            mockPage.props.top_spending_categories,
+            { limit: 15, items: [] },
+        );
+
+        expect(screen.getByTestId('recent-activity-empty')).toBeDefined();
+        expect(screen.getByText(/No recent activity yet/i)).toBeDefined();
     });
 });

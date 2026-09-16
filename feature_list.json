@@ -1331,7 +1331,7 @@
       "Step 4: Verify each item shows date, type, and summary",
       "Step 5: Verify user can click to view details"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

@@ -11,6 +11,7 @@ import {
     AlertCircleIcon,
     LineChart,
     PieChartIcon,
+    ActivityIcon,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -75,11 +76,34 @@ interface TopSpendingCategories {
     categories: TopSpendingCategory[];
 }
 
+interface RecentActivityItem {
+    id: number;
+    type: 'expense' | 'income';
+    date: string;
+    period: string;
+    summary: string;
+    amount_cad: number | null;
+    amount_usd: number | null;
+    amount_cop: number | null;
+    category_code: string | null;
+    category_name_en: string | null;
+    category_name_es: string | null;
+    account_name: string | null;
+    comments: string | null;
+    detail_url: string;
+}
+
+interface RecentActivity {
+    limit: number;
+    items: RecentActivityItem[];
+}
+
 interface DashboardProps {
     summary: DashboardSummary;
     income_expense_chart: IncomeExpenseChart;
     assets_liabilities_chart: AssetsLiabilitiesChart;
     top_spending_categories: TopSpendingCategories;
+    recent_activity: RecentActivity;
 }
 
 function formatPeriodShort(period: string): string {
@@ -561,11 +585,135 @@ function TopSpendingCategoriesWidget({
     );
 }
 
+function formatActivityAmount(item: RecentActivityItem): string {
+    if (item.amount_cad !== null && item.amount_cad !== 0) {
+        return new Intl.NumberFormat('en-CA', {
+            style: 'currency',
+            currency: 'CAD',
+        }).format(item.amount_cad);
+    }
+    if (item.amount_usd !== null && item.amount_usd !== 0) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format(item.amount_usd);
+    }
+    if (item.amount_cop !== null && item.amount_cop !== 0) {
+        return new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            maximumFractionDigits: 0,
+        }).format(item.amount_cop);
+    }
+    return '—';
+}
+
+function formatActivityDate(date: string): string {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return date;
+    }
+    const [year, month, day] = date.split('-').map((part) => parseInt(part, 10));
+    return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+}
+
+function RecentActivityWidget({ data }: { data: RecentActivity }) {
+    return (
+        <Card data-testid="recent-activity-card">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <ActivityIcon className="h-5 w-5" />
+                    Recent Activity
+                </CardTitle>
+                <CardDescription data-testid="recent-activity-description">
+                    Latest {data.limit} transactions and income changes
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                {data.items.length === 0 ? (
+                    <p
+                        className="text-muted-foreground text-sm"
+                        data-testid="recent-activity-empty"
+                    >
+                        No recent activity yet. Add a transaction or income
+                        line to see it here.
+                    </p>
+                ) : (
+                    <div
+                        className="divide-y"
+                        role="list"
+                        data-testid="recent-activity-list"
+                    >
+                        {data.items.map((item) => (
+                            <a
+                                key={`${item.type}-${item.id}`}
+                                href={item.detail_url}
+                                role="listitem"
+                                data-testid={`recent-activity-item-${item.type}-${item.id}`}
+                                data-activity-type={item.type}
+                                className="hover:bg-muted/50 flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0 transition-colors"
+                            >
+                                <div className="min-w-0 flex-1 space-y-1">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <Badge
+                                            variant={
+                                                item.type === 'income'
+                                                    ? 'default'
+                                                    : 'secondary'
+                                            }
+                                            data-testid={`recent-activity-type-${item.type}-${item.id}`}
+                                        >
+                                            {item.type === 'income'
+                                                ? 'Income'
+                                                : 'Expense'}
+                                        </Badge>
+                                        <span
+                                            className="text-muted-foreground text-xs tabular-nums"
+                                            data-testid={`recent-activity-date-${item.type}-${item.id}`}
+                                        >
+                                            {formatActivityDate(item.date)}
+                                        </span>
+                                    </div>
+                                    <p
+                                        className="truncate text-sm font-medium"
+                                        data-testid={`recent-activity-summary-${item.type}-${item.id}`}
+                                    >
+                                        {item.summary}
+                                    </p>
+                                </div>
+                                <div className="shrink-0 text-right">
+                                    <p
+                                        className={`text-sm font-semibold tabular-nums ${
+                                            item.type === 'income'
+                                                ? 'text-green-600'
+                                                : 'text-red-600'
+                                        }`}
+                                        data-testid={`recent-activity-amount-${item.type}-${item.id}`}
+                                    >
+                                        {formatActivityAmount(item)}
+                                    </p>
+                                    <p className="text-muted-foreground text-xs">
+                                        View details →
+                                    </p>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function Dashboard({
     summary,
     income_expense_chart,
     assets_liabilities_chart,
     top_spending_categories,
+    recent_activity,
 }: DashboardProps) {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-CA', {
@@ -790,6 +938,9 @@ export default function Dashboard({
                     data={top_spending_categories}
                     formatCurrency={formatCurrency}
                 />
+
+                {/* Recent Activity Feed */}
+                <RecentActivityWidget data={recent_activity} />
 
                 {/* Reconciliation Status Card */}
                 <Card>

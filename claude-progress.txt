@@ -4566,3 +4566,41 @@ NEXT SESSION:
 PROGRESS: 112/175 passing; 63 remaining
 STATUS: App healthy; duplicate live on transactions page
 
+================================================================================
+SESSION 61 - Sep 15, 2026, ~10:00 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked (interactive approval rejected) — used /dev/browser-tests
+- Frontend/backend/browser via /dev/frontend-tests, /dev/run-tests, /dev/browser-tests
+
+VERIFICATION (before new work):
+- Frontend unit tests: 68/68
+- Backend DashboardTest: 10/10
+- Browser smoke (duplicate): needed /dev/reset-test-user + /dev/seed-browser; then OK
+
+IMPLEMENTED THIS SESSION:
+Test #111 — Recent activity feed on dashboard
+- DashboardService::getRecentActivity(15) merges latest expenses + income
+- DashboardController passes recent_activity to Inertia
+- Dashboard UI: Recent Activity widget (date, type badge, summary, amount)
+- Click expense opens /transactions with highlight and edit dialog
+- Feature tests (2), frontend unit tests (2), Playwright browser spec
+
+BROWSER VERIFIED (screenshots in verification/session-61/):
+- 01-dashboard-with-recent-activity.png
+- 02-recent-activity-widget.png
+- 03-transaction-details-from-activity.png
+
+PASSES UPDATED:
+- #111 → passes: true
+
+NEXT SESSION:
+1. Implement test #112 — default currency preference
+2. Or #113 Spanish/English category name toggle
+3. Prefer /dev/reset-test-user + /dev/seed-browser if login/categories fail
+
+PROGRESS: 113/175 passing; 62 remaining
+STATUS: App healthy; recent activity live on dashboard
+
