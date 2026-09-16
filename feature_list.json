@@ -1940,7 +1940,7 @@
       "Step 5: Verify tooltip is positioned clearly (not overlapping content)",
       "Step 6: Verify tooltip disappears on mouse out"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
