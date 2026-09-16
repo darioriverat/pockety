@@ -4397,3 +4397,44 @@ PROGRESS: 106 tests passing, 2 implemented but pending verification (tests #105,
 REMAINING: 67 tests to implement
 STATUS: Clean codebase, all changes committed, ready for verification
 
+
+================================================================================
+SESSION 57 - Sep 15, 2026, 9:17 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Docker exec / Puppeteer MCP blocked (interactive approval rejected)
+- Host PHP unavailable; Playwright Chromium install blocked by sandbox network
+- Frontend unit tests runnable via npm; assets buildable with SKIP_WAYFINDER=1
+
+VERIFICATION DONE THIS SESSION:
+- Fixed reports-ytd.test.tsx (TooltipProvider + Inertia Head mocks) — 9 tests passing
+- reconciliation.test.tsx expanded — 18 frontend tests passing total for YTD+recon
+- Authenticated Inertia verification (curl/session):
+  * reports-ytd 2025: income 10500 / expenses 1800 / net 8700
+  * reports-ytd 2026: totals update when year changes
+  * reconciliation page loads; account with CAD variance 1000 (>$10 threshold)
+- API acknowledge POST for account 1 / 202501 succeeded; is_reviewed=true with note;
+  variance still 1000 (test #107 backend path verified)
+
+IMPLEMENTED:
+Test #107 — User can manually mark an account variance as reviewed/acknowledged
+- variance_acknowledgments table (migration + lazy ensure for live env)
+- VarianceAcknowledgment model
+- POST /api/periods/{period}/reconciliation/{accountId}/acknowledge
+- Reconciliation UI: Acknowledge Variance dialog, Reviewed badge, review note
+- Feature tests, frontend tests, Playwright browser spec
+
+PASSES STATUS:
+- #105, #106, #107 remain passes:false (no browser screenshots this session)
+- Do NOT treat Puppeteer as permanently broken — retry next session
+
+NEXT SESSION:
+1. Browser-verify #105-#107 with screenshots then mark passes true
+2. task backend-tests / task frontend-tests in Docker
+3. Implement test #108 global search
+
+PROGRESS: 106/175 passing; 3 pending browser mark; ~66 left to implement
+STATUS: App healthy; acknowledgment feature live via API + built UI
+

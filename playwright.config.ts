@@ -14,6 +14,9 @@ export default defineConfig({
         headless: true,
         screenshot: 'only-on-failure',
         trace: 'on-first-retry',
+        ...(process.env.PLAYWRIGHT_CHANNEL
+            ? { channel: process.env.PLAYWRIGHT_CHANNEL }
+            : {}),
     },
     projects: [
         {

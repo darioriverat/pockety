@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Reconciliation from './reconciliation';
 
 // Mock Inertia
@@ -19,6 +19,10 @@ vi.mock('@/hooks/use-period', () => ({
 global.fetch = vi.fn();
 
 describe('Reconciliation - Variance Warnings', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     const mockAccountWithLargeVariance = {
         account_id: 1,
         account_name: 'Test Bank Account',
@@ -30,6 +34,9 @@ describe('Reconciliation - Variance Warnings', () => {
         computed: { cad: 985, usd: 0, cop: 0 },
         variance: { cad: 15, usd: 0, cop: 0 }, // Exceeds $10 threshold
         is_balanced: false,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
     };
 
     const mockAccountWithSmallVariance = {
@@ -43,6 +50,9 @@ describe('Reconciliation - Variance Warnings', () => {
         computed: { cad: 495, usd: 0, cop: 0 },
         variance: { cad: 5, usd: 0, cop: 0 }, // Below $10 threshold
         is_balanced: false,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
     };
 
     const mockAccountBalanced = {
@@ -56,6 +66,9 @@ describe('Reconciliation - Variance Warnings', () => {
         computed: { cad: -200, usd: 0, cop: 0 },
         variance: { cad: 0, usd: 0, cop: 0 },
         is_balanced: true,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
     };
 
     const mockReport = {
@@ -195,5 +208,140 @@ describe('Reconciliation - Variance Warnings', () => {
         // Should show warning icon for USD variance
         const warningIcon = screen.queryByTestId('variance-warning-4');
         expect(warningIcon).toBeTruthy();
+    });
+});
+
+describe('Reconciliation - Variance Acknowledgment', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    const unbalancedAccount = {
+        account_id: 10,
+        account_name: 'Ack Bank',
+        account_type: 'bank',
+        is_asset: true,
+        is_liability: false,
+        has_recorded_balance: true,
+        recorded: { cad: 1000, usd: 0, cop: 0 },
+        computed: { cad: 900, usd: 0, cop: 0 },
+        variance: { cad: 100, usd: 0, cop: 0 },
+        is_balanced: false,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
+    };
+
+    const baseReport = {
+        period: '202501',
+        status: 'unbalanced' as const,
+        accounts: [unbalancedAccount],
+        accounting_equation: {
+            assets_cad: 1000,
+            liabilities_cad: 0,
+            equity_cad: 1000,
+            residual_cad: 0,
+            is_balanced: true,
+        },
+        income_total_cad: 0,
+        expenses_total_cad: 100,
+        net_operating_expenses_cad: 100,
+    };
+
+    it('shows acknowledge button for unbalanced accounts', async () => {
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: baseReport }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Ack Bank');
+
+        expect(
+            screen.getByTestId('acknowledge-variance-10'),
+        ).toHaveTextContent('Acknowledge Variance');
+    });
+
+    it('shows reviewed badge and note after acknowledgment', async () => {
+        const reviewedReport = {
+            ...baseReport,
+            accounts: [
+                {
+                    ...unbalancedAccount,
+                    is_reviewed: true,
+                    review_note: 'Timing difference',
+                    reviewed_at: '2025-01-20T12:00:00+00:00',
+                },
+            ],
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: reviewedReport }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Ack Bank');
+
+        expect(screen.getByTestId('variance-reviewed-10')).toHaveTextContent(
+            'Reviewed',
+        );
+        expect(screen.getByTestId('variance-review-note-10')).toHaveTextContent(
+            'Timing difference',
+        );
+        expect(screen.getByTestId('acknowledge-variance-10')).toHaveTextContent(
+            'Update Acknowledgment',
+        );
+        // Variance amounts still visible
+        expect(screen.getAllByTestId('variance-amount')[0]).toHaveTextContent(
+            '$100.00',
+        );
+    });
+
+    it('submits acknowledgment with optional note and updates UI', async () => {
+        (global.fetch as any)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ data: baseReport }),
+            })
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    data: {
+                        account_id: 10,
+                        period: '202501',
+                        is_reviewed: true,
+                        review_note: 'Bank fee pending',
+                        reviewed_at: '2025-01-21T10:00:00+00:00',
+                    },
+                }),
+            });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Ack Bank');
+
+        fireEvent.click(screen.getByTestId('acknowledge-variance-10'));
+        expect(
+            screen.getByTestId('acknowledge-variance-dialog'),
+        ).toBeInTheDocument();
+
+        fireEvent.change(screen.getByTestId('acknowledge-note-input'), {
+            target: { value: 'Bank fee pending' },
+        });
+        fireEvent.click(screen.getByTestId('acknowledge-submit'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('variance-reviewed-10')).toBeInTheDocument();
+        });
+        expect(screen.getByTestId('variance-review-note-10')).toHaveTextContent(
+            'Bank fee pending',
+        );
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/periods/202501/reconciliation/10/acknowledge',
+            expect.objectContaining({ method: 'POST' }),
+        );
     });
 });

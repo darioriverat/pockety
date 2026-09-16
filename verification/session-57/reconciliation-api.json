@@ -1,0 +1,80 @@
+{
+  "data": {
+    "period": "202501",
+    "status": "unbalanced",
+    "accounts": [
+      {
+        "account_id": 1,
+        "account_name": "Period Compare Checking",
+        "account_type": "bank",
+        "is_asset": true,
+        "is_liability": false,
+        "has_recorded_balance": true,
+        "recorded": {
+          "cad": 10000,
+          "usd": 0,
+          "cop": 0
+        },
+        "computed": {
+          "cad": 9000,
+          "usd": 0,
+          "cop": 0
+        },
+        "variance": {
+          "cad": 1000,
+          "usd": 0,
+          "cop": 0
+        },
+        "is_balanced": false,
+        "is_reviewed": true,
+        "review_note": "Session 57 API verify",
+        "reviewed_at": "2026-09-16T01:15:27+00:00"
+      },
+      {
+        "account_id": 2,
+        "account_name": "Period Compare Loan",
+        "account_type": "liability",
+        "is_asset": false,
+        "is_liability": true,
+        "has_recorded_balance": true,
+        "recorded": {
+          "cad": 4000,
+          "usd": 0,
+          "cop": 0
+        },
+        "computed": {
+          "cad": 4000,
+          "usd": 0,
+          "cop": 0
+        },
+        "variance": {
+          "cad": 0,
+          "usd": 0,
+          "cop": 0
+        },
+        "is_balanced": true,
+        "is_reviewed": false,
+        "review_note": null,
+        "reviewed_at": null
+      }
+    ],
+    "accounting_equation": {
+      "assets_cad": 10000,
+      "liabilities_cad": 4000,
+      "equity_cad": 6000,
+      "residual_cad": 0,
+      "is_balanced": true
+    },
+    "income_total_cad": 5000,
+    "expenses_total_cad": 1000,
+    "net_operating_expenses_cad": 1000
+  },
+  "links": {
+    "self": "http://dev.pockety.com:8080/api/periods/202501/reconciliation"
+  },
+  "meta": {
+    "period": "202501",
+    "status": "unbalanced",
+    "account_count": 2
+  }
+}

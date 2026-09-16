@@ -1,6 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import ReportsYtd from '@/pages/reports-ytd';
 import type { User } from '@/types';
@@ -54,27 +55,41 @@ const mockPage: MockPage = {
     },
 };
 
-vi.mock('@inertiajs/react', async () => {
-    const actual = await vi.importActual('@inertiajs/react');
-    return {
-        ...actual,
-        usePage: () => mockPage,
-        router: {
-            get: vi.fn(),
-        },
-    };
-});
+vi.mock('@inertiajs/react', () => ({
+    Head: ({ title }: { title?: string }) => <title>{title ?? 'Pockety'}</title>,
+    Link: ({
+        href,
+        children,
+        ...props
+    }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+        href: string;
+    }) => (
+        <a href={href} {...props}>
+            {children}
+        </a>
+    ),
+    usePage: () => mockPage,
+    router: {
+        get: vi.fn(),
+    },
+}));
+
+function renderReportsYtd(
+    ytdTotals = mockPage.props.ytd_totals,
+    availableYears = mockPage.props.available_years,
+) {
+    return render(
+        <TooltipProvider delayDuration={0}>
+            <AppLayout>
+                <ReportsYtd ytd_totals={ytdTotals} available_years={availableYears} />
+            </AppLayout>
+        </TooltipProvider>,
+    );
+}
 
 describe('ReportsYtd', () => {
     it('renders the year-to-date reports heading', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         expect(screen.getByTestId('reports-ytd-heading')).toHaveTextContent(
             'Year-to-Date Reports',
@@ -82,70 +97,35 @@ describe('ReportsYtd', () => {
     });
 
     it('displays the year selector card', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         expect(screen.getByTestId('year-selector-card')).toBeInTheDocument();
         expect(screen.getByTestId('year-select')).toBeInTheDocument();
     });
 
     it('displays the YTD income total', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         expect(screen.getByTestId('ytd-income-card')).toBeInTheDocument();
         expect(screen.getByTestId('ytd-income-total')).toHaveTextContent('$60,000.00');
     });
 
     it('displays the YTD expenses total', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         expect(screen.getByTestId('ytd-expenses-card')).toBeInTheDocument();
         expect(screen.getByTestId('ytd-expenses-total')).toHaveTextContent('$45,000.00');
     });
 
     it('displays the YTD net total', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         expect(screen.getByTestId('ytd-net-card')).toBeInTheDocument();
         expect(screen.getByTestId('ytd-net-total')).toHaveTextContent('$15,000.00');
     });
 
     it('displays the correct year in the summary title', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         expect(screen.getByTestId('ytd-summary-card')).toHaveTextContent(
             'Year-to-Date Summary for 2025',
@@ -153,14 +133,7 @@ describe('ReportsYtd', () => {
     });
 
     it('displays period count in the summary description', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         expect(screen.getByTestId('ytd-summary-card')).toHaveTextContent('12 periods');
     });
@@ -171,27 +144,13 @@ describe('ReportsYtd', () => {
             ytd_net_cad: -5000.00,
         };
 
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={negativeNetProps}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd(negativeNetProps);
 
         expect(screen.getByTestId('ytd-net-total')).toHaveTextContent('-$5,000.00');
     });
 
     it('renders all available years in the selector', () => {
-        render(
-            <AppLayout>
-                <ReportsYtd
-                    ytd_totals={mockPage.props.ytd_totals}
-                    available_years={mockPage.props.available_years}
-                />
-            </AppLayout>,
-        );
+        renderReportsYtd();
 
         const yearSelect = screen.getByTestId('year-select');
         fireEvent.click(yearSelect);

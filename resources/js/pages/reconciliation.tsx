@@ -11,6 +11,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     Tooltip,
     TooltipContent,
@@ -18,7 +27,13 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { usePeriod } from '@/hooks/use-period';
-import { ScaleIcon, AlertTriangle, CheckCircle2, ExternalLink } from 'lucide-react';
+import {
+    ScaleIcon,
+    AlertTriangle,
+    CheckCircle2,
+    ExternalLink,
+    ClipboardCheck,
+} from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
 interface CurrencyAmounts {
@@ -38,6 +53,9 @@ interface AccountReconciliation {
     computed: CurrencyAmounts;
     variance: CurrencyAmounts;
     is_balanced: boolean;
+    is_reviewed: boolean;
+    review_note: string | null;
+    reviewed_at: string | null;
 }
 
 interface AccountingEquation {
@@ -58,7 +76,7 @@ interface ReconciliationReport {
     net_operating_expenses_cad: number;
 }
 
-const VARIANCE_WARNING_THRESHOLD = 10.00;
+const VARIANCE_WARNING_THRESHOLD = 10.0;
 
 const formatCurrency = (value: number, currency: string): string => {
     try {
@@ -87,7 +105,7 @@ const hasSignificantVariance = (account: AccountReconciliation): boolean => {
  */
 const getVarianceSummary = (account: AccountReconciliation): string => {
     const variances: string[] = [];
-    
+
     if (Math.abs(account.variance.cad) > VARIANCE_WARNING_THRESHOLD) {
         variances.push(`CAD: ${formatCurrency(account.variance.cad, 'CAD')}`);
     }
@@ -97,7 +115,7 @@ const getVarianceSummary = (account: AccountReconciliation): string => {
     if (Math.abs(account.variance.cop) > VARIANCE_WARNING_THRESHOLD) {
         variances.push(`COP: ${formatCurrency(account.variance.cop, 'COP')}`);
     }
-    
+
     return variances.join(', ');
 };
 
@@ -107,6 +125,13 @@ export default function Reconciliation() {
     const [report, setReport] = useState<ReconciliationReport | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [acknowledgeAccount, setAcknowledgeAccount] =
+        useState<AccountReconciliation | null>(null);
+    const [acknowledgeNote, setAcknowledgeNote] = useState('');
+    const [acknowledgeSubmitting, setAcknowledgeSubmitting] = useState(false);
+    const [acknowledgeError, setAcknowledgeError] = useState<string | null>(
+        null,
+    );
 
     const loadReconciliation = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -121,7 +146,7 @@ export default function Reconciliation() {
 
         try {
             const response = await fetch(
-                `/api/periods/${period}/reconciliation`
+                `/api/periods/${period}/reconciliation`,
             );
 
             if (!response.ok) {
@@ -134,7 +159,7 @@ export default function Reconciliation() {
             setError(
                 err instanceof Error
                     ? err.message
-                    : 'Failed to load reconciliation data'
+                    : 'Failed to load reconciliation data',
             );
             setReport(null);
         } finally {
@@ -142,11 +167,82 @@ export default function Reconciliation() {
         }
     };
 
+    const openAcknowledgeDialog = (account: AccountReconciliation) => {
+        setAcknowledgeAccount(account);
+        setAcknowledgeNote(account.review_note ?? '');
+        setAcknowledgeError(null);
+    };
+
+    const submitAcknowledgment = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!acknowledgeAccount || !report) {
+            return;
+        }
+
+        setAcknowledgeSubmitting(true);
+        setAcknowledgeError(null);
+
+        try {
+            const response = await fetch(
+                `/api/periods/${report.period}/reconciliation/${acknowledgeAccount.account_id}/acknowledge`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                    },
+                    body: JSON.stringify({
+                        note: acknowledgeNote.trim() || null,
+                    }),
+                },
+            );
+
+            if (!response.ok) {
+                const payload = await response.json().catch(() => null);
+                throw new Error(
+                    payload?.error ?? 'Failed to acknowledge variance',
+                );
+            }
+
+            const json = await response.json();
+            const acknowledgment = json.data as {
+                is_reviewed: boolean;
+                review_note: string | null;
+                reviewed_at: string | null;
+            };
+
+            setReport({
+                ...report,
+                accounts: report.accounts.map((account) =>
+                    account.account_id === acknowledgeAccount.account_id
+                        ? {
+                              ...account,
+                              is_reviewed: acknowledgment.is_reviewed,
+                              review_note: acknowledgment.review_note,
+                              reviewed_at: acknowledgment.reviewed_at,
+                          }
+                        : account,
+                ),
+            });
+            setAcknowledgeAccount(null);
+            setAcknowledgeNote('');
+        } catch (err) {
+            setAcknowledgeError(
+                err instanceof Error
+                    ? err.message
+                    : 'Failed to acknowledge variance',
+            );
+        } finally {
+            setAcknowledgeSubmitting(false);
+        }
+    };
+
     const renderCurrencyRow = (
         label: string,
         currencyKey: keyof CurrencyAmounts,
         currencyCode: string,
-        account: AccountReconciliation
+        account: AccountReconciliation,
     ) => {
         const varianceValue = account.variance[currencyKey];
         const isZero = Math.abs(varianceValue) <= 0.01;
@@ -161,13 +257,13 @@ export default function Reconciliation() {
                 <div data-testid="recorded-amount">
                     {formatCurrency(
                         account.recorded[currencyKey],
-                        currencyCode
+                        currencyCode,
                     )}
                 </div>
                 <div data-testid="computed-amount">
                     {formatCurrency(
                         account.computed[currencyKey],
-                        currencyCode
+                        currencyCode,
                     )}
                 </div>
                 <div
@@ -253,97 +349,92 @@ export default function Reconciliation() {
                     </CardContent>
                 </Card>
 
-                {report && report.accounting_equation && (
+                {report && (
                     <Card data-testid="accounting-equation-card">
                         <CardHeader>
-                            <CardTitle className="flex items-center justify-between">
-                                <span>Accounting Equation</span>
-                                <Badge
-                                    variant={
-                                        report.accounting_equation.is_balanced
-                                            ? 'default'
-                                            : 'destructive'
-                                    }
-                                    data-testid="equation-status"
-                                >
-                                    {report.accounting_equation.is_balanced
-                                        ? 'Balanced'
-                                        : 'Unbalanced'}
-                                </Badge>
-                            </CardTitle>
+                            <CardTitle>Accounting Equation</CardTitle>
                             <CardDescription>
-                                Assets = Liabilities + Equity
+                                Assets = Liabilities + Equity for{' '}
+                                {report.period}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">
                                             Assets
-                                        </p>
-                                        <p
-                                            className="text-2xl font-bold"
-                                            data-testid="assets-value"
+                                        </span>
+                                        <span
+                                            className="font-semibold"
+                                            data-testid="assets-total"
                                         >
                                             {formatCurrency(
                                                 report.accounting_equation
                                                     .assets_cad,
-                                                'CAD'
+                                                'CAD',
                                             )}
-                                        </p>
+                                        </span>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">
                                             Liabilities
-                                        </p>
-                                        <p
-                                            className="text-2xl font-bold"
-                                            data-testid="liabilities-value"
+                                        </span>
+                                        <span
+                                            className="font-semibold"
+                                            data-testid="liabilities-total"
                                         >
                                             {formatCurrency(
                                                 report.accounting_equation
                                                     .liabilities_cad,
-                                                'CAD'
+                                                'CAD',
                                             )}
-                                        </p>
+                                        </span>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">
                                             Equity
-                                        </p>
-                                        <p
-                                            className="text-2xl font-bold"
-                                            data-testid="equity-value"
+                                        </span>
+                                        <span
+                                            className="font-semibold"
+                                            data-testid="equity-total"
                                         >
                                             {formatCurrency(
                                                 report.accounting_equation
                                                     .equity_cad,
-                                                'CAD'
+                                                'CAD',
                                             )}
-                                        </p>
+                                        </span>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">
+                                    <div className="flex items-center justify-between border-t pt-3">
+                                        <span className="text-sm font-medium">
                                             Residual
-                                        </p>
-                                        <p
-                                            className={`text-2xl font-bold ${Math.abs(report.accounting_equation.residual_cad) <= 0.01 ? 'text-green-600' : 'text-red-600'}`}
-                                            data-testid="residual-value"
+                                        </span>
+                                        <span
+                                            className={
+                                                report.accounting_equation
+                                                    .is_balanced
+                                                    ? 'font-semibold text-green-600'
+                                                    : 'font-semibold text-red-600'
+                                            }
+                                            data-testid="residual-amount"
                                         >
                                             {formatCurrency(
                                                 report.accounting_equation
                                                     .residual_cad,
-                                                'CAD'
+                                                'CAD',
                                             )}
-                                        </p>
+                                        </span>
                                     </div>
                                 </div>
-                                <div className="border-t pt-4">
-                                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                                <div className="space-y-3 border-t pt-3 md:border-t-0 md:border-l md:pt-0 md:pl-6">
+                                    <p className="text-sm font-medium">
+                                        Period Totals
+                                    </p>
+                                    <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
                                         <div>
                                             <p className="text-sm text-muted-foreground">
-                                                Income Total
+                                                Income
                                             </p>
                                             <p
                                                 className="text-lg font-semibold"
@@ -351,7 +442,7 @@ export default function Reconciliation() {
                                             >
                                                 {formatCurrency(
                                                     report.income_total_cad,
-                                                    'CAD'
+                                                    'CAD',
                                                 )}
                                             </p>
                                         </div>
@@ -365,7 +456,7 @@ export default function Reconciliation() {
                                             >
                                                 {formatCurrency(
                                                     report.expenses_total_cad,
-                                                    'CAD'
+                                                    'CAD',
                                                 )}
                                             </p>
                                         </div>
@@ -379,7 +470,7 @@ export default function Reconciliation() {
                                             >
                                                 {formatCurrency(
                                                     report.net_operating_expenses_cad,
-                                                    'CAD'
+                                                    'CAD',
                                                 )}
                                             </p>
                                         </div>
@@ -419,30 +510,55 @@ export default function Reconciliation() {
                                         </CardDescription>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        {!account.is_balanced && hasSignificantVariance(account) && (
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <div
-                                                            className="flex items-center gap-1 text-amber-600 dark:text-amber-400"
-                                                            data-testid={`variance-warning-${account.account_id}`}
+                                        {!account.is_balanced &&
+                                            hasSignificantVariance(account) && (
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <div
+                                                                className="flex items-center gap-1 text-amber-600 dark:text-amber-400"
+                                                                data-testid={`variance-warning-${account.account_id}`}
+                                                            >
+                                                                <AlertTriangle className="h-5 w-5" />
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent
+                                                            className="max-w-xs"
+                                                            data-testid={`variance-tooltip-${account.account_id}`}
                                                         >
-                                                            <AlertTriangle className="h-5 w-5" />
-                                                        </div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent
-                                                        className="max-w-xs"
-                                                        data-testid={`variance-tooltip-${account.account_id}`}
-                                                    >
-                                                        <p className="font-semibold">Significant Variance Detected</p>
-                                                        <p className="text-sm mt-1">{getVarianceSummary(account)}</p>
-                                                        <p className="text-xs mt-1 text-muted-foreground">
-                                                            Variance exceeds ${VARIANCE_WARNING_THRESHOLD.toFixed(2)} threshold
-                                                        </p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        )}
+                                                            <p className="font-semibold">
+                                                                Significant
+                                                                Variance
+                                                                Detected
+                                                            </p>
+                                                            <p className="mt-1 text-sm">
+                                                                {getVarianceSummary(
+                                                                    account,
+                                                                )}
+                                                            </p>
+                                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                                Variance exceeds
+                                                                $
+                                                                {VARIANCE_WARNING_THRESHOLD.toFixed(
+                                                                    2,
+                                                                )}{' '}
+                                                                threshold
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            )}
+                                        {!account.is_balanced &&
+                                            account.is_reviewed && (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-emerald-600 text-emerald-700 dark:text-emerald-400"
+                                                    data-testid={`variance-reviewed-${account.account_id}`}
+                                                >
+                                                    <ClipboardCheck className="mr-1 h-3.5 w-3.5" />
+                                                    Reviewed
+                                                </Badge>
+                                            )}
                                         <Badge
                                             variant={
                                                 account.is_balanced
@@ -468,36 +584,130 @@ export default function Reconciliation() {
                                     'CAD',
                                     'cad',
                                     'CAD',
-                                    account
+                                    account,
                                 )}
                                 {renderCurrencyRow(
                                     'USD',
                                     'usd',
                                     'USD',
-                                    account
+                                    account,
                                 )}
                                 {renderCurrencyRow(
                                     'COP',
                                     'cop',
                                     'COP',
-                                    account
+                                    account,
                                 )}
+                                {!account.is_balanced &&
+                                    account.is_reviewed &&
+                                    account.review_note && (
+                                        <p
+                                            className="mt-3 text-sm text-muted-foreground"
+                                            data-testid={`variance-review-note-${account.account_id}`}
+                                        >
+                                            Review note: {account.review_note}
+                                        </p>
+                                    )}
                                 {!account.is_balanced && (
-                                    <div className="mt-4 pt-4 border-t">
+                                    <div className="mt-4 flex flex-wrap items-center gap-3 border-t pt-4">
                                         <Link
                                             href={`/accounts/${account.account_id}?period=${report.period}`}
                                             className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                                             data-testid={`investigate-link-${account.account_id}`}
                                         >
-                                            <span>Investigate Transactions</span>
+                                            <span>
+                                                Investigate Transactions
+                                            </span>
                                             <ExternalLink className="h-4 w-4" />
                                         </Link>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                openAcknowledgeDialog(account)
+                                            }
+                                            data-testid={`acknowledge-variance-${account.account_id}`}
+                                        >
+                                            {account.is_reviewed
+                                                ? 'Update Acknowledgment'
+                                                : 'Acknowledge Variance'}
+                                        </Button>
                                     </div>
                                 )}
                             </CardContent>
                         </Card>
                     ))}
             </div>
+
+            <Dialog
+                open={acknowledgeAccount !== null}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setAcknowledgeAccount(null);
+                        setAcknowledgeError(null);
+                    }
+                }}
+            >
+                <DialogContent data-testid="acknowledge-variance-dialog">
+                    <form onSubmit={submitAcknowledgment}>
+                        <DialogHeader>
+                            <DialogTitle>Acknowledge Variance</DialogTitle>
+                            <DialogDescription>
+                                Mark the variance for{' '}
+                                {acknowledgeAccount?.account_name ??
+                                    'this account'}{' '}
+                                as reviewed. The variance amount still shows;
+                                this only records that you acknowledged it.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-3 py-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="acknowledge-note">
+                                    Optional note
+                                </Label>
+                                <Textarea
+                                    id="acknowledge-note"
+                                    value={acknowledgeNote}
+                                    onChange={(e) =>
+                                        setAcknowledgeNote(e.target.value)
+                                    }
+                                    placeholder="e.g. Timing difference pending bank statement"
+                                    rows={3}
+                                    data-testid="acknowledge-note-input"
+                                />
+                            </div>
+                            {acknowledgeError && (
+                                <p
+                                    className="text-sm text-destructive"
+                                    role="alert"
+                                    data-testid="acknowledge-error"
+                                >
+                                    {acknowledgeError}
+                                </p>
+                            )}
+                        </div>
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setAcknowledgeAccount(null)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={acknowledgeSubmitting}
+                                data-testid="acknowledge-submit"
+                            >
+                                {acknowledgeSubmitting
+                                    ? 'Saving…'
+                                    : 'Acknowledge Variance'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

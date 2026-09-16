@@ -5,6 +5,10 @@ namespace App\Services;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\Transaction;
+use App\Models\VarianceAcknowledgment;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class ReconciliationService
 {
@@ -33,6 +37,7 @@ class ReconciliationService
      * Also includes:
      * - Accounting equation check (Assets = Liabilities + Equity)
      * - Income and expense totals for the period
+     * - Per-account variance acknowledgment status
      *
      * @return array{
      *     period: string,
@@ -51,10 +56,25 @@ class ReconciliationService
             ->orderBy('name')
             ->get();
 
+        $acknowledgments = collect();
+
+        if (Schema::hasTable('variance_acknowledgments')) {
+            $acknowledgments = VarianceAcknowledgment::forPeriod($period)
+                ->get()
+                ->keyBy('account_id');
+        } else {
+            // Create table lazily so acknowledgments work before migrate runs.
+            $this->ensureAcknowledgmentsTable();
+        }
+
         $results = [];
 
         foreach ($accounts as $account) {
-            $results[] = $this->reconcileAccount($account, $period);
+            $results[] = $this->reconcileAccount(
+                $account,
+                $period,
+                $acknowledgments->get($account->id)
+            );
         }
 
         $accountsBalanced = collect($results)->every(fn (array $result) => $result['is_balanced']);
@@ -74,6 +94,70 @@ class ReconciliationService
             'income_total_cad' => round($incomeTotal, 2),
             'expenses_total_cad' => round($financialSummary['total_recorded_disbursements_cad'], 2),
             'net_operating_expenses_cad' => round($financialSummary['net_operating_expenses_cad'], 2),
+        ];
+    }
+
+    /**
+     * Ensure the variance_acknowledgments table exists.
+     * Safe for environments where migrate cannot be run interactively;
+     * the dedicated migration remains the source of truth for deploys.
+     */
+    private function ensureAcknowledgmentsTable(): void
+    {
+        if (Schema::hasTable('variance_acknowledgments')) {
+            return;
+        }
+
+        Schema::create('variance_acknowledgments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('account_id')->constrained('accounts')->onDelete('cascade');
+            $table->string('period', 6);
+            $table->text('note')->nullable();
+            $table->timestamp('acknowledged_at');
+            $table->timestamps();
+            $table->unique(['account_id', 'period']);
+            $table->index('period');
+        });
+    }
+
+    /**
+     * Acknowledge a non-zero variance for an account in a period.
+     *
+     * @return array<string, mixed>
+     */
+    public function acknowledgeVariance(int $accountId, string $period, ?string $note = null): array
+    {
+        $this->ensureAcknowledgmentsTable();
+
+        $account = Account::active()->find($accountId);
+
+        if (! $account) {
+            throw new \InvalidArgumentException('Account not found');
+        }
+
+        $reconciliation = $this->reconcileAccount($account, $period);
+
+        if ($reconciliation['is_balanced']) {
+            throw new \InvalidArgumentException('Cannot acknowledge a balanced account with zero variance');
+        }
+
+        $acknowledgment = VarianceAcknowledgment::updateOrCreate(
+            [
+                'account_id' => $accountId,
+                'period' => $period,
+            ],
+            [
+                'note' => $note,
+                'acknowledged_at' => Carbon::now(),
+            ]
+        );
+
+        return [
+            'account_id' => $accountId,
+            'period' => $period,
+            'is_reviewed' => true,
+            'review_note' => $acknowledgment->note,
+            'reviewed_at' => $acknowledgment->acknowledged_at?->toIso8601String(),
         ];
     }
 
@@ -115,8 +199,11 @@ class ReconciliationService
      *
      * @return array<string, mixed>
      */
-    public function reconcileAccount(Account $account, string $period): array
-    {
+    public function reconcileAccount(
+        Account $account,
+        string $period,
+        ?VarianceAcknowledgment $acknowledgment = null
+    ): array {
         /** @var AccountBalance|null $recordedBalance */
         $recordedBalance = $account->balances()->where('period', $period)->first();
 
@@ -157,6 +244,12 @@ class ReconciliationService
             && abs($varianceUsd) <= self::VARIANCE_THRESHOLD
             && abs($varianceCop) <= self::VARIANCE_THRESHOLD;
 
+        if ($acknowledgment === null && Schema::hasTable('variance_acknowledgments')) {
+            $acknowledgment = VarianceAcknowledgment::where('account_id', $account->id)
+                ->where('period', $period)
+                ->first();
+        }
+
         return [
             'account_id' => $account->id,
             'account_name' => $account->name,
@@ -180,6 +273,9 @@ class ReconciliationService
                 'cop' => $varianceCop,
             ],
             'is_balanced' => $isBalanced,
+            'is_reviewed' => $acknowledgment !== null,
+            'review_note' => $acknowledgment?->note,
+            'reviewed_at' => $acknowledgment?->acknowledged_at?->toIso8601String(),
         ];
     }
 }

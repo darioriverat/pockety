@@ -90,6 +90,9 @@ Route::get('/category-actuals', [CategoryActualsController::class, 'index'])->na
 
 // Reconciliation API
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');
+Route::post('/periods/{period}/reconciliation/{accountId}/acknowledge', [ReconciliationController::class, 'acknowledge'])
+    ->name('periods.reconciliation.acknowledge')
+    ->whereNumber('accountId');
 
 // Balance Sheet API
 Route::get('/balance-sheet/time-series', [BalanceSheetController::class, 'timeSeries'])->name('balance-sheet.time-series');
