@@ -1927,7 +1927,7 @@
       "Step 4: Verify checked state is visually clear",
       "Step 5: Verify labels are clickable"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
