@@ -26,6 +26,11 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from '@/components/ui/alert';
 import { usePeriod } from '@/hooks/use-period';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
@@ -274,6 +279,9 @@ export default function Reconciliation() {
         );
     };
 
+    const unbalancedAccountCount =
+        report?.accounts.filter((account) => !account.is_balanced).length ?? 0;
+
     return (
         <>
             <Head title="Reconciliation" />
@@ -316,18 +324,21 @@ export default function Reconciliation() {
                             </Button>
                             {report && (
                                 <Badge
-                                    variant={
+                                    variant="outline"
+                                    className={
                                         report.status === 'balanced'
-                                            ? 'default'
-                                            : 'destructive'
+                                            ? 'ml-2 flex items-center gap-1 border-emerald-600 text-sm text-emerald-700 dark:text-emerald-400'
+                                            : 'ml-2 flex items-center gap-1 border-amber-500 bg-amber-50 text-sm text-amber-900 dark:border-amber-500 dark:bg-amber-950/60 dark:text-amber-200'
                                     }
-                                    className="ml-2 flex items-center gap-1 text-sm"
                                     data-testid="reconciliation-status"
                                 >
                                     {report.status === 'balanced' ? (
                                         <CheckCircle2 className="h-4 w-4" />
                                     ) : (
-                                        <AlertTriangle className="h-4 w-4" />
+                                        <AlertTriangle
+                                            className="h-4 w-4"
+                                            data-testid="reconciliation-status-warning-icon"
+                                        />
                                     )}
                                     {report.status === 'balanced'
                                         ? 'Balanced'
@@ -342,6 +353,30 @@ export default function Reconciliation() {
                         )}
                     </CardContent>
                 </Card>
+
+                {report && report.status === 'unbalanced' && (
+                    <Alert
+                        variant="warning"
+                        data-testid="reconciliation-warning-banner"
+                    >
+                        <AlertTriangle
+                            className="h-4 w-4"
+                            data-testid="reconciliation-warning-icon"
+                        />
+                        <AlertTitle data-testid="reconciliation-warning-title">
+                            Unreconciled variance detected
+                        </AlertTitle>
+                        <AlertDescription data-testid="reconciliation-warning-message">
+                            {unbalancedAccountCount} account
+                            {unbalancedAccountCount === 1 ? '' : 's'}{' '}
+                            {unbalancedAccountCount === 1 ? 'has' : 'have'} a
+                            non-zero difference between recorded and computed
+                            balances for period {report.period}. Review each
+                            account below — investigate transactions or
+                            acknowledge expected variances.
+                        </AlertDescription>
+                    </Alert>
+                )}
 
                 {report && (
                     <Card data-testid="accounting-equation-card">
@@ -568,6 +603,36 @@ export default function Reconciliation() {
                                 </div>
                             </CardHeader>
                             <CardContent>
+                                {!account.is_balanced &&
+                                    hasSignificantVariance(account) && (
+                                        <Alert
+                                            variant="warning"
+                                            className="mb-4"
+                                            data-testid={`variance-warning-message-${account.account_id}`}
+                                        >
+                                            <AlertTriangle
+                                                className="h-4 w-4"
+                                                data-testid={`variance-warning-message-icon-${account.account_id}`}
+                                            />
+                                            <AlertTitle>
+                                                Significant unreconciled
+                                                variance
+                                            </AlertTitle>
+                                            <AlertDescription>
+                                                Recorded and computed balances
+                                                differ by{' '}
+                                                {getVarianceSummary(account)},
+                                                which exceeds the $
+                                                {VARIANCE_WARNING_THRESHOLD.toFixed(
+                                                    2,
+                                                )}{' '}
+                                                threshold. Investigate
+                                                transactions to resolve the
+                                                difference, or acknowledge the
+                                                variance if it is expected.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
                                 <div className="grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold text-muted-foreground">
                                     <div>Currency</div>
                                     <div>Recorded</div>

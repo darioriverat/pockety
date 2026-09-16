@@ -1828,7 +1828,7 @@
       "Step 4: Verify warning icon is present",
       "Step 5: Verify message clearly explains the issue"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

@@ -5444,3 +5444,39 @@ STATUS / NEXT:
 - Changed only passes for feature_list.json index 151.
 - Completion: 152/175 passing; 23 pending.
 - Next: index 152, warning messages (yellow/orange) with icon for unreconciled variance.
+
+=== Session 85 (2026-09-16) ===
+
+GOAL: Implement yellow/orange warning messages for unreconciled variance (feature index 152).
+
+ENVIRONMENT:
+- App running at http://dev.pockety.com:8080/ (HTTP 200).
+- Docker CLI and Puppeteer MCP blocked this session (Local SDK cannot request
+  interactive approval). Used /dev/* HTTP helpers; verified via Playwright
+  screenshots (same pattern as Session 84).
+- Baseline: sampled frontend sonner tests; table-styles light browser case 1/1;
+  assets rebuilt via /dev/build-assets.
+
+IMPLEMENTATION:
+1. resources/js/components/ui/alert.tsx
+   - Added warning variant (amber/yellow-orange, light + dark WCAG AA)
+2. resources/js/pages/reconciliation.tsx
+   - Page-level warning banner when status is unbalanced (icon + clear copy)
+   - Per-account warning Alert when variance exceeds $10 threshold
+   - Unbalanced status badge restyled amber (warning) instead of destructive red
+3. Unit: alert.test.tsx; extended reconciliation.test.tsx
+4. Browser: tests/browser/warning-message-style.spec.ts (light + dark)
+
+VERIFICATION:
+- Frontend suite: 123 passed / 33 files.
+- ReconciliationTest (PHPUnit): 8/8.
+- Playwright warning-message-style: 2/2 passed.
+- Screenshots: verification/test-152-warning-messages/
+  (light/dark warning banner + account warning).
+- Asserted amber text/background dominance, contrast >= 4.5:1, icon, explanatory copy.
+- Puppeteer MCP unavailable; verified via Playwright screenshots.
+
+STATUS / NEXT:
+- Changed only passes for feature_list.json index 152.
+- Completion: 153/175 passing; 22 pending.
+- Next: index 153, loading states (spinner or skeleton) while data fetches.

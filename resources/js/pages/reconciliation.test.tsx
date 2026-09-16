@@ -87,6 +87,60 @@ describe('Reconciliation - Variance Warnings', () => {
         net_operating_expenses_cad: 3715,
     };
 
+    it('shows yellow/orange warning banner explaining unreconciled variance', async () => {
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: mockReport }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Test Bank Account');
+
+        const banner = screen.getByTestId('reconciliation-warning-banner');
+        expect(banner).toBeInTheDocument();
+        expect(banner.className).toMatch(/amber/);
+        expect(
+            screen.getByTestId('reconciliation-warning-icon'),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByTestId('reconciliation-warning-title'),
+        ).toHaveTextContent('Unreconciled variance detected');
+        expect(
+            screen.getByTestId('reconciliation-warning-message'),
+        ).toHaveTextContent(/non-zero difference/);
+        expect(
+            screen.getByTestId('reconciliation-warning-message'),
+        ).toHaveTextContent('2 accounts have');
+
+        const accountMessage = screen.getByTestId('variance-warning-message-1');
+        expect(accountMessage).toBeInTheDocument();
+        expect(accountMessage.className).toMatch(/amber/);
+        expect(
+            screen.getByTestId('variance-warning-message-icon-1'),
+        ).toBeInTheDocument();
+        expect(accountMessage).toHaveTextContent(
+            /Significant unreconciled variance/i,
+        );
+        expect(accountMessage).toHaveTextContent(/CAD:/);
+        expect(accountMessage).toHaveTextContent(/\$10\.00 threshold/);
+    });
+
+    it('does not show account warning message below threshold', async () => {
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: mockReport }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Savings Account');
+
+        expect(
+            screen.queryByTestId('variance-warning-message-2'),
+        ).not.toBeInTheDocument();
+    });
+
     it('shows warning icon for accounts with variance exceeding threshold', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
