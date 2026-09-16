@@ -1865,7 +1865,7 @@
       "Step 5: Verify modal content is on top and clearly visible",
       "Step 6: Verify clicking backdrop closes modal"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
