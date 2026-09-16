@@ -21,12 +21,14 @@ class Transaction extends Model
         'amount_cop',
         'comments',
         'is_recurring',
+        'is_credit',
         'debt_component',
     ];
 
     protected $casts = [
         'date' => 'date',
         'is_recurring' => 'boolean',
+        'is_credit' => 'boolean',
         'amount_cad' => 'decimal:2',
         'amount_usd' => 'decimal:2',
         'amount_cop' => 'decimal:2',

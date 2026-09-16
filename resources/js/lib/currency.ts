@@ -69,6 +69,56 @@ export function formatDisplayCurrency(
 }
 
 /**
+ * Format a currency amount with an explicit leading + or − sign.
+ * Positive → +$1,234.56; Negative → -$1,234.56 (minus already from formatDisplayCurrency).
+ */
+export function formatSignedDisplayCurrency(
+    amount: number,
+    currency: DisplayCurrency,
+): string {
+    if (amount < 0) {
+        return formatDisplayCurrency(amount, currency);
+    }
+
+    return `+${formatDisplayCurrency(amount, currency)}`;
+}
+
+/**
+ * Null-safe signed formatter for list/detail pages.
+ */
+export function formatSignedCurrencyAmount(
+    amount: number | null | undefined,
+    currency: string | null | undefined,
+    empty: string = '—',
+): string {
+    if (amount === null || amount === undefined || currency === null || currency === undefined) {
+        return empty;
+    }
+
+    if (!isDisplayCurrency(currency)) {
+        const sign = amount < 0 ? '-' : '+';
+        return `${sign}${currency} ${Math.abs(amount).toFixed(2)}`;
+    }
+
+    return formatSignedDisplayCurrency(amount, currency);
+}
+
+/**
+ * Tailwind classes that visually distinguish positive (green) vs negative (red) amounts.
+ */
+export function amountToneClass(amount: number): string {
+    if (amount < 0) {
+        return 'text-red-600 dark:text-red-400';
+    }
+
+    if (amount > 0) {
+        return 'text-green-600 dark:text-green-400';
+    }
+
+    return 'text-muted-foreground';
+}
+
+/**
  * Null-safe wrapper used by list/detail pages. Returns `empty` when amount or currency is missing.
  */
 export function formatCurrencyAmount(

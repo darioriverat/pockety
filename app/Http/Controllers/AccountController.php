@@ -247,18 +247,22 @@ class AccountController extends Controller
             ->orderBy('id')
             ->get();
 
-        $totalExpenses = round(
-            (float) $transactions->sum(fn (Transaction $tx) => (float) ($tx->amount ?? 0)),
+        $totalNetOutflow = round(
+            (float) $transactions->sum(function (Transaction $tx) {
+                $amount = (float) ($tx->amount ?? 0);
+
+                return $tx->is_credit ? -$amount : $amount;
+            }),
             2
         );
 
-        // If no recorded balance, treat the ledger as starting at 0 and ending at -expenses.
+        // If no recorded balance, treat the ledger as starting at 0 and ending at -netOutflow.
         if ($ledgerCurrentBalance === null) {
             $ledgerStartingBalance = 0.0;
-            $ledgerCurrentBalance = round(0.0 - $totalExpenses, 2);
+            $ledgerCurrentBalance = round(0.0 - $totalNetOutflow, 2);
         } else {
-            // Expenses reduce balance: starting = current + sum(expenses)
-            $ledgerStartingBalance = round($ledgerCurrentBalance + $totalExpenses, 2);
+            // Net outflows reduce balance: starting = current + netOutflow
+            $ledgerStartingBalance = round($ledgerCurrentBalance + $totalNetOutflow, 2);
         }
 
         $transactionsWithBalance = [];
@@ -279,7 +283,9 @@ class AccountController extends Controller
             }
 
             $amount = (float) ($transaction->amount ?? 0);
-            $runningBalance = round($runningBalance - $amount, 2);
+            $isCredit = (bool) $transaction->is_credit;
+            $signedAmount = $isCredit ? $amount : -$amount;
+            $runningBalance = round($runningBalance + $signedAmount, 2);
 
             if (! $inRange) {
                 continue;
@@ -298,6 +304,8 @@ class AccountController extends Controller
                 'category_code' => $category?->code,
                 'category_name' => $category?->name_en,
                 'amount' => $transaction->amount,
+                'signed_amount' => $signedAmount,
+                'is_credit' => $isCredit,
                 'currency' => $transaction->currency ?? $currency,
                 'comments' => $transaction->comments,
                 'running_balance' => $runningBalance,
@@ -313,10 +321,9 @@ class AccountController extends Controller
                 if ($txDate >= $startDate) {
                     break;
                 }
-                $balanceAtStart = round(
-                    $balanceAtStart - (float) ($transaction->amount ?? 0),
-                    2
-                );
+                $priorAmount = (float) ($transaction->amount ?? 0);
+                $priorSigned = $transaction->is_credit ? $priorAmount : -$priorAmount;
+                $balanceAtStart = round($balanceAtStart + $priorSigned, 2);
             }
             $filteredStartingBalance = $balanceAtStart;
             $filteredEndingBalance = $balanceAtStart;

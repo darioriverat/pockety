@@ -206,7 +206,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Create a new transaction.
      *
-     * @param  array{date: string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, debt_component?: string|null}  $data
+     * @param  array{date: string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, debt_component?: string|null}  $data
      */
     public function create(array $data): TransactionEntity
     {
@@ -215,6 +215,8 @@ class TransactionService implements TransactionServiceInterface
 
         // Validate category exists
         $this->validateCategory($data['category_id']);
+
+        $data['is_credit'] = (bool) ($data['is_credit'] ?? false);
 
         $transaction = Transaction::create($data);
         $transaction->load(['category', 'account']);
@@ -225,7 +227,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Update an existing transaction.
      *
-     * @param  array{date?: string, period?: string, quincena?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, debt_component?: string|null}  $data
+     * @param  array{date?: string, period?: string, quincena?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, debt_component?: string|null}  $data
      */
     public function update(int $id, array $data): TransactionEntity
     {
@@ -237,6 +239,10 @@ class TransactionService implements TransactionServiceInterface
         // Validate category if being updated
         if (isset($data['category_id'])) {
             $this->validateCategory($data['category_id']);
+        }
+
+        if (array_key_exists('is_credit', $data)) {
+            $data['is_credit'] = (bool) $data['is_credit'];
         }
 
         $transaction->update($data);
@@ -323,6 +329,7 @@ class TransactionService implements TransactionServiceInterface
             'amount_cop' => $source->amount_cop,
             'comments' => $source->comments,
             'is_recurring' => $source->is_recurring,
+            'is_credit' => (bool) $source->is_credit,
             'debt_component' => $source->debt_component,
         ];
 
@@ -362,6 +369,7 @@ class TransactionService implements TransactionServiceInterface
             'amount_cop' => $transaction->amount_cop !== null ? (float) $transaction->amount_cop : null,
             'comments' => $transaction->comments,
             'is_recurring' => $transaction->is_recurring,
+            'is_credit' => (bool) $transaction->is_credit,
             'debt_component' => $transaction->debt_component,
         ];
 

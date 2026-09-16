@@ -1791,7 +1791,7 @@
       "Step 4: Verify negative amounts are styled distinctly (e.g., red color)",
       "Step 5: Verify +/- signs are present"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

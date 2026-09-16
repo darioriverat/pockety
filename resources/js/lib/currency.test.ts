@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+    amountToneClass,
     currencySymbol,
     formatCurrencyAmount,
     formatDisplayCurrency,
+    formatSignedDisplayCurrency,
 } from '@/lib/currency';
 
 describe('currencySymbol', () => {
@@ -50,6 +52,25 @@ describe('formatDisplayCurrency', () => {
         expect(formatDisplayCurrency(-1234.56, 'CAD')).toBe('-$1,234.56');
         expect(formatDisplayCurrency(-1234.56, 'USD')).toBe('-US$1,234.56');
         expect(formatDisplayCurrency(-2000000, 'COP')).toBe('-COP 2,000,000');
+    });
+});
+
+describe('formatSignedDisplayCurrency', () => {
+    it('prefixes positive amounts with + and negatives with -', () => {
+        expect(formatSignedDisplayCurrency(1234.56, 'CAD')).toBe('+$1,234.56');
+        expect(formatSignedDisplayCurrency(-1234.56, 'CAD')).toBe('-$1,234.56');
+        expect(formatSignedDisplayCurrency(50, 'USD')).toBe('+US$50.00');
+        expect(formatSignedDisplayCurrency(-50, 'USD')).toBe('-US$50.00');
+        expect(formatSignedDisplayCurrency(2000000, 'COP')).toBe('+COP 2,000,000');
+        expect(formatSignedDisplayCurrency(-2000000, 'COP')).toBe('-COP 2,000,000');
+    });
+});
+
+describe('amountToneClass', () => {
+    it('uses green for positive and red for negative amounts', () => {
+        expect(amountToneClass(10)).toMatch(/text-green/);
+        expect(amountToneClass(-10)).toMatch(/text-red/);
+        expect(amountToneClass(0)).toMatch(/text-muted/);
     });
 });
 

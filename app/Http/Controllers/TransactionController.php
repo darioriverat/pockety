@@ -144,6 +144,7 @@ class TransactionController extends Controller
                 'amount_cop' => 'nullable|numeric|gt:0',
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
+                'is_credit' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
             ], [
                 'date.required' => 'Date must be a valid date.',
@@ -195,6 +196,7 @@ class TransactionController extends Controller
                 'amount_cop' => 'nullable|numeric|gt:0',
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
+                'is_credit' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
             ], [
                 'date.required' => 'Date must be a valid date.',

@@ -226,6 +226,7 @@ class CategoryService implements CategoryServiceInterface
                 'amount_cop' => $transaction->amount_cop !== null ? (float) $transaction->amount_cop : null,
                 'comments' => $transaction->comments,
                 'is_recurring' => $transaction->is_recurring,
+                'is_credit' => (bool) $transaction->is_credit,
                 'debt_component' => $transaction->debt_component,
             ];
 

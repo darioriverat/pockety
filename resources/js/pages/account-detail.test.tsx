@@ -35,6 +35,8 @@ const unfilteredTransactions = {
             category_code: 'C001',
             category_name: 'Groceries',
             amount: 50,
+            signed_amount: -50,
+            is_credit: false,
             currency: 'CAD',
             comments: 'feb-expense',
             running_balance: 600,
@@ -46,6 +48,8 @@ const unfilteredTransactions = {
             category_code: 'C001',
             category_name: 'Groceries',
             amount: 200,
+            signed_amount: -200,
+            is_credit: false,
             currency: 'CAD',
             comments: 'jan-second',
             running_balance: 650,
@@ -57,6 +61,8 @@ const unfilteredTransactions = {
             category_code: 'C001',
             category_name: 'Groceries',
             amount: 100,
+            signed_amount: -100,
+            is_credit: false,
             currency: 'CAD',
             comments: 'jan-first',
             running_balance: 850,
@@ -84,6 +90,8 @@ const filteredTransactions = {
             category_code: 'C001',
             category_name: 'Groceries',
             amount: 200,
+            signed_amount: -200,
+            is_credit: false,
             currency: 'CAD',
             comments: 'jan-second',
             running_balance: 650,
@@ -95,6 +103,8 @@ const filteredTransactions = {
             category_code: 'C001',
             category_name: 'Groceries',
             amount: 100,
+            signed_amount: -100,
+            is_credit: false,
             currency: 'CAD',
             comments: 'jan-first',
             running_balance: 850,
@@ -209,5 +219,74 @@ describe('Account Detail Page — running balance', () => {
             .calls[2][0] as string;
         expect(filteredCall).toContain('start_date=2025-01-01');
         expect(filteredCall).toContain('end_date=2025-01-31');
+    });
+
+    it('styles deposits green with + and withdrawals red with -', async () => {
+        (global.fetch as ReturnType<typeof vi.fn>)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => accountResponse,
+            })
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    data: [
+                        {
+                            id: 10,
+                            date: '2025-01-20',
+                            period: '202501',
+                            category_code: 'C001',
+                            category_name: 'Groceries',
+                            amount: 50,
+                            signed_amount: -50,
+                            is_credit: false,
+                            currency: 'CAD',
+                            comments: 'withdrawal-row',
+                            running_balance: 1050,
+                        },
+                        {
+                            id: 9,
+                            date: '2025-01-10',
+                            period: '202501',
+                            category_code: 'C001',
+                            category_name: 'Groceries',
+                            amount: 100,
+                            signed_amount: 100,
+                            is_credit: true,
+                            currency: 'CAD',
+                            comments: 'deposit-row',
+                            running_balance: 1100,
+                        },
+                    ],
+                    meta: {
+                        account_id: 42,
+                        account_name: 'RBC Checking',
+                        currency: 'CAD',
+                        starting_balance: 1000,
+                        current_balance: 1050,
+                        has_recorded_balance: true,
+                        total_count: 2,
+                        is_filtered: false,
+                        filters: { start_date: null, end_date: null },
+                    },
+                }),
+            });
+
+        render(<AccountDetail />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('account-tx-amount-9')).toBeInTheDocument();
+        });
+
+        const deposit = screen.getByTestId('account-tx-amount-9');
+        const withdrawal = screen.getByTestId('account-tx-amount-10');
+
+        expect(deposit).toHaveTextContent('+$100.00');
+        expect(deposit).toHaveAttribute('data-amount-tone', 'positive');
+        expect(deposit.className).toMatch(/text-green/);
+
+        expect(withdrawal).toHaveTextContent('-$50.00');
+        expect(withdrawal).toHaveAttribute('data-amount-tone', 'negative');
+        expect(withdrawal.className).toMatch(/text-red/);
     });
 });

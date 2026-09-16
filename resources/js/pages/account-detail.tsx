@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { formatCurrencyAmount } from '@/lib/currency';
+import { formatCurrencyAmount, formatSignedCurrencyAmount, amountToneClass } from '@/lib/currency';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 interface Account {
@@ -35,6 +35,8 @@ interface Transaction {
     category_code: string | null;
     category_name: string | null;
     amount: number;
+    signed_amount: number;
+    is_credit: boolean;
     currency: string;
     comments: string | null;
     running_balance: number;
@@ -60,6 +62,16 @@ interface TransactionsResponse {
 
 const formatCurrency = (value: number, currency: string): string =>
     formatCurrencyAmount(value, currency);
+
+const formatSignedCurrency = (value: number, currency: string): string =>
+    formatSignedCurrencyAmount(value, currency);
+
+const cashflowAmount = (transaction: Transaction): number =>
+    typeof transaction.signed_amount === 'number'
+        ? transaction.signed_amount
+        : transaction.is_credit
+          ? Math.abs(transaction.amount)
+          : -Math.abs(transaction.amount);
 
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -408,10 +420,22 @@ export default function AccountDetail() {
                                                     </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right font-medium text-destructive">
-                                                −
-                                                {formatCurrency(
-                                                    transaction.amount,
+                                            <TableCell
+                                                className={`text-right font-medium tabular-nums ${amountToneClass(
+                                                    cashflowAmount(transaction),
+                                                )}`}
+                                                data-testid={`account-tx-amount-${transaction.id}`}
+                                                data-signed-amount={cashflowAmount(
+                                                    transaction,
+                                                )}
+                                                data-amount-tone={
+                                                    cashflowAmount(transaction) >= 0
+                                                        ? 'positive'
+                                                        : 'negative'
+                                                }
+                                            >
+                                                {formatSignedCurrency(
+                                                    cashflowAmount(transaction),
                                                     transaction.currency || displayCurrency
                                                 )}
                                             </TableCell>

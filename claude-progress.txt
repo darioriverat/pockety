@@ -5307,3 +5307,36 @@ STATUS / NEXT:
 - Index 148 marked passing; only passes field changed in feature_list.json.
 - Completion: 149/175 passing; 26 pending.
 - Next: index 149, positive/negative amounts visually distinguished (green/red, +/-).
+
+=== Session 81 (2026-09-16) ===
+
+GOAL: Complete positive/negative amount visual distinction (feature index 149).
+
+ENVIRONMENT / BASELINE:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200).
+- Puppeteer MCP blocked by Local SDK approval; Playwright via /dev/browser-tests.
+- Baseline: DashboardTest 14/14; frontend currency tests; table-styles 2/2 after seed.
+
+FEATURE 149:
+- Added transactions.is_credit boolean (migration) so deposits/refunds keep positive
+  amounts while reversing cash-flow (preserves feature 93 positive-amount validation).
+- Account ledger API returns signed_amount / is_credit; running balance adds credits
+  and subtracts withdrawals.
+- Shared formatSignedDisplayCurrency + amountToneClass in currency.ts
+  (green +$… / red -$…).
+- Account detail Amount column uses signed styling with data-amount-tone hooks.
+- Unit tests: currency (9), account-detail signed styling (3).
+- Browser: tests/browser/signed-amounts.spec.ts.
+
+VERIFICATION:
+- Frontend: 116 tests passed.
+- Backend: TransactionValidationTest 10/10; Account* 28/28.
+- Browser: signed-amounts 1/1; account-running-balance regression 1/1.
+- Screenshots: verification/test-149-signed-amounts/
+  (deposit +$75.00 green, withdrawal -$200.00 red).
+- Assets rebuilt via /dev/build-assets; migration via /dev/migrate.
+
+STATUS / NEXT:
+- Index 149 marked passing; only passes field changed in feature_list.json.
+- Completion: 150/175 passing; 25 pending.
+- Next: index 150, error messages in red with clear icon.
