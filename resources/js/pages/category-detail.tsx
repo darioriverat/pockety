@@ -20,6 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageTitle } from '@/components/page-title';
 import { ArrowLeft, Tags } from 'lucide-react';
 
 interface Category {
@@ -209,24 +210,26 @@ export default function CategoryDetail() {
                         </Button>
                     </Link>
                     <div className="mt-2 flex items-center gap-2">
-                        <Tags className="h-6 w-6" />
-                        <h1
-                            className="text-3xl font-bold tracking-tight"
+                        <PageTitle
+                            title={
+                                category
+                                    ? `${category.code} — ${category.name_en}`
+                                    : 'Loading...'
+                            }
+                            description={
+                                category
+                                    ? `ES: ${category.name_es} · Transaction history across all periods`
+                                    : 'Transaction history across all periods'
+                            }
+                            leading={<Tags className="h-6 w-6" />}
+                            trailing={
+                                category?.is_debt_category ? (
+                                    <Badge variant="secondary">Debt</Badge>
+                                ) : null
+                            }
                             data-testid="category-detail-heading"
-                        >
-                            {category
-                                ? `${category.code} — ${category.name_en}`
-                                : 'Loading...'}
-                        </h1>
-                        {category?.is_debt_category && (
-                            <Badge variant="secondary">Debt</Badge>
-                        )}
+                        />
                     </div>
-                    <p className="text-muted-foreground">
-                        {category
-                            ? `ES: ${category.name_es} · Transaction history across all periods`
-                            : 'Transaction history across all periods'}
-                    </p>
                 </div>
 
                 <Card data-testid="category-period-filter">

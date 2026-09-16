@@ -16,6 +16,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DashboardSummaryCard } from '@/components/dashboard-summary-card';
+import { PageTitle } from '@/components/page-title';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { ChartAxisLabels } from '@/components/charts/chart-axis-labels';
 import { CHART_COLORS } from '@/lib/chart-colors';
@@ -910,12 +911,10 @@ export default function Dashboard({
             >
                 {/* Period Header */}
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                        <p className="text-muted-foreground mt-1">
-                            Financial overview for {formatPeriod(summary.period)}
-                        </p>
-                    </div>
+                    <PageTitle
+                        title="Dashboard"
+                        description={`Financial overview for ${formatPeriod(summary.period)}`}
+                    />
                     <div className="flex flex-wrap items-center gap-3">
                         <div
                             className="flex items-center gap-2"

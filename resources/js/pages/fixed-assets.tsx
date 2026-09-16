@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageTitle } from '@/components/page-title';
 import { PlusIcon, Car, Calendar } from 'lucide-react';
 
 interface FixedAsset {
@@ -254,14 +255,10 @@ export default function FixedAssets() {
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            Fixed Assets
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Manage fixed assets and their book values per period
-                        </p>
-                    </div>
+                    <PageTitle
+                        title="Fixed Assets"
+                        description="Manage fixed assets and their book values per period"
+                    />
 
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>

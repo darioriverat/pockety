@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageTitle } from '@/components/page-title';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import {
@@ -140,16 +141,10 @@ export default function BalanceSheet() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                                Balance Sheet
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Assets, Liabilities, and Equity for the selected
-                                period — shown in CAD with USD and COP
-                                equivalents
-                            </p>
-                        </div>
+                        <PageTitle
+                            title="Balance Sheet"
+                            description="Assets, Liabilities, and Equity for the selected period — shown in CAD with USD and COP equivalents"
+                        />
                         <div className="flex w-full max-w-md flex-col gap-3 sm:items-end">
                             <div className="flex flex-wrap gap-2 sm:justify-end">
                                 <Button

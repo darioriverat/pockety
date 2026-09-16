@@ -12,6 +12,7 @@ import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
+import { PageTitle } from '@/components/page-title';
 import { useCategoryLanguage } from '@/hooks/use-category-language';
 import type { Auth } from '@/types';
 
@@ -116,14 +117,10 @@ export default function Categories() {
             <Head title="Categories" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            Expense Categories
-                        </h1>
-                        <p className="text-muted-foreground">
-                            View all active expense categories for your finance tracking
-                        </p>
-                    </div>
+                    <PageTitle
+                        title="Expense Categories"
+                        description="View all active expense categories for your finance tracking"
+                    />
                     <CategoryLanguageToggle
                         value={language}
                         onChange={setLanguage}

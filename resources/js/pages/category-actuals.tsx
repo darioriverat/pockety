@@ -21,6 +21,7 @@ import {
 import { usePeriod } from '@/hooks/use-period';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { PageTitle } from '@/components/page-title';
 import { ChartColumn, RefreshCw, XCircle } from 'lucide-react';
 
 interface CategoryActualRow {
@@ -93,18 +94,11 @@ export default function CategoryActuals() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1
-                                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
-                                data-testid="category-actuals-heading"
-                            >
-                                Category Actuals
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Actual spending by category for the selected
-                                period, aggregated from the transaction ledger
-                            </p>
-                        </div>
+                        <PageTitle
+                            title="Category Actuals"
+                            description="Actual spending by category for the selected period, aggregated from the transaction ledger"
+                            data-testid="category-actuals-heading"
+                        />
                         <div className="flex flex-wrap items-end gap-3">
                             <div className="space-y-2">
                                 <Label htmlFor="category-actuals-period">

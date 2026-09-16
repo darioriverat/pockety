@@ -16,6 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { FileText, TrendingDown, TrendingUp } from 'lucide-react';
+import { PageTitle } from '@/components/page-title';
 import { formatDisplayCurrency } from '@/lib/currency';
 
 interface YtdTotals {
@@ -75,17 +76,11 @@ export default function ReportsYtd({ ytd_totals, available_years }: ReportsYtdPa
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1
-                                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
-                                data-testid="reports-ytd-heading"
-                            >
-                                Year-to-Date Reports
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                View year-to-date totals for income and expenses
-                            </p>
-                        </div>
+                        <PageTitle
+                            title="Year-to-Date Reports"
+                            description="View year-to-date totals for income and expenses"
+                            data-testid="reports-ytd-heading"
+                        />
                     </div>
 
                     <Card className="mb-6" data-testid="year-selector-card">

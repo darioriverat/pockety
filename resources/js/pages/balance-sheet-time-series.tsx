@@ -18,6 +18,7 @@ import {
 } from '@/lib/chart-layout';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { PageTitle } from '@/components/page-title';
 import {
     ArrowLeft,
     LineChart,
@@ -275,16 +276,10 @@ export default function BalanceSheetTimeSeries() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                                Balance Sheet Time Series
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Historical Assets, Liabilities, and Equity from
-                                January 2025 through September 2026 (Estado
-                                Financiero)
-                            </p>
-                        </div>
+                        <PageTitle
+                            title="Balance Sheet Time Series"
+                            description="Historical Assets, Liabilities, and Equity from January 2025 through September 2026 (Estado Financiero)"
+                        />
                         <Button variant="outline" asChild>
                             <Link href="/balance-sheet">
                                 <ArrowLeft className="mr-2 h-4 w-4" />

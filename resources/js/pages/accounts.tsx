@@ -30,6 +30,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
+import { PageTitle } from '@/components/page-title';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { PlusIcon, Building2, Wallet, AlertCircle } from 'lucide-react';
 
@@ -370,14 +371,10 @@ export default function Accounts() {
             <Head title="Accounts" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="mb-4 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            Accounts
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Manage your bank accounts, investments, and liabilities
-                        </p>
-                    </div>
+                    <PageTitle
+                        title="Accounts"
+                        description="Manage your bank accounts, investments, and liabilities"
+                    />
                     <Dialog
                         open={isDialogOpen}
                         onOpenChange={(open) => {

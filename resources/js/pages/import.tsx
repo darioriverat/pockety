@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { formatDisplayCurrency } from '@/lib/currency';
+import { PageTitle } from '@/components/page-title';
 import { Upload, CheckCircle, XCircle, Database } from 'lucide-react';
 
 interface ImportResult {
@@ -316,15 +317,10 @@ export default function Import() {
             <Head title="Import Historical Data" />
 
             <div className="container mx-auto py-8 space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold">
-                        Import Historical Data
-                    </h1>
-                    <p className="text-muted-foreground mt-2">
-                        Import accounts and transactions from the extracted
-                        spreadsheet data
-                    </p>
-                </div>
+                <PageTitle
+                    title="Import Historical Data"
+                    description="Import accounts and transactions from the extracted spreadsheet data"
+                />
 
                 {/* Account Import Card */}
                 <Card data-testid="account-import-card">

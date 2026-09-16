@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatCurrencyAmount, formatSignedCurrencyAmount, amountToneClass } from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageTitle } from '@/components/page-title';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 interface Account {
@@ -223,15 +224,13 @@ export default function AccountDetail() {
                                 </Button>
                             </Link>
                         </div>
-                        <div className="mt-2 flex items-center gap-2">
-                            <Building2 className="h-6 w-6" />
-                            <h1 className="text-3xl font-bold tracking-tight">
-                                {account?.name || 'Loading...'}
-                            </h1>
-                        </div>
-                        <p className="text-muted-foreground">
-                            Transaction history with running balance
-                        </p>
+                        <PageTitle
+                            className="mt-2"
+                            title={account?.name || 'Loading...'}
+                            description="Transaction history with running balance"
+                            leading={<Building2 className="h-6 w-6" />}
+                            data-testid="account-detail-heading"
+                        />
                     </div>
                 </div>
 

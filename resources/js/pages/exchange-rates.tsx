@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
+import { PageTitle } from '@/components/page-title';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -263,13 +264,10 @@ export default function ExchangeRates() {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                            Exchange Rates
-                        </h1>
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Manage three independent exchange rate series: USD/COP,
-                            USD/CAD, and CAD/COP (COP per 1 CAD)
-                        </p>
+                        <PageTitle
+                            title="Exchange Rates"
+                            description="Manage three independent exchange rate series: USD/COP, USD/CAD, and CAD/COP (COP per 1 CAD)"
+                        />
                     </div>
 
                     <div className="grid gap-6 md:grid-cols-2">

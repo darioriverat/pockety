@@ -32,6 +32,7 @@ import {
     AlertTitle,
 } from '@/components/ui/alert';
 import { usePeriod } from '@/hooks/use-period';
+import { PageTitle } from '@/components/page-title';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
     ScaleIcon,
@@ -287,16 +288,11 @@ export default function Reconciliation() {
             <Head title="Reconciliation" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="mb-2 flex items-center justify-between">
-                    <div>
-                        <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-                            <ScaleIcon className="h-7 w-7" />
-                            Reconciliation
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Compare recorded vs. computed balances for every
-                            account, per period
-                        </p>
-                    </div>
+                    <PageTitle
+                        title="Reconciliation"
+                        description="Compare recorded vs. computed balances for every account, per period"
+                        leading={<ScaleIcon className="h-7 w-7" />}
+                    />
                 </div>
 
                 <Card>

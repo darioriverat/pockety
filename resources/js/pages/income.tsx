@@ -26,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
+import { PageTitle } from '@/components/page-title';
 import { PlusIcon, Banknote, Trash2, AlertCircle } from 'lucide-react';
 
 interface IncomeLine {
@@ -225,15 +226,10 @@ export default function Income() {
 
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold tracking-tight">
-                            Income
-                        </h1>
-                        <p className="text-muted-foreground text-sm">
-                            Track up to {maxLines} free-text income lines per
-                            month across CAD, USD, and COP.
-                        </p>
-                    </div>
+                    <PageTitle
+                        title="Income"
+                        description={`Track up to ${maxLines} free-text income lines per month across CAD, USD, and COP.`}
+                    />
 
                     <Dialog
                         open={isDialogOpen}

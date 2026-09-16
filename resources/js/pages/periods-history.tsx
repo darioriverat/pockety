@@ -12,6 +12,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod } from '@/lib/periods';
+import { PageTitle } from '@/components/page-title';
 import { CalendarRange, Receipt, XCircle, ArrowLeftRight } from 'lucide-react';
 
 interface PeriodSummary {
@@ -70,18 +71,11 @@ export default function PeriodsHistory() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1
-                                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
-                                data-testid="periods-history-heading"
-                            >
-                                Periods History
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Summary stats for every month from January 2025
-                                through September 2026
-                            </p>
-                        </div>
+                        <PageTitle
+                            title="Periods History"
+                            description="Summary stats for every month from January 2025 through September 2026"
+                            data-testid="periods-history-heading"
+                        />
                         <div className="flex flex-wrap gap-2">
                             <Button variant="outline" asChild>
                                 <Link href="/periods/compare">

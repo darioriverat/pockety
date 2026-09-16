@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import { formatDisplayCurrency } from '@/lib/currency';
+import { PageTitle } from '@/components/page-title';
 import {
     ArrowLeftRight,
     CalendarRange,
@@ -170,18 +171,11 @@ export default function PeriodComparison() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1
-                                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
-                                data-testid="period-comparison-heading"
-                            >
-                                Period Comparison
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Compare income, expenses, and balances for two
-                                periods side-by-side
-                            </p>
-                        </div>
+                        <PageTitle
+                            title="Period Comparison"
+                            description="Compare income, expenses, and balances for two periods side-by-side"
+                            data-testid="period-comparison-heading"
+                        />
                         <Button variant="outline" asChild>
                             <Link href="/periods/history">
                                 <CalendarRange className="mr-2 h-4 w-4" />

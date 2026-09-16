@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageTitle } from '@/components/page-title';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -128,17 +129,10 @@ export default function FinancialSummary() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                                Financial Summary
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Income statement for the selected period —
-                                income, Total Recorded Disbursements (Gasto
-                                Total), Net Operating Expenses (Gasto Real), and
-                                net
-                            </p>
-                        </div>
+                        <PageTitle
+                            title="Financial Summary"
+                            description="Income statement for the selected period — income, Total Recorded Disbursements (Gasto Total), Net Operating Expenses (Gasto Real), and net"
+                        />
                         <div className="flex w-full max-w-md flex-col gap-3 sm:items-end">
                             <div className="flex flex-wrap gap-2 sm:justify-end">
                                 <Button

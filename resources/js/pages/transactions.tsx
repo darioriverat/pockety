@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
+import { PageTitle } from '@/components/page-title';
 import { useCategoryLanguage } from '@/hooks/use-category-language';
 import { usePeriod } from '@/hooks/use-period';
 import { formatCurrencyAmount } from '@/lib/currency';
@@ -795,17 +796,11 @@ export default function Transactions() {
                 data-testid="transactions-page"
             >
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <h1
-                            className="text-3xl font-bold tracking-tight"
-                            data-testid="transactions-heading"
-                        >
-                            Transactions
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Manage your expense transactions
-                        </p>
-                    </div>
+                    <PageTitle
+                        title="Transactions"
+                        description="Manage your expense transactions"
+                        data-testid="transactions-heading"
+                    />
                     <div className="flex flex-wrap items-center gap-3">
                         <CategoryLanguageToggle
                             value={language}

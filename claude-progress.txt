@@ -5881,3 +5881,46 @@ NEXT:
 3. Mark feature_list.json index 162 passes: true
 4. Then Feature #163 page titles
 
+=== Session 94 (2026-09-16) ===
+
+GOAL: Orient, verify stack, complete next failing feature (#162 breadcrumbs verification or #163 page titles)
+
+STACK STATUS (THIS SESSION — VERIFIED):
+- App returns HTTP 500: getaddrinfo for web_app_db failed (DNS between web_app and DB)
+- Docker socket present but agent sandbox cannot connect (EPERM); unsandboxed Docker rejected by Local SDK
+- Puppeteer MCP blocked (interactive approval unavailable in Local SDK)
+- /dev/* endpoints also fail (session middleware hits MySQL)
+- Added scripts/recover-stack.sh for manual recovery outside sandbox
+
+VERIFICATION ATTEMPTED:
+- curl homepage → 500 (QueryException web_app_db DNS)
+- docker restart → blocked
+- puppeteer_navigate → rejected
+- Local vitest: PageTitle + breadcrumbs unit tests PASSED on host
+
+FEATURE #162:
+- Already implemented prior session; remains passes:false pending UI verification after stack recovery
+
+FEATURE #163 IMPLEMENTED (not marked passing — no browser verification):
+- New shared PageTitle component (text-3xl font-bold tracking-tight + muted description)
+- Applied across main app pages (dashboard, transactions, accounts, categories, income, budgets, reconciliation, balance sheet, financial summary, exchange rates, fixed assets, import, reports, period pages, account/category detail)
+- Fixed Income page inconsistency (was text-2xl font-semibold)
+- Replaced hardcoded gray-900/gray-600 titles with theme tokens via PageTitle
+- Tests: page-title.test.tsx (3 unit), tests/browser/page-titles.spec.ts (Playwright)
+- feature_list.json UNCHANGED (passes still false for #162/#163)
+
+STATUS: 162/175 still (13 remaining); no feature_list passes flips this session
+
+TO RECOVER (run in a normal terminal with Docker access):
+  ./scripts/recover-stack.sh
+  node scripts/session-helpers.mjs build
+  node scripts/session-helpers.mjs browser breadcrumbs.spec.ts
+  node scripts/session-helpers.mjs browser page-titles.spec.ts
+  # Then mark feature_list indexes 162 and 163 passes:true after screenshots
+
+NEXT:
+1. Recover Docker DB network (./scripts/recover-stack.sh)
+2. Verify + mark Feature #162 breadcrumbs
+3. Verify + mark Feature #163 page titles
+4. Feature #164 consistent section spacing
+

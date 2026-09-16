@@ -21,6 +21,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import { PageTitle } from '@/components/page-title';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import {
@@ -199,13 +200,10 @@ export default function Budgets() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                            Budgets
-                        </h1>
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Set monthly category budgets and compare against
-                            actual spending (CAD equivalent)
-                        </p>
+                        <PageTitle
+                            title="Budgets"
+                            description="Set monthly category budgets and compare against actual spending (CAD equivalent)"
+                        />
                     </div>
 
                     <div className="mb-6 grid gap-4 sm:grid-cols-3">
