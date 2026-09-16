@@ -11,8 +11,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { usePeriod } from '@/hooks/use-period';
-import { ScaleIcon, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ScaleIcon, AlertTriangle, CheckCircle2, ExternalLink } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 
 interface CurrencyAmounts {
     cad: number;
@@ -51,6 +58,8 @@ interface ReconciliationReport {
     net_operating_expenses_cad: number;
 }
 
+const VARIANCE_WARNING_THRESHOLD = 10.00;
+
 const formatCurrency = (value: number, currency: string): string => {
     try {
         return new Intl.NumberFormat('en-US', {
@@ -60,6 +69,36 @@ const formatCurrency = (value: number, currency: string): string => {
     } catch {
         return value.toFixed(2);
     }
+};
+
+/**
+ * Check if any variance in the account exceeds the warning threshold.
+ */
+const hasSignificantVariance = (account: AccountReconciliation): boolean => {
+    return (
+        Math.abs(account.variance.cad) > VARIANCE_WARNING_THRESHOLD ||
+        Math.abs(account.variance.usd) > VARIANCE_WARNING_THRESHOLD ||
+        Math.abs(account.variance.cop) > VARIANCE_WARNING_THRESHOLD
+    );
+};
+
+/**
+ * Get a summary of significant variances for tooltip display.
+ */
+const getVarianceSummary = (account: AccountReconciliation): string => {
+    const variances: string[] = [];
+    
+    if (Math.abs(account.variance.cad) > VARIANCE_WARNING_THRESHOLD) {
+        variances.push(`CAD: ${formatCurrency(account.variance.cad, 'CAD')}`);
+    }
+    if (Math.abs(account.variance.usd) > VARIANCE_WARNING_THRESHOLD) {
+        variances.push(`USD: ${formatCurrency(account.variance.usd, 'USD')}`);
+    }
+    if (Math.abs(account.variance.cop) > VARIANCE_WARNING_THRESHOLD) {
+        variances.push(`COP: ${formatCurrency(account.variance.cop, 'COP')}`);
+    }
+    
+    return variances.join(', ');
 };
 
 export default function Reconciliation() {
@@ -379,17 +418,43 @@ export default function Reconciliation() {
                                             &middot; {account.account_type}
                                         </CardDescription>
                                     </div>
-                                    <Badge
-                                        variant={
-                                            account.is_balanced
-                                                ? 'default'
-                                                : 'destructive'
-                                        }
-                                    >
-                                        {account.is_balanced
-                                            ? 'Balanced'
-                                            : 'Variance'}
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                        {!account.is_balanced && hasSignificantVariance(account) && (
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <div
+                                                            className="flex items-center gap-1 text-amber-600 dark:text-amber-400"
+                                                            data-testid={`variance-warning-${account.account_id}`}
+                                                        >
+                                                            <AlertTriangle className="h-5 w-5" />
+                                                        </div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent
+                                                        className="max-w-xs"
+                                                        data-testid={`variance-tooltip-${account.account_id}`}
+                                                    >
+                                                        <p className="font-semibold">Significant Variance Detected</p>
+                                                        <p className="text-sm mt-1">{getVarianceSummary(account)}</p>
+                                                        <p className="text-xs mt-1 text-muted-foreground">
+                                                            Variance exceeds ${VARIANCE_WARNING_THRESHOLD.toFixed(2)} threshold
+                                                        </p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        )}
+                                        <Badge
+                                            variant={
+                                                account.is_balanced
+                                                    ? 'default'
+                                                    : 'destructive'
+                                            }
+                                        >
+                                            {account.is_balanced
+                                                ? 'Balanced'
+                                                : 'Variance'}
+                                        </Badge>
+                                    </div>
                                 </div>
                             </CardHeader>
                             <CardContent>
@@ -416,6 +481,18 @@ export default function Reconciliation() {
                                     'cop',
                                     'COP',
                                     account
+                                )}
+                                {!account.is_balanced && (
+                                    <div className="mt-4 pt-4 border-t">
+                                        <Link
+                                            href={`/accounts/${account.account_id}?period=${report.period}`}
+                                            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            data-testid={`investigate-link-${account.account_id}`}
+                                        >
+                                            <span>Investigate Transactions</span>
+                                            <ExternalLink className="h-4 w-4" />
+                                        </Link>
+                                    </div>
                                 )}
                             </CardContent>
                         </Card>
