@@ -5340,3 +5340,34 @@ STATUS / NEXT:
 - Index 149 marked passing; only passes field changed in feature_list.json.
 - Completion: 150/175 passing; 25 pending.
 - Next: index 150, error messages in red with clear icon.
+
+=== Session 82 (2026-09-16) ===
+
+GOAL: Implement error messages with icons (feature test #150).
+
+CODE CHANGES IMPLEMENTED:
+1. transactions.tsx - Added AlertCircle icon to 6 error displays
+2. accounts.tsx - Added AlertCircle icon to 2 error displays  
+3. income.tsx - Added AlertCircle icon to 1 error display
+4. reconciliation.tsx - Added AlertCircle icon to 1 error display
+
+Error message structure: Red text (text-destructive) + AlertCircle icon (16x16px) + flex layout with 6px gap
+
+TESTS CREATED:
+- Unit test: transactions-error-messages.test.tsx (3 test cases)
+- Browser test: error-messages.spec.ts (Playwright E2E)
+- Verification script: scripts/verify-test-150.sh
+- Documentation: verification/test-150-error-messages/VERIFICATION-GUIDE.md
+
+GIT COMMIT: 4202053 "Implement error messages with icons - feature #150"
+
+VERIFICATION STATUS: ⚠️ PENDING - Code complete but not browser-verified due to sandbox restrictions
+
+NEXT SESSION MUST:
+1. Rebuild assets: docker exec web_app npm run build OR ./init.sh
+2. Run tests: task frontend-tests && task browser-tests
+3. Manual browser check at /transactions - trigger validation errors
+4. Take screenshots to verification/test-150-error-messages/
+5. ONLY THEN mark test #150 (index 150) as passing in feature_list.json
+
+STATUS: 150/175 passing (unchanged - verification required before update)
