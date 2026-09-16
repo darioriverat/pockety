@@ -264,7 +264,7 @@ export default function FixedAssets() {
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                             <Button onClick={() => resetForm()}>
-                                <PlusIcon className="mr-2 h-4 w-4" />
+                                <PlusIcon className="size-4 shrink-0 fill-none" />
                                 Add Asset
                             </Button>
                         </DialogTrigger>

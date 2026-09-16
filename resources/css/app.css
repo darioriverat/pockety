@@ -168,4 +168,15 @@
     body {
         @apply bg-background text-foreground text-base font-normal leading-relaxed;
     }
+
+    /*
+     * Lucide UI icons: outline stroke style (feature #168).
+     * Brand / logo SVGs may still use fill-current explicitly.
+     */
+    [data-slot='icon'],
+    [data-slot='icon-label'] > svg,
+    [data-slot='page-title-leading'] > svg {
+        fill: none;
+        flex-shrink: 0;
+    }
 }

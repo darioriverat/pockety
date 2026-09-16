@@ -6078,3 +6078,34 @@ NEXT:
 1. Feature #168 consistent icon alignment
 2. Feature #169 reconciliation variance colors
 3. Feature #170 budget vs actual under/over colors
+
+
+=== Session 99 (2026-09-16) ===
+
+GOAL: Verify stack, implement Feature #168 consistent icon alignment
+
+STACK:
+- App HTTP 200 (sqlite recovery still in place)
+- Host Puppeteer MCP rejected this session (sandbox approval) — verified via container Playwright / session-helpers
+- Sample verification: frontend text-link PASS; empty-states browser PASS; phpunit Account PASS (28)
+
+FEATURE #168 IMPLEMENTED + VERIFIED:
+- lib/icon.ts tokens: ICON_SIZE scale, ICON_STROKE/outline, ICON_INLINE_CLASS
+- Icon component (data-slot=icon) + IconLabel for aligned icon+text rows
+- PageTitle leading wrapper standardizes size-7 outline icons
+- NavMain, DashboardSummaryCard, EmptyState use shared Icon
+- Removed double-spacing (mr-2 + button gap-2) across pages; outline fill-none
+- CSS: data-slot icon/icon-label/page-title-leading fill none
+- Unit: icon.test.ts, icon-label.test.tsx PASS
+- Playwright: tests/browser/icon-alignment.spec.ts PASS (4)
+- Screenshots: verification/test-168-icon-alignment/
+- Regression: page-title, empty-state, dashboard unit + empty-states browser PASS
+
+FEATURES MARKED PASSING: #168
+
+STATUS: 169/175 (6 remaining)
+
+NEXT:
+1. Feature #169 reconciliation variance colors
+2. Feature #170 budget vs actual under/over colors
+3. Feature #171 collapsible sidebar

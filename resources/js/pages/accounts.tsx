@@ -312,7 +312,7 @@ export default function Accounts() {
             <CardHeader>
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 shrink-0" />
+                        <Building2 className="size-4 shrink-0 fill-none" />
                         <SubsectionHeading data-testid="account-card-title">
                             {account.name}
                         </SubsectionHeading>
@@ -358,7 +358,7 @@ export default function Accounts() {
                         size="sm"
                         onClick={() => openBalanceDialog(account)}
                     >
-                        <Wallet className="mr-2 h-4 w-4" />
+                        <Wallet className="size-4 shrink-0 fill-none" />
                         Manage Balances
                     </Button>
                 </div>
@@ -389,7 +389,7 @@ export default function Accounts() {
                     >
                         <DialogTrigger asChild>
                             <Button>
-                                <PlusIcon className="mr-2 h-4 w-4" />
+                                <PlusIcon className="size-4 shrink-0 fill-none" />
                                 Add Account
                             </Button>
                         </DialogTrigger>

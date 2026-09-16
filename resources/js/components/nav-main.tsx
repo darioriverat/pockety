@@ -6,6 +6,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { Icon } from '@/components/ui/icon';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { NavItem } from '@/types';
 
@@ -29,7 +30,9 @@ export function NavMain({ items }: { items: NavItem[] }) {
                                 prefetch
                                 data-testid={`nav-link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
                             >
-                                {item.icon && <item.icon />}
+                                {item.icon ? (
+                                    <Icon iconNode={item.icon} size="md" />
+                                ) : null}
                                 <span>{item.title}</span>
                             </Link>
                         </SidebarMenuButton>

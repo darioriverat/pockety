@@ -359,12 +359,12 @@ export default function Import() {
                             >
                                 {importingAccounts ? (
                                     <>
-                                        <Spinner className="mr-2 h-4 w-4" />
+                                        <Spinner className="size-4 shrink-0 fill-none" />
                                         Importing Accounts...
                                     </>
                                 ) : (
                                     <>
-                                        <Upload className="mr-2 h-4 w-4" />
+                                        <Upload className="size-4 shrink-0 fill-none" />
                                         Import Accounts
                                     </>
                                 )}
@@ -377,9 +377,9 @@ export default function Import() {
                                 size="lg"
                             >
                                 {loadingAccountStats ? (
-                                    <Spinner className="mr-2 h-4 w-4" />
+                                    <Spinner className="size-4 shrink-0 fill-none" />
                                 ) : (
-                                    <Database className="mr-2 h-4 w-4" />
+                                    <Database className="size-4 shrink-0 fill-none" />
                                 )}
                                 Refresh Account Stats
                             </Button>
@@ -518,12 +518,12 @@ export default function Import() {
                             >
                                 {importingBalanceSheet ? (
                                     <>
-                                        <Spinner className="mr-2 h-4 w-4" />
+                                        <Spinner className="size-4 shrink-0 fill-none" />
                                         Importing Balance Sheet History...
                                     </>
                                 ) : (
                                     <>
-                                        <Upload className="mr-2 h-4 w-4" />
+                                        <Upload className="size-4 shrink-0 fill-none" />
                                         Import Balance Sheet History
                                     </>
                                 )}
@@ -537,9 +537,9 @@ export default function Import() {
                                 data-testid="refresh-balance-sheet-stats"
                             >
                                 {loadingBalanceSheetStats ? (
-                                    <Spinner className="mr-2 h-4 w-4" />
+                                    <Spinner className="size-4 shrink-0 fill-none" />
                                 ) : (
-                                    <Database className="mr-2 h-4 w-4" />
+                                    <Database className="size-4 shrink-0 fill-none" />
                                 )}
                                 Refresh Balance Sheet Stats
                             </Button>
@@ -729,12 +729,12 @@ export default function Import() {
                             >
                                 {importing ? (
                                     <>
-                                        <Spinner className="mr-2 h-4 w-4" />
+                                        <Spinner className="size-4 shrink-0 fill-none" />
                                         Importing...
                                     </>
                                 ) : (
                                     <>
-                                        <Upload className="mr-2 h-4 w-4" />
+                                        <Upload className="size-4 shrink-0 fill-none" />
                                         Start Import
                                     </>
                                 )}
@@ -747,9 +747,9 @@ export default function Import() {
                                 size="lg"
                             >
                                 {loadingStats ? (
-                                    <Spinner className="mr-2 h-4 w-4" />
+                                    <Spinner className="size-4 shrink-0 fill-none" />
                                 ) : (
-                                    <Database className="mr-2 h-4 w-4" />
+                                    <Database className="size-4 shrink-0 fill-none" />
                                 )}
                                 Refresh Statistics
                             </Button>
@@ -759,7 +759,7 @@ export default function Import() {
                                 variant="destructive"
                                 size="lg"
                             >
-                                <XCircle className="mr-2 h-4 w-4" />
+                                <XCircle className="size-4 shrink-0 fill-none" />
                                 Clear All Transactions
                             </Button>
                         </div>

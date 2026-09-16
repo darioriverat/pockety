@@ -179,7 +179,7 @@ export default function CategoryDetail() {
                             <p className="text-sm text-muted-foreground">{error}</p>
                             <Link href="/categories">
                                 <Button variant="outline" className="mt-4">
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    <ArrowLeft className="size-4 shrink-0 fill-none" />
                                     Back to Categories
                                 </Button>
                             </Link>
@@ -206,7 +206,7 @@ export default function CategoryDetail() {
                 <div className="mb-4">
                     <Link href="/categories">
                         <Button variant="ghost" size="sm">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            <ArrowLeft className="size-4 shrink-0 fill-none" />
                             Back
                         </Button>
                     </Link>
@@ -222,7 +222,7 @@ export default function CategoryDetail() {
                                     ? `ES: ${category.name_es} · Transaction history across all periods`
                                     : 'Transaction history across all periods'
                             }
-                            leading={<Tags className="h-6 w-6" />}
+                            leading={<Tags className="size-7 shrink-0 fill-none" />}
                             trailing={
                                 category?.is_debt_category ? (
                                     <Badge variant="secondary">Debt</Badge>

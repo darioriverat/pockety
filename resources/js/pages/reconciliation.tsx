@@ -293,7 +293,7 @@ export default function Reconciliation() {
                     <PageTitle
                         title="Reconciliation"
                         description="Compare recorded vs. computed balances for every account, per period"
-                        leading={<ScaleIcon className="h-7 w-7" />}
+                        leading={<ScaleIcon className="size-7 shrink-0 fill-none" />}
                     />
                 </div>
 
@@ -331,10 +331,10 @@ export default function Reconciliation() {
                                     data-testid="reconciliation-status"
                                 >
                                     {report.status === 'balanced' ? (
-                                        <CheckCircle2 className="h-4 w-4" />
+                                        <CheckCircle2 className="size-3.5 shrink-0 fill-none" />
                                     ) : (
                                         <AlertTriangle
-                                            className="h-4 w-4"
+                                            className="size-3.5 shrink-0 fill-none"
                                             data-testid="reconciliation-status-warning-icon"
                                         />
                                     )}
@@ -584,7 +584,7 @@ export default function Reconciliation() {
                                                     className="border-emerald-600 text-emerald-700 dark:text-emerald-400"
                                                     data-testid={`variance-reviewed-${account.account_id}`}
                                                 >
-                                                    <ClipboardCheck className="mr-1 h-3.5 w-3.5" />
+                                                    <ClipboardCheck className="size-3.5 shrink-0 fill-none" />
                                                     Reviewed
                                                 </Badge>
                                             )}

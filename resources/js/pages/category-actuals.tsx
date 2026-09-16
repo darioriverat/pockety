@@ -139,7 +139,7 @@ export default function CategoryActuals() {
                                 }}
                                 disabled={loading || !selectedPeriod}
                             >
-                                <RefreshCw className="mr-2 h-4 w-4" />
+                                <RefreshCw className="size-4 shrink-0 fill-none" />
                                 Refresh
                             </Button>
                         </div>

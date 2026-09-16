@@ -3,6 +3,8 @@ import { Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Icon } from '@/components/ui/icon';
+import { ICON_STROKE_DECORATIVE } from '@/lib/icon';
 
 interface EmptyStateProps {
     title: string;
@@ -21,7 +23,7 @@ interface EmptyStateProps {
 function EmptyState({
     title,
     description,
-    icon: Icon = Inbox,
+    icon,
     actionLabel,
     onAction,
     actionTestId = 'empty-state-action',
@@ -39,7 +41,12 @@ function EmptyState({
                     data-testid="empty-state-icon"
                     aria-hidden="true"
                 >
-                    <Icon className="size-8 opacity-80" strokeWidth={1.5} />
+                    <Icon
+                        iconNode={icon ?? Inbox}
+                        size="empty"
+                        strokeWidth={ICON_STROKE_DECORATIVE}
+                        className="opacity-80"
+                    />
                 </div>
                 <div className="space-y-1.5">
                     <p

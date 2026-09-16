@@ -195,7 +195,7 @@ export default function AccountDetail() {
                             <p className="text-sm text-muted-foreground">{error}</p>
                             <Link href="/accounts">
                                 <Button variant="outline" className="mt-4">
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    <ArrowLeft className="size-4 shrink-0 fill-none" />
                                     Back to Accounts
                                 </Button>
                             </Link>
@@ -220,7 +220,7 @@ export default function AccountDetail() {
                         <div className="flex items-center gap-2">
                             <Link href="/accounts">
                                 <Button variant="ghost" size="sm">
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    <ArrowLeft className="size-4 shrink-0 fill-none" />
                                     Back
                                 </Button>
                             </Link>
@@ -229,7 +229,7 @@ export default function AccountDetail() {
                             className="mt-2"
                             title={account?.name || 'Loading...'}
                             description="Transaction history with running balance"
-                            leading={<Building2 className="h-6 w-6" />}
+                            leading={<Building2 className="size-7 shrink-0 fill-none" />}
                             data-testid="account-detail-heading"
                         />
                     </div>

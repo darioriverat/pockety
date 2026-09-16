@@ -5,6 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 
 export type DashboardSummaryCardTone =
@@ -41,7 +42,7 @@ export function DashboardSummaryCard({
     title,
     value,
     description,
-    icon: Icon,
+    icon,
     tone = 'default',
     testId,
     valueTestId,
@@ -62,8 +63,9 @@ export function DashboardSummaryCard({
                     {title}
                 </CardTitle>
                 <Icon
-                    className="text-muted-foreground h-4 w-4 shrink-0"
-                    aria-hidden="true"
+                    iconNode={icon}
+                    size="md"
+                    className="text-muted-foreground"
                 />
             </CardHeader>
             <CardContent className="space-y-1 px-5">

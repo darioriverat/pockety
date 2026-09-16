@@ -282,7 +282,7 @@ export default function BalanceSheetTimeSeries() {
                         />
                         <Button variant="outline" asChild>
                             <Link href="/balance-sheet">
-                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                <ArrowLeft className="size-4 shrink-0 fill-none" />
                                 Period view
                             </Link>
                         </Button>

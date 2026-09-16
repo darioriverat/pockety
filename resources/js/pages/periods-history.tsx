@@ -79,13 +79,13 @@ export default function PeriodsHistory() {
                         <div className="flex flex-wrap gap-2">
                             <Button variant="outline" asChild>
                                 <Link href="/periods/compare">
-                                    <ArrowLeftRight className="mr-2 h-4 w-4" />
+                                    <ArrowLeftRight className="size-4 shrink-0 fill-none" />
                                     Compare Periods
                                 </Link>
                             </Button>
                             <Button variant="outline" asChild>
                                 <Link href="/transactions">
-                                    <Receipt className="mr-2 h-4 w-4" />
+                                    <Receipt className="size-4 shrink-0 fill-none" />
                                     Transactions
                                 </Link>
                             </Button>

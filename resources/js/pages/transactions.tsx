@@ -812,7 +812,7 @@ export default function Transactions() {
                             variant="outline"
                             onClick={handleExportCSV}
                         >
-                            <Download className="mr-2 h-4 w-4" />
+                            <Download className="size-4 shrink-0 fill-none" />
                             Export to CSV
                         </Button>
                         <Dialog
@@ -831,7 +831,7 @@ export default function Transactions() {
                                 onClick={() => setIsBulkDialogOpen(true)}
                                 data-testid="bulk-edit-button"
                             >
-                                <PencilLine className="mr-2 h-4 w-4" />
+                                <PencilLine className="size-4 shrink-0 fill-none" />
                                 Bulk Edit
                                 {selectedIds.length > 0
                                     ? ` (${selectedIds.length})`
@@ -930,7 +930,7 @@ export default function Transactions() {
                         >
                             <DialogTrigger asChild>
                                 <Button>
-                                    <Plus className="mr-2 h-4 w-4" />
+                                    <Plus className="size-4 shrink-0 fill-none" />
                                     Add Transaction
                                 </Button>
                             </DialogTrigger>
@@ -1433,7 +1433,7 @@ export default function Transactions() {
                                     size="sm"
                                     onClick={clearFilters}
                                 >
-                                    <X className="mr-2 h-4 w-4" />
+                                    <X className="size-4 shrink-0 fill-none" />
                                     Clear Filters
                                 </Button>
                             )}

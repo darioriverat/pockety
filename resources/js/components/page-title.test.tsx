@@ -33,7 +33,12 @@ describe('PageTitle', () => {
                 title="Reconciliation"
                 description="Compare recorded vs computed balances"
                 data-testid="reconciliation-heading"
-                leading={<Scale data-testid="title-leading-icon" className="h-7 w-7" />}
+                leading={
+                    <Scale
+                        data-testid="title-leading-icon"
+                        className="size-7 shrink-0 fill-none"
+                    />
+                }
                 trailing={<span data-testid="title-badge">Live</span>}
             />,
         );
@@ -41,7 +46,13 @@ describe('PageTitle', () => {
         expect(screen.getByTestId('reconciliation-heading')).toHaveTextContent(
             'Reconciliation',
         );
-        expect(screen.getByTestId('title-leading-icon')).toBeInTheDocument();
+        const leadingWrap = document.querySelector(
+            '[data-slot="page-title-leading"]',
+        );
+        expect(leadingWrap).toBeInTheDocument();
+        expect(leadingWrap).toContainElement(
+            screen.getByTestId('title-leading-icon'),
+        );
         expect(screen.getByTestId('title-badge')).toHaveTextContent('Live');
     });
 

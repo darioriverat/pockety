@@ -670,7 +670,7 @@ function TopSpendingCategoriesWidget({
         <Card data-testid="top-spending-categories-card">
             <CardHeader>
                 <SubsectionHeading className="flex items-center gap-2">
-                    <PieChartIcon className="h-5 w-5" />
+                    <PieChartIcon className="size-5 shrink-0 fill-none" />
                     Top Spending Categories
                 </SubsectionHeading>
                 <CardDescription data-testid="top-spending-categories-subtitle">
@@ -793,7 +793,7 @@ function RecentActivityWidget({ data }: { data: RecentActivity }) {
         <Card data-testid="recent-activity-card">
             <CardHeader>
                 <SubsectionHeading className="flex items-center gap-2">
-                    <ActivityIcon className="h-5 w-5" />
+                    <ActivityIcon className="size-5 shrink-0 fill-none" />
                     Recent Activity
                 </SubsectionHeading>
                 <CardDescription data-testid="recent-activity-description">
@@ -953,11 +953,12 @@ export default function Dashboard({
                                     ? 'default'
                                     : 'destructive'
                             }
+                            className="inline-flex items-center gap-1"
                         >
                             {summary.reconciliation_status === 'balanced' ? (
-                                <CheckCircleIcon className="mr-1 h-3 w-3" />
+                                <CheckCircleIcon className="size-3 shrink-0 fill-none" />
                             ) : (
-                                <AlertCircleIcon className="mr-1 h-3 w-3" />
+                                <AlertCircleIcon className="size-3 shrink-0 fill-none" />
                             )}
                             {summary.reconciliation_status.charAt(0).toUpperCase() +
                                 summary.reconciliation_status.slice(1)}
@@ -1010,7 +1011,7 @@ export default function Dashboard({
                 <Card data-testid="income-expense-chart-card">
                     <CardHeader>
                         <SubsectionHeading className="flex items-center gap-2">
-                            <LineChart className="h-5 w-5" />
+                            <LineChart className="size-5 shrink-0 fill-none" />
                             Income vs Expenses
                         </SubsectionHeading>
                         <CardDescription data-testid="income-expense-chart-range">
@@ -1113,7 +1114,7 @@ export default function Dashboard({
                 <Card data-testid="assets-liabilities-chart-card">
                     <CardHeader>
                         <SubsectionHeading className="flex items-center gap-2">
-                            <LineChart className="h-5 w-5" />
+                            <LineChart className="size-5 shrink-0 fill-none" />
                             Assets vs Liabilities
                         </SubsectionHeading>
                         <CardDescription data-testid="assets-liabilities-chart-range">
@@ -1195,7 +1196,7 @@ export default function Dashboard({
                 <Card>
                     <CardHeader>
                         <SubsectionHeading className="flex items-center gap-2">
-                            <ScaleIcon className="h-5 w-5" />
+                            <ScaleIcon className="size-5 shrink-0 fill-none" />
                             Reconciliation Status
                         </SubsectionHeading>
                     </CardHeader>

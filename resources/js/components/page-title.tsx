@@ -26,7 +26,14 @@ export function PageTitle({
     return (
         <div className={cn(className)} data-testid="page-header">
             <div className="flex flex-wrap items-center gap-2">
-                {leading}
+                {leading ? (
+                    <span
+                        data-slot="page-title-leading"
+                        className="text-muted-foreground inline-flex shrink-0 items-center [&>svg]:size-7 [&>svg]:shrink-0 [&>svg]:fill-none"
+                    >
+                        {leading}
+                    </span>
+                ) : null}
                 <h1 className={TYPOGRAPHY.h1} data-testid={testId}>
                     {title}
                 </h1>

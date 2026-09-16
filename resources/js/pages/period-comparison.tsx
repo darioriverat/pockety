@@ -178,7 +178,7 @@ export default function PeriodComparison() {
                         />
                         <Button variant="outline" asChild>
                             <Link href="/periods/history">
-                                <CalendarRange className="mr-2 h-4 w-4" />
+                                <CalendarRange className="size-4 shrink-0 fill-none" />
                                 Periods History
                             </Link>
                         </Button>

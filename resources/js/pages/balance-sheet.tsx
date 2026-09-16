@@ -153,7 +153,7 @@ export default function BalanceSheet() {
                                     disabled={!selectedPeriod || loading}
                                     data-testid="export-balance-sheet-pdf"
                                 >
-                                    <Download className="mr-2 h-4 w-4" />
+                                    <Download className="size-4 shrink-0 fill-none" />
                                     Export to PDF
                                 </Button>
                                 <Button variant="outline" asChild>
@@ -161,7 +161,7 @@ export default function BalanceSheet() {
                                         href="/balance-sheet/time-series"
                                         data-testid="time-series-link"
                                     >
-                                        <LineChart className="mr-2 h-4 w-4" />
+                                        <LineChart className="size-4 shrink-0 fill-none" />
                                         Time series
                                     </Link>
                                 </Button>
