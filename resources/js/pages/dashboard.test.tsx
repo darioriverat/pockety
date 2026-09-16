@@ -29,6 +29,16 @@ type MockPage = {
                 total_count: number;
             };
         };
+        income_expense_chart: {
+            months: number;
+            from: string;
+            to: string;
+            periods: Array<{
+                period: string;
+                income_cad: number;
+                expenses_cad: number;
+            }>;
+        };
     };
 };
 
@@ -61,6 +71,25 @@ const mockPage: MockPage = {
                 unbalanced_count: 0,
                 total_count: 5,
             },
+        },
+        income_expense_chart: {
+            months: 12,
+            from: '202502',
+            to: '202601',
+            periods: [
+                { period: '202502', income_cad: 4800, expenses_cad: 1900 },
+                { period: '202503', income_cad: 4900, expenses_cad: 2100 },
+                { period: '202504', income_cad: 5000, expenses_cad: 2000 },
+                { period: '202505', income_cad: 5100, expenses_cad: 2200 },
+                { period: '202506', income_cad: 5050, expenses_cad: 1950 },
+                { period: '202507', income_cad: 5200, expenses_cad: 2300 },
+                { period: '202508', income_cad: 5150, expenses_cad: 2050 },
+                { period: '202509', income_cad: 5300, expenses_cad: 2400 },
+                { period: '202510', income_cad: 5250, expenses_cad: 2150 },
+                { period: '202511', income_cad: 5400, expenses_cad: 2500 },
+                { period: '202512', income_cad: 5350, expenses_cad: 2250 },
+                { period: '202601', income_cad: 5000, expenses_cad: 2000 },
+            ],
         },
     },
 };
@@ -109,11 +138,17 @@ vi.mock('@inertiajs/react', () => {
     };
 });
 
-function renderDashboard(props = mockPage.props.summary) {
+function renderDashboard(
+    summary = mockPage.props.summary,
+    chart = mockPage.props.income_expense_chart,
+) {
     return render(
         <TooltipProvider delayDuration={0}>
             <AppLayout breadcrumbs={Dashboard.layout.breadcrumbs}>
-                <Dashboard summary={props} />
+                <Dashboard
+                    summary={summary}
+                    income_expense_chart={chart}
+                />
             </AppLayout>
         </TooltipProvider>,
     );
@@ -226,5 +261,26 @@ describe('Dashboard feature', () => {
         const link = screen.getByText('View Details →');
         expect(link).toBeDefined();
         expect(link.closest('a')).toHaveAttribute('href', '/reconciliation');
+    });
+
+    it('displays income vs expenses chart with legend and 12 months', () => {
+        renderDashboard();
+
+        expect(screen.getByText('Income vs Expenses')).toBeDefined();
+        expect(screen.getByTestId('income-expense-chart')).toBeDefined();
+        expect(screen.getByTestId('income-expense-chart-legend')).toBeDefined();
+        expect(screen.getByTestId('chart-line-income')).toBeDefined();
+        expect(screen.getByTestId('chart-line-expenses')).toBeDefined();
+        expect(screen.getByTestId('income-expense-chart-range').textContent).toMatch(
+            /Last 12 months/i,
+        );
+        expect(screen.getByTestId('chart-bar-income-202601')).toBeDefined();
+        expect(screen.getByTestId('chart-bar-expenses-202601')).toBeDefined();
+        expect(
+            screen.getByTestId('income-expense-chart-legend').textContent,
+        ).toMatch(/Income/);
+        expect(
+            screen.getByTestId('income-expense-chart-legend').textContent,
+        ).toMatch(/Expenses/);
     });
 });

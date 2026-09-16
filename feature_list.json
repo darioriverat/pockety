@@ -1207,7 +1207,7 @@
       "Step 4: Verify both income and expenses lines/bars are visible",
       "Step 5: Verify chart legend is clear"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

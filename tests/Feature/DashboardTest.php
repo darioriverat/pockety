@@ -238,4 +238,82 @@ class DashboardTest extends TestCase
             ->where('summary.period', $period)
         );
     }
+
+    public function test_dashboard_includes_income_vs_expenses_chart_for_last_12_months()
+    {
+        $endPeriod = '202606';
+
+        ExchangeRate::create([
+            'period' => '202601',
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+        ExchangeRate::create([
+            'period' => '202606',
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        Income::create([
+            'period' => '202601',
+            'description' => 'Jan salary',
+            'line_number' => 1,
+            'amount_cad' => 4000.00,
+            'amount_usd' => 0,
+            'amount_cop' => 0,
+        ]);
+
+        Income::create([
+            'period' => '202606',
+            'description' => 'Jun salary',
+            'line_number' => 1,
+            'amount_cad' => 5500.00,
+            'amount_usd' => 0,
+            'amount_cop' => 0,
+        ]);
+
+        $category = Category::factory()->create(['code' => 'C001']);
+        $account = Account::factory()->create(['type' => 'bank']);
+
+        Transaction::create([
+            'date' => '2026-01-10',
+            'period' => '202601',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 1200.00,
+            'amount_usd' => null,
+            'amount_cop' => null,
+        ]);
+
+        Transaction::create([
+            'date' => '2026-06-10',
+            'period' => '202606',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 1800.00,
+            'amount_usd' => null,
+            'amount_cop' => null,
+        ]);
+
+        $response = $this->get(route('dashboard', ['period' => $endPeriod]));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard')
+            ->where('income_expense_chart.months', 12)
+            ->where('income_expense_chart.from', '202507')
+            ->where('income_expense_chart.to', '202606')
+            ->has('income_expense_chart.periods', 12)
+            ->where('income_expense_chart.periods.11.period', '202606')
+            ->where('income_expense_chart.periods.11.income_cad', 5500)
+            ->where('income_expense_chart.periods.11.expenses_cad', 1800)
+            ->where('income_expense_chart.periods.6.period', '202601')
+            ->where('income_expense_chart.periods.6.income_cad', 4000)
+            ->where('income_expense_chart.periods.6.expenses_cad', 1200)
+        );
+    }
 }

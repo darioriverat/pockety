@@ -4134,3 +4134,29 @@ PROGRESS: 102 of 175 tests passing (73 remaining)
 NEXT: Test #100 — Dashboard income vs expenses chart
 STATUS: Clean, stable. See SESSION-50-SUMMARY.md.
 
+================================================================================
+SESSION 51 - Dashboard Income vs Expenses Chart (2026-09-15)
+================================================================================
+
+SMOKE VERIFICATION (before new work):
+- Backend DashboardTest: 7/7 ✅ (via /dev/run-tests)
+- Frontend unit tests: all passing ✅ (via /dev/frontend-tests)
+- Browser smoke: feature 1 ✅ (via /dev/browser-tests)
+- Puppeteer MCP: blocked by Local SDK approval this session; UI verified via Playwright screenshots
+
+IMPLEMENTED & VERIFIED:
+- Test #101: Dashboard shows chart of income vs expenses over time
+  - Last 12 months ending at selected dashboard period
+  - Grouped bars + trend lines (Income green / Expenses red)
+  - Clear legend and range label
+
+KEY CHANGES:
+- DashboardService::getIncomeExpenseTrend()
+- DashboardController passes income_expense_chart
+- dashboard.tsx SVG chart (same pattern as BS time-series)
+- Backend/FE/browser tests + screenshots in verification/test-101-income-expense-chart/
+
+PROGRESS: 103 of 175 tests passing (72 remaining)
+NEXT: Test #102 — Dashboard assets vs liabilities chart
+STATUS: Clean, stable. See SESSION-51-SUMMARY.md.
+

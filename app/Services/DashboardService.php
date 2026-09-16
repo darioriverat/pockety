@@ -7,6 +7,7 @@ use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class DashboardService
@@ -32,18 +33,7 @@ class DashboardService
      */
     public function getSummary(string $period): array
     {
-        $exchangeRate = ExchangeRate::forPeriod($period);
-
-        // If no exchange rate exists for this period, use defaults or return zeros
-        if (! $exchangeRate) {
-            Log::warning("No exchange rate found for period {$period}, using defaults");
-            $exchangeRate = new ExchangeRate([
-                'period' => $period,
-                'usd_cop' => 4400,
-                'usd_cad' => 0.75,
-                'cad_cop' => 3000,
-            ]);
-        }
+        $exchangeRate = $this->resolveExchangeRate($period);
 
         $totalIncome = $this->calculateTotalIncome($period, $exchangeRate);
         $totalExpenses = $this->calculateTotalExpenses($period, $exchangeRate);
@@ -66,6 +56,60 @@ class DashboardService
             'reconciliation_status' => $reconciliation['status'],
             'reconciliation_summary' => $reconciliationSummary,
         ];
+    }
+
+    /**
+     * Income vs expenses trend for the last N months ending at $endPeriod.
+     *
+     * @return array{
+     *     months: int,
+     *     from: string,
+     *     to: string,
+     *     periods: list<array{period: string, income_cad: float, expenses_cad: float}>
+     * }
+     */
+    public function getIncomeExpenseTrend(string $endPeriod, int $months = 12): array
+    {
+        $months = max(6, min(12, $months));
+
+        $end = Carbon::createFromFormat('Ym', $endPeriod)->startOfMonth();
+        $periodRows = [];
+
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $period = $end->copy()->subMonths($i)->format('Ym');
+            $exchangeRate = $this->resolveExchangeRate($period);
+
+            $periodRows[] = [
+                'period' => $period,
+                'income_cad' => round($this->calculateTotalIncome($period, $exchangeRate), 2),
+                'expenses_cad' => round($this->calculateTotalExpenses($period, $exchangeRate), 2),
+            ];
+        }
+
+        return [
+            'months' => $months,
+            'from' => $periodRows[0]['period'],
+            'to' => $periodRows[count($periodRows) - 1]['period'],
+            'periods' => $periodRows,
+        ];
+    }
+
+    private function resolveExchangeRate(string $period): ExchangeRate
+    {
+        $exchangeRate = ExchangeRate::forPeriod($period);
+
+        if (! $exchangeRate) {
+            Log::warning("No exchange rate found for period {$period}, using defaults");
+
+            return new ExchangeRate([
+                'period' => $period,
+                'usd_cop' => 4400,
+                'usd_cad' => 0.75,
+                'cad_cop' => 3000,
+            ]);
+        }
+
+        return $exchangeRate;
     }
 
     /**
