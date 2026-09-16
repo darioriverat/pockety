@@ -345,9 +345,12 @@ export default function BalanceSheet() {
                                                 )}
                                             </span>
                                         </div>
-                                        <div className="overflow-x-auto">
+                                        <div
+                                            className="overflow-x-auto"
+                                            data-responsive="scroll"
+                                        >
                                             <table
-                                                className="w-full text-sm"
+                                                className="w-full min-w-[28rem] text-sm"
                                                 data-testid="assets-table"
                                             >
                                                 <thead>
@@ -419,9 +422,12 @@ export default function BalanceSheet() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="overflow-x-auto">
+                                        <div
+                                            className="overflow-x-auto"
+                                            data-responsive="scroll"
+                                        >
                                             <table
-                                                className="w-full text-sm"
+                                                className="w-full min-w-[28rem] text-sm"
                                                 data-testid="liabilities-table"
                                             >
                                                 <thead>

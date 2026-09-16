@@ -474,7 +474,11 @@ export default function Income() {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="overflow-x-auto rounded-md border">
+                    <div
+                        className="overflow-x-auto rounded-md border"
+                        data-testid="income-data-table"
+                        data-responsive="scroll"
+                    >
                         <table className="w-full min-w-[640px] text-left text-sm">
                             <thead className="border-b bg-muted/70">
                                 <tr>

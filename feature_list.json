@@ -1755,7 +1755,7 @@
       "Step 4: Verify all data remains accessible",
       "Step 5: Verify user can interact with all rows"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

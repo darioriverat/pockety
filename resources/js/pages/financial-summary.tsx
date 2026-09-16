@@ -312,9 +312,12 @@ export default function FinancialSummary() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="overflow-x-auto">
+                                    <div
+                                        className="overflow-x-auto"
+                                        data-responsive="scroll"
+                                    >
                                         <table
-                                            className="w-full text-left text-sm"
+                                            className="w-full min-w-[36rem] text-left text-sm"
                                             data-testid="income-lines-table"
                                         >
                                             <thead>
@@ -480,9 +483,12 @@ export default function FinancialSummary() {
                                             Refreshing…
                                         </div>
                                     )}
-                                    <div className="overflow-x-auto">
+                                    <div
+                                        className="overflow-x-auto"
+                                        data-responsive="scroll"
+                                    >
                                         <table
-                                            className="w-full text-left text-sm"
+                                            className="w-full min-w-[36rem] text-left text-sm"
                                             data-testid="financial-summary-table"
                                         >
                                             <thead>

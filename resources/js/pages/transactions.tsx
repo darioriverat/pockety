@@ -1771,11 +1771,12 @@ export default function Transactions() {
                         </div>
 
                         <div
-                            className="overflow-hidden rounded-md border"
+                            className="overflow-x-auto rounded-md border"
                             data-testid="transactions-data-table"
+                            data-responsive="cards"
                         >
                         <div
-                            className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] items-center gap-2 border-b bg-muted/70 px-3 py-3"
+                            className="flex flex-wrap items-center gap-2 border-b bg-muted/70 px-3 py-3 sm:grid sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] sm:gap-2"
                             data-testid="transactions-sort-headers"
                             role="row"
                         >
@@ -1866,8 +1867,8 @@ export default function Transactions() {
                                     )}
                                 >
                                     <CardHeader className="px-3">
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="flex items-start gap-3 flex-1">
+                                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                            <div className="flex min-w-0 flex-1 items-start gap-3">
                                                 <Checkbox
                                                     id={`select-transaction-${transaction.id}`}
                                                     checked={selectedIds.includes(
@@ -1881,10 +1882,10 @@ export default function Transactions() {
                                                     }
                                                     data-testid={`select-transaction-${transaction.id}`}
                                                     aria-label={`Select transaction ${transaction.id}`}
-                                                    className="mt-1"
+                                                    className="mt-1 shrink-0"
                                                 />
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex flex-wrap items-center gap-2">
                                                     <CardTitle
                                                         className="text-lg"
                                                         data-testid={`transaction-amount-${transaction.id}`}
@@ -1904,7 +1905,7 @@ export default function Transactions() {
                                                     )}
                                                 </div>
                                                 <CardDescription className="mt-1">
-                                                    <div className="space-y-1">
+                                                    <div className="space-y-1 break-words">
                                                         <div
                                                             data-testid={`transaction-date-${transaction.id}`}
                                                         >
@@ -1963,7 +1964,10 @@ export default function Transactions() {
                                                 </CardDescription>
                                             </div>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div
+                                                className="flex shrink-0 gap-2 self-end sm:self-start"
+                                                data-testid={`transaction-actions-${transaction.id}`}
+                                            >
                                                 <Button
                                                     variant="outline"
                                                     size="icon"

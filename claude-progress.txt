@@ -5213,3 +5213,33 @@ STATUS / NEXT:
 - Completion: 146/175 passing; 29 pending.
 - Next: index 146, responsive tables on mobile (scroll or cards).
 - Note: feature 120 smoke runs migrate:fresh; re-seed if continuing UI work.
+
+=== Session 78 (2026-09-16) ===
+
+GOAL: Complete responsive tables on mobile (feature index 146).
+
+ENVIRONMENT / BASELINE:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200).
+- Docker CLI blocked by Local SDK approval; used /dev HTTP helpers.
+- Puppeteer MCP blocked by approval this session; Playwright used for UI.
+- Baseline: DashboardTest 14/14; frontend 106 passed; table-styles browser 2/2 after reset+seed.
+
+FEATURE 146:
+- Shared Table: overflow-x-auto scroll wrapper with min-w-[36rem], data-responsive=scroll.
+- Transactions: card layout on mobile (stack content/actions), wrap sort headers,
+  data-responsive=cards; edit/select/sort verified at 375px.
+- Income: data-responsive=scroll + horizontal scroll verified (scrollWidth > clientWidth).
+- Financial summary and balance sheet tables gained min-width for mobile scroll.
+- Added tests/browser/responsive-tables.spec.ts (2 cases) and table unit coverage.
+
+VERIFICATION:
+- Frontend: 106 tests passed.
+- Browser: responsive-tables 2/2; table-styles regression 2/2.
+- Screenshots: verification/test-146-responsive-tables/.
+- Assets rebuilt via /dev/build-assets.
+
+STATUS / NEXT:
+- Index 146 marked passing; only passes field changed in feature_list.json.
+- Completion: 147/175 passing; 28 pending.
+- Next: index 147, currency amount formatting (thousand separators / decimals).
+- Development data preserved; reset-test-user + seed-browser used for smoke only.

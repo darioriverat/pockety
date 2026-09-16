@@ -32,6 +32,14 @@ describe('Table', () => {
             </Table>,
         );
 
+        const scroll = container.querySelector('[data-slot="table-scroll"]');
+        expect(scroll).not.toBeNull();
+        expect(scroll?.getAttribute('data-responsive')).toBe('scroll');
+        expect(scroll?.className).toMatch(/overflow-x-auto/);
+
+        const table = container.querySelector('table');
+        expect(table?.className).toMatch(/min-w-\[36rem\]/);
+
         const header = screen.getByTestId('sample-table-header');
         expect(header.className).toMatch(/bg-muted/);
         expect(header.className).toMatch(/border-b/);
