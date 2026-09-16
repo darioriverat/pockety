@@ -86,7 +86,8 @@ class SearchTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('data.query', 'RBC');
         $response->assertJsonPath('meta.account_count', 1);
-        $response->assertJsonPath('meta.transaction_count', 1);
+        // Comment match + account-name match (Coffee shop on RBC) => 2
+        $response->assertJsonPath('meta.transaction_count', 2);
         $response->assertJsonPath('meta.category_count', 0);
 
         $accounts = $response->json('data.accounts');
@@ -97,14 +98,48 @@ class SearchTest extends TestCase
         $this->assertSame('/accounts/'.$rbc->id, $accounts[0]['url']);
 
         $transactions = $response->json('data.transactions');
-        $this->assertCount(1, $transactions);
+        $this->assertCount(2, $transactions);
         $this->assertSame('transaction', $transactions[0]['type']);
-        $this->assertSame($matchingTxn->id, $transactions[0]['id']);
-        $this->assertStringContainsString('RBC', $transactions[0]['title']);
-        $this->assertStringContainsString('/transactions?search=', $transactions[0]['url']);
+        $ids = collect($transactions)->pluck('id')->all();
+        $this->assertContains($matchingTxn->id, $ids);
 
         $this->assertIsArray($response->json('data.categories'));
         $this->assertSame([], $response->json('data.categories'));
+    }
+
+    public function test_search_matches_transactions_by_account_name(): void
+    {
+        $rbc = Account::factory()->create([
+            'name' => 'RBC Checking',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $category = Category::factory()->create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+            'is_debt_category' => false,
+            'is_active' => true,
+        ]);
+
+        $txn = Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $rbc->id,
+            'amount_cad' => 12.34,
+            'comments' => 'Weekly groceries',
+        ]);
+
+        $response = $this->getJson('/api/search?q=RBC');
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.transaction_count', 1);
+        $response->assertJsonPath('data.transactions.0.id', $txn->id);
+        $response->assertJsonPath('data.transactions.0.title', 'Weekly groceries');
     }
 
     public function test_search_finds_categories_by_code_or_name(): void

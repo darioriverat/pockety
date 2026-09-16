@@ -2,6 +2,7 @@
 
 namespace App\Domain\Services\Contracts;
 
+use App\Domain\Collections\TransactionCollection;
 use App\Domain\Entities\TransactionEntity;
 
 interface TransactionServiceInterface
@@ -52,6 +53,14 @@ interface TransactionServiceInterface
      * @param  int  $id  Transaction ID
      */
     public function delete(int $id): bool;
+
+    /**
+     * Bulk-update multiple transactions (e.g. change category).
+     *
+     * @param  list<int>  $ids
+     * @param  array{category_id?: int, account_id?: int|null, is_recurring?: bool}  $data
+     */
+    public function bulkUpdate(array $ids, array $data): TransactionCollection;
 
     /**
      * Get transactions for a specific period.

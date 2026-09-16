@@ -19,6 +19,7 @@ class BrowserTestSeeder extends Seeder
             ]);
         }
 
+        // Plain password — User model casts password as hashed.
         User::query()->updateOrCreate(
             ['email' => 'test@example.com'],
             [

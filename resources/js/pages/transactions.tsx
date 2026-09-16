@@ -41,6 +41,7 @@ import {
     Filter,
     X,
     Download,
+    PencilLine,
 } from 'lucide-react';
 
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
@@ -148,6 +149,11 @@ export default function Transactions() {
     const [formError, setFormError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+    const [bulkCategoryId, setBulkCategoryId] = useState('');
+    const [bulkError, setBulkError] = useState<string | null>(null);
+    const [bulkSubmitting, setBulkSubmitting] = useState(false);
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState<number>(DEFAULT_PAGE_SIZE);
     const [pagination, setPagination] = useState<PaginationMeta>({
@@ -290,6 +296,7 @@ export default function Transactions() {
             const data: ApiResponse = await response.json();
 
             setTransactions(data.data);
+            setSelectedIds([]);
             setPagination({
                 total: data.meta.total,
                 page: data.meta.page ?? page,
@@ -459,6 +466,70 @@ export default function Transactions() {
         window.location.href = url;
     };
 
+    const toggleSelected = (id: number, checked: boolean) => {
+        setSelectedIds((current) => {
+            if (checked) {
+                return current.includes(id) ? current : [...current, id];
+            }
+            return current.filter((item) => item !== id);
+        });
+    };
+
+    const toggleSelectAll = (checked: boolean) => {
+        if (checked) {
+            setSelectedIds(transactions.map((transaction) => transaction.id));
+            return;
+        }
+        setSelectedIds([]);
+    };
+
+    const handleBulkEdit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setBulkError(null);
+
+        if (selectedIds.length === 0) {
+            setBulkError('Select at least one transaction');
+            return;
+        }
+
+        if (!bulkCategoryId) {
+            setBulkError('Select a category');
+            return;
+        }
+
+        try {
+            setBulkSubmitting(true);
+            const response = await fetch('/api/transactions/bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ids: selectedIds,
+                    category_id: parseInt(bulkCategoryId, 10),
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(
+                    errorData.message ||
+                        errorData.error ||
+                        'Failed to bulk update transactions',
+                );
+            }
+
+            setIsBulkDialogOpen(false);
+            setBulkCategoryId('');
+            setSelectedIds([]);
+            await fetchTransactions();
+        } catch (err) {
+            setBulkError(
+                err instanceof Error ? err.message : 'An error occurred',
+            );
+        } finally {
+            setBulkSubmitting(false);
+        }
+    };
+
     const resetForm = () => {
         setEditingId(null);
         setFormError(null);
@@ -547,6 +618,111 @@ export default function Transactions() {
                             <Download className="mr-2 h-4 w-4" />
                             Export to CSV
                         </Button>
+                        <Dialog
+                            open={isBulkDialogOpen}
+                            onOpenChange={(open) => {
+                                setIsBulkDialogOpen(open);
+                                if (!open) {
+                                    setBulkError(null);
+                                    setBulkCategoryId('');
+                                }
+                            }}
+                        >
+                            <Button
+                                variant="secondary"
+                                disabled={selectedIds.length === 0}
+                                onClick={() => setIsBulkDialogOpen(true)}
+                                data-testid="bulk-edit-button"
+                            >
+                                <PencilLine className="mr-2 h-4 w-4" />
+                                Bulk Edit
+                                {selectedIds.length > 0
+                                    ? ` (${selectedIds.length})`
+                                    : ''}
+                            </Button>
+                            <DialogContent
+                                className="max-w-md"
+                                data-testid="bulk-edit-dialog"
+                            >
+                                <form onSubmit={handleBulkEdit}>
+                                    <DialogHeader>
+                                        <DialogTitle>Bulk Edit</DialogTitle>
+                                        <DialogDescription>
+                                            Update the category for{' '}
+                                            {selectedIds.length} selected
+                                            transaction
+                                            {selectedIds.length === 1
+                                                ? ''
+                                                : 's'}
+                                            .
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="bulk-category">
+                                                Category
+                                            </Label>
+                                            <Select
+                                                value={bulkCategoryId}
+                                                onValueChange={(value) => {
+                                                    setBulkError(null);
+                                                    setBulkCategoryId(value);
+                                                }}
+                                            >
+                                                <SelectTrigger
+                                                    id="bulk-category"
+                                                    aria-label="Bulk category"
+                                                    data-testid="bulk-category-select"
+                                                >
+                                                    <SelectValue placeholder="Select category" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {categories.map((cat) => (
+                                                        <SelectItem
+                                                            key={cat.id}
+                                                            value={cat.id.toString()}
+                                                            data-testid={`bulk-category-option-${cat.code}`}
+                                                        >
+                                                            {cat.code} -{' '}
+                                                            {cat.name_en}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    {bulkError && (
+                                        <p
+                                            className="text-destructive text-sm"
+                                            role="alert"
+                                            data-testid="bulk-edit-error"
+                                        >
+                                            {bulkError}
+                                        </p>
+                                    )}
+                                    <DialogFooter>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() =>
+                                                setIsBulkDialogOpen(false)
+                                            }
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            disabled={bulkSubmitting}
+                                            data-testid="bulk-edit-confirm"
+                                        >
+                                            {bulkSubmitting
+                                                ? 'Saving…'
+                                                : 'Confirm changes'}
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
                         <Dialog
                             open={isDialogOpen}
                             onOpenChange={(open) => {
@@ -1159,12 +1335,48 @@ export default function Transactions() {
                 ) : (
                     <>
                         <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                            <p
-                                className="text-sm text-muted-foreground"
-                                data-testid="transactions-total"
-                            >
-                                Total transactions: {pagination.total}
-                            </p>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <p
+                                    className="text-sm text-muted-foreground"
+                                    data-testid="transactions-total"
+                                >
+                                    Total transactions: {pagination.total}
+                                </p>
+                                {transactions.length > 0 && (
+                                    <div
+                                        className="flex items-center gap-2"
+                                        data-testid="bulk-select-controls"
+                                    >
+                                        <Checkbox
+                                            id="select-all-transactions"
+                                            checked={
+                                                selectedIds.length > 0 &&
+                                                selectedIds.length ===
+                                                    transactions.length
+                                            }
+                                            onCheckedChange={(checked) =>
+                                                toggleSelectAll(checked === true)
+                                            }
+                                            data-testid="select-all-transactions"
+                                            aria-label="Select all transactions"
+                                        />
+                                        <Label
+                                            htmlFor="select-all-transactions"
+                                            className="text-sm font-medium"
+                                        >
+                                            Select all on page
+                                        </Label>
+                                        {selectedIds.length > 0 && (
+                                            <span
+                                                className="text-sm text-muted-foreground"
+                                                data-testid="selected-count"
+                                            >
+                                                {selectedIds.length} selected
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                             {showPaginationControls && (
                                 <div
                                     className="flex flex-wrap items-center gap-3"
@@ -1266,9 +1478,30 @@ export default function Transactions() {
                                     data-transaction-comments={
                                         transaction.comments ?? ''
                                     }
+                                    data-selected={
+                                        selectedIds.includes(transaction.id)
+                                            ? 'true'
+                                            : 'false'
+                                    }
                                 >
                                     <CardHeader>
-                                        <div className="flex items-start justify-between">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex items-start gap-3 flex-1">
+                                                <Checkbox
+                                                    id={`select-transaction-${transaction.id}`}
+                                                    checked={selectedIds.includes(
+                                                        transaction.id,
+                                                    )}
+                                                    onCheckedChange={(checked) =>
+                                                        toggleSelected(
+                                                            transaction.id,
+                                                            checked === true,
+                                                        )
+                                                    }
+                                                    data-testid={`select-transaction-${transaction.id}`}
+                                                    aria-label={`Select transaction ${transaction.id}`}
+                                                    className="mt-1"
+                                                />
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <CardTitle
@@ -1304,7 +1537,9 @@ export default function Transactions() {
                                                             {transaction.period} -{' '}
                                                             {transaction.quincena}
                                                         </div>
-                                                        <div>
+                                                        <div
+                                                            data-testid={`transaction-category-${transaction.id}`}
+                                                        >
                                                             <span className="font-medium">
                                                                 Category:
                                                             </span>{' '}
@@ -1353,6 +1588,7 @@ export default function Transactions() {
                                                         </div>
                                                     </div>
                                                 </CardDescription>
+                                            </div>
                                             </div>
                                             <div className="flex gap-2">
                                                 <Button

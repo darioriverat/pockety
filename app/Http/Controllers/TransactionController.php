@@ -213,6 +213,50 @@ class TransactionController extends Controller
     }
 
     /**
+     * Bulk-update multiple transactions (e.g. change category).
+     *
+     * POST /api/transactions/bulk
+     */
+    public function bulkUpdate(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1|max:500',
+                'ids.*' => 'integer|distinct|exists:transactions,id',
+                'category_id' => 'required|integer|exists:categories,id',
+            ]);
+
+            $collection = $this->service->bulkUpdate(
+                $validated['ids'],
+                ['category_id' => (int) $validated['category_id']],
+            );
+
+            $data = array_map(
+                static fn ($entity) => $entity->toArray(),
+                $collection->all(),
+            );
+
+            return response()->json([
+                'data' => $data,
+                'links' => [
+                    'self' => route('transactions.bulk'),
+                    'index' => route('transactions.index'),
+                ],
+                'meta' => [
+                    'updated_count' => $collection->count(),
+                ],
+                'message' => 'Transactions updated successfully',
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 422);
+        } catch (ValidationException $e) {
+            throw $e;
+        }
+    }
+
+    /**
      * Delete a transaction.
      *
      * DELETE /api/transactions/{id}

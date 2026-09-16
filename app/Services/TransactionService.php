@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Collections\TransactionCollection;
 use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Models\Transaction;
@@ -206,6 +207,54 @@ class TransactionService implements TransactionServiceInterface
         $transaction = Transaction::findOrFail($id);
 
         return $transaction->delete();
+    }
+
+    /**
+     * Bulk-update multiple transactions.
+     *
+     * @param  list<int>  $ids
+     * @param  array{category_id?: int, account_id?: int|null, is_recurring?: bool}  $data
+     */
+    public function bulkUpdate(array $ids, array $data): TransactionCollection
+    {
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+        $collection = new TransactionCollection;
+
+        if ($ids === []) {
+            return $collection;
+        }
+
+        $allowed = array_intersect_key($data, array_flip([
+            'category_id',
+            'account_id',
+            'is_recurring',
+        ]));
+
+        if ($allowed === []) {
+            throw new \InvalidArgumentException('No bulk-updatable fields provided');
+        }
+
+        if (isset($allowed['category_id'])) {
+            $this->validateCategory((int) $allowed['category_id']);
+        }
+
+        DB::transaction(function () use ($ids, $allowed) {
+            Transaction::query()
+                ->whereIn('id', $ids)
+                ->update($allowed);
+        });
+
+        $transactions = Transaction::query()
+            ->with(['category', 'account'])
+            ->whereIn('id', $ids)
+            ->orderBy('id')
+            ->get();
+
+        foreach ($transactions as $transaction) {
+            $collection->add($this->toEntity($transaction));
+        }
+
+        return $collection;
     }
 
     /**

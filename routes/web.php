@@ -112,11 +112,33 @@ if (app()->environment('local')) {
             ]
         );
 
+        // Ensure password is always the known browser-test value (cast hashes it).
+        $user->forceFill(['password' => 'password'])->save();
+
         auth()->login($user);
 
         $redirect = request()->query('redirect', '/income');
 
         return redirect($redirect);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
+    Route::get('/dev/reset-test-user', function () {
+        $user = User::query()->updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Browser Test User',
+                'password' => 'password',
+                'email_verified_at' => now(),
+            ]
+        );
+        $user->forceFill(['password' => 'password'])->save();
+
+        return response()->json([
+            'success' => true,
+            'email' => $user->email,
+            'id' => $user->id,
+            'password_check' => \Illuminate\Support\Facades\Hash::check('password', $user->fresh()->password),
+        ]);
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
     Route::get('/dev/seed-browser', function () {

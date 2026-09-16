@@ -1306,7 +1306,7 @@
       "Step 5: Confirm changes",
       "Step 6: Verify all selected transactions have updated category"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

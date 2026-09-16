@@ -70,7 +70,13 @@ class SearchService implements SearchServiceInterface
 
         $transactions = Transaction::query()
             ->with(['category', 'account'])
-            ->where('comments', 'like', $like)
+            ->where(function ($query) use ($like) {
+                $query
+                    ->where('comments', 'like', $like)
+                    ->orWhereHas('account', function ($accountQuery) use ($like) {
+                        $accountQuery->where('name', 'like', $like);
+                    });
+            })
             ->orderByDesc('date')
             ->orderByDesc('id')
             ->limit($limit)

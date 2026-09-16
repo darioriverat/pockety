@@ -71,6 +71,7 @@ Route::delete('/categories/{code}', [CategoryController::class, 'destroy'])->nam
 // Transactions API
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transactions.export');
+Route::post('/transactions/bulk', [TransactionController::class, 'bulkUpdate'])->name('transactions.bulk');
 Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
 Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 Route::put('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');

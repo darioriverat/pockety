@@ -32,3 +32,5 @@ class ResizeObserverMock {
 }
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+
+Element.prototype.scrollIntoView = vi.fn();
