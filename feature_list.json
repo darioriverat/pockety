@@ -2064,7 +2064,7 @@
       "Step 6: Verify main content area expands to use available space",
       "Step 7: Click expand button and verify sidebar returns to full width"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
