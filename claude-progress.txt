@@ -5552,3 +5552,37 @@ STATUS / NEXT:
 - Changed only passes for feature_list.json index 154.
 - Completion: 155/175 passing; 20 pending.
 - Next: index 155, modal dialogs with backdrop, z-index, and centering.
+
+=== Session 88 (2026-09-16) ===
+
+GOAL: Implement modal dialogs with backdrop, z-index, centering (feature index 155).
+
+ENVIRONMENT:
+- App running at http://dev.pockety.com:8080/ (HTTP 200).
+- Puppeteer MCP blocked this session (Local SDK cannot request interactive
+  approval). Used /dev/* HTTP helpers + Playwright screenshots (same pattern
+  as Sessions 84-87).
+- Baseline: table-styles browser 2/2; frontend sample green; assets rebuilt.
+
+IMPLEMENTATION:
+1. resources/js/components/ui/dialog.tsx
+   - Overlay: data-testid=dialog-overlay, fixed inset-0 z-50 bg-black/80
+   - Content: data-modal-centered, top/left 1/2 + -translate centering, z-[51]
+   - Close control: data-testid=dialog-close
+2. Unit: dialog.test.tsx (2 cases — classes + backdrop dismiss)
+3. Browser: tests/browser/modal-dialogs.spec.ts
+   - Light/dark delete confirmation: centered, dark overlay, z-order
+   - Backdrop click closes modal; transaction remains
+
+VERIFICATION:
+- Frontend suite: 131 passed / 36 files.
+- Playwright modal-dialogs: 3/3 passed.
+- Screenshots: verification/test-155-modal-dialogs/
+  (light/dark centered modal + after-backdrop-click).
+- Asserted overlay covers viewport, dialog z > overlay z, center deltas < 24px,
+  dark scrim via bg-black/80, backdrop click dismisses.
+
+STATUS / NEXT:
+- Changed only passes for feature_list.json index 155.
+- Completion: 156/175 passing; 19 pending.
+- Next: index 156, charts with clear colors, legends, and axis labels.
