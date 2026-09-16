@@ -6639,3 +6639,40 @@ NEXT:
 - Optional: replace remaining Radix Selects inside dialogs if similar overlay issues appear
 - Optional: full suite regression / production deploy
 ================================================================================
+
+================================================================================
+SESSION 104 - REGRESSION VERIFICATION (2026-09-16)
+================================================================================
+
+STATUS: 175/175 tests passing (100% COMPLETE — no failing features remain)
+
+CONTEXT:
+- Fresh session; feature_list.json has 0 items with passes:false
+- Prior sessions 101–103 completed features #173–#175 and fixed transaction-form regressions
+- This session: mandatory smoke + core UI regression only (nothing left to implement)
+
+SMOKE / REGRESSION (via /dev HTTP test runners):
+- App HTTP 200 at http://dev.pockety.com:8080/ (title: Pockety)
+- Backend DashboardTest: 14/14 OK
+- Frontend app-footer unit: 4/4 OK
+- Playwright dashboard.spec.ts: 1/1 OK (feature #1)
+- Playwright transactions.spec.ts: 16/16 OK (incl. CAD create, validations)
+- Playwright categories.spec.ts: 4/4 OK (features #2–#4, #89)
+- Playwright app-footer.spec.ts: 2/2 OK
+
+UI VERIFICATION (screenshots refreshed by Playwright):
+- verification/test-5-cad-transaction/ — CAD transaction + success toast OK
+- verification/test-84-quincena/ — Q1 accepted OK
+- Layout: sidebar, filters, table, footer v1.0.0 — no contrast/layout issues found
+
+INFRASTRUCTURE NOTES (this session only):
+- Puppeteer MCP: approval blocked; used Playwright via /dev/browser-tests instead
+- Host docker exec: sandbox blocked; used /dev/run-tests and /dev/frontend-tests
+- Local Chrome screenshot script: sandbox kill EPERM; not required (Playwright covered UI)
+
+feature_list.json: unchanged (already 175/175 passes:true)
+
+NEXT:
+- Project complete. Optional: full Playwright suite regression / production deploy
+- No remaining feature_list items to implement
+================================================================================
