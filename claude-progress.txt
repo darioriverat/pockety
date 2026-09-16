@@ -4160,3 +4160,32 @@ PROGRESS: 103 of 175 tests passing (72 remaining)
 NEXT: Test #102 — Dashboard assets vs liabilities chart
 STATUS: Clean, stable. See SESSION-51-SUMMARY.md.
 
+
+
+================================================================================
+SESSION 52 - Dashboard Assets vs Liabilities Chart (2026-09-15)
+================================================================================
+
+SMOKE VERIFICATION (before new work):
+- Backend DashboardTest: 8/8 (via /dev/run-tests)
+- Frontend unit tests: all passing (via /dev/frontend-tests; flaky Radix focus-scope needed one retry)
+- Browser smoke: feature 1* (via /dev/browser-tests)
+- Puppeteer MCP: blocked by Local SDK approval this session; UI verified via Playwright screenshots
+
+IMPLEMENTED & VERIFIED:
+- Test #102: Dashboard shows chart of assets vs liabilities over time
+  - Last 12 months ending at selected dashboard period
+  - Assets (teal) / Liabilities (amber) / Equity (blue) lines + points
+  - Interactive hover tooltip with CAD values
+  - Clear legend and range label
+
+KEY CHANGES:
+- DashboardService::getAssetsLiabilitiesTrend()
+- DashboardController passes assets_liabilities_chart
+- dashboard.tsx SVG chart with hover state
+- setup.ts flushes Radix FocusScope unmount timer after cleanup
+- Backend/FE/browser tests + screenshots in verification/test-102-assets-liabilities-chart/
+
+PROGRESS: 104 of 175 tests passing (71 remaining)
+NEXT: Test #103 - Dashboard top spending categories
+STATUS: Clean, stable. See SESSION-52-SUMMARY.md.

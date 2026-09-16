@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import AppLayout from '@/layouts/app-layout';
 import Dashboard from '@/pages/dashboard';
@@ -37,6 +37,17 @@ type MockPage = {
                 period: string;
                 income_cad: number;
                 expenses_cad: number;
+            }>;
+        };
+        assets_liabilities_chart: {
+            months: number;
+            from: string;
+            to: string;
+            periods: Array<{
+                period: string;
+                assets_cad: number;
+                liabilities_cad: number;
+                equity_cad: number;
             }>;
         };
     };
@@ -91,6 +102,25 @@ const mockPage: MockPage = {
                 { period: '202601', income_cad: 5000, expenses_cad: 2000 },
             ],
         },
+        assets_liabilities_chart: {
+            months: 12,
+            from: '202502',
+            to: '202601',
+            periods: [
+                { period: '202502', assets_cad: 12000, liabilities_cad: 2500, equity_cad: 9500 },
+                { period: '202503', assets_cad: 12500, liabilities_cad: 2600, equity_cad: 9900 },
+                { period: '202504', assets_cad: 13000, liabilities_cad: 2700, equity_cad: 10300 },
+                { period: '202505', assets_cad: 13200, liabilities_cad: 2800, equity_cad: 10400 },
+                { period: '202506', assets_cad: 13500, liabilities_cad: 2750, equity_cad: 10750 },
+                { period: '202507', assets_cad: 14000, liabilities_cad: 2900, equity_cad: 11100 },
+                { period: '202508', assets_cad: 14200, liabilities_cad: 3000, equity_cad: 11200 },
+                { period: '202509', assets_cad: 14500, liabilities_cad: 3100, equity_cad: 11400 },
+                { period: '202510', assets_cad: 14700, liabilities_cad: 3050, equity_cad: 11650 },
+                { period: '202511', assets_cad: 14800, liabilities_cad: 3200, equity_cad: 11600 },
+                { period: '202512', assets_cad: 14900, liabilities_cad: 3100, equity_cad: 11800 },
+                { period: '202601', assets_cad: 15000, liabilities_cad: 3000, equity_cad: 12000 },
+            ],
+        },
     },
 };
 
@@ -140,14 +170,16 @@ vi.mock('@inertiajs/react', () => {
 
 function renderDashboard(
     summary = mockPage.props.summary,
-    chart = mockPage.props.income_expense_chart,
+    incomeExpenseChart = mockPage.props.income_expense_chart,
+    assetsLiabilitiesChart = mockPage.props.assets_liabilities_chart,
 ) {
     return render(
         <TooltipProvider delayDuration={0}>
             <AppLayout breadcrumbs={Dashboard.layout.breadcrumbs}>
                 <Dashboard
                     summary={summary}
-                    income_expense_chart={chart}
+                    income_expense_chart={incomeExpenseChart}
+                    assets_liabilities_chart={assetsLiabilitiesChart}
                 />
             </AppLayout>
         </TooltipProvider>,
@@ -206,7 +238,7 @@ describe('Dashboard feature', () => {
     it('displays equity card', () => {
         renderDashboard();
 
-        expect(screen.getByText('Equity')).toBeDefined();
+        expect(screen.getAllByText('Equity').length).toBeGreaterThan(0);
         expect(screen.getByText('$12,000.00')).toBeDefined();
     });
 
@@ -282,5 +314,33 @@ describe('Dashboard feature', () => {
         expect(
             screen.getByTestId('income-expense-chart-legend').textContent,
         ).toMatch(/Expenses/);
+    });
+
+    it('displays assets vs liabilities chart with equity and hover values', () => {
+        renderDashboard();
+
+        expect(screen.getByText('Assets vs Liabilities')).toBeDefined();
+        expect(screen.getByTestId('assets-liabilities-chart')).toBeDefined();
+        expect(screen.getByTestId('assets-liabilities-chart-legend')).toBeDefined();
+        expect(screen.getByTestId('al-chart-line-assets')).toBeDefined();
+        expect(screen.getByTestId('al-chart-line-liabilities')).toBeDefined();
+        expect(screen.getByTestId('al-chart-line-equity')).toBeDefined();
+        expect(
+            screen.getByTestId('assets-liabilities-chart-range').textContent,
+        ).toMatch(/Last 12 months/i);
+        expect(screen.getByTestId('al-chart-period-202601')).toBeDefined();
+        expect(screen.getByTestId('al-chart-point-equity-202601')).toBeDefined();
+
+        fireEvent.mouseEnter(screen.getByTestId('al-chart-hit-202601'));
+        expect(screen.getByTestId('assets-liabilities-hover-tooltip')).toBeDefined();
+        expect(
+            screen.getByTestId('assets-liabilities-hover-tooltip').textContent,
+        ).toMatch(/Assets/i);
+        expect(
+            screen.getByTestId('assets-liabilities-hover-tooltip').textContent,
+        ).toMatch(/Liabilities/i);
+        expect(
+            screen.getByTestId('assets-liabilities-hover-tooltip').textContent,
+        ).toMatch(/Equity/i);
     });
 });

@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 import { dashboard } from '@/routes';
 import {
     TrendingUpIcon,
@@ -42,9 +43,24 @@ interface IncomeExpenseChart {
     periods: IncomeExpensePeriod[];
 }
 
+interface AssetsLiabilitiesPeriod {
+    period: string;
+    assets_cad: number;
+    liabilities_cad: number;
+    equity_cad: number;
+}
+
+interface AssetsLiabilitiesChart {
+    months: number;
+    from: string;
+    to: string;
+    periods: AssetsLiabilitiesPeriod[];
+}
+
 interface DashboardProps {
     summary: DashboardSummary;
     income_expense_chart: IncomeExpenseChart;
+    assets_liabilities_chart: AssetsLiabilitiesChart;
 }
 
 function formatPeriodShort(period: string): string {
@@ -52,6 +68,14 @@ function formatPeriodShort(period: string): string {
     const month = period.substring(4, 6);
     const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1);
     return date.toLocaleDateString('en-US', { year: '2-digit', month: 'short' });
+}
+
+function formatCadCompact(amount: number): string {
+    return new Intl.NumberFormat('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+        maximumFractionDigits: 0,
+    }).format(amount);
 }
 
 function IncomeExpenseTrendChart({
@@ -206,9 +230,203 @@ function IncomeExpenseTrendChart({
     );
 }
 
+function AssetsLiabilitiesTrendChart({
+    chart,
+}: {
+    chart: AssetsLiabilitiesChart;
+}) {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    const width = 900;
+    const height = 300;
+    const padding = { top: 24, right: 24, bottom: 40, left: 64 };
+    const innerWidth = width - padding.left - padding.right;
+    const innerHeight = height - padding.top - padding.bottom;
+    const periods = chart.periods;
+
+    const values = periods.flatMap((p) => [
+        p.assets_cad,
+        p.liabilities_cad,
+        p.equity_cad,
+    ]);
+    const maxValue = Math.max(...values, 1);
+    const minValue = Math.min(0, ...values);
+    const range = maxValue - minValue || 1;
+
+    const groupWidth = periods.length > 0 ? innerWidth / periods.length : innerWidth;
+    const xFor = (index: number) =>
+        padding.left + index * groupWidth + groupWidth / 2;
+    const yFor = (value: number) =>
+        padding.top + ((maxValue - value) / range) * innerHeight;
+
+    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => minValue + range * t);
+    const labelStep = Math.max(1, Math.ceil(periods.length / 8));
+    const hovered = hoveredIndex !== null ? periods[hoveredIndex] : null;
+
+    const buildPath = (selector: (p: AssetsLiabilitiesPeriod) => number) =>
+        periods
+            .map((period, index) => {
+                const x = xFor(index);
+                const y = yFor(selector(period));
+                return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+            })
+            .join(' ');
+
+    return (
+        <div className="relative" data-testid="assets-liabilities-chart-wrap">
+            {hovered && hoveredIndex !== null && (
+                <div
+                    className="pointer-events-none absolute z-10 rounded-md border bg-background px-3 py-2 text-xs shadow-md"
+                    data-testid="assets-liabilities-hover-tooltip"
+                    style={{
+                        left: `${Math.min(92, Math.max(8, (xFor(hoveredIndex) / width) * 100))}%`,
+                        top: 8,
+                        transform: 'translateX(-50%)',
+                    }}
+                >
+                    <p className="font-medium">
+                        {formatPeriodShort(hovered.period)}
+                    </p>
+                    <p className="text-teal-700 dark:text-teal-400">
+                        Assets: {formatCadCompact(hovered.assets_cad)}
+                    </p>
+                    <p className="text-amber-700 dark:text-amber-400">
+                        Liabilities: {formatCadCompact(hovered.liabilities_cad)}
+                    </p>
+                    <p className="text-blue-700 dark:text-blue-400">
+                        Equity: {formatCadCompact(hovered.equity_cad)}
+                    </p>
+                </div>
+            )}
+            <svg
+                viewBox={`0 0 ${width} ${height}`}
+                role="img"
+                aria-label="Assets versus liabilities and equity chart for the last 12 months"
+                data-testid="assets-liabilities-chart"
+                className="h-auto w-full"
+                onMouseLeave={() => setHoveredIndex(null)}
+            >
+                <rect x={0} y={0} width={width} height={height} fill="transparent" />
+                {yTicks.map((tick) => {
+                    const y = yFor(tick);
+                    return (
+                        <g key={tick}>
+                            <line
+                                x1={padding.left}
+                                x2={width - padding.right}
+                                y1={y}
+                                y2={y}
+                                stroke="currentColor"
+                                strokeOpacity={0.12}
+                            />
+                            <text
+                                x={padding.left - 8}
+                                y={y + 4}
+                                textAnchor="end"
+                                className="fill-muted-foreground"
+                                fontSize="11"
+                            >
+                                {new Intl.NumberFormat('en-CA', {
+                                    notation: 'compact',
+                                    maximumFractionDigits: 1,
+                                }).format(tick)}
+                            </text>
+                        </g>
+                    );
+                })}
+                <path
+                    d={buildPath((p) => p.assets_cad)}
+                    fill="none"
+                    stroke="#0f766e"
+                    strokeWidth="2.5"
+                    data-testid="al-chart-line-assets"
+                />
+                <path
+                    d={buildPath((p) => p.liabilities_cad)}
+                    fill="none"
+                    stroke="#b45309"
+                    strokeWidth="2.5"
+                    data-testid="al-chart-line-liabilities"
+                />
+                <path
+                    d={buildPath((p) => p.equity_cad)}
+                    fill="none"
+                    stroke="#1d4ed8"
+                    strokeWidth="2.5"
+                    data-testid="al-chart-line-equity"
+                />
+                {periods.map((period, index) => {
+                    const x = xFor(index);
+                    const isHovered = hoveredIndex === index;
+
+                    return (
+                        <g
+                            key={period.period}
+                            data-testid={`al-chart-period-${period.period}`}
+                        >
+                            <circle
+                                cx={x}
+                                cy={yFor(period.assets_cad)}
+                                r={isHovered ? 5 : 3}
+                                fill="#0f766e"
+                                data-testid={`al-chart-point-assets-${period.period}`}
+                            />
+                            <circle
+                                cx={x}
+                                cy={yFor(period.liabilities_cad)}
+                                r={isHovered ? 5 : 3}
+                                fill="#b45309"
+                                data-testid={`al-chart-point-liabilities-${period.period}`}
+                            />
+                            <circle
+                                cx={x}
+                                cy={yFor(period.equity_cad)}
+                                r={isHovered ? 5 : 3}
+                                fill="#1d4ed8"
+                                data-testid={`al-chart-point-equity-${period.period}`}
+                            />
+                            <rect
+                                x={x - groupWidth / 2}
+                                y={padding.top}
+                                width={groupWidth}
+                                height={innerHeight}
+                                fill="transparent"
+                                className="cursor-crosshair"
+                                data-testid={`al-chart-hit-${period.period}`}
+                                onMouseEnter={() => setHoveredIndex(index)}
+                            >
+                                <title>
+                                    {formatPeriodShort(period.period)} — Assets:{' '}
+                                    {period.assets_cad.toFixed(2)} CAD,
+                                    Liabilities:{' '}
+                                    {period.liabilities_cad.toFixed(2)} CAD,
+                                    Equity: {period.equity_cad.toFixed(2)} CAD
+                                </title>
+                            </rect>
+                            {(index % labelStep === 0 ||
+                                index === periods.length - 1) && (
+                                <text
+                                    x={x}
+                                    y={height - 12}
+                                    textAnchor="middle"
+                                    className="fill-muted-foreground"
+                                    fontSize="11"
+                                >
+                                    {formatPeriodShort(period.period)}
+                                </text>
+                            )}
+                        </g>
+                    );
+                })}
+            </svg>
+        </div>
+    );
+}
+
 export default function Dashboard({
     summary,
     income_expense_chart,
+    assets_liabilities_chart,
 }: DashboardProps) {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-CA', {
@@ -382,6 +600,51 @@ export default function Dashboard({
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Assets vs Liabilities Chart */}
+                <Card data-testid="assets-liabilities-chart-card">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <LineChart className="h-5 w-5" />
+                            Assets vs Liabilities
+                        </CardTitle>
+                        <CardDescription data-testid="assets-liabilities-chart-range">
+                            Last {assets_liabilities_chart.months} months (
+                            {formatPeriodShort(assets_liabilities_chart.from)} →{' '}
+                            {formatPeriodShort(assets_liabilities_chart.to)}) · CAD
+                        </CardDescription>
+                        <div
+                            className="mt-2 flex flex-wrap gap-4 text-sm"
+                            data-testid="assets-liabilities-chart-legend"
+                            role="list"
+                            aria-label="Assets liabilities chart legend"
+                        >
+                            <span className="inline-flex items-center gap-2" role="listitem">
+                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-teal-700" />
+                                Assets
+                            </span>
+                            <span className="inline-flex items-center gap-2" role="listitem">
+                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-700" />
+                                Liabilities
+                            </span>
+                            <span className="inline-flex items-center gap-2" role="listitem">
+                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-blue-700" />
+                                Equity
+                            </span>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {assets_liabilities_chart.periods.length > 0 ? (
+                            <AssetsLiabilitiesTrendChart
+                                chart={assets_liabilities_chart}
+                            />
+                        ) : (
+                            <p className="text-muted-foreground text-sm">
+                                No period data available for the chart.
+                            </p>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* Reconciliation Status Card */}
                 <Card>

@@ -94,6 +94,49 @@ class DashboardService
         ];
     }
 
+    /**
+     * Assets vs liabilities (and equity) trend for the last N months ending at $endPeriod.
+     *
+     * @return array{
+     *     months: int,
+     *     from: string,
+     *     to: string,
+     *     periods: list<array{
+     *         period: string,
+     *         assets_cad: float,
+     *         liabilities_cad: float,
+     *         equity_cad: float
+     *     }>
+     * }
+     */
+    public function getAssetsLiabilitiesTrend(string $endPeriod, int $months = 12): array
+    {
+        $months = max(6, min(12, $months));
+
+        $end = Carbon::createFromFormat('Ym', $endPeriod)->startOfMonth();
+        $periodRows = [];
+
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $period = $end->copy()->subMonths($i)->format('Ym');
+            $exchangeRate = $this->resolveExchangeRate($period);
+            [$assets, $liabilities] = $this->calculateAssetsAndLiabilities($period, $exchangeRate);
+
+            $periodRows[] = [
+                'period' => $period,
+                'assets_cad' => round($assets, 2),
+                'liabilities_cad' => round($liabilities, 2),
+                'equity_cad' => round($assets - $liabilities, 2),
+            ];
+        }
+
+        return [
+            'months' => $months,
+            'from' => $periodRows[0]['period'],
+            'to' => $periodRows[count($periodRows) - 1]['period'],
+            'periods' => $periodRows,
+        ];
+    }
+
     private function resolveExchangeRate(string $period): ExchangeRate
     {
         $exchangeRate = ExchangeRate::forPeriod($period);

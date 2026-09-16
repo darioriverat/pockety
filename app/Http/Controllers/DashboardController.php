@@ -28,10 +28,12 @@ class DashboardController extends Controller
 
         $summary = $this->dashboardService->getSummary($period);
         $incomeExpenseChart = $this->dashboardService->getIncomeExpenseTrend($period, 12);
+        $assetsLiabilitiesChart = $this->dashboardService->getAssetsLiabilitiesTrend($period, 12);
 
         return Inertia::render('dashboard', [
             'summary' => $summary,
             'income_expense_chart' => $incomeExpenseChart,
+            'assets_liabilities_chart' => $assetsLiabilitiesChart,
         ]);
     }
 }

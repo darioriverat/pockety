@@ -2,8 +2,11 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
-afterEach(() => {
+afterEach(async () => {
     cleanup();
+    // Flush Radix FocusScope unmount autofocus timeout so jsdom
+    // does not dispatch CustomEvent after the test finishes.
+    await new Promise((resolve) => setTimeout(resolve, 0));
 });
 
 Object.defineProperty(window, 'matchMedia', {

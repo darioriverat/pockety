@@ -316,4 +316,80 @@ class DashboardTest extends TestCase
             ->where('income_expense_chart.periods.6.expenses_cad', 1200)
         );
     }
+
+    public function test_dashboard_displays_assets_vs_liabilities_chart_over_time(): void
+    {
+        $endPeriod = '202606';
+
+        ExchangeRate::create([
+            'period' => '202601',
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+        ExchangeRate::create([
+            'period' => '202606',
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        $assetAccount = Account::factory()->create([
+            'type' => 'bank',
+            'name' => 'Chart Asset Account',
+        ]);
+        $liabilityAccount = Account::factory()->create([
+            'type' => 'liability',
+            'name' => 'Chart Liability Account',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $assetAccount->id,
+            'period' => '202601',
+            'recorded_balance_cad' => 10000.00,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+        AccountBalance::create([
+            'account_id' => $liabilityAccount->id,
+            'period' => '202601',
+            'recorded_balance_cad' => 2000.00,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $assetAccount->id,
+            'period' => '202606',
+            'recorded_balance_cad' => 15000.00,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+        AccountBalance::create([
+            'account_id' => $liabilityAccount->id,
+            'period' => '202606',
+            'recorded_balance_cad' => 3500.00,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        $response = $this->get(route('dashboard', ['period' => $endPeriod]));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard')
+            ->where('assets_liabilities_chart.months', 12)
+            ->where('assets_liabilities_chart.from', '202507')
+            ->where('assets_liabilities_chart.to', '202606')
+            ->has('assets_liabilities_chart.periods', 12)
+            ->where('assets_liabilities_chart.periods.11.period', '202606')
+            ->where('assets_liabilities_chart.periods.11.assets_cad', 15000)
+            ->where('assets_liabilities_chart.periods.11.liabilities_cad', 3500)
+            ->where('assets_liabilities_chart.periods.11.equity_cad', 11500)
+            ->where('assets_liabilities_chart.periods.6.period', '202601')
+            ->where('assets_liabilities_chart.periods.6.assets_cad', 10000)
+            ->where('assets_liabilities_chart.periods.6.liabilities_cad', 2000)
+            ->where('assets_liabilities_chart.periods.6.equity_cad', 8000)
+        );
+    }
 }

@@ -1219,7 +1219,7 @@
       "Step 4: Verify equity can be visualized",
       "Step 5: Verify chart is interactive (hover for values)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
