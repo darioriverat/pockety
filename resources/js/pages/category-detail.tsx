@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { formatCurrencyAmount } from '@/lib/currency';
 import { ArrowLeft, Tags } from 'lucide-react';
 
 interface Category {
@@ -66,18 +67,8 @@ interface CategoryTransactionsResponse {
     };
 }
 
-const formatCurrency = (value: number, currency: string): string => {
-    try {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(value);
-    } catch {
-        return `${currency} ${value.toFixed(2)}`;
-    }
-};
+const formatCurrency = (value: number, currency: string): string =>
+    formatCurrencyAmount(value, currency);
 
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString + 'T00:00:00');

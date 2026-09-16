@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
+import { formatDisplayCurrency } from '@/lib/currency';
 import { Upload, CheckCircle, XCircle, Database } from 'lucide-react';
 
 interface ImportResult {
@@ -67,12 +68,7 @@ interface AccountImportStatistics {
 }
 
 function formatCad(value: number): string {
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(value);
+    return formatDisplayCurrency(value, 'CAD');
 }
 
 export default function Import() {

@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { formatCurrencyAmount } from '@/lib/currency';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 interface Account {
@@ -57,18 +58,8 @@ interface TransactionsResponse {
     };
 }
 
-const formatCurrency = (value: number, currency: string): string => {
-    try {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(value);
-    } catch {
-        return `${currency} ${value.toFixed(2)}`;
-    }
-};
+const formatCurrency = (value: number, currency: string): string =>
+    formatCurrencyAmount(value, currency);
 
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);

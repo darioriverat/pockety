@@ -28,6 +28,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { formatCurrencyAmount } from '@/lib/currency';
 import { PlusIcon, Building2, Wallet } from 'lucide-react';
 
 interface Account {
@@ -82,16 +83,8 @@ const emptyBalanceForm: BalanceFormData = {
     notes: '',
 };
 
-const formatCurrency = (value: number, currency: string): string => {
-    try {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-        }).format(value);
-    } catch {
-        return value.toFixed(2);
-    }
-};
+const formatCurrency = (value: number, currency: string): string =>
+    formatCurrencyAmount(value, currency);
 
 export default function Accounts() {
     const [accounts, setAccounts] = useState<Account[]>([]);

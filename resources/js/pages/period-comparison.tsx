@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatDisplayCurrency } from '@/lib/currency';
 import {
     ArrowLeftRight,
     CalendarRange,
@@ -55,10 +56,7 @@ interface ComparisonData {
 }
 
 function formatCad(value: number): string {
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-    }).format(value);
+    return formatDisplayCurrency(value, 'CAD');
 }
 
 function formatPercent(value: number | null): string {

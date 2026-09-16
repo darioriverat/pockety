@@ -21,6 +21,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import { formatCurrencyAmount } from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import {
     CheckCircle,
@@ -57,13 +58,7 @@ interface ReportTotals {
 }
 
 function formatCad(value: number | null | undefined): string {
-    if (value === null || value === undefined) {
-        return '—';
-    }
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-    }).format(value);
+    return formatCurrencyAmount(value, 'CAD');
 }
 
 export default function Budgets() {

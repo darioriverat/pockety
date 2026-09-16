@@ -19,6 +19,10 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import {
+    formatCurrencyAmount,
+    type DisplayCurrency,
+} from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import {
     Download,
@@ -64,16 +68,9 @@ interface BalanceSheetData {
 
 function formatMoney(
     value: number | null | undefined,
-    currency: 'CAD' | 'USD' | 'COP',
+    currency: DisplayCurrency,
 ): string {
-    if (value === null || value === undefined) {
-        return '—';
-    }
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency,
-        maximumFractionDigits: currency === 'COP' ? 0 : 2,
-    }).format(value);
+    return formatCurrencyAmount(value, currency);
 }
 
 function typeLabel(type: string): string {

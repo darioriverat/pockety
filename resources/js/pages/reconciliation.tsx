@@ -27,6 +27,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { usePeriod } from '@/hooks/use-period';
+import { formatCurrencyAmount } from '@/lib/currency';
 import {
     ScaleIcon,
     AlertTriangle,
@@ -78,16 +79,8 @@ interface ReconciliationReport {
 
 const VARIANCE_WARNING_THRESHOLD = 10.0;
 
-const formatCurrency = (value: number, currency: string): string => {
-    try {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-        }).format(value);
-    } catch {
-        return value.toFixed(2);
-    }
-};
+const formatCurrency = (value: number, currency: string): string =>
+    formatCurrencyAmount(value, currency);
 
 /**
  * Check if any variance in the account exceeds the warning threshold.

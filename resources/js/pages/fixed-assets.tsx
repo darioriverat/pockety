@@ -21,6 +21,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { formatDisplayCurrency } from '@/lib/currency';
 import { PlusIcon, Car, Calendar } from 'lucide-react';
 
 interface FixedAsset {
@@ -66,12 +67,8 @@ const emptyValuationForm: ValuationFormData = {
     depreciation_cad: '0',
 };
 
-const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-    }).format(value);
-};
+const formatCurrency = (value: number): string =>
+    formatDisplayCurrency(value, 'CAD');
 
 const formatPeriod = (period: string): string => {
     if (period.length !== 6) return period;

@@ -10,6 +10,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
+import { formatCurrencyAmount } from '@/lib/currency';
 import {
     ArrowLeft,
     LineChart,
@@ -57,13 +58,7 @@ function formatPeriod(period: string): string {
 }
 
 function formatCad(value: number | null | undefined): string {
-    if (value === null || value === undefined) {
-        return '—';
-    }
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-    }).format(value);
+    return formatCurrencyAmount(value, 'CAD');
 }
 
 function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {

@@ -16,6 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { FileText, TrendingDown, TrendingUp } from 'lucide-react';
+import { formatDisplayCurrency } from '@/lib/currency';
 
 interface YtdTotals {
     year: number;
@@ -33,10 +34,7 @@ interface ReportsYtdPageProps {
 }
 
 function formatCad(value: number): string {
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-    }).format(value);
+    return formatDisplayCurrency(value, 'CAD');
 }
 
 function formatPeriod(period: string): string {

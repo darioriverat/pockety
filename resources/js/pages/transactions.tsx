@@ -34,6 +34,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
 import { useCategoryLanguage } from '@/hooks/use-category-language';
 import { usePeriod } from '@/hooks/use-period';
+import { formatCurrencyAmount } from '@/lib/currency';
 import {
     formatPeriod,
     generatePeriods,
@@ -730,17 +731,7 @@ export default function Transactions() {
     const formatCurrency = (
         amount: number | null,
         currency: string | null
-    ) => {
-        if (amount === null || currency === null) {
-            return '—';
-        }
-
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: currency,
-            minimumFractionDigits: 2,
-        }).format(amount);
-    };
+    ) => formatCurrencyAmount(amount, currency);
 
     const clearFilters = () => {
         setDetailCategoryCode(null);

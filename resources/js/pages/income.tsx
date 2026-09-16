@@ -1,4 +1,5 @@
 import { usePeriod } from '@/hooks/use-period';
+import { formatCurrencyAmount } from '@/lib/currency';
 import { isValidPeriod } from '@/lib/periods';
 import { cn } from '@/lib/utils';
 import { Head } from '@inertiajs/react';
@@ -53,17 +54,8 @@ const emptyForm: IncomeFormData = {
     notes: '',
 };
 
-const formatCurrency = (value: number, currency: string): string => {
-    try {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-            maximumFractionDigits: currency === 'COP' ? 0 : 2,
-        }).format(value);
-    } catch {
-        return value.toFixed(2);
-    }
-};
+const formatCurrency = (value: number, currency: string): string =>
+    formatCurrencyAmount(value, currency);
 
 const formatPeriodLabel = (period: string): string => {
     if (!/^\d{6}$/.test(period)) {

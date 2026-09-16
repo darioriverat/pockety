@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import { ChartColumn, RefreshCw, XCircle } from 'lucide-react';
 
@@ -41,10 +42,7 @@ interface CategoryActualsMeta {
 }
 
 function formatCad(value: number): string {
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-    }).format(value);
+    return formatDisplayCurrency(value, 'CAD');
 }
 
 export default function CategoryActuals() {

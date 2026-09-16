@@ -10,6 +10,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
+import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod } from '@/lib/periods';
 import { CalendarRange, Receipt, XCircle, ArrowLeftRight } from 'lucide-react';
 
@@ -27,10 +28,7 @@ interface PeriodHistoryData {
 }
 
 function formatCad(value: number): string {
-    return new Intl.NumberFormat('en-CA', {
-        style: 'currency',
-        currency: 'CAD',
-    }).format(value);
+    return formatDisplayCurrency(value, 'CAD');
 }
 
 export default function PeriodsHistory() {

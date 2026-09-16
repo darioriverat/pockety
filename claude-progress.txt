@@ -5243,3 +5243,36 @@ STATUS / NEXT:
 - Completion: 147/175 passing; 28 pending.
 - Next: index 147, currency amount formatting (thousand separators / decimals).
 - Development data preserved; reset-test-user + seed-browser used for smoke only.
+
+=== Session 79 (2026-09-16) ===
+
+GOAL: Complete currency amount formatting (feature index 147).
+
+ENVIRONMENT / BASELINE:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200).
+- Puppeteer MCP blocked by Local SDK approval; used /dev/browser-tests.
+- Baseline: DashboardTest 14/14; frontend 106 → 111 after new currency unit tests.
+- Table-styles regression 2/2 passed after reset-test-user.
+
+FEATURE 147:
+- Shared formatDisplayCurrency / formatCurrencyAmount in resources/js/lib/currency.ts:
+  CAD/USD → 2 decimals with comma thousand separators (e.g. $1,234.56).
+  COP → 0 decimals with comma separators (e.g. COP 2,000,000).
+  Stopped using es-CO locale (period grouping) so COP matches product rules.
+- Migrated pages to shared formatter: transactions, income, balance sheet,
+  reconciliation, accounts, account-detail, category-detail, fixed-assets,
+  financial-summary, dashboard activity, budgets, reports, periods, import, etc.
+- Added resources/js/lib/currency.test.ts (5 cases).
+- Added tests/browser/currency-format.spec.ts (transactions + balance sheet).
+
+VERIFICATION:
+- Frontend: 111 tests passed.
+- Browser: currency-format 2/2; table-styles regression 2/2.
+- Screenshots: verification/test-147-currency-format/
+  (CAD $1,234.56, USD $1,234.56, COP 2,000,000, balance sheet COP 75,000,000).
+- Assets rebuilt via /dev/build-assets.
+
+STATUS / NEXT:
+- Index 147 marked passing; only passes field changed in feature_list.json.
+- Completion: 148/175 passing; 27 pending.
+- Next: index 148, currency symbols displayed correctly (CAD, USD, COP or $, US$, $COP).

@@ -1767,7 +1767,7 @@
       "Step 4: Verify COP amounts show appropriate formatting (e.g., 2,000,000)",
       "Step 5: Verify thousand separators (commas) are present"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

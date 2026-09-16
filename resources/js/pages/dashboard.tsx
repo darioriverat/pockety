@@ -157,10 +157,11 @@ function formatPeriodShort(period: string): string {
 
 function formatCadCompact(amount: number, currency: DisplayCurrency = 'CAD'): string {
     return new Intl.NumberFormat(
-        currency === 'USD' ? 'en-US' : currency === 'COP' ? 'es-CO' : 'en-CA',
+        currency === 'USD' ? 'en-US' : 'en-CA',
         {
             style: 'currency',
             currency,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         },
     ).format(amount);
@@ -671,23 +672,13 @@ function TopSpendingCategoriesWidget({
 
 function formatActivityAmount(item: RecentActivityItem): string {
     if (item.amount_cad !== null && item.amount_cad !== 0) {
-        return new Intl.NumberFormat('en-CA', {
-            style: 'currency',
-            currency: 'CAD',
-        }).format(item.amount_cad);
+        return formatDisplayCurrency(item.amount_cad, 'CAD');
     }
     if (item.amount_usd !== null && item.amount_usd !== 0) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(item.amount_usd);
+        return formatDisplayCurrency(item.amount_usd, 'USD');
     }
     if (item.amount_cop !== null && item.amount_cop !== 0) {
-        return new Intl.NumberFormat('es-CO', {
-            style: 'currency',
-            currency: 'COP',
-            maximumFractionDigits: 0,
-        }).format(item.amount_cop);
+        return formatDisplayCurrency(item.amount_cop, 'COP');
     }
     return '—';
 }
