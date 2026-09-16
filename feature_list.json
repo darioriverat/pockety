@@ -1344,7 +1344,7 @@
       "Step 5: Verify amounts are displayed in CAD by default",
       "Step 6: Verify user can toggle to see other currencies"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

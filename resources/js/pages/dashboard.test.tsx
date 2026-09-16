@@ -104,11 +104,23 @@ const mockPage: MockPage = {
         summary: {
             period: '202601',
             total_income_cad: 5000.00,
+            total_income_usd: 6666.67,
+            total_income_cop: 15000000,
             total_expenses_cad: 2000.00,
+            total_expenses_usd: 2666.67,
+            total_expenses_cop: 6000000,
             net_cad: 3000.00,
+            net_usd: 4000.00,
+            net_cop: 9000000,
             total_assets_cad: 15000.00,
+            total_assets_usd: 20000.00,
+            total_assets_cop: 45000000,
             total_liabilities_cad: 3000.00,
+            total_liabilities_usd: 4000.00,
+            total_liabilities_cop: 9000000,
             equity_cad: 12000.00,
+            equity_usd: 16000.00,
+            equity_cop: 36000000,
             reconciliation_status: 'balanced',
             reconciliation_summary: {
                 balanced_count: 5,
@@ -312,16 +324,23 @@ function renderDashboard(
     assetsLiabilitiesChart = mockPage.props.assets_liabilities_chart,
     topSpendingCategories = mockPage.props.top_spending_categories,
     recentActivity = mockPage.props.recent_activity,
+    options: {
+        defaultCurrency?: string;
+        displayCurrency?: string;
+    } = {},
 ) {
     return render(
         <TooltipProvider delayDuration={0}>
             <AppLayout breadcrumbs={Dashboard.layout.breadcrumbs}>
                 <Dashboard
-                    summary={summary}
-                    income_expense_chart={incomeExpenseChart}
-                    assets_liabilities_chart={assetsLiabilitiesChart}
-                    top_spending_categories={topSpendingCategories}
+                    summary={summary as never}
+                    income_expense_chart={incomeExpenseChart as never}
+                    assets_liabilities_chart={assetsLiabilitiesChart as never}
+                    top_spending_categories={topSpendingCategories as never}
                     recent_activity={recentActivity}
+                    default_currency={options.defaultCurrency ?? 'CAD'}
+                    display_currency={options.displayCurrency ?? options.defaultCurrency ?? 'CAD'}
+                    available_currencies={['CAD', 'USD', 'COP']}
                 />
             </AppLayout>
         </TooltipProvider>,
@@ -567,5 +586,49 @@ describe('Dashboard feature', () => {
 
         expect(screen.getByTestId('recent-activity-empty')).toBeDefined();
         expect(screen.getByText(/No recent activity yet/i)).toBeDefined();
+    });
+
+    it('defaults display currency from preferences and allows toggling', () => {
+        renderDashboard(
+            mockPage.props.summary,
+            mockPage.props.income_expense_chart,
+            mockPage.props.assets_liabilities_chart,
+            mockPage.props.top_spending_categories,
+            mockPage.props.recent_activity,
+            { defaultCurrency: 'CAD', displayCurrency: 'CAD' },
+        );
+
+        expect(screen.getByTestId('currency-toggle')).toBeDefined();
+        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
+            /\$5,000\.00/,
+        );
+
+        fireEvent.click(screen.getByTestId('currency-toggle-usd'));
+        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
+            /US\$6,666\.67|\$6,666\.67/,
+        );
+
+        fireEvent.click(screen.getByTestId('currency-toggle-cop'));
+        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
+            /15[,.]000[,.]000|\$15,000,000/,
+        );
+    });
+
+    it('initializes from user default currency preference', () => {
+        renderDashboard(
+            mockPage.props.summary,
+            mockPage.props.income_expense_chart,
+            mockPage.props.assets_liabilities_chart,
+            mockPage.props.top_spending_categories,
+            mockPage.props.recent_activity,
+            { defaultCurrency: 'USD', displayCurrency: 'USD' },
+        );
+
+        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
+            /US\$6,666\.67|\$6,666\.67/,
+        );
+        expect(screen.getByTestId('income-expense-chart-range').textContent).toMatch(
+            /USD/,
+        );
     });
 });

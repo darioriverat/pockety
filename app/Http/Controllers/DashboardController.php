@@ -26,6 +26,17 @@ class DashboardController extends Controller
             $period = now()->format('Ym');
         }
 
+        $user = $request->user();
+        $defaultCurrency = $user?->default_currency ?? 'CAD';
+        if (! in_array($defaultCurrency, ['CAD', 'USD', 'COP'], true)) {
+            $defaultCurrency = 'CAD';
+        }
+
+        $displayCurrency = strtoupper((string) $request->query('currency', $defaultCurrency));
+        if (! in_array($displayCurrency, ['CAD', 'USD', 'COP'], true)) {
+            $displayCurrency = $defaultCurrency;
+        }
+
         $summary = $this->dashboardService->getSummary($period);
         $incomeExpenseChart = $this->dashboardService->getIncomeExpenseTrend($period, 12);
         $assetsLiabilitiesChart = $this->dashboardService->getAssetsLiabilitiesTrend($period, 12);
@@ -38,6 +49,9 @@ class DashboardController extends Controller
             'assets_liabilities_chart' => $assetsLiabilitiesChart,
             'top_spending_categories' => $topSpendingCategories,
             'recent_activity' => $recentActivity,
+            'default_currency' => $defaultCurrency,
+            'display_currency' => $displayCurrency,
+            'available_currencies' => ['CAD', 'USD', 'COP'],
         ]);
     }
 }

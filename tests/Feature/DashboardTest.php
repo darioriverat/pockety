@@ -597,4 +597,54 @@ class DashboardTest extends TestCase
             ->has('recent_activity.items', 15)
         );
     }
+
+    public function test_dashboard_includes_default_currency_and_multi_currency_amounts(): void
+    {
+        $period = '202601';
+        $this->user->update(['default_currency' => 'USD']);
+
+        ExchangeRate::create([
+            'period' => $period,
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        Income::create([
+            'period' => $period,
+            'description' => 'Salary',
+            'line_number' => 1,
+            'amount_cad' => 5000.00,
+            'amount_usd' => 0,
+            'amount_cop' => 0,
+        ]);
+
+        $response = $this->get(route('dashboard', ['period' => $period]));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard')
+            ->where('default_currency', 'USD')
+            ->where('display_currency', 'USD')
+            ->where('available_currencies', ['CAD', 'USD', 'COP'])
+            ->where('summary.total_income_cad', 5000)
+            ->where('summary.total_income_usd', 6666.67)
+            ->where('summary.total_income_cop', 15000000)
+            ->has('summary.exchange_rates')
+        );
+    }
+
+    public function test_dashboard_currency_query_overrides_default_display_currency(): void
+    {
+        $this->user->update(['default_currency' => 'CAD']);
+
+        $response = $this->get(route('dashboard', ['currency' => 'COP']));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard')
+            ->where('default_currency', 'CAD')
+            ->where('display_currency', 'COP')
+        );
+    }
 }

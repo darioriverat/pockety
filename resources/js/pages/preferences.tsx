@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2 } from 'lucide-react';
+import { update as updatePreferences } from '@/routes/preferences';
 
 interface User {
     id: number;
@@ -37,7 +38,7 @@ export default function Preferences({ user, available_currencies }: PreferencesP
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        post(route('preferences.update'));
+        post(updatePreferences.url());
     }
 
     return (
@@ -45,8 +46,8 @@ export default function Preferences({ user, available_currencies }: PreferencesP
             <Head title="Preferences" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <Card>
+                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+                    <Card data-testid="preferences-card">
                         <CardHeader>
                             <CardTitle>User Preferences</CardTitle>
                             <CardDescription>
@@ -54,7 +55,11 @@ export default function Preferences({ user, available_currencies }: PreferencesP
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={submit} className="space-y-6">
+                            <form
+                                onSubmit={submit}
+                                className="space-y-6"
+                                data-testid="preferences-form"
+                            >
                                 <div className="space-y-2">
                                     <Label htmlFor="default_currency">
                                         Default Currency
@@ -65,7 +70,10 @@ export default function Preferences({ user, available_currencies }: PreferencesP
                                             setData('default_currency', value)
                                         }
                                     >
-                                        <SelectTrigger id="default_currency">
+                                        <SelectTrigger
+                                            id="default_currency"
+                                            data-testid="default-currency-select"
+                                        >
                                             <SelectValue placeholder="Select currency" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -73,6 +81,7 @@ export default function Preferences({ user, available_currencies }: PreferencesP
                                                 <SelectItem
                                                     key={currency}
                                                     value={currency}
+                                                    data-testid={`currency-option-${currency.toLowerCase()}`}
                                                 >
                                                     {currency}
                                                 </SelectItem>
@@ -84,14 +93,15 @@ export default function Preferences({ user, available_currencies }: PreferencesP
                                             {errors.default_currency}
                                         </p>
                                     )}
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-muted-foreground">
                                         Choose your preferred currency for displaying amounts
-                                        throughout the application.
+                                        throughout the application. You can still toggle
+                                        currencies on the dashboard at any time.
                                     </p>
                                 </div>
 
                                 {recentlySuccessful && (
-                                    <Alert>
+                                    <Alert data-testid="preferences-success">
                                         <CheckCircle2 className="h-4 w-4" />
                                         <AlertDescription>
                                             Preferences updated successfully!
@@ -100,7 +110,11 @@ export default function Preferences({ user, available_currencies }: PreferencesP
                                 )}
 
                                 <div className="flex justify-end">
-                                    <Button type="submit" disabled={processing}>
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        data-testid="preferences-save"
+                                    >
                                         {processing ? 'Saving...' : 'Save Preferences'}
                                     </Button>
                                 </div>
@@ -112,3 +126,12 @@ export default function Preferences({ user, available_currencies }: PreferencesP
         </>
     );
 }
+
+Preferences.layout = {
+    breadcrumbs: [
+        {
+            title: 'Preferences',
+            href: '/preferences',
+        },
+    ],
+};

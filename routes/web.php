@@ -181,7 +181,8 @@ if (app()->environment('local')) {
         $cwd = base_path();
         $phpunit = $cwd.'/vendor/bin/phpunit';
         $args = $filter ? ' --filter='.escapeshellarg($filter) : '';
-        $command = 'export HOME=/tmp && cd '.escapeshellarg($cwd).' && '.$phpunit.$args.' 2>&1';
+        // Force testing env so CSRF is disabled in feature tests (web process has APP_ENV=local)
+        $command = 'export HOME=/tmp APP_ENV=testing && cd '.escapeshellarg($cwd).' && '.$phpunit.$args.' 2>&1';
         $output = [];
         $exitCode = 0;
         exec($command, $output, $exitCode);

@@ -4604,3 +4604,45 @@ NEXT SESSION:
 PROGRESS: 113/175 passing; 62 remaining
 STATUS: App healthy; recent activity live on dashboard
 
+================================================================================
+SESSION 63 - Sep 15, 2026, ~10:25 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked (interactive approval rejected) — used /dev/browser-tests + Playwright screenshots
+- Frontend/backend/browser via /dev/frontend-tests, /dev/run-tests, /dev/browser-tests
+
+VERIFICATION (before new work):
+- Frontend unit tests: pass
+- Browser smoke (feature 111): pass
+- PreferencesTest was failing under /dev/run-tests due to APP_ENV=local (CSRF 419)
+  Fixed: phpunit.xml APP_ENV force=true + /dev/run-tests exports APP_ENV=testing
+
+IMPLEMENTED THIS SESSION:
+Test #112 — Default currency preference for views (COMPLETED)
+- DashboardService returns CAD/USD/COP equivalents + exchange_rates
+- DashboardController passes default_currency / display_currency / available_currencies
+- Dashboard UI: CAD|USD|COP toggle; amounts/charts respect selected currency
+- Preferences page uses Wayfinder routes; success feedback
+- Feature tests: PreferencesTest (9), DashboardTest (+2 currency tests = 14)
+- Frontend unit tests: currency toggle + preference init
+- Playwright: tests/browser/currency-preference.spec.ts
+
+BROWSER VERIFIED (screenshots in verification/session-63/):
+- 01-preferences-page.png
+- 02-preferences-saved-cad.png
+- 03-dashboard-cad-default.png
+- 04-dashboard-usd-toggle.png
+- 05-dashboard-cop-toggle.png
+
+PASSES UPDATED:
+- #112 → passes: true
+
+NEXT SESSION:
+1. Implement test #113 — Spanish/English category name toggle
+2. Prefer /dev/reset-test-user + /dev/seed-browser if login/categories fail
+
+PROGRESS: 114/175 passing; 61 remaining
+STATUS: App healthy; currency preference + dashboard toggle live
+
