@@ -1392,7 +1392,7 @@
       "Step 3: Verify PDF is generated",
       "Step 4: Verify it shows income line items, total income, expenses by category, net"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

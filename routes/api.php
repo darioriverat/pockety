@@ -126,5 +126,6 @@ Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store
 Route::get('/budgets/report', [BudgetController::class, 'report'])->name('budgets.report');
 Route::get('/budgets/report/export', [BudgetController::class, 'exportReport'])->name('budgets.report.export');
 
-// Financial Summary API
+// Financial Summary / Income Statement API
+Route::get('/financial-summary/export', [FinancialSummaryController::class, 'exportPdf'])->name('financial-summary.export-pdf');
 Route::get('/financial-summary', [FinancialSummaryController::class, 'show'])->name('financial-summary.show');

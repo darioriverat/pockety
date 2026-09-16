@@ -4760,3 +4760,41 @@ NEXT SESSION:
 PROGRESS: 117/175 passing; 58 remaining
 STATUS: App healthy; balance sheet PDF export live
 
+================================================================================
+SESSION 67 - Sep 15, 2026, ~10:50 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked (interactive approval rejected) — used /dev/browser-tests
+- Frontend/backend/browser via /dev/frontend-tests, /dev/run-tests, /dev/browser-tests
+
+VERIFICATION (before new work):
+- Frontend unit tests: 79/79 pass (pre-change smoke)
+- Browser smoke (feature 111): pass
+
+IMPLEMENTED THIS SESSION:
+Test #116 — PDF report of income statement for a period (COMPLETED)
+- FinancialSummaryService now includes income_lines, total_income_cad, net_cad
+- IncomeStatementPdfExporter (Income / Expenses by Category / Net)
+- GET /api/financial-summary/export?period=YYYYMM → application/pdf download
+- Financial Summary UI: Export to PDF, income lines table, net card
+- Feature tests: FinancialSummaryTest (+4 = 10)
+- Frontend unit test: financial-summary-pdf.test.tsx
+- Playwright: tests/browser/income-statement-pdf.spec.ts
+
+BROWSER VERIFIED (screenshots in verification/session-67/):
+- 01-income-statement-before-export.png (Export to PDF; income + expenses + net)
+- 02-income-statement-after-export.png
+- income-statement-202501.pdf (Income, Total Income, Expenses by Category, Net)
+
+PASSES UPDATED:
+- #116 → passes: true
+
+NEXT SESSION:
+1. Implement test #117 — error message when required field is missing
+2. Prefer /dev/reset-test-user + /dev/seed-browser if login fails
+
+PROGRESS: 118/175 passing; 57 remaining
+STATUS: App healthy; income statement PDF export live on Financial Summary
+

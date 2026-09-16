@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\ExchangeRate;
+use App\Models\Income;
 use App\Models\Transaction;
 
 class FinancialSummaryService
@@ -32,11 +33,22 @@ class FinancialSummaryService
      *
      * @return array{
      *     period: string,
+     *     total_income_cad: float,
      *     total_recorded_disbursements_cad: float,
      *     net_operating_expenses_cad: float,
+     *     net_cad: float,
      *     debt_principal_excluded_cad: float,
      *     depreciation_excluded_cad: float,
      *     debt_interest_included_cad: float,
+     *     income_lines: list<array{
+     *         id: int,
+     *         description: string,
+     *         line_number: int,
+     *         amount_cad: float,
+     *         amount_usd: float,
+     *         amount_cop: float,
+     *         total_cad_equivalent: float
+     *     }>,
      *     category_totals: list<array{
      *         category_id: int,
      *         category_code: string,
@@ -54,6 +66,13 @@ class FinancialSummaryService
     public function getSummary(string $period): array
     {
         $exchangeRate = $this->resolveExchangeRate($period);
+        $incomeLines = $this->buildIncomeLines($period, $exchangeRate);
+        $totalIncome = 0.0;
+        foreach ($incomeLines as $line) {
+            $totalIncome += $line['total_cad_equivalent'];
+        }
+        $totalIncome = round($totalIncome, 2);
+
         $categories = Category::active()->orderBy('code')->get()->keyBy('id');
         $transactions = Transaction::forPeriod($period)->with('category')->get();
 
@@ -140,16 +159,58 @@ class FinancialSummaryService
         $netOperatingExpenses = $totalRecordedDisbursements
             - $debtPrincipalExcluded
             - $depreciationExcluded;
+        $netOperatingExpenses = round($netOperatingExpenses, 2);
 
         return [
             'period' => $period,
+            'total_income_cad' => $totalIncome,
             'total_recorded_disbursements_cad' => round($totalRecordedDisbursements, 2),
-            'net_operating_expenses_cad' => round($netOperatingExpenses, 2),
+            'net_operating_expenses_cad' => $netOperatingExpenses,
+            'net_cad' => round($totalIncome - $netOperatingExpenses, 2),
             'debt_principal_excluded_cad' => round($debtPrincipalExcluded, 2),
             'depreciation_excluded_cad' => round($depreciationExcluded, 2),
             'debt_interest_included_cad' => round($debtInterestIncluded, 2),
+            'income_lines' => $incomeLines,
             'category_totals' => $categoryTotals,
         ];
+    }
+
+    /**
+     * @return list<array{
+     *     id: int,
+     *     description: string,
+     *     line_number: int,
+     *     amount_cad: float,
+     *     amount_usd: float,
+     *     amount_cop: float,
+     *     total_cad_equivalent: float
+     * }>
+     */
+    private function buildIncomeLines(string $period, ExchangeRate $exchangeRate): array
+    {
+        $lines = [];
+
+        foreach (
+            Income::forPeriod($period)
+                ->orderBy('line_number')
+                ->orderBy('id')
+                ->get() as $income
+        ) {
+            $lines[] = [
+                'id' => (int) $income->id,
+                'description' => (string) $income->description,
+                'line_number' => (int) $income->line_number,
+                'amount_cad' => (float) $income->amount_cad,
+                'amount_usd' => (float) $income->amount_usd,
+                'amount_cop' => (float) $income->amount_cop,
+                'total_cad_equivalent' => round(
+                    $income->getTotalCadEquivalent($exchangeRate),
+                    2
+                ),
+            ];
+        }
+
+        return $lines;
     }
 
     private function transactionCadEquivalent(Transaction $transaction, ExchangeRate $exchangeRate): float

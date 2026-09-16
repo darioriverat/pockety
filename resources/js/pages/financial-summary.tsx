@@ -10,6 +10,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -22,10 +23,22 @@ import { usePeriod } from '@/hooks/use-period';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import {
     Calculator,
+    Download,
     Landmark,
     MinusCircle,
+    TrendingUp,
     XCircle,
 } from 'lucide-react';
+
+interface IncomeLine {
+    id: number;
+    description: string;
+    line_number: number;
+    amount_cad: number;
+    amount_usd: number;
+    amount_cop: number;
+    total_cad_equivalent: number;
+}
 
 interface CategoryTotal {
     category_id: number;
@@ -42,11 +55,14 @@ interface CategoryTotal {
 
 interface FinancialSummaryData {
     period: string;
+    total_income_cad: number;
     total_recorded_disbursements_cad: number;
     net_operating_expenses_cad: number;
+    net_cad: number;
     debt_principal_excluded_cad: number;
     depreciation_excluded_cad: number;
     debt_interest_included_cad: number;
+    income_lines: IncomeLine[];
     category_totals: CategoryTotal[];
 }
 
@@ -96,6 +112,11 @@ export default function FinancialSummary() {
         }
     };
 
+    const handleExportPdf = () => {
+        const url = `/api/financial-summary/export?period=${encodeURIComponent(selectedPeriod)}`;
+        window.location.href = url;
+    };
+
     const rowsWithActivity =
         summary?.category_totals.filter(
             (row) =>
@@ -116,34 +137,48 @@ export default function FinancialSummary() {
                                 Financial Summary
                             </h1>
                             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Total Recorded Disbursements (Gasto Total) and
-                                Net Operating Expenses (Gasto Real) for the
-                                selected period
+                                Income statement for the selected period —
+                                income, Total Recorded Disbursements (Gasto
+                                Total), Net Operating Expenses (Gasto Real), and
+                                net
                             </p>
                         </div>
-                        <div className="w-full max-w-xs space-y-2">
-                            <Label htmlFor="period">Period</Label>
-                            <Select
-                                value={selectedPeriod}
-                                onValueChange={setSelectedPeriod}
-                            >
-                                <SelectTrigger
-                                    id="period"
-                                    data-testid="page-period-selector"
+                        <div className="flex w-full max-w-md flex-col gap-3 sm:items-end">
+                            <div className="flex flex-wrap gap-2 sm:justify-end">
+                                <Button
+                                    variant="outline"
+                                    onClick={handleExportPdf}
+                                    disabled={!selectedPeriod || loading}
+                                    data-testid="export-income-statement-pdf"
                                 >
-                                    <SelectValue placeholder="Select period" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {periods.map((period) => (
-                                        <SelectItem
-                                            key={period}
-                                            value={period}
-                                        >
-                                            {formatPeriod(period)}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Export to PDF
+                                </Button>
+                            </div>
+                            <div className="w-full max-w-xs space-y-2">
+                                <Label htmlFor="period">Period</Label>
+                                <Select
+                                    value={selectedPeriod}
+                                    onValueChange={setSelectedPeriod}
+                                >
+                                    <SelectTrigger
+                                        id="period"
+                                        data-testid="page-period-selector"
+                                    >
+                                        <SelectValue placeholder="Select period" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {periods.map((period) => (
+                                            <SelectItem
+                                                key={period}
+                                                value={period}
+                                            >
+                                                {formatPeriod(period)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
 
@@ -160,7 +195,22 @@ export default function FinancialSummary() {
                         </div>
                     ) : (
                         <>
-                            <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                                <Card>
+                                    <CardHeader className="pb-2">
+                                        <CardDescription>
+                                            Total Income
+                                        </CardDescription>
+                                        <CardTitle
+                                            className="text-2xl"
+                                            data-testid="total-income"
+                                        >
+                                            {formatCad(
+                                                summary?.total_income_cad ?? 0,
+                                            )}
+                                        </CardTitle>
+                                    </CardHeader>
+                                </Card>
                                 <Card>
                                     <CardHeader className="pb-2">
                                         <CardDescription>
@@ -203,6 +253,20 @@ export default function FinancialSummary() {
                                 </Card>
                                 <Card>
                                     <CardHeader className="pb-2">
+                                        <CardDescription>Net</CardDescription>
+                                        <CardTitle
+                                            className="text-2xl"
+                                            data-testid="income-statement-net"
+                                        >
+                                            {formatCad(summary?.net_cad ?? 0)}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="text-xs text-gray-500">
+                                        Income − Net Operating Expenses
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardHeader className="pb-2">
                                         <CardDescription>
                                             Debt Principal Excluded
                                         </CardDescription>
@@ -234,6 +298,82 @@ export default function FinancialSummary() {
                                     </CardHeader>
                                 </Card>
                             </div>
+
+                            <Card className="mb-6">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <TrendingUp className="h-5 w-5" />
+                                        Income line items (
+                                        {formatPeriod(selectedPeriod)})
+                                    </CardTitle>
+                                    <CardDescription>
+                                        CAD equivalents using period exchange
+                                        rates
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="overflow-x-auto">
+                                        <table
+                                            className="w-full text-left text-sm"
+                                            data-testid="income-lines-table"
+                                        >
+                                            <thead>
+                                                <tr className="border-b text-xs uppercase tracking-wide text-gray-500">
+                                                    <th className="py-2 pr-3">
+                                                        #
+                                                    </th>
+                                                    <th className="py-2 pr-3">
+                                                        Description
+                                                    </th>
+                                                    <th className="py-2 text-right">
+                                                        CAD
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {(summary?.income_lines
+                                                    ?.length ?? 0) === 0 ? (
+                                                    <tr>
+                                                        <td
+                                                            colSpan={3}
+                                                            className="py-8 text-center text-gray-500"
+                                                        >
+                                                            No income lines for
+                                                            this period yet.
+                                                        </td>
+                                                    </tr>
+                                                ) : (
+                                                    summary?.income_lines.map(
+                                                        (line) => (
+                                                            <tr
+                                                                key={line.id}
+                                                                className="border-b border-gray-100 dark:border-gray-800"
+                                                                data-testid={`income-line-${line.id}`}
+                                                            >
+                                                                <td className="py-2 pr-3">
+                                                                    {
+                                                                        line.line_number
+                                                                    }
+                                                                </td>
+                                                                <td className="py-2 pr-3">
+                                                                    {
+                                                                        line.description
+                                                                    }
+                                                                </td>
+                                                                <td className="py-2 text-right font-medium">
+                                                                    {formatCad(
+                                                                        line.total_cad_equivalent,
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        ),
+                                                    )
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </CardContent>
+                            </Card>
 
                             <div className="mb-6 grid gap-6 md:grid-cols-2">
                                 <Card>
@@ -324,7 +464,7 @@ export default function FinancialSummary() {
                             <Card>
                                 <CardHeader>
                                     <CardTitle>
-                                        Category totals (
+                                        Expenses by category (
                                         {formatPeriod(selectedPeriod)})
                                     </CardTitle>
                                     <CardDescription>
