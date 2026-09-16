@@ -1,3 +1,4 @@
+import SearchController from './SearchController'
 import AccountController from './AccountController'
 import AccountImportController from './AccountImportController'
 import AccountBalanceController from './AccountBalanceController'
@@ -17,9 +18,11 @@ import ExchangeRateImportController from './ExchangeRateImportController'
 import BudgetController from './BudgetController'
 import FinancialSummaryController from './FinancialSummaryController'
 import DashboardController from './DashboardController'
+import ReportsController from './ReportsController'
 import Settings from './Settings'
 
 const Controllers = {
+    SearchController: Object.assign(SearchController, SearchController),
     AccountController: Object.assign(AccountController, AccountController),
     AccountImportController: Object.assign(AccountImportController, AccountImportController),
     AccountBalanceController: Object.assign(AccountBalanceController, AccountBalanceController),
@@ -39,6 +42,7 @@ const Controllers = {
     BudgetController: Object.assign(BudgetController, BudgetController),
     FinancialSummaryController: Object.assign(FinancialSummaryController, FinancialSummaryController),
     DashboardController: Object.assign(DashboardController, DashboardController),
+    ReportsController: Object.assign(ReportsController, ReportsController),
     Settings: Object.assign(Settings, Settings),
 }
 

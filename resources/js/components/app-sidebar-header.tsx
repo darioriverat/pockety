@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { GlobalSearch } from '@/components/global-search';
 import { PeriodSelector } from '@/components/period-selector';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
@@ -14,12 +15,15 @@ export function AppSidebarHeader({
                 <SidebarTrigger className="-ml-1" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
-            <PeriodSelector
-                id="global-period"
-                showLabel={false}
-                testId="period-selector"
-                className="ml-auto w-48 max-w-none space-y-0"
-            />
+            <div className="ml-auto flex items-center gap-2">
+                <GlobalSearch />
+                <PeriodSelector
+                    id="global-period"
+                    showLabel={false}
+                    testId="period-selector"
+                    className="w-40 max-w-none space-y-0 sm:w-48"
+                />
+            </div>
         </header>
     );
 }

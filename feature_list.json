@@ -1256,7 +1256,7 @@
       "Step 5: Verify YTD net (income - expenses) is displayed",
       "Step 6: Verify totals update when year selection changes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1268,7 +1268,7 @@
       "Step 4: Verify tooltip or message explains the variance",
       "Step 5: Verify user can click to investigate transactions"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1281,7 +1281,7 @@
       "Step 5: Verify variance is marked as reviewed",
       "Step 6: Verify variance still shows but with 'reviewed' indicator"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1293,7 +1293,7 @@
       "Step 4: Verify search results include matching transactions (in comments)",
       "Step 5: Verify results are organized by type"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

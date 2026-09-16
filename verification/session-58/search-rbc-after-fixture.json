@@ -1,0 +1,50 @@
+{
+  "data": {
+    "query": "RBC",
+    "accounts": [
+      {
+        "type": "account",
+        "id": 7,
+        "title": "RBC Checking",
+        "subtitle": "Bank · CAD",
+        "url": "/accounts/7"
+      },
+      {
+        "type": "account",
+        "id": 22,
+        "title": "RBC Chequing Search Fixture",
+        "subtitle": "Bank · CAD",
+        "url": "/accounts/22"
+      },
+      {
+        "type": "account",
+        "id": 8,
+        "title": "RBC Savings",
+        "subtitle": "Bank · CAD",
+        "url": "/accounts/8"
+      }
+    ],
+    "transactions": [
+      {
+        "type": "transaction",
+        "id": 3,
+        "title": "Transfer from RBC online banking",
+        "subtitle": "2025-01-15 · C001 · 55.25 CAD",
+        "url": "/transactions?search=RBC"
+      }
+    ],
+    "categories": [],
+    "total": 4
+  },
+  "links": {
+    "self": "http://dev.pockety.com:8080/api/search?q=RBC&limit=10"
+  },
+  "meta": {
+    "query": "RBC",
+    "limit": 10,
+    "account_count": 3,
+    "transaction_count": 1,
+    "category_count": 0,
+    "total": 4
+  }
+}

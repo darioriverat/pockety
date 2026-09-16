@@ -16,6 +16,7 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\PeriodComparisonController;
 use App\Http\Controllers\PeriodHistoryController;
 use App\Http\Controllers\ReconciliationController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionImportController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group.
 |
 */
+
+// Global search API
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
 // Accounts API
 Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
