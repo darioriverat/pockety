@@ -215,6 +215,10 @@ export default function ReportsYtd({ ytd_totals, available_years }: ReportsYtdPa
 ReportsYtd.layout = {
     breadcrumbs: [
         {
+            title: 'Home',
+            href: '/dashboard',
+        },
+        {
             title: 'Reports',
             href: '/reports/year-to-date',
         },

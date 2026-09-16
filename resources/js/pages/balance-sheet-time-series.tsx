@@ -529,6 +529,10 @@ export default function BalanceSheetTimeSeries() {
 BalanceSheetTimeSeries.layout = {
     breadcrumbs: [
         {
+            title: 'Home',
+            href: '/dashboard',
+        },
+        {
             title: 'Balance Sheet',
             href: '/balance-sheet',
         },

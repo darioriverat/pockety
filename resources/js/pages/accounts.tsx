@@ -800,3 +800,12 @@ export default function Accounts() {
         </>
     );
 }
+
+Accounts.layout = {
+    breadcrumbs: [
+        {
+            title: 'Accounts',
+            href: '/accounts',
+        },
+    ],
+};

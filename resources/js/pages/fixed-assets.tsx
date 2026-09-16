@@ -629,3 +629,12 @@ export default function FixedAssets() {
         </>
     );
 }
+
+FixedAssets.layout = {
+    breadcrumbs: [
+        {
+            title: 'Fixed Assets',
+            href: '/fixed-assets',
+        },
+    ],
+};

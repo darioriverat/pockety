@@ -15,36 +15,54 @@ export function Breadcrumbs({
 }: {
     breadcrumbs: BreadcrumbItemType[];
 }) {
-    return (
-        <>
-            {breadcrumbs.length > 0 && (
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        {breadcrumbs.map((item, index) => {
-                            const isLast = index === breadcrumbs.length - 1;
+    if (breadcrumbs.length === 0) {
+        return null;
+    }
 
-                            return (
-                                <Fragment key={index}>
-                                    <BreadcrumbItem>
-                                        {isLast ? (
-                                            <BreadcrumbPage>
-                                                {item.title}
-                                            </BreadcrumbPage>
-                                        ) : (
-                                            <BreadcrumbLink asChild>
-                                                <Link href={item.href}>
-                                                    {item.title}
-                                                </Link>
-                                            </BreadcrumbLink>
-                                        )}
-                                    </BreadcrumbItem>
-                                    {!isLast && <BreadcrumbSeparator />}
-                                </Fragment>
-                            );
-                        })}
-                    </BreadcrumbList>
-                </Breadcrumb>
-            )}
-        </>
+    return (
+        <Breadcrumb data-testid="breadcrumbs">
+            <BreadcrumbList data-testid="breadcrumb-list">
+                {breadcrumbs.map((item, index) => {
+                    const isLast = index === breadcrumbs.length - 1;
+                    const href =
+                        typeof item.href === 'string'
+                            ? item.href
+                            : typeof item.href === 'object' &&
+                                item.href !== null &&
+                                'url' in item.href
+                              ? String(item.href.url)
+                              : '#';
+
+                    return (
+                        <Fragment key={`${item.title}-${index}`}>
+                            <BreadcrumbItem
+                                data-testid={
+                                    isLast
+                                        ? 'breadcrumb-current'
+                                        : `breadcrumb-item-${index}`
+                                }
+                            >
+                                {isLast ? (
+                                    <BreadcrumbPage className="text-foreground font-medium">
+                                        {item.title}
+                                    </BreadcrumbPage>
+                                ) : (
+                                    <BreadcrumbLink asChild>
+                                        <Link
+                                            href={item.href}
+                                            data-testid={`breadcrumb-link-${index}`}
+                                            data-breadcrumb-href={href}
+                                        >
+                                            {item.title}
+                                        </Link>
+                                    </BreadcrumbLink>
+                                )}
+                            </BreadcrumbItem>
+                            {!isLast && <BreadcrumbSeparator />}
+                        </Fragment>
+                    );
+                })}
+            </BreadcrumbList>
+        </Breadcrumb>
     );
 }

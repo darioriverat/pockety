@@ -45,8 +45,11 @@ export function AppSidebarHeader({
                 </Link>
                 {breadcrumbs.length > 0 && (
                     <>
-                        <div className="bg-border mx-1 hidden h-4 w-px md:block" />
-                        <div className="hidden min-w-0 md:block">
+                        <div className="bg-border mx-1 hidden h-4 w-px sm:block" />
+                        <div
+                            className="min-w-0 max-w-[40vw] truncate sm:max-w-none sm:overflow-visible"
+                            data-testid="breadcrumb-trail"
+                        >
                             <Breadcrumbs breadcrumbs={breadcrumbs} />
                         </div>
                     </>

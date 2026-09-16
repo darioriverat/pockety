@@ -541,3 +541,12 @@ export default function ExchangeRates() {
         </>
     );
 }
+
+ExchangeRates.layout = {
+    breadcrumbs: [
+        {
+            title: 'Exchange Rates',
+            href: '/exchange-rates',
+        },
+    ],
+};

@@ -64,5 +64,21 @@ describe('AppSidebarHeader', () => {
         expect(screen.getByTestId('nav-menu-trigger')).toBeInTheDocument();
         expect(screen.getByTestId('global-search')).toBeInTheDocument();
         expect(screen.getByTestId('period-selector')).toBeInTheDocument();
+        expect(screen.queryByTestId('breadcrumb-trail')).not.toBeInTheDocument();
+    });
+
+    it('shows the breadcrumb trail when breadcrumbs are provided', () => {
+        render(
+            <AppSidebarHeader
+                breadcrumbs={[
+                    { title: 'Home', href: '/dashboard' },
+                    { title: 'Accounts', href: '/accounts' },
+                    { title: 'Details', href: '#' },
+                ]}
+            />,
+        );
+
+        expect(screen.getByTestId('breadcrumb-trail')).toBeInTheDocument();
+        expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
     });
 });

@@ -19,16 +19,13 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
                     <SelectItem value="1">Option 1</SelectItem>
                     <SelectItem value="2">Option 2</SelectItem>
                 </SelectContent>
-            </Select>
+            </Select>,
         );
 
         const trigger = screen.getByTestId('select-trigger');
         expect(trigger).toBeInTheDocument();
-
-        // Verify the trigger has the correct data attributes
         expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
 
-        // Verify ChevronDown icon is present (lucide-react adds the lucide-chevron-down class)
         const chevronIcon = trigger.querySelector('svg.lucide-chevron-down');
         expect(chevronIcon).toBeInTheDocument();
     });
@@ -42,12 +39,10 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
                 <SelectContent>
                     <SelectItem value="1">Option 1</SelectItem>
                 </SelectContent>
-            </Select>
+            </Select>,
         );
 
         const trigger = screen.getByTestId('select-trigger');
-
-        // Verify key styling classes are present
         expect(trigger.className).toContain('border');
         expect(trigger.className).toContain('rounded-md');
         expect(trigger.className).toContain('shadow-xs');
@@ -55,62 +50,48 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
     });
 
     it('renders SelectContent with proper styling attributes', () => {
-        const { container } = render(
+        render(
             <Select open>
                 <SelectTrigger>
                     <SelectValue placeholder="Select option" />
                 </SelectTrigger>
-                <SelectContent data-testid="select-content">
+                <SelectContent>
                     <SelectItem value="1">Option 1</SelectItem>
                     <SelectItem value="2">Option 2</SelectItem>
                 </SelectContent>
-            </Select>
+            </Select>,
         );
 
-        // SelectContent is rendered in a portal, so we need to check for data-slot
-        const content = container.querySelector('[data-slot="select-content"]');
+        const content = document.querySelector('[data-slot="select-content"]');
         expect(content).toBeInTheDocument();
-
-        if (content) {
-            // Verify styling classes for dropdown
-            expect(content.className).toContain('border');
-            expect(content.className).toContain('shadow-md');
-            expect(content.className).toContain('rounded-md');
-        }
+        expect(content?.className).toContain('border');
+        expect(content?.className).toContain('shadow-md');
+        expect(content?.className).toContain('rounded-md');
     });
 
     it('renders SelectItem with check icon indicator', () => {
-        const { container } = render(
+        render(
             <Select open value="1">
                 <SelectTrigger>
                     <SelectValue placeholder="Select option" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="1" data-testid="select-item-1">
-                        Option 1
-                    </SelectItem>
+                    <SelectItem value="1">Option 1</SelectItem>
                     <SelectItem value="2">Option 2</SelectItem>
                 </SelectContent>
-            </Select>
+            </Select>,
         );
 
-        // Find the item with data-slot
-        const item = container.querySelector('[data-slot="select-item"]');
+        const item = document.querySelector('[data-slot="select-item"]');
         expect(item).toBeInTheDocument();
+        expect(item?.className).toContain('cursor-default');
+        expect(item?.className).toContain('focus:bg-accent');
 
-        if (item) {
-            // Verify item has proper styling
-            expect(item.className).toContain('cursor-default');
-            expect(item.className).toContain('focus:bg-accent');
-
-            // Verify check icon indicator exists
-            const indicator = item.querySelector('[data-slot="select-item-indicator"]');
-            expect(indicator).toBeInTheDocument();
-
-            // Verify the indicator contains a check icon (lucide-check class)
-            const checkIcon = item.querySelector('svg.lucide-check');
-            expect(checkIcon).toBeInTheDocument();
-        }
+        const indicator = item?.querySelector(
+            '[data-slot="select-item-indicator"]',
+        );
+        expect(indicator).toBeInTheDocument();
+        expect(item?.querySelector('svg.lucide-check')).toBeInTheDocument();
     });
 
     it('supports small size variant', () => {
@@ -122,11 +103,13 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
                 <SelectContent>
                     <SelectItem value="1">Option 1</SelectItem>
                 </SelectContent>
-            </Select>
+            </Select>,
         );
 
-        const trigger = screen.getByTestId('select-trigger');
-        expect(trigger).toHaveAttribute('data-size', 'sm');
+        expect(screen.getByTestId('select-trigger')).toHaveAttribute(
+            'data-size',
+            'sm',
+        );
     });
 
     it('supports default size variant', () => {
@@ -138,15 +121,17 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
                 <SelectContent>
                     <SelectItem value="1">Option 1</SelectItem>
                 </SelectContent>
-            </Select>
+            </Select>,
         );
 
-        const trigger = screen.getByTestId('select-trigger');
-        expect(trigger).toHaveAttribute('data-size', 'default');
+        expect(screen.getByTestId('select-trigger')).toHaveAttribute(
+            'data-size',
+            'default',
+        );
     });
 
     it('renders scroll buttons with chevron icons', () => {
-        const { container } = render(
+        render(
             <Select open>
                 <SelectTrigger>
                     <SelectValue placeholder="Select option" />
@@ -158,24 +143,27 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
                         </SelectItem>
                     ))}
                 </SelectContent>
-            </Select>
+            </Select>,
         );
 
-        // Scroll buttons are rendered by default in SelectContent
-        const scrollUpButton = container.querySelector('[data-slot="select-scroll-up-button"]');
-        const scrollDownButton = container.querySelector('[data-slot="select-scroll-down-button"]');
+        const scrollUpButton = document.querySelector(
+            '[data-slot="select-scroll-up-button"]',
+        );
+        const scrollDownButton = document.querySelector(
+            '[data-slot="select-scroll-down-button"]',
+        );
 
-        // At least one should be present
         expect(scrollUpButton || scrollDownButton).toBeTruthy();
 
-        // Both should contain ChevronUp/ChevronDown icons
         if (scrollUpButton) {
-            const upIcon = scrollUpButton.querySelector('svg.lucide-chevron-up');
-            expect(upIcon).toBeInTheDocument();
+            expect(
+                scrollUpButton.querySelector('svg.lucide-chevron-up'),
+            ).toBeInTheDocument();
         }
         if (scrollDownButton) {
-            const downIcon = scrollDownButton.querySelector('svg.lucide-chevron-down');
-            expect(downIcon).toBeInTheDocument();
+            expect(
+                scrollDownButton.querySelector('svg.lucide-chevron-down'),
+            ).toBeInTheDocument();
         }
     });
 });

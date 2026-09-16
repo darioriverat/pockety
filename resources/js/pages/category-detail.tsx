@@ -453,6 +453,10 @@ export default function CategoryDetail() {
 CategoryDetail.layout = {
     breadcrumbs: [
         {
+            title: 'Home',
+            href: '/dashboard',
+        },
+        {
             title: 'Categories',
             href: '/categories',
         },

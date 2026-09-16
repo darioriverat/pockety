@@ -896,3 +896,12 @@ export default function Import() {
         </>
     );
 }
+
+Import.layout = {
+    breadcrumbs: [
+        {
+            title: 'Import',
+            href: '/import',
+        },
+    ],
+};

@@ -490,3 +490,20 @@ export default function AccountDetail() {
         </>
     );
 }
+
+AccountDetail.layout = {
+    breadcrumbs: [
+        {
+            title: 'Home',
+            href: '/dashboard',
+        },
+        {
+            title: 'Accounts',
+            href: '/accounts',
+        },
+        {
+            title: 'Details',
+            href: '#',
+        },
+    ],
+};

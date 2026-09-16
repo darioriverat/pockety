@@ -585,3 +585,12 @@ export default function Income() {
         </>
     );
 }
+
+Income.layout = {
+    breadcrumbs: [
+        {
+            title: 'Income',
+            href: '/income',
+        },
+    ],
+};

@@ -771,3 +771,12 @@ export default function Reconciliation() {
         </>
     );
 }
+
+Reconciliation.layout = {
+    breadcrumbs: [
+        {
+            title: 'Reconciliation',
+            href: '/reconciliation',
+        },
+    ],
+};
