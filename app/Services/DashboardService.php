@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\AccountBalance;
+use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\Transaction;
@@ -248,6 +249,112 @@ class DashboardService
         }
 
         return [$totalAssets, $totalLiabilities];
+    }
+
+    /**
+     * Top spending categories for a period (by CAD equivalent), with share of total expenses.
+     *
+     * @return array{
+     *     period: string,
+     *     limit: int,
+     *     total_expenses_cad: float,
+     *     categories: list<array{
+     *         category_id: int,
+     *         category_code: string,
+     *         category_name_es: string,
+     *         category_name_en: string,
+     *         amount_cad: float,
+     *         percentage: float,
+     *         transaction_count: int
+     *     }>
+     * }
+     */
+    public function getTopSpendingCategories(string $period, int $limit = 10): array
+    {
+        $limit = max(5, min(10, $limit));
+        $exchangeRate = $this->resolveExchangeRate($period);
+
+        /** @var array<int, array{amount: float, count: int}> $aggregates */
+        $aggregates = [];
+
+        $transactions = Transaction::forPeriod($period)->get();
+
+        foreach ($transactions as $transaction) {
+            $categoryId = (int) $transaction->category_id;
+            $cadEquivalent = $this->transactionToCad($transaction, $exchangeRate);
+
+            if ($cadEquivalent <= 0) {
+                continue;
+            }
+
+            if (! isset($aggregates[$categoryId])) {
+                $aggregates[$categoryId] = ['amount' => 0.0, 'count' => 0];
+            }
+
+            $aggregates[$categoryId]['amount'] += $cadEquivalent;
+            $aggregates[$categoryId]['count']++;
+        }
+
+        $totalExpenses = array_sum(array_column($aggregates, 'amount'));
+
+        arsort($aggregates);
+        $topIds = array_slice(array_keys($aggregates), 0, $limit, true);
+
+        $categoriesById = Category::query()
+            ->whereIn('id', $topIds)
+            ->get()
+            ->keyBy('id');
+
+        $categories = [];
+
+        foreach ($topIds as $categoryId) {
+            $category = $categoriesById->get($categoryId);
+
+            if (! $category) {
+                continue;
+            }
+
+            $amount = round($aggregates[$categoryId]['amount'], 2);
+            $percentage = $totalExpenses > 0
+                ? round(($aggregates[$categoryId]['amount'] / $totalExpenses) * 100, 1)
+                : 0.0;
+
+            $categories[] = [
+                'category_id' => (int) $category->id,
+                'category_code' => (string) $category->code,
+                'category_name_es' => (string) $category->name_es,
+                'category_name_en' => (string) $category->name_en,
+                'amount_cad' => $amount,
+                'percentage' => $percentage,
+                'transaction_count' => $aggregates[$categoryId]['count'],
+            ];
+        }
+
+        return [
+            'period' => $period,
+            'limit' => $limit,
+            'total_expenses_cad' => round($totalExpenses, 2),
+            'categories' => $categories,
+        ];
+    }
+
+    private function transactionToCad(Transaction $transaction, ExchangeRate $exchangeRate): float
+    {
+        $cadEquivalent = 0.0;
+
+        if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
+            $cadEquivalent += (float) $transaction->amount_cad;
+        }
+
+        if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
+            $cadEquivalent += $exchangeRate->usdToCad((float) $transaction->amount_usd);
+        }
+
+        if ($transaction->amount_cop !== null && (float) $transaction->amount_cop != 0) {
+            $cadEquivalent += $exchangeRate->copToCad((float) $transaction->amount_cop);
+        }
+
+        return $cadEquivalent;
     }
 
     /**

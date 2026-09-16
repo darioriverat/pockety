@@ -50,6 +50,20 @@ type MockPage = {
                 equity_cad: number;
             }>;
         };
+        top_spending_categories: {
+            period: string;
+            limit: number;
+            total_expenses_cad: number;
+            categories: Array<{
+                category_id: number;
+                category_code: string;
+                category_name_es: string;
+                category_name_en: string;
+                amount_cad: number;
+                percentage: number;
+                transaction_count: number;
+            }>;
+        };
     };
 };
 
@@ -121,6 +135,58 @@ const mockPage: MockPage = {
                 { period: '202601', assets_cad: 15000, liabilities_cad: 3000, equity_cad: 12000 },
             ],
         },
+        top_spending_categories: {
+            period: '202601',
+            limit: 10,
+            total_expenses_cad: 2000,
+            categories: [
+                {
+                    category_id: 1,
+                    category_code: 'C001',
+                    category_name_es: 'MERCADO',
+                    category_name_en: 'Groceries',
+                    amount_cad: 800,
+                    percentage: 40,
+                    transaction_count: 4,
+                },
+                {
+                    category_id: 2,
+                    category_code: 'C006',
+                    category_name_es: 'COMIDAS CALLE',
+                    category_name_en: 'Dining Out / Takeout',
+                    amount_cad: 500,
+                    percentage: 25,
+                    transaction_count: 3,
+                },
+                {
+                    category_id: 3,
+                    category_code: 'C004',
+                    category_name_es: 'TRANSPORTES',
+                    category_name_en: 'Transportation',
+                    amount_cad: 350,
+                    percentage: 17.5,
+                    transaction_count: 2,
+                },
+                {
+                    category_id: 4,
+                    category_code: 'C008',
+                    category_name_es: 'SERVICIOS',
+                    category_name_en: 'Utilities',
+                    amount_cad: 250,
+                    percentage: 12.5,
+                    transaction_count: 1,
+                },
+                {
+                    category_id: 5,
+                    category_code: 'C005',
+                    category_name_es: 'HOGAR',
+                    category_name_en: 'Household',
+                    amount_cad: 100,
+                    percentage: 5,
+                    transaction_count: 1,
+                },
+            ],
+        },
     },
 };
 
@@ -172,6 +238,7 @@ function renderDashboard(
     summary = mockPage.props.summary,
     incomeExpenseChart = mockPage.props.income_expense_chart,
     assetsLiabilitiesChart = mockPage.props.assets_liabilities_chart,
+    topSpendingCategories = mockPage.props.top_spending_categories,
 ) {
     return render(
         <TooltipProvider delayDuration={0}>
@@ -180,6 +247,7 @@ function renderDashboard(
                     summary={summary}
                     income_expense_chart={incomeExpenseChart}
                     assets_liabilities_chart={assetsLiabilitiesChart}
+                    top_spending_categories={topSpendingCategories}
                 />
             </AppLayout>
         </TooltipProvider>,
@@ -342,5 +410,42 @@ describe('Dashboard feature', () => {
         expect(
             screen.getByTestId('assets-liabilities-hover-tooltip').textContent,
         ).toMatch(/Equity/i);
+    });
+
+    it('displays top spending categories with amounts and percentages', () => {
+        renderDashboard();
+
+        expect(screen.getByText('Top Spending Categories')).toBeDefined();
+        expect(screen.getByTestId('top-spending-categories-card')).toBeDefined();
+        expect(screen.getByTestId('top-spending-categories-list')).toBeDefined();
+        expect(screen.getByTestId('top-spending-row-C001')).toBeDefined();
+        expect(screen.getByTestId('top-spending-amount-C001').textContent).toMatch(
+            /\$800\.00/,
+        );
+        expect(screen.getByTestId('top-spending-pct-C001').textContent).toMatch(
+            /40\.0%/,
+        );
+        expect(screen.getByTestId('top-spending-bar-C001')).toBeDefined();
+        expect(screen.getByText(/MERCADO/)).toBeDefined();
+        expect(screen.getByText(/Groceries/)).toBeDefined();
+        expect(screen.getByTestId('top-spending-row-C006')).toBeDefined();
+        expect(screen.getByTestId('top-spending-row-C005')).toBeDefined();
+    });
+
+    it('shows empty state when there are no top spending categories', () => {
+        renderDashboard(
+            mockPage.props.summary,
+            mockPage.props.income_expense_chart,
+            mockPage.props.assets_liabilities_chart,
+            {
+                period: '202601',
+                limit: 10,
+                total_expenses_cad: 0,
+                categories: [],
+            },
+        );
+
+        expect(screen.getByTestId('top-spending-categories-empty')).toBeDefined();
+        expect(screen.getByText(/No spending recorded/i)).toBeDefined();
     });
 });

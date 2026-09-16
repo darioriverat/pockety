@@ -10,6 +10,7 @@ import {
     CheckCircleIcon,
     AlertCircleIcon,
     LineChart,
+    PieChartIcon,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -57,10 +58,28 @@ interface AssetsLiabilitiesChart {
     periods: AssetsLiabilitiesPeriod[];
 }
 
+interface TopSpendingCategory {
+    category_id: number;
+    category_code: string;
+    category_name_es: string;
+    category_name_en: string;
+    amount_cad: number;
+    percentage: number;
+    transaction_count: number;
+}
+
+interface TopSpendingCategories {
+    period: string;
+    limit: number;
+    total_expenses_cad: number;
+    categories: TopSpendingCategory[];
+}
+
 interface DashboardProps {
     summary: DashboardSummary;
     income_expense_chart: IncomeExpenseChart;
     assets_liabilities_chart: AssetsLiabilitiesChart;
+    top_spending_categories: TopSpendingCategories;
 }
 
 function formatPeriodShort(period: string): string {
@@ -423,10 +442,130 @@ function AssetsLiabilitiesTrendChart({
     );
 }
 
+const TOP_SPENDING_BAR_COLORS = [
+    '#0f766e', // teal-700
+    '#1d4ed8', // blue-700
+    '#b45309', // amber-700
+    '#be123c', // rose-700
+    '#047857', // emerald-700
+    '#0369a1', // sky-700
+    '#a16207', // yellow-700
+    '#9a3412', // orange-800
+    '#334155', // slate-700
+    '#115e59', // teal-800
+];
+
+function TopSpendingCategoriesWidget({
+    data,
+    formatCurrency,
+}: {
+    data: TopSpendingCategories;
+    formatCurrency: (amount: number) => string;
+}) {
+    const maxAmount = Math.max(
+        ...data.categories.map((category) => category.amount_cad),
+        1,
+    );
+
+    return (
+        <Card data-testid="top-spending-categories-card">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <PieChartIcon className="h-5 w-5" />
+                    Top Spending Categories
+                </CardTitle>
+                <CardDescription data-testid="top-spending-categories-subtitle">
+                    Top {data.categories.length} categories for the selected period · CAD
+                    {data.total_expenses_cad > 0
+                        ? ` · Total ${formatCurrency(data.total_expenses_cad)}`
+                        : ''}
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                {data.categories.length === 0 ? (
+                    <p
+                        className="text-muted-foreground text-sm"
+                        data-testid="top-spending-categories-empty"
+                    >
+                        No spending recorded for this period.
+                    </p>
+                ) : (
+                    <div
+                        className="space-y-3"
+                        data-testid="top-spending-categories-list"
+                        role="list"
+                        aria-label="Top spending categories"
+                    >
+                        {data.categories.map((category, index) => {
+                            const barWidth = Math.max(
+                                4,
+                                (category.amount_cad / maxAmount) * 100,
+                            );
+                            const color =
+                                TOP_SPENDING_BAR_COLORS[
+                                    index % TOP_SPENDING_BAR_COLORS.length
+                                ];
+
+                            return (
+                                <div
+                                    key={category.category_id}
+                                    className="space-y-1.5"
+                                    role="listitem"
+                                    data-testid={`top-spending-row-${category.category_code}`}
+                                >
+                                    <div className="flex items-baseline justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-medium">
+                                                <span className="text-muted-foreground mr-1.5 font-mono text-xs">
+                                                    {category.category_code}
+                                                </span>
+                                                {category.category_name_es} /{' '}
+                                                {category.category_name_en}
+                                            </p>
+                                        </div>
+                                        <div className="shrink-0 text-right">
+                                            <p
+                                                className="text-sm font-semibold tabular-nums"
+                                                data-testid={`top-spending-amount-${category.category_code}`}
+                                            >
+                                                {formatCurrency(category.amount_cad)}
+                                            </p>
+                                            <p
+                                                className="text-muted-foreground text-xs tabular-nums"
+                                                data-testid={`top-spending-pct-${category.category_code}`}
+                                            >
+                                                {category.percentage.toFixed(1)}%
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="bg-muted h-2.5 w-full overflow-hidden rounded-sm"
+                                        aria-hidden="true"
+                                    >
+                                        <div
+                                            className="h-full rounded-sm transition-[width]"
+                                            data-testid={`top-spending-bar-${category.category_code}`}
+                                            style={{
+                                                width: `${barWidth}%`,
+                                                backgroundColor: color,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function Dashboard({
     summary,
     income_expense_chart,
     assets_liabilities_chart,
+    top_spending_categories,
 }: DashboardProps) {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-CA', {
@@ -645,6 +784,12 @@ export default function Dashboard({
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Top Spending Categories */}
+                <TopSpendingCategoriesWidget
+                    data={top_spending_categories}
+                    formatCurrency={formatCurrency}
+                />
 
                 {/* Reconciliation Status Card */}
                 <Card>

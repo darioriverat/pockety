@@ -392,4 +392,102 @@ class DashboardTest extends TestCase
             ->where('assets_liabilities_chart.periods.6.equity_cad', 8000)
         );
     }
+
+    public function test_dashboard_displays_top_spending_categories_for_current_period(): void
+    {
+        $period = '202601';
+
+        ExchangeRate::create([
+            'period' => $period,
+            'usd_cop' => 4400,
+            'usd_cad' => 0.75,
+            'cad_cop' => 3000,
+        ]);
+
+        $account = Account::factory()->create(['type' => 'bank']);
+
+        $c001 = Category::factory()->create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+        ]);
+        $c006 = Category::factory()->create([
+            'code' => 'C006',
+            'name_es' => 'COMIDAS CALLE',
+            'name_en' => 'Dining Out',
+        ]);
+        $c004 = Category::factory()->create([
+            'code' => 'C004',
+            'name_es' => 'TRANSPORTES',
+            'name_en' => 'Transportation',
+        ]);
+        $c008 = Category::factory()->create([
+            'code' => 'C008',
+            'name_es' => 'SERVICIOS',
+            'name_en' => 'Utilities',
+        ]);
+        $c005 = Category::factory()->create([
+            'code' => 'C005',
+            'name_es' => 'HOGAR',
+            'name_en' => 'Household',
+        ]);
+        $c007 = Category::factory()->create([
+            'code' => 'C007',
+            'name_es' => 'JUGUETES NIÑAS',
+            'name_en' => "Kids' Toys",
+        ]);
+
+        $spendByCategory = [
+            [$c001, 800.00],
+            [$c006, 500.00],
+            [$c004, 350.00],
+            [$c008, 250.00],
+            [$c005, 100.00],
+            [$c007, 50.00],
+        ];
+
+        foreach ($spendByCategory as [$category, $amount]) {
+            Transaction::create([
+                'date' => '2026-01-15',
+                'period' => $period,
+                'quincena' => 'Q1',
+                'category_id' => $category->id,
+                'account_id' => $account->id,
+                'amount_cad' => $amount,
+                'amount_usd' => null,
+                'amount_cop' => null,
+            ]);
+        }
+
+        // Other-period spend must not appear in this period's top list
+        Transaction::create([
+            'date' => '2026-02-15',
+            'period' => '202602',
+            'quincena' => 'Q1',
+            'category_id' => $c001->id,
+            'account_id' => $account->id,
+            'amount_cad' => 9999.00,
+            'amount_usd' => null,
+            'amount_cop' => null,
+        ]);
+
+        $response = $this->get(route('dashboard', ['period' => $period]));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard')
+            ->where('top_spending_categories.period', $period)
+            ->where('top_spending_categories.limit', 10)
+            ->where('top_spending_categories.total_expenses_cad', 2050)
+            ->has('top_spending_categories.categories', 6)
+            ->where('top_spending_categories.categories.0.category_code', 'C001')
+            ->where('top_spending_categories.categories.0.amount_cad', 800)
+            ->where('top_spending_categories.categories.0.percentage', 39)
+            ->where('top_spending_categories.categories.1.category_code', 'C006')
+            ->where('top_spending_categories.categories.1.amount_cad', 500)
+            ->where('top_spending_categories.categories.2.category_code', 'C004')
+            ->where('top_spending_categories.categories.5.category_code', 'C007')
+            ->where('top_spending_categories.categories.5.amount_cad', 50)
+        );
+    }
 }

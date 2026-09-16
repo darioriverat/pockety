@@ -1231,7 +1231,7 @@
       "Step 4: Verify amounts are displayed",
       "Step 5: Verify percentages or chart visualization is included"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
