@@ -6011,3 +6011,40 @@ NEXT:
 1. Feature #166 WCAG AA color contrast
 2. Feature #167 distinct link styling
 3. Optionally restore MySQL when Lima/Docker DNS works (./scripts/recover-stack.sh)
+
+
+=== Session 97 (2026-09-16) ===
+
+GOAL: Verify stack, implement Feature #166 WCAG AA color contrast
+
+STACK:
+- App HTTP 200 (sqlite recovery from Session 96 still in place)
+- Host Puppeteer MCP still rejected (sandbox interactive approval)
+- Container Playwright via session-helpers works
+
+VERIFICATION (before new work):
+- Frontend unit (section-heading): PASSED
+- Sample browser empty-states.spec.ts: PASSED (3)
+- Sample phpunit Transaction*: PASSED (54)
+
+FEATURE #166 IMPLEMENTED + VERIFIED:
+- Tightened theme tokens in resources/css/app.css for WCAG AA:
+  - light muted-foreground 0.556 -> 0.45 (~7.5:1)
+  - dark muted-foreground -> 0.78; fixed sidebar-primary-foreground (was 1:1)
+  - destructive text/bg pair; stronger border/ring contrast
+- Alert destructive: tinted bg + text-destructive (not white-on-transparent)
+- financial-summary: text-gray-500 -> text-muted-foreground
+- dropdown destructive items use text-destructive
+- New contrast helpers + unit tests (resources/js/lib/contrast.ts)
+- Browser: tests/browser/color-contrast.spec.ts (light+dark) PASSED
+- Screenshots: verification/test-166-color-contrast/
+- Regression: empty-states + alert unit PASSED
+
+FEATURES MARKED PASSING: #166
+
+STATUS: 167/175 (8 remaining)
+
+NEXT:
+1. Feature #167 distinct link styling
+2. Feature #168 consistent icon alignment
+3. Feature #169 reconciliation variance colors

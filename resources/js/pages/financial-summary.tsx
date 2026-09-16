@@ -218,7 +218,7 @@ export default function FinancialSummary() {
                                             )}
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="text-xs text-gray-500">
+                                    <CardContent className="text-xs text-muted-foreground">
                                         Gasto Total — all categories including
                                         debt payments
                                     </CardContent>
@@ -238,7 +238,7 @@ export default function FinancialSummary() {
                                             )}
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="text-xs text-gray-500">
+                                    <CardContent className="text-xs text-muted-foreground">
                                         Gasto Real — excludes principal &amp;
                                         depreciation
                                     </CardContent>
@@ -253,7 +253,7 @@ export default function FinancialSummary() {
                                             {formatCad(summary?.net_cad ?? 0)}
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="text-xs text-gray-500">
+                                    <CardContent className="text-xs text-muted-foreground">
                                         Income − Net Operating Expenses
                                     </CardContent>
                                 </Card>
@@ -313,7 +313,7 @@ export default function FinancialSummary() {
                                             data-testid="income-lines-table"
                                         >
                                             <thead>
-                                                <tr className="border-b text-xs uppercase tracking-wide text-gray-500">
+                                                <tr className="border-b text-xs uppercase tracking-wide text-muted-foreground">
                                                     <th className="py-2 pr-3">
                                                         #
                                                     </th>
@@ -331,7 +331,7 @@ export default function FinancialSummary() {
                                                     <tr>
                                                         <td
                                                             colSpan={3}
-                                                            className="py-8 text-center text-gray-500"
+                                                            className="py-8 text-center text-muted-foreground"
                                                         >
                                                             No income lines for
                                                             this period yet.
@@ -470,7 +470,7 @@ export default function FinancialSummary() {
                                 </CardHeader>
                                 <CardContent>
                                     {loading && (
-                                        <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
+                                        <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
                                             <Spinner className="h-4 w-4" />
                                             Refreshing…
                                         </div>
@@ -484,7 +484,7 @@ export default function FinancialSummary() {
                                             data-testid="financial-summary-table"
                                         >
                                             <thead>
-                                                <tr className="border-b text-xs uppercase tracking-wide text-gray-500">
+                                                <tr className="border-b text-xs uppercase tracking-wide text-muted-foreground">
                                                     <th className="py-2 pr-3">
                                                         Category
                                                     </th>
@@ -508,7 +508,7 @@ export default function FinancialSummary() {
                                                     <tr>
                                                         <td
                                                             colSpan={5}
-                                                            className="py-8 text-center text-gray-500"
+                                                            className="py-8 text-center text-muted-foreground"
                                                         >
                                                             No transactions for
                                                             this period yet.
