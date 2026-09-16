@@ -156,6 +156,7 @@ export default function Transactions() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [isDuplicating, setIsDuplicating] = useState(false);
@@ -295,6 +296,7 @@ export default function Transactions() {
 
         highlightApplied.current = true;
         setFormError(null);
+        setFieldErrors({});
         setIsDuplicating(false);
         setEditingId(target.id);
         setFormData({
@@ -388,22 +390,43 @@ export default function Transactions() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFormError(null);
+        setFieldErrors({});
 
-        if (!isValidTransactionDate(formData.date.trim())) {
-            setFormError(DATE_VALID_ERROR);
-            return;
+        // Field-level validation for required fields
+        const errors: Record<string, string> = {};
+
+        if (!formData.date.trim()) {
+            errors.date = 'Date is required';
+        } else if (!isValidTransactionDate(formData.date.trim())) {
+            errors.date = DATE_VALID_ERROR;
         }
 
-        if (!isPeriodFormatValid(formData.period.trim())) {
-            setFormError(PERIOD_FORMAT_ERROR);
+        if (!formData.period.trim()) {
+            errors.period = 'Period is required';
+        } else if (!isPeriodFormatValid(formData.period.trim())) {
+            errors.period = PERIOD_FORMAT_ERROR;
+        }
+
+        if (!formData.category_id) {
+            errors.category_id = 'Category is required';
+        }
+
+        if (!formData.amount.trim()) {
+            errors.amount = 'Amount is required';
+        } else {
+            const amountNum = parseFloat(formData.amount);
+            if (Number.isNaN(amountNum) || amountNum <= 0) {
+                errors.amount = AMOUNT_POSITIVE_ERROR;
+            }
+        }
+
+        // If there are validation errors, set them and stop submission
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
             return;
         }
 
         const amountNum = parseFloat(formData.amount);
-        if (Number.isNaN(amountNum) || amountNum <= 0) {
-            setFormError(AMOUNT_POSITIVE_ERROR);
-            return;
-        }
 
         const payload: Record<string, unknown> = {
             date: formData.date.trim(),
@@ -485,6 +508,7 @@ export default function Transactions() {
 
     const handleEdit = (transaction: Transaction) => {
         setFormError(null);
+        setFieldErrors({});
         setIsDuplicating(false);
         setEditingId(transaction.id);
         setFormData({
@@ -507,6 +531,7 @@ export default function Transactions() {
 
     const handleDuplicate = (transaction: Transaction) => {
         setFormError(null);
+        setFieldErrors({});
         setEditingId(null);
         setIsDuplicating(true);
         setFormData({
@@ -627,6 +652,7 @@ export default function Transactions() {
         setEditingId(null);
         setIsDuplicating(false);
         setFormError(null);
+        setFieldErrors({});
         const today = new Date().toISOString().split('T')[0];
         setFormData({
             date: today,
@@ -644,6 +670,7 @@ export default function Transactions() {
 
     const handleDateChange = (date: string) => {
         setFormError(null);
+        setFieldErrors((prev) => ({ ...prev, date: '' }));
         const derivedPeriod = periodFromDate(date);
         setFormData((prev) => ({
             ...prev,
@@ -880,19 +907,24 @@ export default function Transactions() {
                                             onChange={(e) =>
                                                 handleDateChange(e.target.value)
                                             }
-                                            aria-invalid={
-                                                formError !== null &&
-                                                formError
-                                                    .toLowerCase()
-                                                    .includes('date')
-                                            }
+                                            aria-invalid={!!fieldErrors.date}
                                             aria-describedby={
-                                                formError
-                                                    ? 'transaction-form-error'
+                                                fieldErrors.date
+                                                    ? 'date-error'
                                                     : undefined
                                             }
                                             required
                                         />
+                                        {fieldErrors.date && (
+                                            <p
+                                                id="date-error"
+                                                className="text-destructive text-sm"
+                                                role="alert"
+                                                data-testid="date-error"
+                                            >
+                                                {fieldErrors.date}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="grid gap-2">
@@ -905,25 +937,31 @@ export default function Transactions() {
                                                 data-testid="transaction-period-input"
                                                 onChange={(e) => {
                                                     setFormError(null);
+                                                    setFieldErrors((prev) => ({ ...prev, period: '' }));
                                                     setFormData({
                                                         ...formData,
                                                         period: e.target.value,
                                                     });
                                                 }}
                                                 placeholder="202501"
-                                                aria-invalid={
-                                                    formError !== null &&
-                                                    formError
-                                                        .toLowerCase()
-                                                        .includes('period')
-                                                }
+                                                aria-invalid={!!fieldErrors.period}
                                                 aria-describedby={
-                                                    formError
-                                                        ? 'transaction-form-error transaction-period-hint'
+                                                    fieldErrors.period
+                                                        ? 'period-error transaction-period-hint'
                                                         : 'transaction-period-hint'
                                                 }
                                                 required
                                             />
+                                            {fieldErrors.period && (
+                                                <p
+                                                    id="period-error"
+                                                    className="text-destructive text-sm"
+                                                    role="alert"
+                                                    data-testid="period-error"
+                                                >
+                                                    {fieldErrors.period}
+                                                </p>
+                                            )}
                                             <p
                                                 id="transaction-period-hint"
                                                 className="text-muted-foreground text-xs"
@@ -970,16 +1008,23 @@ export default function Transactions() {
                                         </Label>
                                         <Select
                                             value={formData.category_id}
-                                            onValueChange={(value) =>
+                                            onValueChange={(value) => {
+                                                setFieldErrors((prev) => ({ ...prev, category_id: '' }));
                                                 setFormData({
                                                     ...formData,
                                                     category_id: value,
-                                                })
-                                            }
+                                                });
+                                            }}
                                         >
                                             <SelectTrigger
                                                 id="category"
                                                 aria-label="Category"
+                                                aria-invalid={!!fieldErrors.category_id}
+                                                aria-describedby={
+                                                    fieldErrors.category_id
+                                                        ? 'category-error'
+                                                        : undefined
+                                                }
                                             >
                                                 <SelectValue placeholder="Select category" />
                                             </SelectTrigger>
@@ -995,6 +1040,16 @@ export default function Transactions() {
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                        {fieldErrors.category_id && (
+                                            <p
+                                                id="category-error"
+                                                className="text-destructive text-sm"
+                                                role="alert"
+                                                data-testid="category-error"
+                                            >
+                                                {fieldErrors.category_id}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="account">
@@ -1076,24 +1131,30 @@ export default function Transactions() {
                                                 data-testid="transaction-amount-input"
                                                 onChange={(e) => {
                                                     setFormError(null);
+                                                    setFieldErrors((prev) => ({ ...prev, amount: '' }));
                                                     setFormData({
                                                         ...formData,
                                                         amount: e.target.value,
                                                     });
                                                 }}
-                                                aria-invalid={
-                                                    formError !== null &&
-                                                    formError
-                                                        .toLowerCase()
-                                                        .includes('amount')
-                                                }
+                                                aria-invalid={!!fieldErrors.amount}
                                                 aria-describedby={
-                                                    formError
-                                                        ? 'transaction-form-error'
+                                                    fieldErrors.amount
+                                                        ? 'amount-error'
                                                         : undefined
                                                 }
                                                 required
                                             />
+                                            {fieldErrors.amount && (
+                                                <p
+                                                    id="amount-error"
+                                                    className="text-destructive text-sm"
+                                                    role="alert"
+                                                    data-testid="amount-error"
+                                                >
+                                                    {fieldErrors.amount}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="grid gap-2">
