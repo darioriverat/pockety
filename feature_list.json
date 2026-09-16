@@ -2013,7 +2013,7 @@
       "Step 4: Verify hover state makes links more obvious",
       "Step 5: Verify visited links are distinguishable (if applicable)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

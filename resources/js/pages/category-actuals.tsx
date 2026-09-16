@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import {
     Card,
@@ -21,6 +21,7 @@ import {
 import { usePeriod } from '@/hooks/use-period';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
+import TextLink from '@/components/text-link';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
 import { ChartColumn, RefreshCw, XCircle } from 'lucide-react';
@@ -253,13 +254,13 @@ export default function CategoryActuals() {
                                                 }
                                             >
                                                 <td className="px-3 py-2 font-mono text-gray-900 dark:text-gray-100">
-                                                    <Link
+                                                    <TextLink
                                                         href={`/transactions?period=${selectedPeriod}&category=${row.category_code}`}
-                                                        className="text-teal-700 underline-offset-2 hover:underline dark:text-teal-400"
+                                                        className="font-mono"
                                                         data-testid={`category-actual-link-${row.category_code}`}
                                                     >
                                                         {row.category_code}
-                                                    </Link>
+                                                    </TextLink>
                                                 </td>
                                                 <td className="px-3 py-2 text-gray-700 dark:text-gray-300">
                                                     <span className="font-medium text-gray-900 dark:text-gray-100">

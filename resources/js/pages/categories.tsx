@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -12,6 +12,7 @@ import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
+import TextLink from '@/components/text-link';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
 import { useCategoryLanguage } from '@/hooks/use-category-language';
@@ -175,13 +176,12 @@ export default function Categories() {
                                     <CardHeader>
                                         <div className="flex items-start justify-between">
                                             <CardTitle className="text-lg">
-                                                <Link
+                                                <TextLink
                                                     href={`/categories/${category.code}`}
-                                                    className="hover:underline"
                                                     data-testid={`category-link-${category.code}`}
                                                 >
                                                     {category.code}
-                                                </Link>
+                                                </TextLink>
                                             </CardTitle>
                                             <div className="flex gap-2 items-center">
                                                 {category.is_debt_category && (
@@ -214,9 +214,9 @@ export default function Categories() {
                                             </div>
                                         </div>
                                         <CardDescription>
-                                            <Link
+                                            <TextLink
                                                 href={`/categories/${category.code}`}
-                                                className="block space-y-1 hover:opacity-90"
+                                                className="block space-y-1 no-underline hover:underline"
                                             >
                                                 <div
                                                     data-testid={`category-name-${category.code}`}
@@ -233,7 +233,7 @@ export default function Categories() {
                                                         {category.status}
                                                     </div>
                                                 )}
-                                            </Link>
+                                            </TextLink>
                                         </CardDescription>
                                     </CardHeader>
                                 </Card>

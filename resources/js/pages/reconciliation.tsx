@@ -35,6 +35,7 @@ import { usePeriod } from '@/hooks/use-period';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
 import { SubsectionHeading } from '@/components/section-heading';
+import TextLink from '@/components/text-link';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
     ScaleIcon,
@@ -44,7 +45,6 @@ import {
     ClipboardCheck,
     AlertCircle,
 } from 'lucide-react';
-import { Link } from '@inertiajs/react';
 
 interface CurrencyAmounts {
     cad: number;
@@ -669,16 +669,16 @@ export default function Reconciliation() {
                                     )}
                                 {!account.is_balanced && (
                                     <div className="mt-4 flex flex-wrap items-center gap-3 border-t pt-4">
-                                        <Link
+                                        <TextLink
                                             href={`/accounts/${account.account_id}?period=${report.period}`}
-                                            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            className="inline-flex items-center gap-2 text-sm"
                                             data-testid={`investigate-link-${account.account_id}`}
                                         >
                                             <span>
                                                 Investigate Transactions
                                             </span>
                                             <ExternalLink className="h-4 w-4" />
-                                        </Link>
+                                        </TextLink>
                                         <Button
                                             type="button"
                                             variant="outline"

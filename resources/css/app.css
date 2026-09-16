@@ -29,6 +29,11 @@
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
 
+    /* Content links (distinct from body / primary chrome) */
+    --color-link: var(--link);
+    --color-link-hover: var(--link-hover);
+    --color-link-visited: var(--link-visited);
+
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
 
@@ -76,6 +81,10 @@
     --popover-foreground: oklch(0.145 0 0);
     --primary: oklch(0.205 0 0);
     --primary-foreground: oklch(0.985 0 0);
+    /* Teal links: distinct from near-black body, ≥4.5:1 on white */
+    --link: oklch(0.45 0.1 195);
+    --link-hover: oklch(0.38 0.11 195);
+    --link-visited: oklch(0.42 0.12 305);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
@@ -114,6 +123,10 @@
     --popover-foreground: oklch(0.985 0 0);
     --primary: oklch(0.985 0 0);
     --primary-foreground: oklch(0.205 0 0);
+    /* Lighter teal / purple for dark surfaces */
+    --link: oklch(0.78 0.1 195);
+    --link-hover: oklch(0.88 0.09 195);
+    --link-visited: oklch(0.78 0.12 305);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
     --muted: oklch(0.269 0 0);

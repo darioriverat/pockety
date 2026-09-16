@@ -1,9 +1,14 @@
 import { Link } from '@inertiajs/react';
 import type { ComponentProps } from 'react';
+import { TEXT_LINK_CLASS } from '@/lib/text-link';
 import { cn } from '@/lib/utils';
 
 type Props = ComponentProps<typeof Link>;
 
+/**
+ * In-content hyperlink: teal color + underline, distinct from body text.
+ * Use for prose / card content links — not nav chrome or buttons.
+ */
 export default function TextLink({
     className = '',
     children,
@@ -11,10 +16,8 @@ export default function TextLink({
 }: Props) {
     return (
         <Link
-            className={cn(
-                'text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500',
-                className,
-            )}
+            data-slot="text-link"
+            className={cn(TEXT_LINK_CLASS, className)}
             {...props}
         >
             {children}

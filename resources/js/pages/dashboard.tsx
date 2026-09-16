@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
+import TextLink from '@/components/text-link';
 import { dashboard } from '@/routes';
 import {
     TrendingUpIcon,
@@ -1213,12 +1214,13 @@ export default function Dashboard({
                                     </p>
                                 )}
                             </div>
-                            <a
+                            <TextLink
                                 href="/reconciliation"
-                                className="text-sm font-medium text-primary hover:underline"
+                                className="text-sm"
+                                data-testid="reconciliation-details-link"
                             >
                                 View Details →
-                            </a>
+                            </TextLink>
                         </div>
                     </CardContent>
                 </Card>

@@ -6048,3 +6048,33 @@ NEXT:
 1. Feature #167 distinct link styling
 2. Feature #168 consistent icon alignment
 3. Feature #169 reconciliation variance colors
+
+
+=== Session 98 (2026-09-16) ===
+
+GOAL: Verify stack, implement Feature #167 distinct link styling
+
+STACK:
+- App HTTP 200 (sqlite recovery still in place)
+- Host Puppeteer MCP rejected this session (sandbox approval) — verified via container Playwright / session-helpers
+- Sample verification: frontend section-heading PASS; empty-states.spec PASS; phpunit Account PASS (28)
+
+FEATURE #167 IMPLEMENTED + VERIFIED:
+- CSS tokens --link / --link-hover / --link-visited (teal + purple visited) light+dark
+- TEXT_LINK_CLASS + TextLink: distinct color, underline, hover, visited
+- Applied on dashboard reconciliation CTA, categories, category-actuals, reconciliation investigate links
+- Button link variant aligned with content-link tokens
+- Fixed categories white-screen: leftover Link after import removal → TextLink
+- Unit: text-link.test.tsx PASS; dashboard.test PASS (22)
+- Playwright: tests/browser/link-styling.spec.ts PASS (3)
+- Screenshots: verification/test-167-link-styling/
+- Regression: categories.spec features 2–4 PASS (feature 89 date-input flake unrelated)
+
+FEATURES MARKED PASSING: #167
+
+STATUS: 168/175 (7 remaining)
+
+NEXT:
+1. Feature #168 consistent icon alignment
+2. Feature #169 reconciliation variance colors
+3. Feature #170 budget vs actual under/over colors
