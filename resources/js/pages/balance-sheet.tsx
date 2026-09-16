@@ -21,6 +21,7 @@ import {
 import { usePeriod } from '@/hooks/use-period';
 import { formatPeriod, generatePeriods } from '@/lib/periods';
 import {
+    Download,
     Landmark,
     LineChart,
     Scale,
@@ -130,6 +131,11 @@ export default function BalanceSheet() {
         }
     };
 
+    const handleExportPdf = () => {
+        const url = `/api/balance-sheet/export?period=${encodeURIComponent(selectedPeriod)}`;
+        window.location.href = url;
+    };
+
     return (
         <>
             <Head title="Balance Sheet" />
@@ -148,15 +154,26 @@ export default function BalanceSheet() {
                             </p>
                         </div>
                         <div className="flex w-full max-w-md flex-col gap-3 sm:items-end">
-                            <Button variant="outline" asChild>
-                                <Link
-                                    href="/balance-sheet/time-series"
-                                    data-testid="time-series-link"
+                            <div className="flex flex-wrap gap-2 sm:justify-end">
+                                <Button
+                                    variant="outline"
+                                    onClick={handleExportPdf}
+                                    disabled={!selectedPeriod || loading}
+                                    data-testid="export-balance-sheet-pdf"
                                 >
-                                    <LineChart className="mr-2 h-4 w-4" />
-                                    Time series
-                                </Link>
-                            </Button>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Export to PDF
+                                </Button>
+                                <Button variant="outline" asChild>
+                                    <Link
+                                        href="/balance-sheet/time-series"
+                                        data-testid="time-series-link"
+                                    >
+                                        <LineChart className="mr-2 h-4 w-4" />
+                                        Time series
+                                    </Link>
+                                </Button>
+                            </div>
                             <div className="w-full max-w-xs space-y-2">
                                 <Label htmlFor="period">Period</Label>
                                 <Select

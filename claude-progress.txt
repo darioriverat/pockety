@@ -4722,3 +4722,41 @@ NEXT SESSION:
 PROGRESS: 116/175 passing; 59 remaining
 STATUS: App healthy; period auto-fills from transaction date on add form
 
+================================================================================
+SESSION 66 - Sep 15, 2026, ~10:45 PM (Fresh Context)
+================================================================================
+
+ENVIRONMENT:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200)
+- Puppeteer MCP blocked (interactive approval rejected) — used /dev/browser-tests
+- Frontend/backend/browser via /dev/frontend-tests, /dev/run-tests, /dev/browser-tests
+
+VERIFICATION (before new work):
+- Frontend unit tests: 78/78 pass
+- Browser smoke (feature 111): pass
+
+IMPLEMENTED THIS SESSION:
+Test #115 — PDF report of balance sheet for a period (COMPLETED)
+- SimplePdf support class (pure PHP, multi-page Helvetica WinAnsi)
+- BalanceSheetPdfExporter builds Assets / Liabilities / Equity report
+- GET /api/balance-sheet/export?period=YYYYMM → application/pdf download
+- Balance sheet UI: Export to PDF button (data-testid=export-balance-sheet-pdf)
+- Feature tests: BalanceSheetTest (+4 PDF export tests = 16)
+- Frontend unit test: balance-sheet-pdf.test.tsx
+- Playwright: tests/browser/balance-sheet-pdf.spec.ts
+
+BROWSER VERIFIED (screenshots in verification/session-66/):
+- 01-balance-sheet-before-export.png (Export to PDF visible; 202501 totals)
+- 02-balance-sheet-after-export.png
+- balance-sheet-202501.pdf (contains Assets, Liabilities, Equity + account lines)
+
+PASSES UPDATED:
+- #115 → passes: true
+
+NEXT SESSION:
+1. Implement test #116 — PDF report of income statement for a period
+2. Prefer /dev/reset-test-user + /dev/seed-browser if login fails
+
+PROGRESS: 117/175 passing; 58 remaining
+STATUS: App healthy; balance sheet PDF export live
+

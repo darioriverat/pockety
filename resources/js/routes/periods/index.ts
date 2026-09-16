@@ -263,7 +263,7 @@ reconciliation.form = reconciliationForm
 
 /**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
-* @see app/Http/Controllers/BalanceSheetController.php:21
+* @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
 */
 export const balanceSheet = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -278,7 +278,7 @@ balanceSheet.definition = {
 
 /**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
-* @see app/Http/Controllers/BalanceSheetController.php:21
+* @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
 */
 balanceSheet.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -305,7 +305,7 @@ balanceSheet.url = (args: { period: string | number } | [period: string | number
 
 /**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
-* @see app/Http/Controllers/BalanceSheetController.php:21
+* @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
 */
 balanceSheet.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -315,7 +315,7 @@ balanceSheet.get = (args: { period: string | number } | [period: string | number
 
 /**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
-* @see app/Http/Controllers/BalanceSheetController.php:21
+* @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
 */
 balanceSheet.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -325,7 +325,7 @@ balanceSheet.head = (args: { period: string | number } | [period: string | numbe
 
 /**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
-* @see app/Http/Controllers/BalanceSheetController.php:21
+* @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
 */
 const balanceSheetForm = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -335,7 +335,7 @@ const balanceSheetForm = (args: { period: string | number } | [period: string | 
 
 /**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
-* @see app/Http/Controllers/BalanceSheetController.php:21
+* @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
 */
 balanceSheetForm.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -345,7 +345,7 @@ balanceSheetForm.get = (args: { period: string | number } | [period: string | nu
 
 /**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
-* @see app/Http/Controllers/BalanceSheetController.php:21
+* @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
 */
 balanceSheetForm.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

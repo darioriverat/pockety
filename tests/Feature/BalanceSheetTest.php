@@ -304,4 +304,77 @@ class BalanceSheetTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page->component('balance-sheet-time-series'));
     }
+
+    public function test_user_can_export_balance_sheet_pdf_for_a_period(): void
+    {
+        $bank = Account::factory()->create([
+            'name' => 'RBC Checking PDF',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+        ]);
+        $loan = Account::factory()->create([
+            'name' => 'CIBC Loan PDF',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $bank->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 2500.00,
+        ]);
+        AccountBalance::create([
+            'account_id' => $loan->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 800.00,
+        ]);
+
+        $response = $this->get('/api/balance-sheet/export?period=202501');
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $this->assertStringContainsString(
+            'attachment; filename="balance_sheet_202501_',
+            (string) $response->headers->get('Content-Disposition')
+        );
+
+        $pdf = $response->getContent();
+        $this->assertIsString($pdf);
+        $this->assertStringStartsWith('%PDF', $pdf);
+        $this->assertStringContainsString('Balance Sheet', $pdf);
+        $this->assertStringContainsString('Assets', $pdf);
+        $this->assertStringContainsString('Liabilities', $pdf);
+        $this->assertStringContainsString('Equity', $pdf);
+        $this->assertStringContainsString('RBC Checking PDF', $pdf);
+        $this->assertStringContainsString('CIBC Loan PDF', $pdf);
+        $this->assertStringContainsString('Total Assets', $pdf);
+        $this->assertStringContainsString('Total Liabilities', $pdf);
+    }
+
+    public function test_balance_sheet_pdf_export_requires_period(): void
+    {
+        $response = $this->getJson('/api/balance-sheet/export');
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['period']);
+    }
+
+    public function test_balance_sheet_pdf_export_rejects_invalid_period(): void
+    {
+        $response = $this->getJson('/api/balance-sheet/export?period=2025');
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['period']);
+    }
+
+    public function test_balance_sheet_json_includes_export_pdf_link(): void
+    {
+        $response = $this->getJson('/api/balance-sheet?period=202501');
+
+        $response->assertOk();
+        $response->assertJsonPath(
+            'links.export_pdf',
+            route('balance-sheet.export-pdf', ['period' => '202501'])
+        );
+    }
 }

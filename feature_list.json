@@ -1381,7 +1381,7 @@
       "Step 4: Open PDF",
       "Step 5: Verify it contains assets, liabilities, equity with proper formatting"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

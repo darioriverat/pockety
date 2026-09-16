@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BalanceSheetPdfExporter;
 use App\Services\BalanceSheetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class BalanceSheetController extends Controller
 {
     public function __construct(
-        private readonly BalanceSheetService $balanceSheetService
+        private readonly BalanceSheetService $balanceSheetService,
+        private readonly BalanceSheetPdfExporter $pdfExporter
     ) {}
 
     /**
@@ -44,11 +47,35 @@ class BalanceSheetController extends Controller
                 'self' => route('balance-sheet.show', ['period' => $period]),
                 'by_period' => route('periods.balance-sheet', ['period' => $period]),
                 'time_series' => route('balance-sheet.time-series'),
+                'export_pdf' => route('balance-sheet.export-pdf', ['period' => $period]),
             ],
             'meta' => [
                 'period' => $period,
                 'currencies' => ['CAD', 'USD', 'COP'],
             ],
+        ]);
+    }
+
+    /**
+     * Export balance sheet as a downloadable PDF for a period.
+     *
+     * GET /api/balance-sheet/export?period=YYYYMM
+     */
+    public function exportPdf(Request $request): Response
+    {
+        $validated = $request->validate([
+            'period' => 'required|string|size:6|regex:/^\d{6}$/',
+        ]);
+
+        $period = $validated['period'];
+        $sheet = $this->balanceSheetService->getBalanceSheet($period);
+        $pdf = $this->pdfExporter->export($sheet);
+        $filename = 'balance_sheet_'.$period.'_'.date('Y-m-d').'.pdf';
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Length' => (string) strlen($pdf),
         ]);
     }
 

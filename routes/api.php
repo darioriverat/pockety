@@ -102,6 +102,7 @@ Route::post('/periods/{period}/reconciliation/{accountId}/acknowledge', [Reconci
 
 // Balance Sheet API
 Route::get('/balance-sheet/time-series', [BalanceSheetController::class, 'timeSeries'])->name('balance-sheet.time-series');
+Route::get('/balance-sheet/export', [BalanceSheetController::class, 'exportPdf'])->name('balance-sheet.export-pdf');
 Route::get('/balance-sheet', [BalanceSheetController::class, 'show'])->name('balance-sheet.show');
 Route::get('/periods/{period}/balance-sheet', [BalanceSheetController::class, 'show'])->name('periods.balance-sheet');
 Route::post('/balance-sheet/import', [BalanceSheetImportController::class, 'import'])->name('balance-sheet.import');
