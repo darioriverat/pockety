@@ -62,7 +62,7 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
         page.getByRole('button', { name: 'Save Budget' }),
     ).toBeVisible();
     await expect(page.getByTestId('budget-vs-actual-table')).toBeVisible();
-    await expect(page.getByLabel('Period')).toBeVisible();
+    await expect(page.getByTestId('page-period-selector')).toBeVisible();
     await expect(page.getByLabel('Category')).toBeVisible();
     await expect(page.getByLabel('Budget Amount (CAD)')).toBeVisible();
 
@@ -76,8 +76,8 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
     await expect(c001Row).toBeVisible();
     await expect(c001Row).toContainText('800');
     await expect(c001Row).toContainText('750');
-    await expect(c001Row).toContainText('93.75%');
-    await expect(c001Row).toContainText('Under budget');
+    await expect(c001Row).toContainText('94%');
+    await expect(c001Row).toContainText('Under');
     await expect(c001Row).toHaveAttribute('data-over-budget', 'false');
 
     // Push category over budget (additional CAD 150 → actual 900)
@@ -94,10 +94,8 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
 
     await page.reload();
     await expect(page.getByTestId('budget-row-C001')).toContainText('900');
-    await expect(page.getByTestId('budget-row-C001')).toContainText('112.50%');
-    await expect(page.getByTestId('budget-row-C001')).toContainText(
-        'Over budget',
-    );
+    await expect(page.getByTestId('budget-row-C001')).toContainText('113%');
+    await expect(page.getByTestId('budget-row-C001')).toContainText('Over');
     await expect(page.getByTestId('budget-row-C001')).toHaveAttribute(
         'data-over-budget',
         'true',

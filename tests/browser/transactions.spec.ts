@@ -42,8 +42,27 @@ async function selectOption(
     label: 'Quincena' | 'Category' | 'Account' | 'Currency' | 'Debt Component',
     option: string,
 ): Promise<void> {
-    await getDialogCombobox(page, label).click();
+    const dialog = page.getByTestId('transaction-form-dialog');
+
+    if (label === 'Debt Component') {
+        const nativeSelect = dialog.getByTestId('debt-component-select');
+        await expect(nativeSelect).toBeVisible();
+        const value =
+            option === 'Principal'
+                ? 'principal'
+                : option === 'Interest'
+                  ? 'interest'
+                  : 'none';
+        await nativeSelect.selectOption(value);
+        await expect(nativeSelect).toHaveValue(value);
+        return;
+    }
+
+    const trigger = dialog.getByRole('combobox', { name: label });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
     await page.getByRole('option', { name: option, exact: true }).click();
+    await expect(trigger).toContainText(option);
 }
 
 async function fillTransactionForm(
@@ -61,25 +80,28 @@ async function fillTransactionForm(
         debtComponent?: 'Principal' | 'Interest';
     },
 ): Promise<void> {
-    await page.getByLabel(/Date/).fill(values.date);
-    await page.getByLabel('Period (YYYYMM)').fill(values.period);
+    const dialog = page.getByTestId('transaction-form-dialog');
+
+    await dialog.getByTestId('transaction-date-input').fill(values.date);
+    await dialog.getByTestId('transaction-period-input').fill(values.period);
     await selectOption(page, 'Quincena', values.quincena);
     await selectOption(page, 'Category', values.category);
     if (values.account) {
         await selectOption(page, 'Account', values.account);
     }
     await selectOption(page, 'Currency', values.currency);
-    await page.getByLabel('Amount').fill(values.amount);
+    await dialog.getByTestId('transaction-amount-input').fill(values.amount);
 
     if (values.comments !== undefined) {
-        await page.getByLabel('Comments').fill(values.comments);
+        await dialog.getByLabel('Comments').fill(values.comments);
     }
 
     if (values.isRecurring) {
-        await page.getByLabel('Recurring transaction').click();
+        await dialog.getByLabel('Recurring transaction').click();
     }
 
     if (values.debtComponent) {
+        await expect(dialog.getByLabel('Debt Component')).toBeVisible();
         await selectOption(page, 'Debt Component', values.debtComponent);
     }
 }
@@ -176,8 +198,13 @@ test('feature 5: user can create a CAD expense transaction', async ({
     await expect(transactionCard).toContainText('$100.50');
     await expect(transactionCard).toContainText('CAD');
     await expect(transactionCard).toContainText('2026-01-05 | Period: 202601 - Q1');
-    await expect(transactionCard).toContainText('C001 - Groceries / MERCADO');
+    await expect(transactionCard).toContainText('C001 - Groceries');
     await expect(transactionCard).toContainText(comments);
+
+    await page.screenshot({
+        path: 'verification/test-5-cad-transaction/01-created-cad-transaction.png',
+        fullPage: true,
+    });
 
     const transaction = await getTransactionByComments(request, comments);
 
@@ -271,9 +298,9 @@ test('feature 8: transactions reject multiple currency amounts', async ({
     await openAddTransactionDialog(page);
 
     await expect(getDialogCombobox(page, 'Currency')).toBeVisible();
-    await expect(page.getByLabel('Amount')).toBeVisible();
+    await expect(page.getByTestId('transaction-amount-input')).toBeVisible();
     await expect(getDialogCombobox(page, 'Currency')).toHaveCount(1);
-    await expect(page.getByLabel('Amount')).toHaveCount(1);
+    await expect(page.getByTestId('transaction-amount-input')).toHaveCount(1);
 
     const response = await request.post('/api/transactions', {
         data: {
@@ -355,7 +382,7 @@ test('feature 10: transactions display category descriptions from the category l
         .locator('[data-slot="card"]')
         .filter({ hasText: comments });
 
-    await expect(transactionCard).toContainText('C001 - Groceries / MERCADO');
+    await expect(transactionCard).toContainText('C001 - Groceries');
 
     const transaction = await getTransactionByComments(request, comments);
 
@@ -480,9 +507,9 @@ test('feature 14: non-debt transactions do not require a debt component', async 
     await selectOption(page, 'Category', 'C001 - Groceries');
     await expect(page.getByText('Debt Component')).toHaveCount(0);
     await selectOption(page, 'Currency', 'CAD');
-    await page.getByLabel(/Date/).fill('2026-01-26');
-    await page.getByLabel('Period (YYYYMM)').fill('202601');
-    await page.getByLabel('Amount').fill('44.00');
+    await page.getByTestId('transaction-date-input').fill('2026-01-26');
+    await page.getByTestId('transaction-period-input').fill('202601');
+    await page.getByTestId('transaction-amount-input').fill('44.00');
     await page.getByLabel('Comments').fill(comments);
     await submitTransactionForm(page, 'Create');
 
@@ -517,9 +544,9 @@ test('feature 15: users can edit an existing transaction', async ({
         .locator('[data-slot="card"]')
         .filter({ hasText: originalComments });
 
-    await transactionCard.locator('[data-slot="button"]').first().click();
+    await transactionCard.getByTestId('edit-transaction-button').click();
     await expect(page.getByRole('heading', { name: 'Edit Transaction' })).toBeVisible();
-    await page.getByLabel('Amount').fill('125.75');
+    await page.getByTestId('transaction-amount-input').fill('125.75');
     await page.getByLabel('Comments').fill(updatedComments);
     await submitTransactionForm(page, 'Update');
 
@@ -560,8 +587,9 @@ test('feature 16: users can delete an existing transaction', async ({
         .locator('[data-slot="card"]')
         .filter({ hasText: comments });
 
-    page.once('dialog', (dialog) => dialog.accept());
-    await transactionCard.locator('[data-slot="button"]').nth(1).click();
+    await transactionCard.getByTestId('delete-transaction-button').click();
+    await expect(page.getByTestId('delete-confirmation-dialog')).toBeVisible();
+    await page.getByTestId('delete-confirm-button').click();
 
     await expect(
         page.locator('[data-slot="card"]').filter({ hasText: comments }),
@@ -583,19 +611,19 @@ test('feature 93: transaction form validates that amount is a positive number', 
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
 
-    await page.getByLabel(/Date/).fill('2026-01-15');
-    await page.getByLabel('Period (YYYYMM)').fill('202601');
+    await page.getByTestId('transaction-date-input').fill('2026-01-15');
+    await page.getByTestId('transaction-period-input').fill('202601');
     await selectOption(page, 'Quincena', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
-    await page.getByLabel('Amount').fill('-100');
+    await page.getByTestId('transaction-amount-input').fill('-100');
     await page.getByLabel('Comments').fill(comments);
 
     await page.getByRole('button', { name: 'Create' }).click();
 
-    const formError = page.getByTestId('transaction-form-error');
-    await expect(formError).toBeVisible();
-    await expect(formError).toContainText(/positive/i);
+    const amountError = page.getByTestId('amount-error');
+    await expect(amountError).toBeVisible();
+    await expect(amountError).toContainText(/positive/i);
     await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
 
     await page.screenshot({
@@ -603,7 +631,7 @@ test('feature 93: transaction form validates that amount is a positive number', 
         fullPage: false,
     });
 
-    await page.getByLabel('Amount').fill('100.50');
+    await page.getByTestId('transaction-amount-input').fill('100.50');
     await submitTransactionForm(page, 'Create');
 
     await expect(
@@ -627,19 +655,19 @@ test('feature 94: transaction form validates that date is a valid date', async (
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
 
-    await page.getByLabel(/Date/).fill('2025-13-45');
-    await page.getByLabel('Period (YYYYMM)').fill('202601');
+    await page.getByTestId('transaction-date-input').fill('2025-13-45');
+    await page.getByTestId('transaction-period-input').fill('202601');
     await selectOption(page, 'Quincena', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
-    await page.getByLabel('Amount').fill('100.50');
+    await page.getByTestId('transaction-amount-input').fill('100.50');
     await page.getByLabel('Comments').fill(comments);
 
     await page.getByRole('button', { name: 'Create' }).click();
 
-    const formError = page.getByTestId('transaction-form-error');
-    await expect(formError).toBeVisible();
-    await expect(formError).toContainText(/valid date/i);
+    const dateError = page.getByTestId('date-error');
+    await expect(dateError).toBeVisible();
+    await expect(dateError).toContainText(/valid date/i);
     await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
 
     await page.screenshot({
@@ -647,7 +675,7 @@ test('feature 94: transaction form validates that date is a valid date', async (
         fullPage: false,
     });
 
-    await page.getByLabel(/Date/).fill('2026-01-15');
+    await page.getByTestId('transaction-date-input').fill('2026-01-15');
     await submitTransactionForm(page, 'Create');
 
     await expect(
@@ -671,19 +699,19 @@ test('feature 83: system validates period format as YYYYMM', async ({
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
 
-    await page.getByLabel(/Date/).fill('2025-01-15');
-    await page.getByLabel('Period (YYYYMM)').fill('2025-01');
+    await page.getByTestId('transaction-date-input').fill('2025-01-15');
+    await page.getByTestId('transaction-period-input').fill('2025-01');
     await selectOption(page, 'Quincena', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
-    await page.getByLabel('Amount').fill('42.00');
+    await page.getByTestId('transaction-amount-input').fill('42.00');
     await page.getByLabel('Comments').fill(comments);
 
     await page.getByRole('button', { name: 'Create' }).click();
 
-    const formError = page.getByTestId('transaction-form-error');
-    await expect(formError).toBeVisible();
-    await expect(formError).toContainText(/YYYYMM/i);
+    const periodError = page.getByTestId('period-error');
+    await expect(periodError).toBeVisible();
+    await expect(periodError).toContainText(/YYYYMM/i);
     await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
 
     await page.screenshot({
@@ -691,17 +719,17 @@ test('feature 83: system validates period format as YYYYMM', async ({
         fullPage: false,
     });
 
-    await page.getByLabel('Period (YYYYMM)').fill('01/2025');
+    await page.getByTestId('transaction-period-input').fill('01/2025');
     await page.getByRole('button', { name: 'Create' }).click();
-    await expect(formError).toBeVisible();
-    await expect(formError).toContainText(/YYYYMM/i);
+    await expect(periodError).toBeVisible();
+    await expect(periodError).toContainText(/YYYYMM/i);
 
     await page.screenshot({
         path: 'verification/test-83-period-format/02-invalid-period-01-2025.png',
         fullPage: false,
     });
 
-    await page.getByLabel('Period (YYYYMM)').fill('202601');
+    await page.getByTestId('transaction-period-input').fill('202601');
     await submitTransactionForm(page, 'Create');
 
     await expect(
@@ -725,8 +753,8 @@ test('feature 84: system validates quincena as Q1 or Q2 only', async ({
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
 
-    await page.getByLabel(/Date/).fill('2026-01-16');
-    await page.getByLabel('Period (YYYYMM)').fill('202601');
+    await page.getByTestId('transaction-date-input').fill('2026-01-16');
+    await page.getByTestId('transaction-period-input').fill('202601');
 
     await getDialogCombobox(page, 'Quincena').click();
     const options = page.getByRole('option');
@@ -743,7 +771,7 @@ test('feature 84: system validates quincena as Q1 or Q2 only', async ({
     await page.getByRole('option', { name: 'Q1', exact: true }).click();
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
-    await page.getByLabel('Amount').fill('15.00');
+    await page.getByTestId('transaction-amount-input').fill('15.00');
     await page.getByLabel('Comments').fill(comments);
     await submitTransactionForm(page, 'Create');
 

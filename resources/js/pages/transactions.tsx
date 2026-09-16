@@ -1266,44 +1266,41 @@ export default function Transactions() {
                                                 <Label htmlFor="debt_component">
                                                     Debt Component
                                                 </Label>
-                                                <Select
+                                                <select
+                                                    id="debt_component"
+                                                    aria-label="Debt Component"
+                                                    data-testid="debt-component-select"
+                                                    className="border-input bg-transparent focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
                                                     value={
                                                         formData.debt_component ||
                                                         'none'
                                                     }
-                                                    onValueChange={(value) =>
+                                                    onChange={(e) =>
                                                         setFormData({
                                                             ...formData,
                                                             debt_component:
-                                                                (value ===
+                                                                (e.target
+                                                                    .value ===
                                                                 'none'
                                                                     ? ''
-                                                                    : value) as
+                                                                    : e.target
+                                                                          .value) as
                                                                     | 'principal'
                                                                     | 'interest'
                                                                     | '',
                                                         })
                                                     }
                                                 >
-                                                    <SelectTrigger
-                                                        className="w-full"
-                                                        id="debt_component"
-                                                        aria-label="Debt Component"
-                                                    >
-                                                        <SelectValue placeholder="Select component" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="none">
-                                                            None
-                                                        </SelectItem>
-                                                        <SelectItem value="principal">
-                                                            Principal
-                                                        </SelectItem>
-                                                        <SelectItem value="interest">
-                                                            Interest
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
+                                                    <option value="none">
+                                                        None
+                                                    </option>
+                                                    <option value="principal">
+                                                        Principal
+                                                    </option>
+                                                    <option value="interest">
+                                                        Interest
+                                                    </option>
+                                                </select>
                                             </div>
                                         )}
                                 </div>
@@ -1774,7 +1771,7 @@ export default function Transactions() {
                                 className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
                                 onClick={() => handleSort('date')}
                                 data-testid="sort-header-date"
-                                aria-label="Date"
+                                aria-label="Sort by Date"
                                 aria-sort={
                                     sortBy === 'date'
                                         ? sortDir === 'asc'
@@ -1791,7 +1788,7 @@ export default function Transactions() {
                                 className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
                                 onClick={() => handleSort('amount')}
                                 data-testid="sort-header-amount"
-                                aria-label="Amount"
+                                aria-label="Sort by Amount"
                                 aria-sort={
                                     sortBy === 'amount'
                                         ? sortDir === 'asc'
@@ -1808,7 +1805,7 @@ export default function Transactions() {
                                 className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
                                 onClick={() => handleSort('category')}
                                 data-testid="sort-header-category"
-                                aria-label="Category"
+                                aria-label="Sort by Category"
                                 aria-sort={
                                     sortBy === 'category'
                                         ? sortDir === 'asc'

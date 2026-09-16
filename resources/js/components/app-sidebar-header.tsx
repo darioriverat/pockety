@@ -71,6 +71,7 @@ export function AppSidebarHeader({
                             : undefined
                     }
                     id="global-period"
+                    label="Global period"
                     showLabel={false}
                     testId="period-selector"
                     className="w-[7.5rem] max-w-none space-y-0 sm:w-40 md:w-48"
