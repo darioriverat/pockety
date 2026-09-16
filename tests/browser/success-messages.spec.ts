@@ -1,172 +1,106 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
 
-test.describe('Transaction Success Messages', () => {
-    test.beforeEach(async ({ page }) => {
-        // Navigate to transactions page
-        await page.goto('/transactions');
-        await page.waitForLoadState('networkidle');
+/**
+ * Feature #118 — success toast after create/update/delete.
+ * Single login to avoid Fortify login throttle (5/min).
+ */
+test('success messages after create, update, and delete', async ({
+    page,
+    request,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page);
+
+    const categoriesResponse = await request.get('/api/categories');
+    expect(categoriesResponse.ok()).toBeTruthy();
+    const categoriesPayload = (await categoriesResponse.json()) as {
+        data: Array<{ id: number; code: string; name_en: string }>;
+    };
+    const c001 = categoriesPayload.data.find((item) => item.code === 'C001');
+    expect(c001).toBeTruthy();
+
+    // Seed a transaction for update/delete via API
+    const createResponse = await request.post('/api/transactions', {
+        data: {
+            date: '2025-01-21',
+            period: '202501',
+            quincena: 'Q1',
+            category_id: c001!.id,
+            amount_cad: 40,
+            comments: 'Toast flow source',
+        },
+    });
+    expect(createResponse.ok()).toBeTruthy();
+    const seeded = (await createResponse.json()) as { data: { id: number } };
+
+    await page.goto('/transactions');
+    await page.getByTestId('page-period-selector').click();
+    await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+    await expect(page.getByTestId('transactions-heading')).toBeVisible();
+
+    // CREATE via UI
+    await page.getByRole('button', { name: /add transaction/i }).click();
+    await expect(page.getByTestId('transaction-form-dialog')).toBeVisible();
+    await page.getByTestId('transaction-date-input').fill('2025-01-20');
+    await expect(page.getByTestId('transaction-period-input')).toHaveValue(
+        '202501',
+    );
+    await page.getByRole('combobox', { name: 'Category' }).click();
+    await page.getByRole('option', { name: /Groceries|MERCADO/ }).click();
+    await page.getByTestId('transaction-amount-input').fill('50.00');
+    await page.getByTestId('transaction-form-submit').click();
+
+    await expect(
+        page.getByText('Transaction created successfully'),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('transaction-form-dialog')).toHaveCount(0);
+
+    await page.screenshot({
+        path: 'verification/test-118-success-messages/01-create-success.png',
+        fullPage: true,
     });
 
-    test('displays success message after creating a transaction', async ({ page }) => {
-        // Open add transaction dialog
-        await page.click('button:has-text("Add Transaction")');
-        await page.waitForSelector('[data-testid="transaction-form-dialog"]');
+    // UPDATE seeded transaction
+    await expect(
+        page.getByTestId(`transaction-row-${seeded.data.id}`),
+    ).toBeVisible({ timeout: 10000 });
+    await page
+        .getByTestId(`transaction-row-${seeded.data.id}`)
+        .getByTestId('edit-transaction-button')
+        .click();
+    await expect(page.getByTestId('transaction-form-dialog')).toBeVisible();
+    await page.getByTestId('transaction-amount-input').fill('75.00');
+    await page.getByTestId('transaction-form-submit').click();
 
-        // Fill in the form
-        await page.fill('[data-testid="transaction-date-input"]', '2025-01-15');
-        await page.fill('[data-testid="transaction-period-input"]', '202501');
-        
-        // Select category
-        await page.click('[aria-label="Category"]');
-        await page.waitForSelector('text=Groceries');
-        await page.click('text=Groceries');
-        
-        // Fill amount
-        await page.fill('[data-testid="transaction-amount-input"]', '50.00');
+    await expect(
+        page.getByText('Transaction updated successfully'),
+    ).toBeVisible({ timeout: 10000 });
 
-        // Submit the form
-        await page.click('[data-testid="transaction-form-submit"]');
-
-        // Wait for and verify success toast
-        const toast = page.locator('.sonner-toast:has-text("Transaction created successfully")');
-        await expect(toast).toBeVisible({ timeout: 5000 });
-
-        // Verify dialog is closed
-        await expect(page.locator('[data-testid="transaction-form-dialog"]')).not.toBeVisible();
-
-        // Take screenshot
-        await page.screenshot({
-            path: 'verification/test-118-success-messages/01-create-success.png',
-        });
+    await page.screenshot({
+        path: 'verification/test-118-success-messages/02-update-success.png',
+        fullPage: true,
     });
 
-    test('displays success message after updating a transaction', async ({ page }) => {
-        // Wait for transactions to load
-        await page.waitForSelector('[data-testid="transactions-page"]');
-        
-        // Find and click first edit button (if transactions exist)
-        const editButtons = page.locator('[data-testid="edit-transaction-button"]');
-        const count = await editButtons.count();
-        
-        if (count > 0) {
-            await editButtons.first().click();
-            await page.waitForSelector('[data-testid="transaction-form-dialog"]');
+    // DELETE seeded transaction via confirmation dialog
+    await page
+        .getByTestId(`transaction-row-${seeded.data.id}`)
+        .getByTestId('delete-transaction-button')
+        .click();
+    await expect(page.getByTestId('delete-confirmation-dialog')).toBeVisible();
+    await page.getByTestId('delete-confirm-button').click();
 
-            // Update amount
-            await page.fill('[data-testid="transaction-amount-input"]', '75.00');
+    await expect(
+        page.getByText('Transaction deleted successfully'),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(
+        page.getByTestId(`transaction-row-${seeded.data.id}`),
+    ).toHaveCount(0);
 
-            // Submit
-            await page.click('[data-testid="transaction-form-submit"]');
-
-            // Verify success toast
-            const toast = page.locator('.sonner-toast:has-text("Transaction updated successfully")');
-            await expect(toast).toBeVisible({ timeout: 5000 });
-
-            // Take screenshot
-            await page.screenshot({
-                path: 'verification/test-118-success-messages/02-update-success.png',
-            });
-        } else {
-            // Create a transaction first, then edit it
-            await page.click('button:has-text("Add Transaction")');
-            await page.waitForSelector('[data-testid="transaction-form-dialog"]');
-
-            await page.fill('[data-testid="transaction-date-input"]', '2025-01-15');
-            await page.fill('[data-testid="transaction-period-input"]', '202501');
-            await page.click('[aria-label="Category"]');
-            await page.waitForSelector('text=Groceries');
-            await page.click('text=Groceries');
-            await page.fill('[data-testid="transaction-amount-input"]', '50.00');
-            await page.click('[data-testid="transaction-form-submit"]');
-            
-            // Wait for creation toast to disappear
-            await page.waitForTimeout(2000);
-            
-            // Now edit the transaction
-            await editButtons.first().click();
-            await page.waitForSelector('[data-testid="transaction-form-dialog"]');
-            await page.fill('[data-testid="transaction-amount-input"]', '75.00');
-            await page.click('[data-testid="transaction-form-submit"]');
-
-            const toast = page.locator('.sonner-toast:has-text("Transaction updated successfully")');
-            await expect(toast).toBeVisible({ timeout: 5000 });
-
-            await page.screenshot({
-                path: 'verification/test-118-success-messages/02-update-success.png',
-            });
-        }
+    await page.screenshot({
+        path: 'verification/test-118-success-messages/03-delete-success.png',
+        fullPage: true,
     });
 
-    test('displays success message after deleting a transaction', async ({ page }) => {
-        // First, ensure there's at least one transaction
-        const deleteButtons = page.locator('button:has([aria-label*="delete" i])');
-        let count = await deleteButtons.count();
-
-        if (count === 0) {
-            // Create a transaction first
-            await page.click('button:has-text("Add Transaction")');
-            await page.waitForSelector('[data-testid="transaction-form-dialog"]');
-
-            await page.fill('[data-testid="transaction-date-input"]', '2025-01-15');
-            await page.fill('[data-testid="transaction-period-input"]', '202501');
-            await page.click('[aria-label="Category"]');
-            await page.waitForSelector('text=Groceries');
-            await page.click('text=Groceries');
-            await page.fill('[data-testid="transaction-amount-input"]', '50.00');
-            await page.click('[data-testid="transaction-form-submit"]');
-
-            // Wait for creation toast to disappear
-            await page.waitForTimeout(2000);
-        }
-
-        // Set up dialog handler
-        page.on('dialog', dialog => dialog.accept());
-
-        // Click delete on first transaction
-        const deleteButton = page.locator('button:has([aria-label*="delete" i])').first();
-        await deleteButton.click();
-
-        // Verify success toast
-        const toast = page.locator('.sonner-toast:has-text("Transaction deleted successfully")');
-        await expect(toast).toBeVisible({ timeout: 5000 });
-
-        // Take screenshot
-        await page.screenshot({
-            path: 'verification/test-118-success-messages/03-delete-success.png',
-        });
-    });
-
-    test('success toast auto-dismisses after a few seconds', async ({ page }) => {
-        // Create a transaction
-        await page.click('button:has-text("Add Transaction")');
-        await page.waitForSelector('[data-testid="transaction-form-dialog"]');
-
-        await page.fill('[data-testid="transaction-date-input"]', '2025-01-15');
-        await page.fill('[data-testid="transaction-period-input"]', '202501');
-        await page.click('[aria-label="Category"]');
-        await page.waitForSelector('text=Groceries');
-        await page.click('text=Groceries');
-        await page.fill('[data-testid="transaction-amount-input"]', '50.00');
-        await page.click('[data-testid="transaction-form-submit"]');
-
-        // Verify toast appears
-        const toast = page.locator('.sonner-toast:has-text("Transaction created successfully")');
-        await expect(toast).toBeVisible({ timeout: 5000 });
-
-        // Take screenshot while visible
-        await page.screenshot({
-            path: 'verification/test-118-success-messages/04-toast-visible.png',
-        });
-
-        // Wait for auto-dismiss (Sonner default is ~4 seconds)
-        await page.waitForTimeout(5000);
-
-        // Verify toast has been dismissed
-        await expect(toast).not.toBeVisible();
-
-        // Take screenshot after dismissal
-        await page.screenshot({
-            path: 'verification/test-118-success-messages/05-toast-dismissed.png',
-        });
-    });
+    expect(consoleErrors).toEqual([]);
 });

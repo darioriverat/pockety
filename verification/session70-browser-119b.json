@@ -1,0 +1,1 @@
+{"success":true,"exit_code":0,"filter":null,"spec":"tests\/browser\/delete-confirmation.spec.ts","output":"\nRunning 1 test using 1 worker\n\n  \u2713  1 [chromium] \u203a tests\/browser\/delete-confirmation.spec.ts:8:5 \u203a Delete transaction confirmation dialog \u203a cancel keeps the transaction; confirm deletes it (3.1s)\n\n  1 passed (3.4s)"}

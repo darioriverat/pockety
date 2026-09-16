@@ -1405,7 +1405,7 @@
       "Step 5: Verify form does not submit",
       "Step 6: Fill in date and verify error clears"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1417,7 +1417,7 @@
       "Step 4: Verify success message is displayed (e.g., toast notification)",
       "Step 5: Verify user is redirected to transaction list or details page"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1430,7 +1430,7 @@
       "Step 5: Click 'Cancel' and verify transaction is not deleted",
       "Step 6: Click 'Delete' again and confirm, verify transaction is deleted"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

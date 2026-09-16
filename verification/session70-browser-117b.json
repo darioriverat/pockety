@@ -1,0 +1,1 @@
+{"success":true,"exit_code":0,"filter":null,"spec":"tests\/browser\/required-field-validation.spec.ts","output":"\nRunning 1 test using 1 worker\n\n  \u2713  1 [chromium] \u203a tests\/browser\/required-field-validation.spec.ts:8:1 \u203a required field validation on transaction form (1.8s)\n\n  1 passed (2.2s)"}

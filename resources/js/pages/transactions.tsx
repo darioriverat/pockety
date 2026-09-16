@@ -161,6 +161,8 @@ export default function Transactions() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [isDuplicating, setIsDuplicating] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
     const [bulkCategoryId, setBulkCategoryId] = useState('');
@@ -563,20 +565,37 @@ export default function Transactions() {
         setIsDialogOpen(true);
     };
 
-    const handleDelete = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this transaction?'))
-            return;
+    const requestDelete = (id: number) => {
+        setDeleteTargetId(id);
+    };
 
+    const cancelDelete = () => {
+        if (isDeleting) {
+            return;
+        }
+        setDeleteTargetId(null);
+    };
+
+    const confirmDelete = async () => {
+        if (deleteTargetId === null) {
+            return;
+        }
+
+        setIsDeleting(true);
         try {
-            const response = await fetch(`/api/transactions/${id}`, {
+            const response = await fetch(`/api/transactions/${deleteTargetId}`, {
                 method: 'DELETE',
             });
             if (!response.ok) throw new Error('Failed to delete transaction');
             await fetchTransactions();
+            setDeleteTargetId(null);
             toast.success('Transaction deleted successfully');
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+            const errorMessage =
+                err instanceof Error ? err.message : 'An error occurred';
             toast.error(errorMessage);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -680,8 +699,14 @@ export default function Transactions() {
 
     const handleDateChange = (date: string) => {
         setFormError(null);
-        setFieldErrors((prev) => ({ ...prev, date: '' }));
         const derivedPeriod = periodFromDate(date);
+        setFieldErrors((prev) => {
+            const next = { ...prev, date: '' };
+            if (derivedPeriod) {
+                next.period = '';
+            }
+            return next;
+        });
         setFormData((prev) => ({
             ...prev,
             date,
@@ -887,7 +912,7 @@ export default function Transactions() {
                             className="max-w-md"
                             data-testid="transaction-form-dialog"
                         >
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={handleSubmit} noValidate>
                                 <DialogHeader>
                                     <DialogTitle data-testid="transaction-form-title">
                                         {editingId
@@ -1274,6 +1299,47 @@ export default function Transactions() {
                                     </Button>
                                 </DialogFooter>
                             </form>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog
+                        open={deleteTargetId !== null}
+                        onOpenChange={(open) => {
+                            if (!open) {
+                                cancelDelete();
+                            }
+                        }}
+                    >
+                        <DialogContent data-testid="delete-confirmation-dialog">
+                            <DialogHeader>
+                                <DialogTitle data-testid="delete-confirmation-title">
+                                    Delete transaction?
+                                </DialogTitle>
+                                <DialogDescription data-testid="delete-confirmation-warning">
+                                    This action cannot be undone. The transaction
+                                    will be permanently deleted from your records.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter className="gap-2 sm:gap-0">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    data-testid="delete-cancel-button"
+                                    onClick={cancelDelete}
+                                    disabled={isDeleting}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    data-testid="delete-confirm-button"
+                                    onClick={confirmDelete}
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? 'Deleting…' : 'Delete'}
+                                </Button>
+                            </DialogFooter>
                         </DialogContent>
                     </Dialog>
                         </div>
@@ -1814,8 +1880,8 @@ export default function Transactions() {
                                                     aria-label="Delete transaction"
                                                     data-testid="delete-transaction-button"
                                                     onClick={() =>
-                                                        handleDelete(
-                                                            transaction.id
+                                                        requestDelete(
+                                                            transaction.id,
                                                         )
                                                     }
                                                 >

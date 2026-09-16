@@ -1,0 +1,1 @@
+{"success":true,"exit_code":0,"filter":"Duplicate transaction","spec":null,"output":"\nRunning 1 test using 1 worker\n\n  \u2713  1 [chromium] \u203a tests\/browser\/transaction-duplicate.spec.ts:8:5 \u203a Duplicate transaction \u203a user can duplicate a transaction with updated date (2.7s)\n\n  1 passed (3.1s)"}

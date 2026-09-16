@@ -3,7 +3,6 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { toast } from 'sonner';
 import Transactions from './transactions';
 
-// Mock sonner toast
 vi.mock('sonner', () => ({
     toast: {
         success: vi.fn(),
@@ -11,11 +10,19 @@ vi.mock('sonner', () => ({
     },
 }));
 
-// Mock Inertia
 vi.mock('@inertiajs/react', () => ({
-    Head: ({ title }: { title: string }) => <title>{title}</title>,
-    Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
-        <a href={href}>{children}</a>
+    Head: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+    Link: ({
+        children,
+        href,
+        ...props
+    }: {
+        children?: React.ReactNode;
+        href: string;
+    }) => (
+        <a href={href} {...props}>
+            {children}
+        </a>
     ),
     usePage: () => ({
         props: {
@@ -31,7 +38,6 @@ vi.mock('@inertiajs/react', () => ({
     }),
 }));
 
-// Mock use-period hook
 vi.mock('@/hooks/use-period', () => ({
     usePeriod: () => ({
         period: '202501',
@@ -39,354 +45,283 @@ vi.mock('@/hooks/use-period', () => ({
     }),
 }));
 
-// Mock fetch
-global.fetch = vi.fn();
-
-const mockFetch = (url: string, options?: RequestInit) => {
-    if (url.includes('/api/categories')) {
-        return Promise.resolve({
-            ok: true,
-            json: () =>
-                Promise.resolve({
-                    data: [
-                        {
-                            id: 1,
-                            code: 'C001',
-                            name_es: 'MERCADO',
-                            name_en: 'Groceries',
-                            is_debt_category: false,
-                        },
-                    ],
-                }),
-        });
-    }
-    if (url.includes('/api/accounts')) {
-        return Promise.resolve({
-            ok: true,
-            json: () =>
-                Promise.resolve({
-                    data: [
-                        {
-                            id: 1,
-                            name: 'RBC Checking',
-                            type: 'bank',
-                        },
-                    ],
-                }),
-        });
-    }
-    if (url.includes('/api/transactions') && options?.method === 'POST') {
-        return Promise.resolve({
-            ok: true,
-            json: () =>
-                Promise.resolve({
-                    data: {
-                        id: 123,
-                        date: '2025-01-15',
-                        period: '202501',
-                        quincena: 'Q1',
-                        category_id: 1,
-                        account_id: 1,
-                        amount_cad: 50.0,
-                        amount_usd: null,
-                        amount_cop: null,
-                        currency: 'CAD',
-                        amount: 50.0,
-                        comments: null,
-                        is_recurring: false,
-                        debt_component: null,
-                    },
-                }),
-        });
-    }
-    if (url.includes('/api/transactions') && options?.method === 'PUT') {
-        return Promise.resolve({
-            ok: true,
-            json: () =>
-                Promise.resolve({
-                    data: {
-                        id: 123,
-                        date: '2025-01-15',
-                        period: '202501',
-                        quincena: 'Q1',
-                        category_id: 1,
-                        account_id: 1,
-                        amount_cad: 75.0,
-                        amount_usd: null,
-                        amount_cop: null,
-                        currency: 'CAD',
-                        amount: 75.0,
-                        comments: 'Updated',
-                        is_recurring: false,
-                        debt_component: null,
-                    },
-                }),
-        });
-    }
-    if (url.includes('/api/transactions') && options?.method === 'DELETE') {
-        return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({}),
-        });
-    }
-    if (url.includes('/api/transactions')) {
-        return Promise.resolve({
-            ok: true,
-            json: () =>
-                Promise.resolve({
-                    data: [],
-                    links: { self: '' },
-                    meta: { total: 0, page: 1, per_page: 50, last_page: 1 },
-                }),
-        });
-    }
-    return Promise.reject(new Error('Unknown URL'));
+const baseTransaction = {
+    id: 123,
+    date: '2025-01-15',
+    period: '202501',
+    quincena: 'Q1',
+    category_id: 1,
+    account_id: null,
+    account: null,
+    amount_cad: 50.0,
+    amount_usd: null,
+    amount_cop: null,
+    currency: 'CAD',
+    amount: 50.0,
+    comments: null,
+    is_recurring: false,
+    debt_component: null,
+    category: {
+        id: 1,
+        code: 'C001',
+        name_es: 'MERCADO',
+        name_en: 'Groceries',
+        is_debt_category: false,
+    },
 };
 
 describe('Transactions - Success Messages', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(mockFetch);
+
+        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+            const url = String(input);
+
+            if (url.startsWith('/api/categories')) {
+                return {
+                    ok: true,
+                    json: async () => ({
+                        data: [
+                            {
+                                id: 1,
+                                code: 'C001',
+                                name_es: 'MERCADO',
+                                name_en: 'Groceries',
+                                is_debt_category: false,
+                            },
+                        ],
+                    }),
+                } as Response;
+            }
+
+            if (url.startsWith('/api/accounts')) {
+                return {
+                    ok: true,
+                    json: async () => ({ data: [] }),
+                } as Response;
+            }
+
+            if (url === '/api/transactions' && init?.method === 'POST') {
+                return {
+                    ok: true,
+                    status: 201,
+                    json: async () => ({
+                        data: { ...baseTransaction, id: 999 },
+                    }),
+                } as Response;
+            }
+
+            if (
+                url.startsWith('/api/transactions/') &&
+                init?.method === 'PUT'
+            ) {
+                return {
+                    ok: true,
+                    json: async () => ({
+                        data: { ...baseTransaction, amount: 75, amount_cad: 75 },
+                    }),
+                } as Response;
+            }
+
+            if (
+                url.startsWith('/api/transactions/') &&
+                init?.method === 'DELETE'
+            ) {
+                return {
+                    ok: true,
+                    json: async () => ({}),
+                } as Response;
+            }
+
+            if (url.startsWith('/api/transactions')) {
+                return {
+                    ok: true,
+                    json: async () => ({
+                        data: [baseTransaction],
+                        links: { self: '/api/transactions' },
+                        meta: {
+                            total: 1,
+                            page: 1,
+                            per_page: 50,
+                            last_page: 1,
+                        },
+                    }),
+                } as Response;
+            }
+
+            throw new Error(`Unexpected fetch: ${url}`);
+        });
     });
 
     it('displays success message after creating a transaction', async () => {
         render(<Transactions />);
 
-        // Wait for data to load
-        await waitFor(() =>
-            expect(screen.getByTestId('transactions-page')).toBeInTheDocument(),
-        );
-
-        // Open the add transaction dialog
-        const addButton = screen.getByRole('button', { name: /add transaction/i });
-        fireEvent.click(addButton);
-
-        // Wait for dialog to open
-        await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
-        );
-
-        // Fill in required fields
-        const dateInput = screen.getByTestId('transaction-date-input');
-        fireEvent.change(dateInput, { target: { value: '2025-01-15' } });
-
-        const periodInput = screen.getByTestId('transaction-period-input');
-        fireEvent.change(periodInput, { target: { value: '202501' } });
-
-        // Select category (this is more complex with shadcn Select, so we'll test the basic flow)
-        const categorySelect = screen.getByLabelText('Category');
-        fireEvent.click(categorySelect);
-        await waitFor(() => screen.getByText('Groceries'));
-        fireEvent.click(screen.getByText('Groceries'));
-
-        const amountInput = screen.getByTestId('transaction-amount-input');
-        fireEvent.change(amountInput, { target: { value: '50.00' } });
-
-        // Submit the form
-        const submitButton = screen.getByTestId('transaction-form-submit');
-        fireEvent.click(submitButton);
-
-        // Verify success toast was called
         await waitFor(() => {
-            expect(toast.success).toHaveBeenCalledWith('Transaction created successfully');
+            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
         });
 
-        // Verify dialog was closed
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
+
         await waitFor(() => {
-            expect(screen.queryByTestId('transaction-form-dialog')).not.toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.change(screen.getByTestId('transaction-date-input'), {
+            target: { value: '2025-01-15' },
+        });
+        fireEvent.change(screen.getByTestId('transaction-period-input'), {
+            target: { value: '202501' },
+        });
+
+        fireEvent.click(screen.getByRole('combobox', { name: 'Category' }));
+        const option = await screen.findByRole('option', {
+            name: /Groceries/,
+        });
+        fireEvent.click(option);
+
+        fireEvent.change(screen.getByTestId('transaction-amount-input'), {
+            target: { value: '50.00' },
+        });
+
+        fireEvent.click(screen.getByTestId('transaction-form-submit'));
+
+        await waitFor(() => {
+            expect(toast.success).toHaveBeenCalledWith(
+                'Transaction created successfully',
+            );
         });
     });
 
     it('displays success message after updating a transaction', async () => {
-        // Mock transactions list with one transaction
-        (global.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string, options?: RequestInit) => {
-            if (url.includes('/api/transactions') && !options?.method) {
-                return Promise.resolve({
-                    ok: true,
-                    json: () =>
-                        Promise.resolve({
-                            data: [
-                                {
-                                    id: 123,
-                                    date: '2025-01-15',
-                                    period: '202501',
-                                    quincena: 'Q1',
-                                    category_id: 1,
-                                    account_id: 1,
-                                    amount_cad: 50.0,
-                                    amount_usd: null,
-                                    amount_cop: null,
-                                    currency: 'CAD',
-                                    amount: 50.0,
-                                    comments: null,
-                                    is_recurring: false,
-                                    debt_component: null,
-                                    category: {
-                                        id: 1,
-                                        code: 'C001',
-                                        name_es: 'MERCADO',
-                                        name_en: 'Groceries',
-                                        is_debt_category: false,
-                                    },
-                                },
-                            ],
-                            links: { self: '' },
-                            meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
-                        }),
-                });
-            }
-            return mockFetch(url, options);
-        });
-
         render(<Transactions />);
 
-        // Wait for transactions to load
-        await waitFor(() => screen.getByText('Groceries'));
-
-        // Click edit button
-        const editButtons = screen.getAllByTestId('edit-transaction-button');
-        fireEvent.click(editButtons[0]);
-
-        // Wait for dialog to open
-        await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
-        );
-
-        // Update amount
-        const amountInput = screen.getByTestId('transaction-amount-input');
-        fireEvent.change(amountInput, { target: { value: '75.00' } });
-
-        // Submit the form
-        const submitButton = screen.getByTestId('transaction-form-submit');
-        fireEvent.click(submitButton);
-
-        // Verify success toast was called with update message
         await waitFor(() => {
-            expect(toast.success).toHaveBeenCalledWith('Transaction updated successfully');
+            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getAllByTestId('edit-transaction-button')[0]);
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.change(screen.getByTestId('transaction-amount-input'), {
+            target: { value: '75.00' },
+        });
+        fireEvent.click(screen.getByTestId('transaction-form-submit'));
+
+        await waitFor(() => {
+            expect(toast.success).toHaveBeenCalledWith(
+                'Transaction updated successfully',
+            );
         });
     });
 
     it('displays success message after deleting a transaction', async () => {
-        // Mock window.confirm
-        global.confirm = vi.fn(() => true);
-
-        // Mock transactions list with one transaction
-        (global.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string, options?: RequestInit) => {
-            if (url.includes('/api/transactions') && !options?.method) {
-                return Promise.resolve({
-                    ok: true,
-                    json: () =>
-                        Promise.resolve({
-                            data: [
-                                {
-                                    id: 123,
-                                    date: '2025-01-15',
-                                    period: '202501',
-                                    quincena: 'Q1',
-                                    category_id: 1,
-                                    account_id: 1,
-                                    amount_cad: 50.0,
-                                    amount_usd: null,
-                                    amount_cop: null,
-                                    currency: 'CAD',
-                                    amount: 50.0,
-                                    comments: null,
-                                    is_recurring: false,
-                                    debt_component: null,
-                                    category: {
-                                        id: 1,
-                                        code: 'C001',
-                                        name_es: 'MERCADO',
-                                        name_en: 'Groceries',
-                                        is_debt_category: false,
-                                    },
-                                },
-                            ],
-                            links: { self: '' },
-                            meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
-                        }),
-                });
-            }
-            return mockFetch(url, options);
-        });
-
         render(<Transactions />);
 
-        // Wait for transactions to load
-        await waitFor(() => screen.getByText('Groceries'));
-
-        // Click delete button
-        const deleteButtons = screen.getAllByLabelText(/delete transaction/i);
-        fireEvent.click(deleteButtons[0]);
-
-        // Verify success toast was called
         await waitFor(() => {
-            expect(toast.success).toHaveBeenCalledWith('Transaction deleted successfully');
+            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getAllByTestId('delete-transaction-button')[0]);
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('delete-confirmation-dialog'),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('delete-confirm-button'));
+
+        await waitFor(() => {
+            expect(toast.success).toHaveBeenCalledWith(
+                'Transaction deleted successfully',
+            );
         });
     });
 
     it('displays error message when delete fails', async () => {
-        // Mock window.confirm
-        global.confirm = vi.fn(() => true);
+        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+            const url = String(input);
 
-        // Mock transactions list and failing delete
-        (global.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string, options?: RequestInit) => {
-            if (url.includes('/api/transactions') && options?.method === 'DELETE') {
-                return Promise.resolve({
-                    ok: false,
-                    json: () => Promise.resolve({ error: 'Failed to delete' }),
-                });
-            }
-            if (url.includes('/api/transactions') && !options?.method) {
-                return Promise.resolve({
+            if (url.startsWith('/api/categories')) {
+                return {
                     ok: true,
-                    json: () =>
-                        Promise.resolve({
-                            data: [
-                                {
-                                    id: 123,
-                                    date: '2025-01-15',
-                                    period: '202501',
-                                    quincena: 'Q1',
-                                    category_id: 1,
-                                    account_id: 1,
-                                    amount_cad: 50.0,
-                                    amount_usd: null,
-                                    amount_cop: null,
-                                    currency: 'CAD',
-                                    amount: 50.0,
-                                    comments: null,
-                                    is_recurring: false,
-                                    debt_component: null,
-                                    category: {
-                                        id: 1,
-                                        code: 'C001',
-                                        name_es: 'MERCADO',
-                                        name_en: 'Groceries',
-                                        is_debt_category: false,
-                                    },
-                                },
-                            ],
-                            links: { self: '' },
-                            meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
-                        }),
-                });
+                    json: async () => ({
+                        data: [
+                            {
+                                id: 1,
+                                code: 'C001',
+                                name_es: 'MERCADO',
+                                name_en: 'Groceries',
+                                is_debt_category: false,
+                            },
+                        ],
+                    }),
+                } as Response;
             }
-            return mockFetch(url, options);
+
+            if (url.startsWith('/api/accounts')) {
+                return {
+                    ok: true,
+                    json: async () => ({ data: [] }),
+                } as Response;
+            }
+
+            if (
+                url.startsWith('/api/transactions/') &&
+                init?.method === 'DELETE'
+            ) {
+                return {
+                    ok: false,
+                    json: async () => ({ error: 'Failed to delete' }),
+                } as Response;
+            }
+
+            if (url.startsWith('/api/transactions')) {
+                return {
+                    ok: true,
+                    json: async () => ({
+                        data: [baseTransaction],
+                        links: { self: '/api/transactions' },
+                        meta: {
+                            total: 1,
+                            page: 1,
+                            per_page: 50,
+                            last_page: 1,
+                        },
+                    }),
+                } as Response;
+            }
+
+            throw new Error(`Unexpected fetch: ${url}`);
         });
 
         render(<Transactions />);
 
-        // Wait for transactions to load
-        await waitFor(() => screen.getByText('Groceries'));
-
-        // Click delete button
-        const deleteButtons = screen.getAllByLabelText(/delete transaction/i);
-        fireEvent.click(deleteButtons[0]);
-
-        // Verify error toast was called
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Failed to delete transaction');
+            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getAllByTestId('delete-transaction-button')[0]);
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('delete-confirmation-dialog'),
+            ).toBeInTheDocument();
+        });
+        fireEvent.click(screen.getByTestId('delete-confirm-button'));
+
+        await waitFor(() => {
+            expect(toast.error).toHaveBeenCalledWith(
+                'Failed to delete transaction',
+            );
         });
     });
 });

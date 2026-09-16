@@ -4884,3 +4884,45 @@ RECOMMENDATIONS:
 
 PROGRESS: 118/175 passing; 57 remaining (no change - verification pending)
 STATUS: App healthy; implementations complete but unverified due to infrastructure
+
+=== Session 70 (2026-09-15) ===
+
+GOAL: Verify pending required-field + success-message features and implement delete confirmation dialog
+
+ORIENTATION:
+- App healthy at http://dev.pockety.com:8080/ (HTTP 200)
+- Started at 118/175 passing; 57 remaining
+- Prior session left required-field and success-toast work implemented but unverified; frontend smoke showed failing unit tests
+
+VERIFICATION / FIXES:
+- Root cause for required-field failures: HTML5 required blocked custom field errors; fixed with noValidate on transaction form
+- Stale period error after date auto-fill: handleDateChange now clears period error when period is derived
+- Login throttle (5/min) broke multi-login Playwright files; raised local/testing login limit to 60/min; consolidated browser specs to one login each
+- Rewrote fragile success-message unit tests to match working patterns (row testids, combobox options)
+- Smoke: Duplicate transaction browser test passed; full frontend suite passed
+
+IMPLEMENTED THIS SESSION:
+- Required field validation — verified (unit + Playwright + screenshots in verification/test-117-required-fields/)
+- Success toasts create/update/delete — verified (verification/test-118-success-messages/)
+- Delete confirmation Dialog (Cancel keeps txn; Confirm deletes) — implemented + verified (verification/test-119-delete-confirm/)
+
+FILES:
+- resources/js/pages/transactions.tsx (noValidate, delete Dialog, period error clear)
+- resources/js/pages/transactions-success-messages.test.tsx
+- resources/js/pages/transactions-delete-confirm.test.tsx (new)
+- tests/browser/required-field-validation.spec.ts
+- tests/browser/success-messages.spec.ts
+- tests/browser/delete-confirmation.spec.ts (new)
+- app/Providers/FortifyServiceProvider.php (local login throttle)
+- routes/web.php (frontend filter + browser spec query params)
+- feature_list.json (three features marked passes true)
+
+PASSES UPDATED: tests for required fields, success messages, delete confirmation -> true
+
+NEXT SESSION:
+- Highest priority failing: sort transactions by date, amount, category
+- Or API endpoint suite
+
+PROGRESS: 121/175 passing; 54 remaining
+STATUS: App healthy; required fields, success toasts, and delete confirmation verified end-to-end
+

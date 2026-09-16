@@ -197,7 +197,9 @@ if (app()->environment('local')) {
 
     Route::get('/dev/frontend-tests', function () {
         $cwd = base_path();
-        $command = 'export HOME=/tmp && cd '.escapeshellarg($cwd).' && npm run test:unit 2>&1';
+        $filter = request()->query('filter');
+        $filterArg = $filter ? ' -- '.escapeshellarg($filter) : '';
+        $command = 'export HOME=/tmp && cd '.escapeshellarg($cwd).' && npm run test:unit'.$filterArg.' 2>&1';
         $output = [];
         $exitCode = 0;
         exec($command, $output, $exitCode);
@@ -205,6 +207,7 @@ if (app()->environment('local')) {
         return response()->json([
             'success' => $exitCode === 0,
             'exit_code' => $exitCode,
+            'filter' => $filter,
             'output' => implode("\n", $output),
         ], $exitCode === 0 ? 200 : 500);
     })->withoutMiddleware([VerifyCsrfToken::class]);
@@ -228,10 +231,12 @@ if (app()->environment('local')) {
 
     Route::get('/dev/browser-tests', function () {
         $filter = request()->query('grep');
+        $spec = request()->query('spec');
         $cwd = base_path();
+        $specArg = $spec ? ' '.escapeshellarg($spec) : '';
         $grep = $filter ? ' --grep='.escapeshellarg($filter) : '';
         $baseUrl = getenv('PLAYWRIGHT_BASE_URL') ?: 'http://host.docker.internal:8080';
-        $command = 'export HOME=/tmp && cd '.escapeshellarg($cwd).' && PLAYWRIGHT_BASE_URL='.escapeshellarg($baseUrl).' npx playwright test'.$grep.' 2>&1';
+        $command = 'export HOME=/tmp && cd '.escapeshellarg($cwd).' && PLAYWRIGHT_BASE_URL='.escapeshellarg($baseUrl).' npx playwright test'.$specArg.$grep.' 2>&1';
         $output = [];
         $exitCode = 0;
         exec($command, $output, $exitCode);
@@ -240,6 +245,7 @@ if (app()->environment('local')) {
             'success' => $exitCode === 0,
             'exit_code' => $exitCode,
             'filter' => $filter,
+            'spec' => $spec,
             'output' => implode("\n", $output),
         ], $exitCode === 0 ? 200 : 500);
     })->withoutMiddleware([VerifyCsrfToken::class]);
