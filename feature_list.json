@@ -2038,7 +2038,7 @@
       "Step 5: Verify significant positive variance is highlighted (yellow/orange)",
       "Step 6: Verify significant negative variance is highlighted (red)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

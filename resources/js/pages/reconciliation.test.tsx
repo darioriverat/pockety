@@ -265,6 +265,212 @@ describe('Reconciliation - Variance Warnings', () => {
     });
 });
 
+describe('Reconciliation - Variance Color Highlighting', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    const mockAccountNegativeVariance = {
+        account_id: 100,
+        account_name: 'Account With Negative Variance',
+        account_type: 'bank',
+        is_asset: true,
+        is_liability: false,
+        has_recorded_balance: true,
+        recorded: { cad: 500, usd: 0, cop: 0 },
+        computed: { cad: 520, usd: 0, cop: 0 },
+        variance: { cad: -20, usd: 0, cop: 0 }, // Significant negative
+        is_balanced: false,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
+    };
+
+    const mockAccountPositiveVariance = {
+        account_id: 101,
+        account_name: 'Account With Positive Variance',
+        account_type: 'bank',
+        is_asset: true,
+        is_liability: false,
+        has_recorded_balance: true,
+        recorded: { cad: 520, usd: 0, cop: 0 },
+        computed: { cad: 500, usd: 0, cop: 0 },
+        variance: { cad: 20, usd: 0, cop: 0 }, // Significant positive
+        is_balanced: false,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
+    };
+
+    const mockAccountZeroVariance = {
+        account_id: 102,
+        account_name: 'Account With Zero Variance',
+        account_type: 'bank',
+        is_asset: true,
+        is_liability: false,
+        has_recorded_balance: true,
+        recorded: { cad: 500, usd: 0, cop: 0 },
+        computed: { cad: 500, usd: 0, cop: 0 },
+        variance: { cad: 0, usd: 0, cop: 0 },
+        is_balanced: true,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
+    };
+
+    const mockAccountMinorVariance = {
+        account_id: 103,
+        account_name: 'Account With Minor Variance',
+        account_type: 'bank',
+        is_asset: true,
+        is_liability: false,
+        has_recorded_balance: true,
+        recorded: { cad: 500, usd: 0, cop: 0 },
+        computed: { cad: 502, usd: 0, cop: 0 },
+        variance: { cad: -2, usd: 0, cop: 0 }, // Minor, below threshold
+        is_balanced: false,
+        is_reviewed: false,
+        review_note: null,
+        reviewed_at: null,
+    };
+
+    it('displays negative significant variance in red', async () => {
+        const report = {
+            period: '202501',
+            status: 'unbalanced' as const,
+            accounts: [mockAccountNegativeVariance],
+            accounting_equation: {
+                assets_cad: 500,
+                liabilities_cad: 0,
+                equity_cad: 500,
+                residual_cad: 0,
+                is_balanced: true,
+            },
+            income_total_cad: 0,
+            expenses_total_cad: 20,
+            net_operating_expenses_cad: 20,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Account With Negative Variance');
+
+        const accountCard = screen.getByTestId('account-reconciliation-100');
+        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const cadVariance = varianceAmounts[0];
+
+        expect(cadVariance).toHaveClass('text-red-600');
+        expect(cadVariance).toHaveAttribute('data-variance-state', 'negative-significant');
+    });
+
+    it('displays positive significant variance in amber/yellow', async () => {
+        const report = {
+            period: '202501',
+            status: 'unbalanced' as const,
+            accounts: [mockAccountPositiveVariance],
+            accounting_equation: {
+                assets_cad: 520,
+                liabilities_cad: 0,
+                equity_cad: 520,
+                residual_cad: 0,
+                is_balanced: true,
+            },
+            income_total_cad: 0,
+            expenses_total_cad: 0,
+            net_operating_expenses_cad: 0,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Account With Positive Variance');
+
+        const accountCard = screen.getByTestId('account-reconciliation-101');
+        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const cadVariance = varianceAmounts[0];
+
+        expect(cadVariance).toHaveClass('text-amber-600');
+        expect(cadVariance).toHaveAttribute('data-variance-state', 'positive-significant');
+    });
+
+    it('displays zero variance in green', async () => {
+        const report = {
+            period: '202501',
+            status: 'balanced' as const,
+            accounts: [mockAccountZeroVariance],
+            accounting_equation: {
+                assets_cad: 500,
+                liabilities_cad: 0,
+                equity_cad: 500,
+                residual_cad: 0,
+                is_balanced: true,
+            },
+            income_total_cad: 0,
+            expenses_total_cad: 0,
+            net_operating_expenses_cad: 0,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Account With Zero Variance');
+
+        const accountCard = screen.getByTestId('account-reconciliation-102');
+        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const cadVariance = varianceAmounts[0];
+
+        expect(cadVariance).toHaveClass('text-green-600');
+        expect(cadVariance).toHaveAttribute('data-variance-state', 'balanced');
+    });
+
+    it('displays minor variance in neutral/muted color', async () => {
+        const report = {
+            period: '202501',
+            status: 'unbalanced' as const,
+            accounts: [mockAccountMinorVariance],
+            accounting_equation: {
+                assets_cad: 500,
+                liabilities_cad: 0,
+                equity_cad: 500,
+                residual_cad: 0,
+                is_balanced: true,
+            },
+            income_total_cad: 0,
+            expenses_total_cad: 2,
+            net_operating_expenses_cad: 2,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Account With Minor Variance');
+
+        const accountCard = screen.getByTestId('account-reconciliation-103');
+        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const cadVariance = varianceAmounts[0];
+
+        expect(cadVariance).toHaveClass('text-muted-foreground');
+        expect(cadVariance).toHaveAttribute('data-variance-state', 'minor');
+    });
+});
+
 describe('Reconciliation - Variance Acknowledgment', () => {
     beforeEach(() => {
         vi.clearAllMocks();

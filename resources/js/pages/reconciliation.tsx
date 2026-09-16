@@ -248,6 +248,27 @@ export default function Reconciliation() {
     ) => {
         const varianceValue = account.variance[currencyKey];
         const isZero = Math.abs(varianceValue) <= 0.01;
+        const isSignificant =
+            Math.abs(varianceValue) > VARIANCE_WARNING_THRESHOLD;
+        const isPositive = varianceValue > 0.01;
+        const isNegative = varianceValue < -0.01;
+
+        // Determine variance color based on magnitude and direction
+        let varianceColorClass = 'font-medium text-green-600 dark:text-green-500';
+        if (isSignificant) {
+            if (isNegative) {
+                // Significant negative variance: red (critical issue)
+                varianceColorClass =
+                    'font-medium text-red-600 dark:text-red-400';
+            } else if (isPositive) {
+                // Significant positive variance: yellow/amber (warning)
+                varianceColorClass =
+                    'font-medium text-amber-600 dark:text-amber-400';
+            }
+        } else if (!isZero) {
+            // Small non-zero variance: neutral/muted
+            varianceColorClass = 'font-medium text-muted-foreground';
+        }
 
         return (
             <div
@@ -270,10 +291,15 @@ export default function Reconciliation() {
                 </div>
                 <div
                     data-testid="variance-amount"
-                    className={
+                    className={varianceColorClass}
+                    data-variance-state={
                         isZero
-                            ? 'font-medium text-green-600'
-                            : 'font-medium text-red-600'
+                            ? 'balanced'
+                            : isSignificant
+                              ? isNegative
+                                  ? 'negative-significant'
+                                  : 'positive-significant'
+                              : 'minor'
                     }
                 >
                     {formatCurrency(varianceValue, currencyCode)}
