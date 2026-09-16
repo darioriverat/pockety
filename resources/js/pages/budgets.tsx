@@ -448,7 +448,7 @@ export default function Budgets() {
                                                     Variance
                                                 </th>
                                                 <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    %
+                                                    Progress
                                                 </th>
                                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                                     Status
@@ -465,11 +465,7 @@ export default function Budgets() {
                                                             ? 'true'
                                                             : 'false'
                                                     }
-                                                    className={
-                                                        row.is_over_budget
-                                                            ? 'bg-red-50 dark:bg-red-950/40'
-                                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-                                                    }
+                                                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 >
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                                                         {row.category_code}{' '}
@@ -484,25 +480,44 @@ export default function Budgets() {
                                                         {formatCad(row.actual_cad)}
                                                     </td>
                                                     <td
-                                                        className={`whitespace-nowrap px-4 py-3 text-right text-sm ${
-                                                            (row.variance_cad ??
-                                                                0) > 0
+                                                        className={`whitespace-nowrap px-4 py-3 text-right text-sm font-medium ${
+                                                            (row.variance_cad ?? 0) > 0
                                                                 ? 'text-red-600 dark:text-red-400'
-                                                                : 'text-gray-700 dark:text-gray-300'
+                                                                : row.variance_cad === null || row.variance_cad === 0
+                                                                  ? 'text-gray-700 dark:text-gray-300'
+                                                                  : 'text-green-600 dark:text-green-400'
                                                         }`}
+                                                        data-testid={`variance-${row.category_code}`}
                                                     >
-                                                        {formatCad(
-                                                            row.variance_cad,
+                                                        {formatCad(row.variance_cad)}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right">
+                                                        {/* Progress bar visualization */}
+                                                        {row.budget_cad !== null && row.percentage !== null ? (
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                                    <div
+                                                                        className={`h-full transition-all ${
+                                                                            row.is_over_budget
+                                                                                ? 'bg-red-500 dark:bg-red-400'
+                                                                                : 'bg-green-500 dark:bg-green-400'
+                                                                        }`}
+                                                                        style={{
+                                                                            width: `${Math.min(row.percentage, 100)}%`,
+                                                                        }}
+                                                                        data-testid={`progress-bar-${row.category_code}`}
+                                                                    />
+                                                                </div>
+                                                                <span className="text-sm text-gray-700 dark:text-gray-300 w-16 text-right">
+                                                                    {row.percentage.toFixed(0)}%
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-sm text-gray-500">—</span>
                                                         )}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300">
-                                                        {row.percentage !== null
-                                                            ? `${row.percentage.toFixed(2)}%`
-                                                            : '—'}
-                                                    </td>
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm">
-                                                        {row.budget_cad ===
-                                                        null ? (
+                                                        {row.budget_cad === null ? (
                                                             <Badge variant="outline">
                                                                 No budget
                                                             </Badge>
@@ -510,16 +525,19 @@ export default function Budgets() {
                                                             <Badge
                                                                 variant="destructive"
                                                                 className="gap-1"
+                                                                data-testid={`status-badge-${row.category_code}`}
                                                             >
                                                                 <AlertTriangle className="h-3 w-3" />
-                                                                Over budget
+                                                                Over
                                                             </Badge>
                                                         ) : (
                                                             <Badge
                                                                 variant="secondary"
-                                                                className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                                                                className="gap-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                                                                data-testid={`status-badge-${row.category_code}`}
                                                             >
-                                                                Under budget
+                                                                <CheckCircle className="h-3 w-3" />
+                                                                Under
                                                             </Badge>
                                                         )}
                                                     </td>
