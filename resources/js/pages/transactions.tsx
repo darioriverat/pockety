@@ -40,6 +40,7 @@ import {
     isPeriodFormatValid,
     periodFromDate,
 } from '@/lib/periods';
+import { cn } from '@/lib/utils';
 import {
     ArrowDown,
     ArrowUp,
@@ -1770,13 +1771,17 @@ export default function Transactions() {
                         </div>
 
                         <div
-                            className="mb-2 grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] items-center gap-2 rounded-md border bg-muted/40 px-3 py-2"
+                            className="overflow-hidden rounded-md border"
+                            data-testid="transactions-data-table"
+                        >
+                        <div
+                            className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] items-center gap-2 border-b bg-muted/70 px-3 py-3"
                             data-testid="transactions-sort-headers"
                             role="row"
                         >
                             <button
                                 type="button"
-                                className="flex items-center text-left text-sm font-medium text-foreground hover:text-primary"
+                                className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
                                 onClick={() => handleSort('date')}
                                 data-testid="sort-header-date"
                                 aria-label="Date"
@@ -1793,7 +1798,7 @@ export default function Transactions() {
                             </button>
                             <button
                                 type="button"
-                                className="flex items-center text-left text-sm font-medium text-foreground hover:text-primary"
+                                className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
                                 onClick={() => handleSort('amount')}
                                 data-testid="sort-header-amount"
                                 aria-label="Amount"
@@ -1810,7 +1815,7 @@ export default function Transactions() {
                             </button>
                             <button
                                 type="button"
-                                className="flex items-center text-left text-sm font-medium text-foreground hover:text-primary"
+                                className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
                                 onClick={() => handleSort('category')}
                                 data-testid="sort-header-category"
                                 aria-label="Category"
@@ -1825,16 +1830,16 @@ export default function Transactions() {
                                 Category
                                 {sortIcon('category')}
                             </button>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm font-semibold text-foreground">
                                 Actions
                             </span>
                         </div>
 
                         <div
-                            className="space-y-2"
+                            className="divide-y"
                             data-testid="transactions-list"
                         >
-                            {transactions.map((transaction) => (
+                            {transactions.map((transaction, index) => (
                                 <Card
                                     key={transaction.id}
                                     data-testid={`transaction-row-${transaction.id}`}
@@ -1849,8 +1854,18 @@ export default function Transactions() {
                                             ? 'true'
                                             : 'false'
                                     }
+                                    data-row-stripe={
+                                        index % 2 === 1 ? 'odd' : 'even'
+                                    }
+                                    className={cn(
+                                        'rounded-none border-0 py-3 shadow-none transition-colors gap-3',
+                                        index % 2 === 1 && 'bg-muted/35',
+                                        'hover:bg-accent/70',
+                                        selectedIds.includes(transaction.id) &&
+                                            'bg-muted data-[state=selected]:bg-muted',
+                                    )}
                                 >
-                                    <CardHeader>
+                                    <CardHeader className="px-3">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex items-start gap-3 flex-1">
                                                 <Checkbox
@@ -1991,6 +2006,7 @@ export default function Transactions() {
                                     </CardHeader>
                                 </Card>
                             ))}
+                        </div>
                         </div>
 
                         {transactions.length === 0 && !loading && (

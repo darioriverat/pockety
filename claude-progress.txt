@@ -5182,3 +5182,34 @@ FINAL VERIFICATION / STATUS:
 - Completion: 145/175 passing; 30 pending.
 - Next: index 145, table column headers, row striping, and hover states.
 - Development data preserved; no database reset, import, or seed was needed.
+
+=== Session 77 (2026-09-16) ===
+
+GOAL: Complete data table headers, striping, and hover (feature index 145).
+
+ENVIRONMENT / BASELINE:
+- App reachable at http://dev.pockety.com:8080/ (HTTP 200).
+- Docker CLI and Puppeteer MCP blocked by Local SDK approval; /dev helpers used.
+- Baseline: 256 backend tests / 1475 assertions; 105 frontend tests passed.
+- Browser smoke (button-styles income period) passed after reset-test-user + seed.
+
+TABLE FEATURE:
+- Shared Table: bordered container, muted header background, even-row striping,
+  stronger hover (accent), semibold header text.
+- Transactions list: bordered data table wrapper, header bg-muted/70, alternating
+  row backgrounds, hover highlight; preserved existing testids/actions.
+- Income table: matching header/stripe/hover treatment.
+- Added table.test.tsx and tests/browser/table-styles.spec.ts (light/dark).
+
+VERIFICATION:
+- Frontend: 106 tests passed (includes new table unit test).
+- Browser: table-styles 2/2 passed; feature 120 sort smoke 1/1 passed.
+- Screenshots: verification/test-145-table-styles/ (light/dark + hover).
+- Assets rebuilt via /dev/build-assets.
+- Puppeteer navigate unavailable this session; Playwright UI verification used.
+
+STATUS / NEXT:
+- Index 145 marked passing; only passes field changed in feature_list.json.
+- Completion: 146/175 passing; 29 pending.
+- Next: index 146, responsive tables on mobile (scroll or cards).
+- Note: feature 120 smoke runs migrate:fresh; re-seed if continuing UI work.

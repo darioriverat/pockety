@@ -1,5 +1,6 @@
 import { usePeriod } from '@/hooks/use-period';
 import { isValidPeriod } from '@/lib/periods';
+import { cn } from '@/lib/utils';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
@@ -475,35 +476,43 @@ export default function Income() {
                 ) : (
                     <div className="overflow-x-auto rounded-md border">
                         <table className="w-full min-w-[640px] text-left text-sm">
-                            <thead className="bg-muted/50 border-b">
+                            <thead className="border-b bg-muted/70">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium">#</th>
-                                    <th className="px-4 py-3 font-medium">
+                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                        #
+                                    </th>
+                                    <th className="px-4 py-3 font-semibold text-foreground">
                                         Description
                                     </th>
-                                    <th className="px-4 py-3 font-medium">
+                                    <th className="px-4 py-3 font-semibold text-foreground">
                                         CAD
                                     </th>
-                                    <th className="px-4 py-3 font-medium">
+                                    <th className="px-4 py-3 font-semibold text-foreground">
                                         USD
                                     </th>
-                                    <th className="px-4 py-3 font-medium">
+                                    <th className="px-4 py-3 font-semibold text-foreground">
                                         COP
                                     </th>
-                                    <th className="px-4 py-3 font-medium">
+                                    <th className="px-4 py-3 font-semibold text-foreground">
                                         CAD equiv.
                                     </th>
-                                    <th className="px-4 py-3 font-medium">
+                                    <th className="px-4 py-3 font-semibold text-foreground">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {lines.map((line) => (
+                                {lines.map((line, index) => (
                                     <tr
                                         key={line.id}
-                                        className="border-b last:border-0"
+                                        className={cn(
+                                            'border-b last:border-0 transition-colors hover:bg-accent/70',
+                                            index % 2 === 1 && 'bg-muted/35',
+                                        )}
                                         data-testid={`income-line-${line.id}`}
+                                        data-row-stripe={
+                                            index % 2 === 1 ? 'odd' : 'even'
+                                        }
                                     >
                                         <td className="text-muted-foreground px-4 py-3 tabular-nums">
                                             {line.line_number}
