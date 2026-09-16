@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/loading-state';
+import { EmptyState } from '@/components/ui/empty-state';
 import { PlusIcon, Banknote, Trash2, AlertCircle } from 'lucide-react';
 
 interface IncomeLine {
@@ -463,13 +464,15 @@ export default function Income() {
                         data-testid="income-loading-state"
                     />
                 ) : lines.length === 0 ? (
-                    <Card>
-                        <CardContent className="text-muted-foreground flex flex-col items-center gap-3 py-12 text-center text-sm">
-                            <Banknote className="size-8 opacity-50" />
-                            <p>No income lines for this period yet.</p>
-                            <p>Click Add Income to create the first line.</p>
-                        </CardContent>
-                    </Card>
+                    <EmptyState
+                        data-testid="income-empty-state"
+                        icon={Banknote}
+                        title="No income lines for this period yet"
+                        description="Add your first income line to start tracking earnings for this period."
+                        actionLabel="Add First Income"
+                        actionTestId="add-first-income"
+                        onAction={() => setIsDialogOpen(true)}
+                    />
                 ) : (
                     <div
                         className="overflow-x-auto rounded-md border"

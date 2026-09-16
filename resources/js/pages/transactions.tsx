@@ -11,6 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/ui/loading-state';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -57,6 +58,7 @@ import {
     Download,
     PencilLine,
     Copy,
+    Receipt,
 } from 'lucide-react';
 
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
@@ -2008,14 +2010,27 @@ export default function Transactions() {
                         </div>
 
                         {transactions.length === 0 && !loading && (
-                            <Card>
-                                <CardContent className="flex items-center justify-center py-12">
-                                    <p className="text-muted-foreground">
-                                        No transactions found. Click "Add
-                                        Transaction" to create one.
-                                    </p>
-                                </CardContent>
-                            </Card>
+                            <EmptyState
+                                data-testid="transactions-empty-state"
+                                icon={Receipt}
+                                title={
+                                    hasActiveFilters
+                                        ? 'No transactions found'
+                                        : 'No transactions yet'
+                                }
+                                description={
+                                    hasActiveFilters
+                                        ? 'Try clearing filters or add a new transaction.'
+                                        : 'Track your expenses by adding your first transaction.'
+                                }
+                                actionLabel={
+                                    hasActiveFilters
+                                        ? 'Add Transaction'
+                                        : 'Add First Transaction'
+                                }
+                                actionTestId="add-first-transaction"
+                                onAction={() => setIsDialogOpen(true)}
+                            />
                         )}
                     </>
                 )}

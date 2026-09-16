@@ -5518,3 +5518,37 @@ STATUS / NEXT:
 - Changed only passes for feature_list.json index 153.
 - Completion: 154/175 passing; 21 pending.
 - Next: index 154, empty states with helpful message + CTA.
+
+=== Session 87 (2026-09-16) ===
+
+GOAL: Implement empty states with helpful message + CTA (feature index 154).
+
+ENVIRONMENT:
+- App running at http://dev.pockety.com:8080/ (HTTP 200).
+- Puppeteer MCP blocked this session (Local SDK cannot request interactive
+  approval / mcp_auth unsupported). Used /dev/* HTTP helpers + Playwright
+  screenshots (same pattern as Sessions 84-86).
+- Baseline: loading-state frontend 3/3; sample browser case 2/2; assets rebuilt.
+
+IMPLEMENTATION:
+1. resources/js/components/ui/empty-state.tsx
+   - Shared EmptyState: icon circle, title, description, optional CTA button
+   - data-testid hooks for title/icon/action; dashed card border
+2. Wired into transactions, accounts, income empty lists
+   - Transactions: "No transactions yet" + "Add First Transaction" (opens dialog)
+   - Filter-aware copy when hasActiveFilters
+3. Unit: empty-state.test.tsx (3 cases)
+4. Browser: tests/browser/empty-states.spec.ts
+   - Mocks empty API responses; asserts icon, message, CTA; CTA opens form
+
+VERIFICATION:
+- Frontend suite: 129 passed / 35 files.
+- Playwright empty-states: 3/3 passed (light/dark transactions + accounts).
+- Screenshots: verification/test-154-empty-states/
+  (light/dark empty + CTA opens dialog; accounts empty).
+- Asserted message, receipt/building icon, Add First Transaction/Account CTA.
+
+STATUS / NEXT:
+- Changed only passes for feature_list.json index 154.
+- Completion: 155/175 passing; 20 pending.
+- Next: index 155, modal dialogs with backdrop, z-index, and centering.

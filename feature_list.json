@@ -1852,7 +1852,7 @@
       "Step 4: Verify helpful illustration or icon is shown",
       "Step 5: Verify call-to-action button (e.g., 'Add First Transaction') is present"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

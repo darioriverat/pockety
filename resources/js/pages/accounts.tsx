@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/loading-state';
+import { EmptyState } from '@/components/ui/empty-state';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { PlusIcon, Building2, Wallet, AlertCircle } from 'lucide-react';
 
@@ -547,11 +548,15 @@ export default function Accounts() {
                         data-testid="accounts-loading-state"
                     />
                 ) : accounts.length === 0 ? (
-                    <Card>
-                        <CardContent className="py-8 text-center text-muted-foreground">
-                            No accounts yet. Click "Add Account" to create one.
-                        </CardContent>
-                    </Card>
+                    <EmptyState
+                        data-testid="accounts-empty-state"
+                        icon={Building2}
+                        title="No accounts yet"
+                        description="Create your first bank, investment, or liability account to get started."
+                        actionLabel="Add First Account"
+                        actionTestId="add-first-account"
+                        onAction={() => setIsDialogOpen(true)}
+                    />
                 ) : (
                     <>
                         <div className="space-y-4">
