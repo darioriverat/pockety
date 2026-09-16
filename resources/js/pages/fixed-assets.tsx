@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDisplayCurrency } from '@/lib/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 import { PlusIcon, Car, Calendar } from 'lucide-react';
 
 interface FixedAsset {
@@ -385,13 +386,12 @@ export default function FixedAssets() {
                 )}
 
                 {loading ? (
-                    <Card>
-                        <CardContent className="pt-6">
-                            <p className="text-center text-muted-foreground">
-                                Loading fixed assets...
-                            </p>
-                        </CardContent>
-                    </Card>
+                    <LoadingState
+                        variant="skeleton-cards"
+                        count={3}
+                        label="Loading fixed assets…"
+                        data-testid="fixed-assets-loading-state"
+                    />
                 ) : assets.length === 0 ? (
                     <Card>
                         <CardContent className="pt-6">

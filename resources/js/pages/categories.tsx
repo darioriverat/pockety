@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { CategoryLanguageToggle } from '@/components/category-language-toggle';
@@ -146,17 +146,12 @@ export default function Categories() {
                 )}
 
                 {loading ? (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {[...Array(6)].map((_, i) => (
-                            <Card key={i}>
-                                <CardHeader>
-                                    <Skeleton className="h-6 w-20" />
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-3/4" />
-                                </CardHeader>
-                            </Card>
-                        ))}
-                    </div>
+                    <LoadingState
+                        variant="skeleton-cards"
+                        count={6}
+                        label="Loading categories…"
+                        data-testid="categories-loading-state"
+                    />
                 ) : (
                     <>
                         <div className="mb-4">

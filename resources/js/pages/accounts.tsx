@@ -28,6 +28,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { LoadingState } from '@/components/ui/loading-state';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { PlusIcon, Building2, Wallet, AlertCircle } from 'lucide-react';
 
@@ -539,11 +540,12 @@ export default function Accounts() {
                 )}
 
                 {loading ? (
-                    <Card>
-                        <CardContent className="py-8 text-center text-muted-foreground">
-                            Loading accounts...
-                        </CardContent>
-                    </Card>
+                    <LoadingState
+                        variant="skeleton-cards"
+                        count={6}
+                        label="Loading accounts…"
+                        data-testid="accounts-loading-state"
+                    />
                 ) : accounts.length === 0 ? (
                     <Card>
                         <CardContent className="py-8 text-center text-muted-foreground">

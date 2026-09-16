@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Spinner } from '@/components/ui/spinner';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import {
@@ -206,9 +206,11 @@ export default function BalanceSheet() {
                     )}
 
                     {loading && !sheet ? (
-                        <div className="flex justify-center py-16">
-                            <Spinner className="h-8 w-8" />
-                        </div>
+                        <LoadingState
+                            variant="spinner"
+                            label="Loading balance sheet…"
+                            data-testid="balance-sheet-loading-state"
+                        />
                     ) : (
                         <>
                             <div

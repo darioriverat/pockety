@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatCurrencyAmount, formatSignedCurrencyAmount, amountToneClass } from '@/lib/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 interface Account {
@@ -346,11 +347,12 @@ export default function AccountDetail() {
                 )}
 
                 {loading ? (
-                    <Card>
-                        <CardContent className="py-8 text-center text-muted-foreground">
-                            Loading transactions...
-                        </CardContent>
-                    </Card>
+                    <LoadingState
+                        variant="skeleton-rows"
+                        count={4}
+                        label="Loading transactions…"
+                        data-testid="account-detail-loading-state"
+                    />
                 ) : transactions.length === 0 ? (
                     <Card>
                         <CardContent

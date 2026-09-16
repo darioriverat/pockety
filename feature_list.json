@@ -1840,7 +1840,7 @@
       "Step 4: Verify loading indicator (spinner, progress bar, or skeleton) is shown",
       "Step 5: Verify loading state is removed when data loads"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

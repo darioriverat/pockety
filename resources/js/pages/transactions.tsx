@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -1626,16 +1626,12 @@ export default function Transactions() {
                 )}
 
                 {loading ? (
-                    <div className="space-y-2">
-                        {[...Array(5)].map((_, i) => (
-                            <Card key={i}>
-                                <CardHeader>
-                                    <Skeleton className="h-6 w-40" />
-                                    <Skeleton className="h-4 w-full" />
-                                </CardHeader>
-                            </Card>
-                        ))}
-                    </div>
+                    <LoadingState
+                        variant="skeleton-rows"
+                        count={5}
+                        label="Loading transactions…"
+                        data-testid="transactions-loading-state"
+                    />
                 ) : (
                     <>
                         <div className="mb-2 flex flex-wrap items-center justify-between gap-3">

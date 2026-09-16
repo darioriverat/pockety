@@ -24,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { LoadingState } from '@/components/ui/loading-state';
 import { PlusIcon, Banknote, Trash2, AlertCircle } from 'lucide-react';
 
 interface IncomeLine {
@@ -455,9 +456,12 @@ export default function Income() {
                 )}
 
                 {loading ? (
-                    <p className="text-muted-foreground text-sm">
-                        Loading income…
-                    </p>
+                    <LoadingState
+                        variant="skeleton-rows"
+                        count={3}
+                        label="Loading income…"
+                        data-testid="income-loading-state"
+                    />
                 ) : lines.length === 0 ? (
                     <Card>
                         <CardContent className="text-muted-foreground flex flex-col items-center gap-3 py-12 text-center text-sm">

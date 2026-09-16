@@ -8,6 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -185,9 +186,11 @@ export default function FinancialSummary() {
                     )}
 
                     {loading && !summary ? (
-                        <div className="flex justify-center py-16">
-                            <Spinner className="h-8 w-8" />
-                        </div>
+                        <LoadingState
+                            variant="spinner"
+                            label="Loading financial summary…"
+                            data-testid="financial-summary-loading-state"
+                        />
                     ) : (
                         <>
                             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
