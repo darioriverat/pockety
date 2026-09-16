@@ -1902,7 +1902,7 @@
       "Step 5: Verify date format is clear (e.g., YYYY-MM-DD)",
       "Step 6: Verify user can type or select from calendar"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

@@ -22,6 +22,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -961,16 +962,12 @@ export default function Transactions() {
                                         <Label htmlFor="date">
                                             Date (YYYY-MM-DD)
                                         </Label>
-                                        <Input
+                                        <DatePicker
                                             id="date"
-                                            type="text"
-                                            inputMode="numeric"
                                             placeholder="2025-01-15"
                                             value={formData.date}
-                                            data-testid="transaction-date-input"
-                                            onChange={(e) =>
-                                                handleDateChange(e.target.value)
-                                            }
+                                            data-testid="transaction-date"
+                                            onChange={handleDateChange}
                                             aria-invalid={!!fieldErrors.date}
                                             aria-describedby={
                                                 fieldErrors.date

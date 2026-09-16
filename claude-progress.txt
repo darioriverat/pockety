@@ -5657,3 +5657,36 @@ STATUS / NEXT:
 - Changed only passes for feature_list.json index 157.
 - Completion: 158/175 passing; 17 pending.
 - Next: index 158, date inputs with calendar picker and consistent format.
+
+=== Session 91 (2026-09-16) ===
+
+GOAL: Date inputs use consistent format and have calendar picker (feature index 158).
+
+ENVIRONMENT:
+- App running at http://dev.pockety.com:8080/ (HTTP 200).
+- Puppeteer MCP blocked this session (Local SDK cannot request interactive
+  approval). Used /dev/* HTTP helpers + Playwright screenshots (same pattern
+  as Sessions 84-90).
+- Baseline: chart-axis-labels 2/2; chart-styles light sample 1/1; assets rebuilt.
+
+IMPLEMENTATION:
+1. resources/js/components/ui/date-picker.tsx
+   - YYYY-MM-DD text input + calendar icon trigger
+   - Inline month calendar (not portaled; Radix modal blocks outside clicks)
+   - Type or click-to-select; Escape closes picker without closing dialog
+   - Calendar controls tabIndex=-1 so form Tab order stays intact
+2. transactions.tsx uses DatePicker (testid transaction-date-input preserved)
+3. Unit: date-picker.test.tsx (3)
+4. Browser: tests/browser/date-picker.spec.ts (light/dark)
+
+VERIFICATION:
+- Frontend: date-picker 3/3; transactions-period-auto 1/1.
+- Playwright date-picker: 2/2; form-presentation light regression 1/1.
+- Screenshots: verification/test-158-date-picker/
+  (light/dark before, calendar open, after type, after select).
+- Asserted Format: YYYY-MM-DD, calendar open on field click, type + select.
+
+STATUS / NEXT:
+- Changed only passes for feature_list.json index 158.
+- Completion: 159/175 passing; 16 pending.
+- Next: index 159, dropdown/select inputs with clear arrow and styling.
