@@ -41,6 +41,9 @@ import {
     periodFromDate,
 } from '@/lib/periods';
 import {
+    ArrowDown,
+    ArrowUp,
+    ArrowUpDown,
     ChevronLeft,
     ChevronRight,
     Plus,
@@ -58,6 +61,9 @@ const AMOUNT_POSITIVE_ERROR = 'Amount must be a positive number';
 const DATE_VALID_ERROR = 'Date must be a valid date.';
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 50;
+const SORT_COLUMNS = ['date', 'amount', 'category'] as const;
+type SortColumn = (typeof SORT_COLUMNS)[number];
+type SortDirection = 'asc' | 'desc';
 
 function isValidTransactionDate(value: string): boolean {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -115,6 +121,8 @@ interface ApiResponse {
         page?: number;
         per_page?: number;
         last_page?: number;
+        sort_by?: SortColumn;
+        sort_dir?: SortDirection;
     };
 }
 
@@ -170,6 +178,8 @@ export default function Transactions() {
     const [bulkSubmitting, setBulkSubmitting] = useState(false);
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState<number>(DEFAULT_PAGE_SIZE);
+    const [sortBy, setSortBy] = useState<SortColumn>('date');
+    const [sortDir, setSortDir] = useState<SortDirection>('desc');
     const [pagination, setPagination] = useState<PaginationMeta>({
         total: 0,
         page: 1,
@@ -270,7 +280,7 @@ export default function Transactions() {
 
     useEffect(() => {
         fetchTransactions();
-    }, [filters, page, perPage]);
+    }, [filters, page, perPage, sortBy, sortDir]);
 
     useEffect(() => {
         if (highlightApplied.current || loading || transactions.length === 0) {
@@ -359,6 +369,8 @@ export default function Transactions() {
             if (filters.currency) params.append('currency', filters.currency);
             if (filters.is_recurring) params.append('is_recurring', filters.is_recurring);
             if (filters.search.trim()) params.append('search', filters.search.trim());
+            params.append('sort_by', sortBy);
+            params.append('sort_dir', sortDir);
             params.append('page', page.toString());
             params.append('per_page', perPage.toString());
 
@@ -739,6 +751,27 @@ export default function Transactions() {
             is_recurring: '',
             search: '',
         });
+    };
+
+    const handleSort = (column: SortColumn) => {
+        setPage(1);
+        if (sortBy === column) {
+            setSortDir((current) => (current === 'asc' ? 'desc' : 'asc'));
+            return;
+        }
+        setSortBy(column);
+        setSortDir('asc');
+    };
+
+    const sortIcon = (column: SortColumn) => {
+        if (sortBy !== column) {
+            return <ArrowUpDown className="ml-1 h-3.5 w-3.5 opacity-50" />;
+        }
+        return sortDir === 'asc' ? (
+            <ArrowUp className="ml-1 h-3.5 w-3.5" />
+        ) : (
+            <ArrowDown className="ml-1 h-3.5 w-3.5" />
+        );
     };
 
     const showPaginationControls = pagination.total > 50;
@@ -1729,6 +1762,67 @@ export default function Transactions() {
                                     </div>
                                 </div>
                             )}
+                        </div>
+
+                        <div
+                            className="mb-2 grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] items-center gap-2 rounded-md border bg-muted/40 px-3 py-2"
+                            data-testid="transactions-sort-headers"
+                            role="row"
+                        >
+                            <button
+                                type="button"
+                                className="flex items-center text-left text-sm font-medium text-foreground hover:text-primary"
+                                onClick={() => handleSort('date')}
+                                data-testid="sort-header-date"
+                                aria-label="Date"
+                                aria-sort={
+                                    sortBy === 'date'
+                                        ? sortDir === 'asc'
+                                            ? 'ascending'
+                                            : 'descending'
+                                        : 'none'
+                                }
+                            >
+                                Date
+                                {sortIcon('date')}
+                            </button>
+                            <button
+                                type="button"
+                                className="flex items-center text-left text-sm font-medium text-foreground hover:text-primary"
+                                onClick={() => handleSort('amount')}
+                                data-testid="sort-header-amount"
+                                aria-label="Amount"
+                                aria-sort={
+                                    sortBy === 'amount'
+                                        ? sortDir === 'asc'
+                                            ? 'ascending'
+                                            : 'descending'
+                                        : 'none'
+                                }
+                            >
+                                Amount
+                                {sortIcon('amount')}
+                            </button>
+                            <button
+                                type="button"
+                                className="flex items-center text-left text-sm font-medium text-foreground hover:text-primary"
+                                onClick={() => handleSort('category')}
+                                data-testid="sort-header-category"
+                                aria-label="Category"
+                                aria-sort={
+                                    sortBy === 'category'
+                                        ? sortDir === 'asc'
+                                            ? 'ascending'
+                                            : 'descending'
+                                        : 'none'
+                                }
+                            >
+                                Category
+                                {sortIcon('category')}
+                            </button>
+                            <span className="text-sm text-muted-foreground">
+                                Actions
+                            </span>
                         </div>
 
                         <div

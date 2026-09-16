@@ -22,7 +22,7 @@ class TransactionController extends Controller
      *
      * GET /api/transactions
      * Query params: period, category_id, category (code), account_id, quincena, currency,
-     *               is_recurring, search, page, per_page
+     *               is_recurring, search, sort_by, sort_dir, page, per_page
      */
     public function index(Request $request): JsonResponse
     {
@@ -35,6 +35,8 @@ class TransactionController extends Controller
             'currency',
             'is_recurring',
             'search',
+            'sort_by',
+            'sort_dir',
         ]);
 
         $wantsPagination = $request->has('page') || $request->has('per_page');
@@ -43,6 +45,8 @@ class TransactionController extends Controller
             $validated = $request->validate([
                 'page' => 'sometimes|integer|min:1',
                 'per_page' => ['sometimes', 'integer', Rule::in(TransactionService::ALLOWED_PER_PAGE)],
+                'sort_by' => ['sometimes', 'string', Rule::in(TransactionService::ALLOWED_SORT_BY)],
+                'sort_dir' => ['sometimes', 'string', Rule::in(['asc', 'desc'])],
             ]);
 
             $page = (int) ($validated['page'] ?? 1);
@@ -61,10 +65,17 @@ class TransactionController extends Controller
                     'page' => $result['page'],
                     'per_page' => $result['per_page'],
                     'last_page' => $result['last_page'],
+                    'sort_by' => $filters['sort_by'] ?? TransactionService::DEFAULT_SORT_BY,
+                    'sort_dir' => $filters['sort_dir'] ?? TransactionService::DEFAULT_SORT_DIR,
                     'filters' => $filters,
                 ],
             ]);
         }
+
+        $request->validate([
+            'sort_by' => ['sometimes', 'string', Rule::in(TransactionService::ALLOWED_SORT_BY)],
+            'sort_dir' => ['sometimes', 'string', Rule::in(['asc', 'desc'])],
+        ]);
 
         $transactions = $this->service->getAll($filters);
 
@@ -77,6 +88,8 @@ class TransactionController extends Controller
             ],
             'meta' => [
                 'total' => count($data),
+                'sort_by' => $filters['sort_by'] ?? TransactionService::DEFAULT_SORT_BY,
+                'sort_dir' => $filters['sort_dir'] ?? TransactionService::DEFAULT_SORT_DIR,
                 'filters' => $filters,
             ],
         ]);

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "catNames": [
+    "Groceries",
+    "Transportation",
+    "Utilities"
+  ],
+  "catNamesDesc": [
+    "Utilities",
+    "Transportation",
+    "Groceries"
+  ],
+  "hasSortHeaders": true
+}

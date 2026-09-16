@@ -15,10 +15,16 @@ class TransactionService implements TransactionServiceInterface
 
     public const DEFAULT_PER_PAGE = 50;
 
+    public const ALLOWED_SORT_BY = ['date', 'amount', 'category'];
+
+    public const DEFAULT_SORT_BY = 'date';
+
+    public const DEFAULT_SORT_DIR = 'desc';
+
     /**
      * Get all transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, quincena?: string, currency?: string, is_recurring?: bool|string, search?: mixed}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, quincena?: string, currency?: string, is_recurring?: bool|string, search?: mixed, sort_by?: string, sort_dir?: string}  $filters
      * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array
@@ -29,7 +35,9 @@ class TransactionService implements TransactionServiceInterface
             return [];
         }
 
-        $transactions = $query->orderBy('date', 'desc')->orderBy('id', 'desc')->get();
+        $this->applySorting($query, $filters);
+
+        $transactions = $query->get();
 
         return $transactions->map(function (Transaction $transaction) {
             return $this->toEntity($transaction);
@@ -39,7 +47,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Get a paginated page of transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, quincena?: string, currency?: string, is_recurring?: bool|string, search?: mixed}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, quincena?: string, currency?: string, is_recurring?: bool|string, search?: mixed, sort_by?: string, sort_dir?: string}  $filters
      * @return array{data: TransactionEntity[], total: int, page: int, per_page: int, last_page: int}
      */
     public function getPaginated(array $filters = [], int $page = 1, int $perPage = self::DEFAULT_PER_PAGE): array
@@ -67,9 +75,9 @@ class TransactionService implements TransactionServiceInterface
             $page = $lastPage;
         }
 
+        $this->applySorting($query, $filters);
+
         $transactions = $query
-            ->orderBy('date', 'desc')
-            ->orderBy('id', 'desc')
             ->forPage($page, $perPage)
             ->get();
 
@@ -80,6 +88,44 @@ class TransactionService implements TransactionServiceInterface
             'per_page' => $perPage,
             'last_page' => $lastPage,
         ];
+    }
+
+    /**
+     * Apply sort_by / sort_dir from filters onto the query.
+     *
+     * @param  Builder<Transaction>  $query
+     * @param  array{sort_by?: string, sort_dir?: string}  $filters
+     */
+    private function applySorting(Builder $query, array $filters): void
+    {
+        $sortBy = isset($filters['sort_by']) && is_string($filters['sort_by'])
+            ? strtolower($filters['sort_by'])
+            : self::DEFAULT_SORT_BY;
+
+        if (! in_array($sortBy, self::ALLOWED_SORT_BY, true)) {
+            $sortBy = self::DEFAULT_SORT_BY;
+        }
+
+        $sortDir = isset($filters['sort_dir']) && is_string($filters['sort_dir'])
+            ? strtolower($filters['sort_dir'])
+            : self::DEFAULT_SORT_DIR;
+
+        if (! in_array($sortDir, ['asc', 'desc'], true)) {
+            $sortDir = self::DEFAULT_SORT_DIR;
+        }
+
+        match ($sortBy) {
+            'amount' => $query->orderByRaw(
+                'COALESCE(NULLIF(amount_cad, 0), NULLIF(amount_usd, 0), NULLIF(amount_cop, 0), 0) '.$sortDir
+            )->orderBy('id', $sortDir),
+            'category' => $query
+                ->leftJoin('categories', 'transactions.category_id', '=', 'categories.id')
+                ->select('transactions.*')
+                ->orderBy('categories.name_en', $sortDir)
+                ->orderBy('categories.code', $sortDir)
+                ->orderBy('transactions.id', $sortDir),
+            default => $query->orderBy('date', $sortDir)->orderBy('id', $sortDir),
+        };
     }
 
     /**

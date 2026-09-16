@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "amounts": [
+    10,
+    25,
+    50
+  ],
+  "amountsDesc": [
+    50,
+    25,
+    10
+  ],
+  "hasSortHeaders": true
+}

@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "dateAscDates": [
+    "2026-09-01",
+    "2026-09-10",
+    "2026-09-20"
+  ],
+  "dateDescDates": [
+    "2026-09-20",
+    "2026-09-10",
+    "2026-09-01"
+  ],
+  "amounts": [
+    10,
+    25,
+    50
+  ],
+  "amountsDesc": [
+    50,
+    25,
+    10
+  ],
+  "catNames": [
+    "Groceries",
+    "Transportation",
+    "Utilities"
+  ],
+  "catNamesDesc": [
+    "Utilities",
+    "Transportation",
+    "Groceries"
+  ],
+  "hasSortHeaders": true,
+  "meta": {
+    "dateAsc": {
+      "sort_by": "date",
+      "sort_dir": "asc"
+    },
+    "amountAsc": {
+      "sort_by": "amount",
+      "sort_dir": "asc"
+    },
+    "catAsc": {
+      "sort_by": "category",
+      "sort_dir": "asc"
+    }
+  }
+}

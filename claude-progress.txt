@@ -4926,3 +4926,43 @@ NEXT SESSION:
 PROGRESS: 121/175 passing; 54 remaining
 STATUS: App healthy; required fields, success toasts, and delete confirmation verified end-to-end
 
+=== Session 71 (2026-09-15) ===
+
+GOAL: Implement transaction table sorting (date / amount / category)
+
+ORIENTATION:
+- Started at 121/175 passing; 54 remaining
+- App healthy at http://dev.pockety.com:8080/
+- Next failing features: sort by date, amount, category
+
+VERIFICATION SMOKE:
+- Frontend unit smoke (delete-confirm) passed
+- Puppeteer MCP blocked (approval/sandbox)
+- Playwright/Chrome launches abort in sandbox (SIGABRT / kill EPERM)
+- Docker daemon blocked (no task backend/browser tests)
+- Host php unavailable (no PHPUnit on host)
+
+IMPLEMENTED:
+- Backend sort_by + sort_dir on GET /api/transactions (date, amount, category)
+- Frontend sortable Date / Amount / Category headers on transactions list
+- Default remains date desc; first click on a column sorts asc, toggle reverses
+- Feature tests: tests/Feature/TransactionSortTest.php
+- Unit tests: resources/js/pages/transactions-sort.test.tsx (4/4 pass)
+- Playwright: tests/browser/transaction-sort.spec.ts
+- Live API verification script: verification/verify-transaction-sort.mjs (PASSED)
+- Rebuilt frontend with SKIP_WAYFINDER=1 (sort headers present in bundle)
+
+PASSES UPDATED:
+- None — browser screenshots required by protocol; UI automation blocked this session
+- feature_list.json sort features remain passes: false
+
+NEXT SESSION (priority):
+1. Outside sandbox run:
+   PLAYWRIGHT_CHANNEL=chrome npm run test:browser -- tests/browser/transaction-sort.spec.ts
+2. Confirm screenshots under verification/test-120|121|122-*/
+3. Mark the three sort features passes: true
+4. Or continue with API endpoint suite (#123+)
+
+PROGRESS: 121/175 passing; 54 remaining (implementation complete, UI screenshots pending)
+STATUS: App healthy; sort API verified live; unit tests green; awaiting browser screenshots
+
