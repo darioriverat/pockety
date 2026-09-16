@@ -10,12 +10,12 @@ import PeriodHistoryController from './PeriodHistoryController'
 import PeriodComparisonController from './PeriodComparisonController'
 import CategoryActualsController from './CategoryActualsController'
 import ReconciliationController from './ReconciliationController'
+import BudgetController from './BudgetController'
 import BalanceSheetController from './BalanceSheetController'
 import BalanceSheetImportController from './BalanceSheetImportController'
 import TransactionImportController from './TransactionImportController'
 import ExchangeRateController from './ExchangeRateController'
 import ExchangeRateImportController from './ExchangeRateImportController'
-import BudgetController from './BudgetController'
 import FinancialSummaryController from './FinancialSummaryController'
 import DashboardController from './DashboardController'
 import ReportsController from './ReportsController'
@@ -35,12 +35,12 @@ const Controllers = {
     PeriodComparisonController: Object.assign(PeriodComparisonController, PeriodComparisonController),
     CategoryActualsController: Object.assign(CategoryActualsController, CategoryActualsController),
     ReconciliationController: Object.assign(ReconciliationController, ReconciliationController),
+    BudgetController: Object.assign(BudgetController, BudgetController),
     BalanceSheetController: Object.assign(BalanceSheetController, BalanceSheetController),
     BalanceSheetImportController: Object.assign(BalanceSheetImportController, BalanceSheetImportController),
     TransactionImportController: Object.assign(TransactionImportController, TransactionImportController),
     ExchangeRateController: Object.assign(ExchangeRateController, ExchangeRateController),
     ExchangeRateImportController: Object.assign(ExchangeRateImportController, ExchangeRateImportController),
-    BudgetController: Object.assign(BudgetController, BudgetController),
     FinancialSummaryController: Object.assign(FinancialSummaryController, FinancialSummaryController),
     DashboardController: Object.assign(DashboardController, DashboardController),
     ReportsController: Object.assign(ReportsController, ReportsController),

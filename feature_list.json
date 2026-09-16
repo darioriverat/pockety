@@ -1666,7 +1666,7 @@
       "Step 4: Verify logo or app name 'Pockety' is visible",
       "Step 5: Verify main navigation links are visible and styled consistently"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1678,7 +1678,7 @@
       "Step 4: Click hamburger icon",
       "Step 5: Verify menu expands and all navigation items are accessible"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

@@ -262,6 +262,105 @@ reconciliationForm.head = (args: { period: string | number } | [period: string |
 reconciliation.form = reconciliationForm
 
 /**
+* @see \App\Http\Controllers\BudgetController::budgetVsActual
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+export const budgetVsActual = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: budgetVsActual.url(args, options),
+    method: 'get',
+})
+
+budgetVsActual.definition = {
+    methods: ["get","head"],
+    url: '/api/periods/{period}/budget-vs-actual',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\BudgetController::budgetVsActual
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+budgetVsActual.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { period: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            period: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        period: args.period,
+    }
+
+    return budgetVsActual.definition.url
+            .replace('{period}', parsedArgs.period.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\BudgetController::budgetVsActual
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+budgetVsActual.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: budgetVsActual.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::budgetVsActual
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+budgetVsActual.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: budgetVsActual.url(args, options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::budgetVsActual
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+const budgetVsActualForm = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: budgetVsActual.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::budgetVsActual
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+budgetVsActualForm.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: budgetVsActual.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::budgetVsActual
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+budgetVsActualForm.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: budgetVsActual.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+budgetVsActual.form = budgetVsActualForm
+
+/**
 * @see \App\Http\Controllers\BalanceSheetController::balanceSheet
 * @see app/Http/Controllers/BalanceSheetController.php:24
 * @route '/api/periods/{period}/balance-sheet'
@@ -364,6 +463,7 @@ const periods = {
     history: Object.assign(history, history),
     compare: Object.assign(compare, compare),
     reconciliation: Object.assign(reconciliation, reconciliationAcee99),
+    budgetVsActual: Object.assign(budgetVsActual, budgetVsActual),
     balanceSheet: Object.assign(balanceSheet, balanceSheet),
 }
 

@@ -1,4 +1,103 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+/**
+* @see \App\Http\Controllers\BudgetController::reportForPeriod
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+export const reportForPeriod = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: reportForPeriod.url(args, options),
+    method: 'get',
+})
+
+reportForPeriod.definition = {
+    methods: ["get","head"],
+    url: '/api/periods/{period}/budget-vs-actual',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\BudgetController::reportForPeriod
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+reportForPeriod.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { period: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            period: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        period: args.period,
+    }
+
+    return reportForPeriod.definition.url
+            .replace('{period}', parsedArgs.period.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\BudgetController::reportForPeriod
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+reportForPeriod.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: reportForPeriod.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::reportForPeriod
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+reportForPeriod.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: reportForPeriod.url(args, options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::reportForPeriod
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+const reportForPeriodForm = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: reportForPeriod.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::reportForPeriod
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+reportForPeriodForm.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: reportForPeriod.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\BudgetController::reportForPeriod
+* @see app/Http/Controllers/BudgetController.php:125
+* @route '/api/periods/{period}/budget-vs-actual'
+*/
+reportForPeriodForm.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: reportForPeriod.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+reportForPeriod.form = reportForPeriodForm
+
 /**
 * @see \App\Http\Controllers\BudgetController::index
 * @see app/Http/Controllers/BudgetController.php:20
@@ -219,7 +318,7 @@ report.form = reportForm
 
 /**
 * @see \App\Http\Controllers\BudgetController::exportReport
-* @see app/Http/Controllers/BudgetController.php:124
+* @see app/Http/Controllers/BudgetController.php:162
 * @route '/api/budgets/report/export'
 */
 export const exportReport = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -234,7 +333,7 @@ exportReport.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetController::exportReport
-* @see app/Http/Controllers/BudgetController.php:124
+* @see app/Http/Controllers/BudgetController.php:162
 * @route '/api/budgets/report/export'
 */
 exportReport.url = (options?: RouteQueryOptions) => {
@@ -243,7 +342,7 @@ exportReport.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\BudgetController::exportReport
-* @see app/Http/Controllers/BudgetController.php:124
+* @see app/Http/Controllers/BudgetController.php:162
 * @route '/api/budgets/report/export'
 */
 exportReport.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -253,7 +352,7 @@ exportReport.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::exportReport
-* @see app/Http/Controllers/BudgetController.php:124
+* @see app/Http/Controllers/BudgetController.php:162
 * @route '/api/budgets/report/export'
 */
 exportReport.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -263,7 +362,7 @@ exportReport.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetController::exportReport
-* @see app/Http/Controllers/BudgetController.php:124
+* @see app/Http/Controllers/BudgetController.php:162
 * @route '/api/budgets/report/export'
 */
 const exportReportForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -273,7 +372,7 @@ const exportReportForm = (options?: RouteQueryOptions): RouteFormDefinition<'get
 
 /**
 * @see \App\Http\Controllers\BudgetController::exportReport
-* @see app/Http/Controllers/BudgetController.php:124
+* @see app/Http/Controllers/BudgetController.php:162
 * @route '/api/budgets/report/export'
 */
 exportReportForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -283,7 +382,7 @@ exportReportForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'>
 
 /**
 * @see \App\Http\Controllers\BudgetController::exportReport
-* @see app/Http/Controllers/BudgetController.php:124
+* @see app/Http/Controllers/BudgetController.php:162
 * @route '/api/budgets/report/export'
 */
 exportReportForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -298,6 +397,6 @@ exportReportForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'
 
 exportReport.form = exportReportForm
 
-const BudgetController = { index, store, report, exportReport }
+const BudgetController = { reportForPeriod, index, store, report, exportReport }
 
 export default BudgetController
