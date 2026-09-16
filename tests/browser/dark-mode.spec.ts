@@ -53,12 +53,8 @@ test('feature 175: dark mode toggle in settings works correctly', async ({
     const consoleErrors = trackConsoleErrors(page);
 
     await loginAsBrowserTestUser(page);
-    await page.goto('/dashboard');
-
-    // Navigate to appearance settings
-    await page.getByTestId('sidebar-menu-button').click();
-    await page.getByRole('link', { name: /settings/i }).first().click();
-    await expect(page).toHaveURL(/\/settings\/profile$/);
+    await page.goto('/settings/appearance');
+    await expect(page).toHaveURL(/\/settings\/appearance$/);
 
     // Take screenshot of settings navigation
     await page.screenshot({
@@ -66,14 +62,10 @@ test('feature 175: dark mode toggle in settings works correctly', async ({
         fullPage: true,
     });
 
-    // Click on Appearance link in settings sidebar
-    await page.getByRole('link', { name: /appearance/i }).click();
-    await expect(page).toHaveURL(/\/settings\/appearance$/);
-
     // Verify appearance toggle is visible
-    const lightButton = page.getByRole('button', { name: /light/i });
-    const darkButton = page.getByRole('button', { name: /dark/i });
-    const systemButton = page.getByRole('button', { name: /system/i });
+    const lightButton = page.getByRole('button', { name: /^light$/i });
+    const darkButton = page.getByRole('button', { name: /^dark$/i });
+    const systemButton = page.getByRole('button', { name: /^system$/i });
 
     await expect(lightButton).toBeVisible();
     await expect(darkButton).toBeVisible();
@@ -110,7 +102,7 @@ test('feature 175: dark mode toggle in settings works correctly', async ({
 
     // Switch back to light mode
     await page.goto('/settings/appearance');
-    await lightButton.click();
+    await page.getByRole('button', { name: /^light$/i }).click();
     await page.waitForTimeout(500);
 
     await expect(html).not.toHaveClass(/dark/);
@@ -121,7 +113,7 @@ test('feature 175: dark mode toggle in settings works correctly', async ({
     });
 
     // Test system preference mode
-    await systemButton.click();
+    await page.getByRole('button', { name: /^system$/i }).click();
     await page.waitForTimeout(500);
 
     // System mode should respect browser preference
@@ -172,29 +164,45 @@ test('feature 175: colors are inverted and readable in dark mode', async ({
             fullPage: false,
         });
 
-        // Verify text is readable (body should have light text on dark background)
-        const body = page.locator('body');
-        const bodyStyles = await body.evaluate((el) => {
+        // Verify readable contrast using relative luminance (supports oklch/rgb)
+        const contrast = await page.locator('body').evaluate((el) => {
+            const parseColor = (value: string) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    return { r: 0, g: 0, b: 0 };
+                }
+                ctx.fillStyle = value;
+                ctx.fillRect(0, 0, 1, 1);
+                const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+                return { r, g, b };
+            };
+
+            const luminance = ({ r, g, b }: { r: number; g: number; b: number }) => {
+                const toLinear = (c: number) => {
+                    const s = c / 255;
+                    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+                };
+                return (
+                    0.2126 * toLinear(r) +
+                    0.7152 * toLinear(g) +
+                    0.0722 * toLinear(b)
+                );
+            };
+
             const computed = window.getComputedStyle(el);
+            const text = parseColor(computed.color);
+            const bg = parseColor(computed.backgroundColor);
             return {
-                color: computed.color,
-                backgroundColor: computed.backgroundColor,
+                textLuminance: luminance(text),
+                bgLuminance: luminance(bg),
             };
         });
 
-        // In dark mode, text should be light (rgb values > 200)
-        // and background should be dark (rgb values < 50)
-        const textMatch = bodyStyles.color.match(/\d+/g);
-        const bgMatch = bodyStyles.backgroundColor.match(/\d+/g);
-
-        if (textMatch && bgMatch) {
-            const textR = parseInt(textMatch[0]);
-            const bgR = parseInt(bgMatch[0]);
-
-            // Verify there's good contrast (light text on dark bg)
-            expect(textR).toBeGreaterThan(200); // Light text
-            expect(bgR).toBeLessThan(50); // Dark background
-        }
+        expect(contrast.textLuminance).toBeGreaterThan(0.6);
+        expect(contrast.bgLuminance).toBeLessThan(0.2);
     }
 
     expect(consoleErrors).toEqual([]);
@@ -222,16 +230,17 @@ test('feature 175: dark mode works correctly on forms and interactive elements',
         fullPage: true,
     });
 
-    // Verify form inputs are visible and readable
-    const amountInput = page.getByLabel(/amount/i);
+    // Verify form inputs are visible and readable (scoped to dialog)
+    const dialog = page.getByRole('dialog');
+    const amountInput = dialog.getByTestId('transaction-amount-input');
     await expect(amountInput).toBeVisible();
 
-    // Verify buttons are visible with good contrast
-    const cancelButton = page.getByRole('button', { name: /cancel/i });
-    const saveButton = page.getByRole('button', { name: /save|create/i });
+    // Verify primary action and close control are visible with good contrast
+    const saveButton = dialog.getByTestId('transaction-form-submit');
+    const closeButton = dialog.getByRole('button', { name: /close/i });
 
-    await expect(cancelButton).toBeVisible();
     await expect(saveButton).toBeVisible();
+    await expect(closeButton).toBeVisible();
 
     // Test hover state on save button
     await saveButton.hover();

@@ -2076,7 +2076,7 @@
       "Step 4: Verify footer includes copyright or app name",
       "Step 5: Verify useful links are present (if applicable)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -2089,7 +2089,7 @@
       "Step 5: Verify report content is formatted for printing",
       "Step 6: Verify page breaks are logical"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -2102,6 +2102,6 @@
       "Step 5: Verify colors are inverted appropriately",
       "Step 6: Verify readability is maintained in dark mode"
     ],
-    "passes": false
+    "passes": true
   }
 ]

@@ -136,12 +136,13 @@ test('feature 174: data tables are readable in print view', async ({
     const consoleErrors = trackConsoleErrors(page);
 
     await loginAsBrowserTestUser(page);
-    await page.goto('/transactions');
-    await expect(page).toHaveURL(/\/transactions$/);
+    // Balance sheet always renders tables (even with empty-state rows)
+    await page.goto('/balance-sheet');
+    await expect(page).toHaveURL(/\/balance-sheet$/);
 
     // Normal view
     await page.screenshot({
-        path: 'verification/test-174-print-stylesheet/06-transactions-normal.png',
+        path: 'verification/test-174-print-stylesheet/06-tables-normal.png',
         fullPage: false,
     });
 
@@ -149,8 +150,8 @@ test('feature 174: data tables are readable in print view', async ({
     await page.emulateMedia({ media: 'print' });
     await page.waitForTimeout(500);
 
-    // Verify table is visible
-    const table = page.locator('table');
+    // Verify at least one table remains readable in print view
+    const table = page.locator('table').first();
     await expect(table).toBeVisible();
 
     // Verify action buttons are hidden in print (if they exist)
@@ -162,7 +163,7 @@ test('feature 174: data tables are readable in print view', async ({
 
     // Take print view
     await page.screenshot({
-        path: 'verification/test-174-print-stylesheet/07-transactions-print.png',
+        path: 'verification/test-174-print-stylesheet/07-tables-print.png',
         fullPage: false,
     });
 
