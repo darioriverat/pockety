@@ -1442,7 +1442,7 @@
       "Step 4: Click 'Date' header again",
       "Step 5: Verify transactions are sorted by date descending"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1454,7 +1454,7 @@
       "Step 4: Click again",
       "Step 5: Verify transactions are sorted by amount descending"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1466,7 +1466,7 @@
       "Step 4: Click again",
       "Step 5: Verify sort order reverses"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1488,7 +1488,7 @@
       "Step 3: Verify response contains created transaction with ID",
       "Step 4: Verify transaction is saved in database"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1500,7 +1500,7 @@
       "Step 4: Verify response contains transaction details",
       "Step 5: Verify all fields match created transaction"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1512,7 +1512,7 @@
       "Step 4: Verify response contains updated transaction",
       "Step 5: Verify changes are persisted in database"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1524,7 +1524,7 @@
       "Step 4: Verify transaction is removed from database",
       "Step 5: Verify GET request for same ID returns 404"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1535,7 +1535,7 @@
       "Step 3: Verify response contains 45 active categories",
       "Step 4: Verify each category has code, name_es, name_en, is_debt_category fields"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1546,7 +1546,7 @@
       "Step 3: Verify response contains accounts array",
       "Step 4: Verify accounts are grouped by type (assets vs liabilities)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1557,7 +1557,7 @@
       "Step 3: Verify response contains account balances (recorded, computed, variance)",
       "Step 4: Verify response contains reconciliation status (balanced/unbalanced)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1579,7 +1579,7 @@
       "Step 3: Verify response contains array of categories with budget, actual, variance, percentage",
       "Step 4: Verify all 45 categories are included"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1590,7 +1590,7 @@
       "Step 3: Verify only transactions from period 202501 are returned",
       "Step 4: Verify transaction count matches expected"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1600,7 +1600,7 @@
       "Step 2: Verify response status is 200",
       "Step 3: Verify only C001 transactions are returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1610,7 +1610,7 @@
       "Step 2: Verify response status is 200",
       "Step 3: Verify only transactions for account ID 1 are returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1620,7 +1620,7 @@
       "Step 2: Verify response status is 404",
       "Step 3: Verify error message is returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1631,7 +1631,7 @@
       "Step 3: Verify response contains validation errors",
       "Step 4: Verify error message specifies which field is invalid"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1642,7 +1642,7 @@
       "Step 3: Verify response contains usd_cop, usd_cad, cad_cop rates",
       "Step 4: Verify rates are numeric values"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1654,7 +1654,7 @@
       "Step 4: Verify only 25 transactions are returned",
       "Step 5: Request page 2 and verify different transactions are returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

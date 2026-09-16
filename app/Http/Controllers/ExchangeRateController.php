@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class ExchangeRateController extends Controller
 {
     /**
-     * Get exchange rates for a specific period.
+     * Get exchange rates for a specific period (query param).
      */
     public function show(Request $request): JsonResponse
     {
@@ -17,7 +17,33 @@ class ExchangeRateController extends Controller
             'period' => 'required|string|size:6|regex:/^\d{6}$/',
         ]);
 
-        $period = $request->input('period');
+        return $this->rateForPeriod($request->input('period'));
+    }
+
+    /**
+     * Get exchange rates for a specific period (path param).
+     *
+     * GET /api/exchange-rates/{period}
+     */
+    public function showByPeriod(string $period): JsonResponse
+    {
+        $validator = validator(
+            ['period' => $period],
+            ['period' => 'required|string|size:6|regex:/^\d{6}$/']
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'Invalid period format. Expected YYYYMM.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        return $this->rateForPeriod($period);
+    }
+
+    private function rateForPeriod(string $period): JsonResponse
+    {
         $rate = ExchangeRate::forPeriod($period);
 
         if (! $rate) {

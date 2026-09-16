@@ -39,6 +39,11 @@ class TransactionController extends Controller
             'sort_dir',
         ]);
 
+        // Alias: ?account=1 → account_id
+        if ($request->filled('account') && empty($filters['account_id'])) {
+            $filters['account_id'] = $request->query('account');
+        }
+
         $wantsPagination = $request->has('page') || $request->has('per_page');
 
         if ($wantsPagination) {
@@ -63,6 +68,7 @@ class TransactionController extends Controller
                 'meta' => [
                     'total' => $result['total'],
                     'page' => $result['page'],
+                    'current_page' => $result['page'],
                     'per_page' => $result['per_page'],
                     'last_page' => $result['last_page'],
                     'sort_by' => $filters['sort_by'] ?? TransactionService::DEFAULT_SORT_BY,

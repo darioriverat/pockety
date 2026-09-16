@@ -99,13 +99,51 @@ class BudgetController extends Controller
             'period' => 'required|string|size:6|regex:/^\d{6}$/',
         ]);
 
-        $report = $this->budgetService->getBudgetVsActualReport($validated['period']);
+        $period = $validated['period'];
+        $report = $this->budgetService->getBudgetVsActualReport($period);
 
         return response()->json([
             'data' => $report['rows'],
             'links' => [
-                'self' => route('budgets.report', ['period' => $validated['period']]),
-                'budgets' => route('budgets.index', ['period' => $validated['period']]),
+                'self' => route('budgets.report', ['period' => $period]),
+                'budgets' => route('budgets.index', ['period' => $period]),
+                'period_path' => route('periods.budget-vs-actual', ['period' => $period]),
+            ],
+            'meta' => [
+                'period' => $report['period'],
+                'totals' => $report['totals'],
+                'currency' => 'CAD',
+            ],
+        ]);
+    }
+
+    /**
+     * Budget vs actual report with period in the path.
+     *
+     * GET /api/periods/{period}/budget-vs-actual
+     */
+    public function reportForPeriod(string $period): JsonResponse
+    {
+        $validator = validator(
+            ['period' => $period],
+            ['period' => 'required|string|size:6|regex:/^\d{6}$/']
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'Invalid period format. Expected YYYYMM.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $report = $this->budgetService->getBudgetVsActualReport($period);
+
+        return response()->json([
+            'data' => $report['rows'],
+            'links' => [
+                'self' => route('periods.budget-vs-actual', ['period' => $period]),
+                'report' => route('budgets.report', ['period' => $period]),
+                'budgets' => route('budgets.index', ['period' => $period]),
             ],
             'meta' => [
                 'period' => $report['period'],

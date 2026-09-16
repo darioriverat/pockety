@@ -100,6 +100,11 @@ Route::post('/periods/{period}/reconciliation/{accountId}/acknowledge', [Reconci
     ->name('periods.reconciliation.acknowledge')
     ->whereNumber('accountId');
 
+// Budget vs actual alias (period in path)
+Route::get('/periods/{period}/budget-vs-actual', [BudgetController::class, 'reportForPeriod'])
+    ->name('periods.budget-vs-actual')
+    ->where('period', '\d{6}');
+
 // Balance Sheet API
 Route::get('/balance-sheet/time-series', [BalanceSheetController::class, 'timeSeries'])->name('balance-sheet.time-series');
 Route::get('/balance-sheet/export', [BalanceSheetController::class, 'exportPdf'])->name('balance-sheet.export-pdf');
@@ -116,6 +121,9 @@ Route::post('/transactions/import/clear', [TransactionImportController::class, '
 // Exchange Rates API
 Route::get('/exchange-rates', [ExchangeRateController::class, 'index'])->name('exchange-rates.index');
 Route::get('/exchange-rates/show', [ExchangeRateController::class, 'show'])->name('exchange-rates.show');
+Route::get('/exchange-rates/{period}', [ExchangeRateController::class, 'showByPeriod'])
+    ->name('exchange-rates.show-by-period')
+    ->where('period', '\d{6}');
 Route::post('/exchange-rates', [ExchangeRateController::class, 'store'])->name('exchange-rates.store');
 Route::post('/exchange-rates/import', [ExchangeRateImportController::class, 'import'])->name('exchange-rates.import');
 Route::get('/exchange-rates/import/statistics', [ExchangeRateImportController::class, 'statistics'])->name('exchange-rates.import.statistics');

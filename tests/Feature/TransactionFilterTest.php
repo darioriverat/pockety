@@ -93,6 +93,42 @@ class TransactionFilterTest extends TestCase
         $this->assertSame('C001', $response->json('meta.filters.category'));
     }
 
+    public function test_index_filters_by_account_alias_query_param(): void
+    {
+        $other = Account::factory()->create([
+            'name' => 'Other Bank',
+            'type' => 'bank',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-05',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->groceries->id,
+            'account_id' => $this->account->id,
+            'amount_cad' => 40.00,
+            'comments' => 'account-match',
+            'is_recurring' => false,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-06',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->groceries->id,
+            'account_id' => $other->id,
+            'amount_cad' => 20.00,
+            'comments' => 'account-other',
+            'is_recurring' => false,
+        ]);
+
+        $response = $this->getJson('/api/transactions?account='.$this->account->id);
+
+        $response->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.comments', 'account-match');
+    }
+
     public function test_index_returns_empty_for_unknown_category_code(): void
     {
         Transaction::create([
