@@ -4243,3 +4243,90 @@ KEY CHANGES:
 PROGRESS: 106 of 175 tests passing (69 remaining)
 NEXT: Test #105 - Year-to-date income/expense totals
 STATUS: Clean, stable. See SESSION-54-SUMMARY.md.
+
+================================================================================
+SESSION 55 - Year-to-Date Reports Implementation (2026-09-15)
+================================================================================
+
+ENVIRONMENT CONSTRAINTS:
+This session encountered Docker permission issues preventing:
+- Backend test execution via 'task backend-tests'
+- Frontend test execution via 'task frontend-tests'
+- Browser automation verification via Puppeteer MCP (requires interactive approval)
+
+SMOKE VERIFICATION: 
+Skipped due to Docker permission issues. Previous sessions confirmed stable state.
+
+IMPLEMENTED (Code Complete):
+- Test #105: User can view year-to-date totals for income and expenses
+  - URL: /reports/year-to-date
+  - Year selector dropdown (2020 to current year)
+  - Three YTD summary cards: Income, Expenses, Net
+  - Multi-currency support (CAD/USD/COP)
+  - Responsive design with color-coded cards
+  - Updates dynamically when year changes
+
+KEY CHANGES:
+Backend:
+- ReportsService::getYearToDateTotals($year) - calculates YTD totals for given year
+  * Iterates through all months Jan-Dec (or to current month if same year)
+  * Converts USD/COP to CAD using period-specific exchange rates
+  * Returns: year, from_period, to_period, ytd_income_cad, ytd_expenses_cad, ytd_net_cad, period_count
+- ReportsController::yearToDate() - handles reports page
+  * Validates year parameter (defaults to current year)
+  * Provides available years (2020-current)
+- routes/web.php: Added GET /reports/year-to-date route
+
+Frontend:
+- resources/js/pages/reports-ytd.tsx - YTD reports page
+  * Year selector with dynamic loading
+  * Three cards: Income (green), Expenses (red), Net (blue/amber)
+  * Period range and count display
+  * Responsive grid layout
+- resources/js/components/app-sidebar.tsx - Added "Reports" nav item
+
+Tests Created:
+- tests/Feature/ReportsTest.php (8 test cases)
+  * Guest redirect, authentication, YTD calculation
+  * Multi-currency conversion, year validation, available years
+- resources/js/pages/reports-ytd.test.tsx (9 test cases)
+  * Component rendering, data display, year selection
+- tests/browser/reports-ytd.spec.ts (Playwright E2E)
+  * Seeds 3 months of test data
+  * Verifies all 6 test steps with screenshots
+
+VERIFICATION STATUS:
+❌ Backend tests: Not executed (Docker permission denied)
+❌ Frontend tests: Not executed (Docker permission denied)
+❌ Browser automation: Not executed (Puppeteer MCP requires approval)
+❓ Test #105: Remains "passes": false (awaiting verification)
+
+CODE QUALITY:
+✅ Follows existing patterns (DashboardService, PeriodComparison)
+✅ Type-safe TypeScript components
+✅ Comprehensive test coverage created
+✅ Documentation in verification/test-105-ytd-reports/IMPLEMENTATION.md
+✅ Clean git commit with descriptive message
+
+NEXT SESSION TASKS:
+1. CRITICAL: Verify test #105 with browser automation
+   - Run: task browser-tests --grep "feature 105"
+   - OR manually navigate to /reports/year-to-date
+   - Verify YTD totals display correctly
+   - Take screenshots at each step
+   - Mark test #105 as "passes": true if verified
+
+2. Run backend tests to confirm no regressions
+   - task backend-tests
+   - Ensure all ReportsTest cases pass
+
+3. Run frontend tests to confirm component tests pass
+   - task frontend-tests
+   - Ensure reports-ytd.test.tsx passes
+
+4. After verification, proceed to test #106
+
+PROGRESS: 106 of 175 tests passing (69 remaining, +1 implemented pending verification)
+COMMIT: 9fbab2e "Implement year-to-date income/expense reports (test #105) - pending verification"
+STATUS: Implementation complete, awaiting verification in next session
+
