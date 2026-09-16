@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import {
     Card,
     CardContent,
@@ -499,6 +500,13 @@ export default function Transactions() {
             await fetchTransactions();
             setIsDialogOpen(false);
             resetForm();
+            
+            // Show success message
+            if (editingId) {
+                toast.success('Transaction updated successfully');
+            } else {
+                toast.success('Transaction created successfully');
+            }
         } catch (err) {
             setFormError(
                 err instanceof Error ? err.message : 'An error occurred',
@@ -565,8 +573,10 @@ export default function Transactions() {
             });
             if (!response.ok) throw new Error('Failed to delete transaction');
             await fetchTransactions();
+            toast.success('Transaction deleted successfully');
         } catch (err) {
-            alert(err instanceof Error ? err.message : 'An error occurred');
+            const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+            toast.error(errorMessage);
         }
     };
 
@@ -1791,6 +1801,7 @@ export default function Transactions() {
                                                     variant="outline"
                                                     size="icon"
                                                     aria-label="Edit transaction"
+                                                    data-testid="edit-transaction-button"
                                                     onClick={() =>
                                                         handleEdit(transaction)
                                                     }
@@ -1801,6 +1812,7 @@ export default function Transactions() {
                                                     variant="outline"
                                                     size="icon"
                                                     aria-label="Delete transaction"
+                                                    data-testid="delete-transaction-button"
                                                     onClick={() =>
                                                         handleDelete(
                                                             transaction.id
