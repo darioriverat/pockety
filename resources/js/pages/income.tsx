@@ -24,7 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusIcon, Banknote, Trash2 } from 'lucide-react';
+import { PlusIcon, Banknote, Trash2, AlertCircle } from 'lucide-react';
 
 interface IncomeLine {
     id: number;
@@ -362,10 +362,11 @@ export default function Income() {
 
                                     {formError && (
                                         <p
-                                            className="text-destructive text-sm"
+                                            className="flex items-center gap-1.5 text-destructive text-sm"
                                             role="alert"
                                         >
-                                            {formError}
+                                            <AlertCircle className="h-4 w-4 shrink-0" />
+                                            <span>{formError}</span>
                                         </p>
                                     )}
                                 </div>

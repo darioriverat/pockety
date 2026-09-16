@@ -43,6 +43,7 @@ import {
 } from '@/lib/periods';
 import { cn } from '@/lib/utils';
 import {
+    AlertCircle,
     ArrowDown,
     ArrowUp,
     ArrowUpDown,
@@ -890,11 +891,12 @@ export default function Transactions() {
                                     </div>
                                     {bulkError && (
                                         <p
-                                            className="text-destructive text-sm"
+                                            className="flex items-center gap-1.5 text-destructive text-sm"
                                             role="alert"
                                             data-testid="bulk-edit-error"
                                         >
-                                            {bulkError}
+                                            <AlertCircle className="h-4 w-4 shrink-0" />
+                                            <span>{bulkError}</span>
                                         </p>
                                     )}
                                     <DialogFooter>
@@ -978,11 +980,12 @@ export default function Transactions() {
                                         {fieldErrors.date && (
                                             <p
                                                 id="date-error"
-                                                className="text-destructive text-sm"
+                                                className="flex items-center gap-1.5 text-destructive text-sm"
                                                 role="alert"
                                                 data-testid="date-error"
                                             >
-                                                {fieldErrors.date}
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                                <span>{fieldErrors.date}</span>
                                             </p>
                                         )}
                                     </div>
@@ -1015,11 +1018,12 @@ export default function Transactions() {
                                             {fieldErrors.period && (
                                                 <p
                                                     id="period-error"
-                                                    className="text-destructive text-sm"
+                                                    className="flex items-center gap-1.5 text-destructive text-sm"
                                                     role="alert"
                                                     data-testid="period-error"
                                                 >
-                                                    {fieldErrors.period}
+                                                    <AlertCircle className="h-4 w-4 shrink-0" />
+                                                    <span>{fieldErrors.period}</span>
                                                 </p>
                                             )}
                                             <p
@@ -1105,11 +1109,12 @@ export default function Transactions() {
                                         {fieldErrors.category_id && (
                                             <p
                                                 id="category-error"
-                                                className="text-destructive text-sm"
+                                                className="flex items-center gap-1.5 text-destructive text-sm"
                                                 role="alert"
                                                 data-testid="category-error"
                                             >
-                                                {fieldErrors.category_id}
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                                <span>{fieldErrors.category_id}</span>
                                             </p>
                                         )}
                                     </div>
@@ -1212,11 +1217,12 @@ export default function Transactions() {
                                             {fieldErrors.amount && (
                                                 <p
                                                     id="amount-error"
-                                                    className="text-destructive text-sm"
+                                                    className="flex items-center gap-1.5 text-destructive text-sm"
                                                     role="alert"
                                                     data-testid="amount-error"
                                                 >
-                                                    {fieldErrors.amount}
+                                                    <AlertCircle className="h-4 w-4 shrink-0" />
+                                                    <span>{fieldErrors.amount}</span>
                                                 </p>
                                             )}
                                         </div>
@@ -1309,11 +1315,12 @@ export default function Transactions() {
                                 {formError && (
                                     <p
                                         id="transaction-form-error"
-                                        className="text-destructive text-sm"
+                                        className="flex items-center gap-1.5 text-destructive text-sm"
                                         role="alert"
                                         data-testid="transaction-form-error"
                                     >
-                                        {formError}
+                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                        <span>{formError}</span>
                                     </p>
                                 )}
                                 <DialogFooter>

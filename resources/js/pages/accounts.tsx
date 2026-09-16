@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { formatCurrencyAmount } from '@/lib/currency';
-import { PlusIcon, Building2, Wallet } from 'lucide-react';
+import { PlusIcon, Building2, Wallet, AlertCircle } from 'lucide-react';
 
 interface Account {
     id: number;
@@ -503,8 +503,9 @@ export default function Accounts() {
                                     </div>
 
                                     {formError && (
-                                        <p className="text-sm text-destructive">
-                                            {formError}
+                                        <p className="flex items-center gap-1.5 text-sm text-destructive">
+                                            <AlertCircle className="h-4 w-4 shrink-0" />
+                                            <span>{formError}</span>
                                         </p>
                                     )}
                                 </div>
@@ -710,8 +711,9 @@ export default function Accounts() {
                                 </div>
 
                                 {balanceFormError && (
-                                    <p className="text-sm text-destructive">
-                                        {balanceFormError}
+                                    <p className="flex items-center gap-1.5 text-sm text-destructive">
+                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                        <span>{balanceFormError}</span>
                                     </p>
                                 )}
                             </div>

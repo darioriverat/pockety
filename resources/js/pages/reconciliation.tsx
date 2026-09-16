@@ -34,6 +34,7 @@ import {
     CheckCircle2,
     ExternalLink,
     ClipboardCheck,
+    AlertCircle,
 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
@@ -672,11 +673,12 @@ export default function Reconciliation() {
                             </div>
                             {acknowledgeError && (
                                 <p
-                                    className="text-sm text-destructive"
+                                    className="flex items-center gap-1.5 text-sm text-destructive"
                                     role="alert"
                                     data-testid="acknowledge-error"
                                 >
-                                    {acknowledgeError}
+                                    <AlertCircle className="h-4 w-4 shrink-0" />
+                                    <span>{acknowledgeError}</span>
                                 </p>
                             )}
                         </div>
