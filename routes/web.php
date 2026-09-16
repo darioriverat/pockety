@@ -5,6 +5,7 @@ use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Account;
 use App\Models\AccountBalance;
@@ -40,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('periods/history', 'periods-history')->name('periods-history');
     Route::inertia('periods/compare', 'period-comparison')->name('periods-compare');
     Route::inertia('category-actuals', 'category-actuals')->name('category-actuals');
+    Route::get('reports/year-to-date', [ReportsController::class, 'yearToDate'])->name('reports.ytd');
     Route::inertia('import', 'import')->name('import');
 });
 
