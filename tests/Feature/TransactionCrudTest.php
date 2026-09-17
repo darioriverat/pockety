@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Account;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -137,6 +138,44 @@ class TransactionCrudTest extends TestCase
         $this->getJson('/api/transactions/999999')
             ->assertNotFound()
             ->assertJsonPath('error', 'Transaction not found');
+    }
+
+    public function test_update_can_clear_account_id(): void
+    {
+        $account = Account::factory()->create([
+            'name' => 'RBC Checking Unset',
+            'type' => 'bank',
+        ]);
+
+        $created = $this->postJson('/api/transactions', [
+            'date' => '2026-09-15',
+            'period' => '202609',
+            'quincena' => 'Q1',
+            'category_id' => $this->category->id,
+            'account_id' => $account->id,
+            'amount_cad' => 10,
+            'comments' => 'crud-unset-account',
+        ])->json('data');
+
+        $this->assertSame($account->id, $created['account_id']);
+
+        $response = $this->putJson('/api/transactions/'.$created['id'], [
+            'date' => '2026-09-15',
+            'period' => '202609',
+            'quincena' => 'Q1',
+            'category_id' => $this->category->id,
+            'account_id' => null,
+            'amount_cad' => 10,
+            'comments' => 'crud-unset-account',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.account_id', null);
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $created['id'],
+            'account_id' => null,
+        ]);
     }
 
     public function test_post_missing_required_field_returns_422(): void

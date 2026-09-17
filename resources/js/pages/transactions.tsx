@@ -29,6 +29,7 @@ import {
     Select,
     SelectContent,
     SelectItem,
+    SelectSeparator,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -67,6 +68,7 @@ import {
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
 const AMOUNT_POSITIVE_ERROR = 'Amount must be a positive number';
 const DATE_VALID_ERROR = 'Date must be a valid date.';
+const NO_ACCOUNT_VALUE = 'none';
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 50;
 const SORT_COLUMNS = ['date', 'amount', 'category'] as const;
@@ -456,9 +458,10 @@ export default function Transactions() {
             period: formData.period.trim(),
             quincena: formData.quincena,
             category_id: parseInt(formData.category_id),
-            account_id: formData.account_id
-                ? parseInt(formData.account_id)
-                : null,
+            account_id:
+                formData.account_id && formData.account_id !== NO_ACCOUNT_VALUE
+                    ? parseInt(formData.account_id)
+                    : null,
             comments: formData.comments || null,
             is_recurring: formData.is_recurring,
             debt_component: formData.debt_component || null,
@@ -1118,11 +1121,18 @@ export default function Transactions() {
                                             Account
                                         </Label>
                                         <Select
-                                            value={formData.account_id}
+                                            value={
+                                                formData.account_id ||
+                                                NO_ACCOUNT_VALUE
+                                            }
                                             onValueChange={(value) =>
                                                 setFormData({
                                                     ...formData,
-                                                    account_id: value,
+                                                    account_id:
+                                                        value ===
+                                                        NO_ACCOUNT_VALUE
+                                                            ? ''
+                                                            : value,
                                                 })
                                             }
                                         >
@@ -1135,6 +1145,15 @@ export default function Transactions() {
                                                 <SelectValue placeholder="Select account" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem
+                                                    value={NO_ACCOUNT_VALUE}
+                                                    data-testid="account-none-option"
+                                                >
+                                                    None
+                                                </SelectItem>
+                                                {accounts.length > 0 && (
+                                                    <SelectSeparator />
+                                                )}
                                                 {accounts.map((account) => (
                                                     <SelectItem
                                                         key={account.id}

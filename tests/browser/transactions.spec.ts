@@ -166,6 +166,23 @@ async function createTransaction(
     return body.data;
 }
 
+async function createAccount(
+    request: APIRequestContext,
+    name: string,
+): Promise<{ id: number; name: string }> {
+    const response = await request.post('/api/accounts', {
+        data: {
+            name,
+            type: 'bank',
+            primary_currency: 'CAD',
+        },
+    });
+    expect(response.ok()).toBeTruthy();
+
+    const body = (await response.json()) as { data: { id: number; name: string } };
+    return body.data;
+}
+
 test.beforeEach(async ({ page }) => {
     resetBrowserState();
     await loginAsBrowserTestUser(page);
@@ -786,6 +803,66 @@ test('feature 84: system validates quincena as Q1 or Q2 only', async ({
         path: 'verification/test-84-quincena/02-quincena-q1-accepted.png',
         fullPage: false,
     });
+
+    expect(consoleErrors).toEqual([]);
+});
+
+test('users can unset and reassign the account on a transaction', async ({
+    page,
+    request,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const category = await getCategoryByCode(request, 'C001');
+    const comments = 'unset-transaction-account';
+    const account = await createAccount(request, 'Unset Account Checking');
+
+    const created = await createTransaction(request, {
+        date: '2026-01-29',
+        period: '202601',
+        quincena: 'Q1',
+        category_id: category.id,
+        account_id: account.id,
+        amount_cad: 42,
+        comments,
+    });
+
+    await openTransactionsPage(page);
+
+    const transactionCard = page
+        .locator('[data-slot="card"]')
+        .filter({ hasText: comments });
+
+    await expect(
+        transactionCard.getByTestId(`transaction-account-${created.id}`),
+    ).toContainText(account.name);
+
+    await transactionCard.getByTestId('edit-transaction-button').click();
+    await expect(page.getByRole('heading', { name: 'Edit Transaction' })).toBeVisible();
+    await expect(page.getByTestId('account-field')).toContainText(account.name);
+
+    await selectOption(page, 'Account', 'None');
+    await submitTransactionForm(page, 'Update');
+
+    await expect(
+        transactionCard.getByTestId(`transaction-account-${created.id}`),
+    ).toHaveText(/Account:\s*—/);
+
+    const cleared = await getTransactionByComments(request, comments);
+    expect(cleared.account_id).toBeNull();
+
+    await transactionCard.getByTestId('edit-transaction-button').click();
+    await expect(page.getByRole('heading', { name: 'Edit Transaction' })).toBeVisible();
+    await expect(page.getByTestId('account-field')).toContainText('None');
+
+    await selectOption(page, 'Account', account.name);
+    await submitTransactionForm(page, 'Update');
+
+    await expect(
+        transactionCard.getByTestId(`transaction-account-${created.id}`),
+    ).toContainText(account.name);
+
+    const reassigned = await getTransactionByComments(request, comments);
+    expect(reassigned.account_id).toBe(account.id);
 
     expect(consoleErrors).toEqual([]);
 });

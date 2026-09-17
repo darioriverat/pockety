@@ -15,6 +15,7 @@ export interface ApiTransaction {
     period: string;
     quincena: 'Q1' | 'Q2';
     category_id: number;
+    account_id: number | null;
     amount_cad: number | null;
     amount_usd: number | null;
     amount_cop: number | null;
