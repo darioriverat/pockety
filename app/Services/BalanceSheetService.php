@@ -257,11 +257,6 @@ class BalanceSheetService
 
     private function resolveExchangeRate(string $period): ExchangeRate
     {
-        return ExchangeRate::forPeriod($period) ?? new ExchangeRate([
-            'period' => $period,
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
+        return ExchangeRate::forPeriod($period);
     }
 }
