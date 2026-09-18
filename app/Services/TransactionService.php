@@ -395,6 +395,32 @@ class TransactionService implements TransactionServiceInterface
     }
 
     /**
+     * Sum the amounts of roll-forward transactions for a specific account and period.
+     */
+    public function sumRollForwardAmountsForAccount(Account $account, string $period): array
+    {
+        $transactions = $this->getRollForwardTransactionsForAccount($account, $period);
+
+        $isLiability = $account->isLiability();
+        $computedCad = 0.0;
+        $computedUsd = 0.0;
+        $computedCop = 0.0;
+
+        foreach ($transactions as $transaction) {
+            $sign = $transaction->balanceSign($isLiability);
+            $computedCad += $sign * (float) ($transaction->amountCad ?? 0);
+            $computedUsd += $sign * (float) ($transaction->amountUsd ?? 0);
+            $computedCop += $sign * (float) ($transaction->amountCop ?? 0);
+        }
+
+        return [
+            'cad' => $computedCad,
+            'usd' => $computedUsd,
+            'cop' => $computedCop,
+        ];
+    }
+
+    /**
      * Get transactions for a specific category.
      */
     public function getForCategory(int $categoryId): array

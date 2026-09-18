@@ -222,20 +222,14 @@ class ReconciliationService
         $baseUsd = $base ? (float) $base->recorded_balance_usd : 0.0;
         $baseCop = $base ? (float) $base->recorded_balance_cop : 0.0;
 
-        $transactions = $this->transactionService
-            ->getRollForwardTransactionsForAccount($account, $period);
-
-        $isLiability = $account->isLiability();
         $computedCad = $baseCad;
         $computedUsd = $baseUsd;
         $computedCop = $baseCop;
 
-        foreach ($transactions as $transaction) {
-            $sign = $transaction->balanceSign($isLiability);
-            $computedCad += $sign * (float) ($transaction->amountCad ?? 0);
-            $computedUsd += $sign * (float) ($transaction->amountUsd ?? 0);
-            $computedCop += $sign * (float) ($transaction->amountCop ?? 0);
-        }
+        $computedAmounts = $this->transactionService->sumRollForwardAmountsForAccount($account, $period);
+        $computedCad += $computedAmounts['cad'];
+        $computedUsd += $computedAmounts['usd'];
+        $computedCop += $computedAmounts['cop'];
 
         $recordedCad = $recordedBalance ? (float) $recordedBalance->recorded_balance_cad : 0.0;
         $recordedUsd = $recordedBalance ? (float) $recordedBalance->recorded_balance_usd : 0.0;
