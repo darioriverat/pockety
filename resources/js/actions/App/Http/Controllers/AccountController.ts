@@ -181,7 +181,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:200
+* @see app/Http/Controllers/AccountController.php:204
 * @route '/api/accounts/{id}/transactions'
 */
 export const transactions = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -196,7 +196,7 @@ transactions.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:200
+* @see app/Http/Controllers/AccountController.php:204
 * @route '/api/accounts/{id}/transactions'
 */
 transactions.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -223,7 +223,7 @@ transactions.url = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:200
+* @see app/Http/Controllers/AccountController.php:204
 * @route '/api/accounts/{id}/transactions'
 */
 transactions.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -233,7 +233,7 @@ transactions.get = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:200
+* @see app/Http/Controllers/AccountController.php:204
 * @route '/api/accounts/{id}/transactions'
 */
 transactions.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -243,7 +243,7 @@ transactions.head = (args: { id: string | number } | [id: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:200
+* @see app/Http/Controllers/AccountController.php:204
 * @route '/api/accounts/{id}/transactions'
 */
 const transactionsForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -253,7 +253,7 @@ const transactionsForm = (args: { id: string | number } | [id: string | number ]
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:200
+* @see app/Http/Controllers/AccountController.php:204
 * @route '/api/accounts/{id}/transactions'
 */
 transactionsForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -263,7 +263,7 @@ transactionsForm.get = (args: { id: string | number } | [id: string | number ] |
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:200
+* @see app/Http/Controllers/AccountController.php:204
 * @route '/api/accounts/{id}/transactions'
 */
 transactionsForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

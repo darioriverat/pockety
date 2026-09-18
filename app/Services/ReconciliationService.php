@@ -29,8 +29,10 @@ class ReconciliationService
      * - Recorded: the manually-entered balance for the period (0 if not yet entered).
      * - Computed: a "known prior balance" (the most recent recorded balance for a period
      *   strictly before this one; if none exists yet, the current period's own recorded
-     *   balance is used as the baseline) minus this period's expense outflows
-     *   plus income/credit inflows for the account.
+     *   balance is used as the baseline) plus this period's signed transaction deltas.
+     *   Asset accounts: minus regular spend, plus income, minus principal.
+     *   Liability accounts: plus regular charges, minus income/credits, minus principal.
+     *   Non-principal debt (interest) is omitted on assets and treated as a charge on liabilities.
      * - Variance: Recorded minus Computed.
      *
      * Also includes:
@@ -225,21 +227,28 @@ class ReconciliationService
             ->with('category')
             ->get();
 
-        $netOutflowCad = 0.0;
-        $netOutflowUsd = 0.0;
-        $netOutflowCop = 0.0;
+        $isLiability = $account->isLiability();
+        $computedCad = $baseCad;
+        $computedUsd = $baseUsd;
+        $computedCop = $baseCop;
 
         foreach ($transactions as $transaction) {
-            $sign = $transaction->isInflow() ? -1 : 1;
-            $netOutflowCad += $sign * (float) ($transaction->amount_cad ?? 0);
-            $netOutflowUsd += $sign * (float) ($transaction->amount_usd ?? 0);
-            $netOutflowCop += $sign * (float) ($transaction->amount_cop ?? 0);
-        }
+            $category = $transaction->category;
 
-        // Expenses reduce the computed balance; income and credits increase it.
-        $computedCad = $baseCad - $netOutflowCad;
-        $computedUsd = $baseUsd - $netOutflowUsd;
-        $computedCop = $baseCop - $netOutflowCop;
+            // Asset accounts omit non-principal debt (interest) from the roll-forward.
+            if (
+                ! $isLiability
+                && $category?->is_debt_category
+                && ! $transaction->isPrincipal()
+            ) {
+                continue;
+            }
+
+            $sign = $transaction->balanceSign($isLiability);
+            $computedCad += $sign * (float) ($transaction->amount_cad ?? 0);
+            $computedUsd += $sign * (float) ($transaction->amount_usd ?? 0);
+            $computedCop += $sign * (float) ($transaction->amount_cop ?? 0);
+        }
 
         $recordedCad = $recordedBalance ? (float) $recordedBalance->recorded_balance_cad : 0.0;
         $recordedUsd = $recordedBalance ? (float) $recordedBalance->recorded_balance_usd : 0.0;

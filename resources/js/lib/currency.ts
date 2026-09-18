@@ -105,17 +105,35 @@ export function formatSignedCurrencyAmount(
 
 /**
  * Tailwind classes that visually distinguish positive (green) vs negative (red) amounts.
+ * Pass invert=true for liability accounts, where increasing the balance (more debt)
+ * is unfavorable and decreasing it is favorable.
  */
-export function amountToneClass(amount: number): string {
-    if (amount < 0) {
+export function amountToneClass(amount: number, invert = false): string {
+    const value = invert ? -amount : amount;
+
+    if (value < 0) {
         return 'text-red-600 dark:text-red-400';
     }
 
-    if (amount > 0) {
+    if (value > 0) {
         return 'text-green-600 dark:text-green-400';
     }
 
     return 'text-muted-foreground';
+}
+
+export function amountTone(amount: number, invert = false): 'positive' | 'negative' | 'neutral' {
+    const value = invert ? -amount : amount;
+
+    if (value < 0) {
+        return 'negative';
+    }
+
+    if (value > 0) {
+        return 'positive';
+    }
+
+    return 'neutral';
 }
 
 /**

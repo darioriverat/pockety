@@ -125,6 +125,219 @@ class ReconciliationTest extends TestCase
         $this->assertEquals('balanced', $response->json('data.status'));
     }
 
+    public function test_reconciliation_adds_income_and_subtracts_principal_from_computed_balance(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $account = Account::create([
+            'name' => 'Income Debt Bank',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $expenseCategory = Category::factory()->create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+        ]);
+
+        $incomeCategory = Category::factory()->income()->create([
+            'code' => 'I02',
+            'name_es' => 'SALARIO',
+            'name_en' => 'Salary',
+        ]);
+
+        $debtCategory = Category::factory()->debt()->create([
+            'code' => 'C044',
+            'name_es' => 'CREDITO FORD ESCAPE',
+            'name_en' => 'Ford Escape Auto Loan Payment',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $account->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-10',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $expenseCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 100,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-12',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $incomeCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 500,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $debtCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 200,
+            'debt_component' => 'principal',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $debtCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 50,
+            'debt_component' => 'interest',
+        ]);
+
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        $response->assertOk();
+
+        $accountData = collect($response->json('data.accounts'))
+            ->firstWhere('account_id', $account->id);
+
+        // 1000 - 100 spend + 500 income - 200 principal = 1200 (interest omitted)
+        $this->assertEquals(1000, $accountData['recorded']['cad']);
+        $this->assertEquals(1200, $accountData['computed']['cad']);
+        $this->assertEquals(-200, $accountData['variance']['cad']);
+        $this->assertFalse($accountData['is_balanced']);
+    }
+
+    public function test_reconciliation_omits_debt_interest_from_computed_balance(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $account = Account::create([
+            'name' => 'Interest Bank',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $debtCategory = Category::factory()->debt()->create([
+            'code' => 'C044',
+            'name_es' => 'CREDITO FORD ESCAPE',
+            'name_en' => 'Ford Escape Auto Loan Payment',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $account->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $debtCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 50,
+            'debt_component' => 'interest',
+        ]);
+
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        $response->assertOk();
+
+        $accountData = collect($response->json('data.accounts'))
+            ->firstWhere('account_id', $account->id);
+
+        $this->assertEquals(1000, $accountData['recorded']['cad']);
+        $this->assertEquals(1000, $accountData['computed']['cad']);
+        $this->assertEquals(0, $accountData['variance']['cad']);
+        $this->assertTrue($accountData['is_balanced']);
+    }
+
+    public function test_liability_reconciliation_adds_charges_and_subtracts_principal(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $account = Account::create([
+            'name' => 'CIBC Visa',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $expenseCategory = Category::factory()->create([
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+        ]);
+
+        $debtCategory = Category::factory()->debt()->create([
+            'name_es' => 'CREDITO VISA',
+            'name_en' => 'Visa Payment',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $account->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $account->id,
+            'period' => '202502',
+            'recorded_balance_cad' => 900,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-10',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $expenseCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 100,
+            'comments' => 'card-charge',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-20',
+            'period' => '202502',
+            'quincena' => 'Q2',
+            'category_id' => $debtCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 200,
+            'debt_component' => 'principal',
+            'comments' => 'down-payment',
+        ]);
+
+        $response = $this->getJson('/api/periods/202502/reconciliation');
+
+        $response->assertOk();
+
+        $accountData = collect($response->json('data.accounts'))
+            ->firstWhere('account_id', $account->id);
+
+        // 1000 + 100 charge - 200 principal = 900
+        $this->assertEquals(900, $accountData['recorded']['cad']);
+        $this->assertEquals(900, $accountData['computed']['cad']);
+        $this->assertEquals(0, $accountData['variance']['cad']);
+        $this->assertTrue($accountData['is_balanced']);
+        $this->assertTrue($accountData['is_liability']);
+    }
+
     public function test_reconciliation_rejects_invalid_period_format(): void
     {
         $user = User::factory()->create();

@@ -230,4 +230,73 @@ class AccountTransactionHistoryTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_liability_charges_increase_balance_and_principal_decreases_it(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $account = Account::factory()->create([
+            'name' => 'CIBC Visa',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+        ]);
+
+        $expenseCategory = Category::factory()->create([
+            'name_en' => 'Groceries',
+            'is_active' => true,
+        ]);
+
+        $debtCategory = Category::factory()->debt()->create([
+            'name_en' => 'Visa Payment',
+            'is_active' => true,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $account->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 900.00,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-05',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $expenseCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 100.00,
+            'comments' => 'card-charge',
+            'is_recurring' => false,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-20',
+            'period' => '202501',
+            'quincena' => 'Q2',
+            'category_id' => $debtCategory->id,
+            'account_id' => $account->id,
+            'amount_cad' => 200.00,
+            'debt_component' => 'principal',
+            'comments' => 'down-payment',
+            'is_recurring' => false,
+        ]);
+
+        $response = $this->getJson("/api/accounts/{$account->id}/transactions");
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.starting_balance', 1000);
+        $response->assertJsonPath('meta.current_balance', 900);
+        $response->assertJsonPath('meta.is_liability', true);
+
+        $data = $response->json('data');
+
+        $this->assertSame('down-payment', $data[0]['comments']);
+        $this->assertEquals(-200.0, $data[0]['signed_amount']);
+        $this->assertEquals(900.0, $data[0]['running_balance']);
+
+        $this->assertSame('card-charge', $data[1]['comments']);
+        $this->assertEquals(100.0, $data[1]['signed_amount']);
+        $this->assertEquals(1100.0, $data[1]['running_balance']);
+    }
 }

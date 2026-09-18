@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { formatCurrencyAmount, formatSignedCurrencyAmount, amountToneClass } from '@/lib/currency';
+import { formatCurrencyAmount, formatSignedCurrencyAmount, amountToneClass, amountTone } from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
@@ -54,6 +54,7 @@ interface TransactionsResponse {
         starting_balance: number;
         current_balance: number;
         has_recorded_balance: boolean;
+        is_liability?: boolean;
         total_count: number;
         is_filtered?: boolean;
         filters?: {
@@ -102,6 +103,7 @@ export default function AccountDetail() {
     const [endDate, setEndDate] = useState('');
     const [appliedStartDate, setAppliedStartDate] = useState('');
     const [appliedEndDate, setAppliedEndDate] = useState('');
+    const [isLiability, setIsLiability] = useState(false);
 
     useEffect(() => {
         if (!accountId) {
@@ -126,6 +128,7 @@ export default function AccountDetail() {
 
             const data: { data: Account } = await response.json();
             setAccount(data.data || null);
+            setIsLiability(data.data?.type === 'liability');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
         }
@@ -159,6 +162,9 @@ export default function AccountDetail() {
             setCurrentBalance(data.meta.current_balance ?? 0);
             setCurrency(data.meta.currency || account?.primary_currency || 'CAD');
             setIsFiltered(Boolean(data.meta.is_filtered));
+            if (typeof data.meta.is_liability === 'boolean') {
+                setIsLiability(data.meta.is_liability);
+            }
             setError(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
@@ -392,77 +398,82 @@ export default function AccountDetail() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {transactions.map((transaction, index) => (
-                                        <TableRow
-                                            key={transaction.id}
-                                            data-testid={`account-tx-row-${transaction.id}`}
-                                            data-running-balance={
-                                                transaction.running_balance
-                                            }
-                                            data-tx-date={transaction.date}
-                                        >
-                                            <TableCell className="font-medium">
-                                                {formatDate(transaction.date)}
-                                            </TableCell>
-                                            <TableCell>
-                                                {transaction.category_code ? (
-                                                    <div>
-                                                        <span className="font-mono text-xs text-muted-foreground">
-                                                            {transaction.category_code}
+                                    {transactions.map((transaction, index) => {
+                                        const displayAmount = cashflowAmount(
+                                            transaction,
+                                        );
+                                        const tone = amountTone(
+                                            displayAmount,
+                                            isLiability,
+                                        );
+
+                                        return (
+                                            <TableRow
+                                                key={transaction.id}
+                                                data-testid={`account-tx-row-${transaction.id}`}
+                                                data-running-balance={
+                                                    transaction.running_balance
+                                                }
+                                                data-tx-date={transaction.date}
+                                            >
+                                                <TableCell className="font-medium">
+                                                    {formatDate(transaction.date)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {transaction.category_code ? (
+                                                        <div>
+                                                            <span className="font-mono text-xs text-muted-foreground">
+                                                                {transaction.category_code}
+                                                            </span>
+                                                            {transaction.category_name && (
+                                                                <div className="text-sm">
+                                                                    {transaction.category_name}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">
+                                                            —
                                                         </span>
-                                                        {transaction.category_name && (
-                                                            <div className="text-sm">
-                                                                {transaction.category_name}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-muted-foreground">
-                                                        —
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell
-                                                className={`text-right font-medium tabular-nums ${amountToneClass(
-                                                    cashflowAmount(transaction),
-                                                )}`}
-                                                data-testid={`account-tx-amount-${transaction.id}`}
-                                                data-signed-amount={cashflowAmount(
-                                                    transaction,
-                                                )}
-                                                data-amount-tone={
-                                                    cashflowAmount(transaction) >= 0
-                                                        ? 'positive'
-                                                        : 'negative'
-                                                }
-                                            >
-                                                {formatSignedCurrency(
-                                                    cashflowAmount(transaction),
-                                                    transaction.currency || displayCurrency
-                                                )}
-                                            </TableCell>
-                                            <TableCell
-                                                className={`text-right font-semibold ${
-                                                    index === 0
-                                                        ? 'text-foreground'
-                                                        : ''
-                                                }`}
-                                                data-testid={
-                                                    index === 0
-                                                        ? 'final-running-balance'
-                                                        : undefined
-                                                }
-                                            >
-                                                {formatCurrency(
-                                                    transaction.running_balance,
-                                                    transaction.currency || displayCurrency
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-sm text-muted-foreground">
-                                                {transaction.comments || '—'}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                                    )}
+                                                </TableCell>
+                                                <TableCell
+                                                    className={`text-right font-medium tabular-nums ${amountToneClass(
+                                                        displayAmount,
+                                                        isLiability,
+                                                    )}`}
+                                                    data-testid={`account-tx-amount-${transaction.id}`}
+                                                    data-signed-amount={displayAmount}
+                                                    data-amount-tone={tone}
+                                                >
+                                                    {formatSignedCurrency(
+                                                        displayAmount,
+                                                        transaction.currency || displayCurrency
+                                                    )}
+                                                </TableCell>
+                                                <TableCell
+                                                    className={`text-right font-semibold ${
+                                                        index === 0
+                                                            ? 'text-foreground'
+                                                            : ''
+                                                    }`}
+                                                    data-testid={
+                                                        index === 0
+                                                            ? 'final-running-balance'
+                                                            : undefined
+                                                    }
+                                                >
+                                                    {formatCurrency(
+                                                        transaction.running_balance,
+                                                        transaction.currency || displayCurrency
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-sm text-muted-foreground">
+                                                    {transaction.comments || '—'}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
                                     <TableRow
                                         className="bg-muted/40"
                                         data-testid="starting-balance-row"

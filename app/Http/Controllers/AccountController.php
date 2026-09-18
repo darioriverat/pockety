@@ -188,10 +188,14 @@ class AccountController extends Controller
      * GET /api/accounts/{id}/transactions
      * Query params: start_date (Y-m-d), end_date (Y-m-d)
      *
-     * Expense amounts are stored as positive values and reduce the account balance
-     * (same convention as reconciliation). Running balance after each transaction
-     * is anchored so the newest balance equals the account's current recorded balance
-     * when one exists; otherwise the ledger starts at 0.
+     * Expense amounts are stored as positive values. The signed amount applied
+     * to the running balance depends on account type:
+     * - Assets: spend/principal decrease the balance; income and credits increase it.
+     * - Liabilities: regular charges increase the amount owed; principal payments
+     *   and credits decrease it.
+     * Running balance after each transaction is anchored so the newest balance
+     * equals the account's current recorded balance when one exists; otherwise
+     * the ledger starts at 0.
      *
      * When a date range filter is applied, starting_balance is the balance just
      * before the first in-range transaction (ledger balance at start_date), and
@@ -247,22 +251,21 @@ class AccountController extends Controller
             ->orderBy('id')
             ->get();
 
-        $totalNetOutflow = round(
-            (float) $transactions->sum(function (Transaction $tx) {
-                $amount = (float) ($tx->amount ?? 0);
+        $isLiability = $account->isLiability();
 
-                return $tx->isInflow() ? -$amount : $amount;
-            }),
+        $totalNetChange = round(
+            (float) $transactions->sum(
+                fn (Transaction $tx): float => $tx->signedAmountFor($isLiability)
+            ),
             2
         );
 
-        // If no recorded balance, treat the ledger as starting at 0 and ending at -netOutflow.
+        // If no recorded balance, treat the ledger as starting at 0 and ending at net change.
         if ($ledgerCurrentBalance === null) {
             $ledgerStartingBalance = 0.0;
-            $ledgerCurrentBalance = round(0.0 - $totalNetOutflow, 2);
+            $ledgerCurrentBalance = $totalNetChange;
         } else {
-            // Net outflows reduce balance: starting = current + netOutflow
-            $ledgerStartingBalance = round($ledgerCurrentBalance + $totalNetOutflow, 2);
+            $ledgerStartingBalance = round($ledgerCurrentBalance - $totalNetChange, 2);
         }
 
         $transactionsWithBalance = [];
@@ -282,9 +285,7 @@ class AccountController extends Controller
                 $filteredStartingCaptured = true;
             }
 
-            $amount = (float) ($transaction->amount ?? 0);
-            $isInflow = $transaction->isInflow();
-            $signedAmount = $isInflow ? $amount : -$amount;
+            $signedAmount = $transaction->signedAmountFor($isLiability);
             $runningBalance = round($runningBalance + $signedAmount, 2);
 
             if (! $inRange) {
@@ -305,7 +306,7 @@ class AccountController extends Controller
                 'category_name' => $category?->name_en,
                 'amount' => $transaction->amount,
                 'signed_amount' => $signedAmount,
-                'is_credit' => $isInflow,
+                'is_credit' => $transaction->isInflow(),
                 'is_income' => $transaction->isIncome(),
                 'currency' => $transaction->currency ?? $currency,
                 'comments' => $transaction->comments,
@@ -322,8 +323,7 @@ class AccountController extends Controller
                 if ($txDate >= $startDate) {
                     break;
                 }
-                $priorAmount = (float) ($transaction->amount ?? 0);
-                $priorSigned = $transaction->isInflow() ? $priorAmount : -$priorAmount;
+                $priorSigned = $transaction->signedAmountFor($isLiability);
                 $balanceAtStart = round($balanceAtStart + $priorSigned, 2);
             }
             $filteredStartingBalance = $balanceAtStart;
@@ -351,6 +351,7 @@ class AccountController extends Controller
                 'starting_balance' => $startingBalance,
                 'current_balance' => $currentBalance,
                 'has_recorded_balance' => $hasRecordedBalance,
+                'is_liability' => $isLiability,
                 'total_count' => count($transactionsWithBalance),
                 'filters' => [
                     'start_date' => $startDate,

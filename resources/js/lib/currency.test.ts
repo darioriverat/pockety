@@ -72,6 +72,11 @@ describe('amountToneClass', () => {
         expect(amountToneClass(-10)).toMatch(/text-red/);
         expect(amountToneClass(0)).toMatch(/text-muted/);
     });
+
+    it('inverts favorability for liability accounts', () => {
+        expect(amountToneClass(10, true)).toMatch(/text-red/);
+        expect(amountToneClass(-10, true)).toMatch(/text-green/);
+    });
 });
 
 describe('formatCurrencyAmount', () => {

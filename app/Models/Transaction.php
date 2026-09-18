@@ -187,6 +187,43 @@ class Transaction extends Model
     }
 
     /**
+     * Whether this transaction is a debt principal (down) payment.
+     */
+    public function isPrincipal(): bool
+    {
+        return $this->debt_component === 'principal';
+    }
+
+    /**
+     * Direction this transaction moves an account's displayed balance.
+     * +1 increases it, -1 decreases it.
+     *
+     * Asset accounts: income and credits increase cash; spend and principal decrease it.
+     * Liability accounts: regular charges increase the amount owed; principal
+     * payments and credits decrease it.
+     */
+    public function balanceSign(bool $isLiability): int
+    {
+        if ($isLiability) {
+            if ($this->isPrincipal() || $this->isInflow()) {
+                return -1;
+            }
+
+            return 1;
+        }
+
+        return $this->isInflow() ? 1 : -1;
+    }
+
+    /**
+     * Signed amount in the transaction's own currency for an asset or liability ledger.
+     */
+    public function signedAmountFor(bool $isLiability): float
+    {
+        return $this->balanceSign($isLiability) * abs((float) ($this->amount ?? 0));
+    }
+
+    /**
      * CAD-equivalent amount using the given exchange rates.
      */
     public function cadEquivalent(ExchangeRate $exchangeRate): float

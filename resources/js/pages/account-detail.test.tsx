@@ -289,4 +289,81 @@ describe('Account Detail Page — running balance', () => {
         expect(withdrawal).toHaveAttribute('data-amount-tone', 'negative');
         expect(withdrawal.className).toMatch(/text-red/);
     });
+
+    it('styles liability charges red with + and principal paydowns green with -', async () => {
+        (global.fetch as ReturnType<typeof vi.fn>)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    data: {
+                        id: 42,
+                        name: 'CIBC Visa',
+                        type: 'liability',
+                        primary_currency: 'CAD',
+                    },
+                }),
+            })
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    data: [
+                        {
+                            id: 21,
+                            date: '2025-01-20',
+                            period: '202501',
+                            category_code: 'C044',
+                            category_name: 'Ford Escape Auto Loan Payment',
+                            amount: 400,
+                            signed_amount: -400,
+                            is_credit: false,
+                            currency: 'CAD',
+                            comments: 'principal-payment',
+                            running_balance: 750,
+                        },
+                        {
+                            id: 20,
+                            date: '2025-01-10',
+                            period: '202501',
+                            category_code: 'C001',
+                            category_name: 'Groceries',
+                            amount: 150,
+                            signed_amount: 150,
+                            is_credit: false,
+                            currency: 'CAD',
+                            comments: 'card-charge',
+                            running_balance: 1150,
+                        },
+                    ],
+                    meta: {
+                        account_id: 42,
+                        account_name: 'CIBC Visa',
+                        currency: 'CAD',
+                        starting_balance: 1000,
+                        current_balance: 750,
+                        has_recorded_balance: true,
+                        is_liability: true,
+                        total_count: 2,
+                        is_filtered: false,
+                        filters: { start_date: null, end_date: null },
+                    },
+                }),
+            });
+
+        render(<AccountDetail />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('account-tx-amount-20')).toBeInTheDocument();
+        });
+
+        const charge = screen.getByTestId('account-tx-amount-20');
+        const principal = screen.getByTestId('account-tx-amount-21');
+
+        expect(charge).toHaveTextContent('+$150.00');
+        expect(charge).toHaveAttribute('data-amount-tone', 'negative');
+        expect(charge.className).toMatch(/text-red/);
+
+        expect(principal).toHaveTextContent('-$400.00');
+        expect(principal).toHaveAttribute('data-amount-tone', 'positive');
+        expect(principal.className).toMatch(/text-green/);
+    });
 });
