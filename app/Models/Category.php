@@ -15,12 +15,14 @@ class Category extends Model
         'name_es',
         'name_en',
         'is_debt_category',
+        'is_income_category',
         'is_active',
         'status',
     ];
 
     protected $casts = [
         'is_debt_category' => 'boolean',
+        'is_income_category' => 'boolean',
         'is_active' => 'boolean',
     ];
 
@@ -54,6 +56,14 @@ class Category extends Model
     public function scopeDebtCategories($query)
     {
         return $query->where('is_debt_category', true);
+    }
+
+    /**
+     * Scope to get only income categories.
+     */
+    public function scopeIncomeCategories($query)
+    {
+        return $query->where('is_income_category', true);
     }
 
     /**

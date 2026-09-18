@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -13,11 +12,9 @@ class BrowserTestSeeder extends Seeder
      */
     public function run(): void
     {
-        if (Category::query()->count() === 0) {
-            $this->call([
-                CategorySeeder::class,
-            ]);
-        }
+        $this->call([
+            CategorySeeder::class,
+        ]);
 
         // Plain password — User model casts password as hashed.
         User::query()->updateOrCreate(

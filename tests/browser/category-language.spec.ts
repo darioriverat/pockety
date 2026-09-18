@@ -28,7 +28,7 @@ test('feature 113: user can toggle between Spanish and English category names', 
     // Step 1: Navigate to categories page
     await page.goto('/categories');
     await expect(
-        page.getByRole('heading', { name: 'Expense Categories' }),
+        page.getByRole('heading', { name: 'Categories' }),
     ).toBeVisible();
 
     // Step 2: Verify language toggle is available

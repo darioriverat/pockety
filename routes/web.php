@@ -422,6 +422,10 @@ HTML;
 
         $rowHtml = '';
         foreach ($summary['category_totals'] as $row) {
+            if (! empty($row['is_income_category'])) {
+                continue;
+            }
+
             if ($row['total_cad'] <= 0 && ! $row['is_debt_category'] && ! $row['is_depreciation']) {
                 continue;
             }

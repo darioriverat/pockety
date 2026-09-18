@@ -145,4 +145,66 @@ class Transaction extends Model
     {
         return $query->where('debt_component', 'interest');
     }
+
+    /**
+     * Scope to expense (non-income) transactions.
+     */
+    public function scopeExpenses($query)
+    {
+        return $query->whereHas('category', function ($categoryQuery) {
+            $categoryQuery->where('is_income_category', false);
+        });
+    }
+
+    /**
+     * Scope to income-category deposit transactions.
+     */
+    public function scopeIncome($query)
+    {
+        return $query->whereHas('category', function ($categoryQuery) {
+            $categoryQuery->where('is_income_category', true);
+        });
+    }
+
+    /**
+     * Whether this transaction is tagged with an income category.
+     */
+    public function isIncome(): bool
+    {
+        if ($this->relationLoaded('category')) {
+            return (bool) $this->category?->is_income_category;
+        }
+
+        return (bool) $this->category()->value('is_income_category');
+    }
+
+    /**
+     * Whether this transaction increases an account balance (deposit, refund, or income).
+     */
+    public function isInflow(): bool
+    {
+        return $this->is_credit || $this->isIncome();
+    }
+
+    /**
+     * CAD-equivalent amount using the given exchange rates.
+     */
+    public function cadEquivalent(ExchangeRate $exchangeRate): float
+    {
+        $cadEquivalent = 0.0;
+
+        if ($this->amount_cad !== null && (float) $this->amount_cad != 0) {
+            $cadEquivalent += (float) $this->amount_cad;
+        }
+
+        if ($this->amount_usd !== null && (float) $this->amount_usd != 0) {
+            $cadEquivalent += $exchangeRate->usdToCad((float) $this->amount_usd);
+        }
+
+        if ($this->amount_cop !== null && (float) $this->amount_cop != 0) {
+            $cadEquivalent += $exchangeRate->copToCad((float) $this->amount_cop);
+        }
+
+        return $cadEquivalent;
+    }
 }

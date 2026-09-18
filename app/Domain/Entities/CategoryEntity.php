@@ -12,12 +12,13 @@ readonly class CategoryEntity
         public bool $isDebtCategory,
         public bool $isActive,
         public ?string $status = null,
+        public bool $isIncomeCategory = false,
     ) {}
 
     /**
      * Create from array (useful for batch creation).
      *
-     * @param  array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_active: bool, status?: string|null}  $data
+     * @param  array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_active: bool, status?: string|null, is_income_category?: bool}  $data
      */
     public static function fromArray(array $data): self
     {
@@ -29,13 +30,14 @@ readonly class CategoryEntity
             isDebtCategory: $data['is_debt_category'],
             isActive: $data['is_active'],
             status: $data['status'] ?? null,
+            isIncomeCategory: (bool) ($data['is_income_category'] ?? false),
         );
     }
 
     /**
      * Convert to array for JSON serialization.
      *
-     * @return array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_active: bool, status: string|null}
+     * @return array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_income_category: bool, is_active: bool, status: string|null}
      */
     public function toArray(): array
     {
@@ -45,6 +47,7 @@ readonly class CategoryEntity
             'name_es' => $this->nameEs,
             'name_en' => $this->nameEn,
             'is_debt_category' => $this->isDebtCategory,
+            'is_income_category' => $this->isIncomeCategory,
             'is_active' => $this->isActive,
             'status' => $this->status,
         ];

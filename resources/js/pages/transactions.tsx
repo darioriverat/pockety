@@ -70,6 +70,7 @@ const AMOUNT_ZERO_ERROR = 'Amount cannot be zero';
 const AMOUNT_INVALID_ERROR = 'Amount must be a valid number';
 const DATE_VALID_ERROR = 'Date must be a valid date.';
 const NO_ACCOUNT_VALUE = 'none';
+const DEPOSIT_ACCOUNT_PLACEHOLDER = 'select-deposit-account';
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 50;
 const SORT_COLUMNS = ['date', 'amount', 'category'] as const;
@@ -95,6 +96,7 @@ interface Category {
     name_es: string;
     name_en: string;
     is_debt_category: boolean;
+    is_income_category?: boolean;
 }
 
 interface Account {
@@ -217,6 +219,12 @@ export default function Transactions() {
             debt_component: '',
         };
     });
+    const selectedFormCategory = categories.find(
+        (category) => category.id.toString() === formData.category_id,
+    );
+    const isIncomeCategorySelected = Boolean(
+        selectedFormCategory?.is_income_category,
+    );
     const [filters, setFilters] = useState<FilterState>(() => {
         const params =
             typeof window !== 'undefined'
@@ -437,6 +445,11 @@ export default function Transactions() {
             errors.category_id = 'Category is required';
         }
 
+        if (isIncomeCategorySelected && !formData.account_id) {
+            errors.account_id =
+                'Income transactions must be assigned to a deposit account.';
+        }
+
         if (!formData.amount.trim()) {
             errors.amount = 'Amount is required';
         } else {
@@ -517,10 +530,28 @@ export default function Transactions() {
                     setFormError(amountErrors[0]);
                     return;
                 }
+                const accountErrors = errorData.errors?.account_id;
+                if (Array.isArray(accountErrors) && accountErrors.length > 0) {
+                    setFieldErrors((prev) => ({
+                        ...prev,
+                        account_id: accountErrors[0],
+                    }));
+                    setFormError(accountErrors[0]);
+                    return;
+                }
                 const message =
                     errorData.message ||
                     errorData.error ||
                     'Failed to save transaction';
+                if (
+                    typeof message === 'string' &&
+                    message.toLowerCase().includes('deposit account')
+                ) {
+                    setFieldErrors((prev) => ({
+                        ...prev,
+                        account_id: message,
+                    }));
+                }
                 setFormError(message);
                 return;
             }
@@ -1075,10 +1106,24 @@ export default function Transactions() {
                                         <Select
                                             value={formData.category_id}
                                             onValueChange={(value) => {
-                                                setFieldErrors((prev) => ({ ...prev, category_id: '' }));
+                                                setFieldErrors((prev) => ({
+                                                    ...prev,
+                                                    category_id: '',
+                                                    account_id: '',
+                                                }));
+                                                const nextCategory =
+                                                    categories.find(
+                                                        (category) =>
+                                                            category.id.toString() ===
+                                                            value,
+                                                    );
                                                 setFormData({
                                                     ...formData,
                                                     category_id: value,
+                                                    debt_component:
+                                                        nextCategory?.is_debt_category
+                                                            ? formData.debt_component
+                                                            : '',
                                                 });
                                             }}
                                         >
@@ -1086,6 +1131,7 @@ export default function Transactions() {
                                                 className="w-full"
                                                 id="category"
                                                 aria-label="Category"
+                                                data-testid="transaction-category-field"
                                                 aria-invalid={!!fieldErrors.category_id}
                                                 aria-describedby={
                                                     fieldErrors.category_id
@@ -1121,39 +1167,73 @@ export default function Transactions() {
                                     </div>
                                     <div className="grid content-start gap-2">
                                         <Label htmlFor="account">
-                                            Account
+                                            {isIncomeCategorySelected
+                                                ? 'Deposit account'
+                                                : 'Account'}
                                         </Label>
                                         <Select
                                             value={
                                                 formData.account_id ||
-                                                NO_ACCOUNT_VALUE
+                                                (isIncomeCategorySelected
+                                                    ? DEPOSIT_ACCOUNT_PLACEHOLDER
+                                                    : NO_ACCOUNT_VALUE)
                                             }
-                                            onValueChange={(value) =>
+                                            onValueChange={(value) => {
+                                                setFieldErrors((prev) => ({
+                                                    ...prev,
+                                                    account_id: '',
+                                                }));
                                                 setFormData({
                                                     ...formData,
                                                     account_id:
                                                         value ===
-                                                        NO_ACCOUNT_VALUE
+                                                            NO_ACCOUNT_VALUE ||
+                                                        value ===
+                                                            DEPOSIT_ACCOUNT_PLACEHOLDER
                                                             ? ''
                                                             : value,
-                                                })
-                                            }
+                                                });
+                                            }}
                                         >
                                             <SelectTrigger
                                                 className="w-full"
                                                 id="account"
-                                                aria-label="Account"
+                                                aria-label={
+                                                    isIncomeCategorySelected
+                                                        ? 'Deposit account'
+                                                        : 'Account'
+                                                }
                                                 data-testid="account-field"
+                                                aria-invalid={
+                                                    !!fieldErrors.account_id
+                                                }
+                                                aria-describedby={
+                                                    fieldErrors.account_id
+                                                        ? 'account-error'
+                                                        : isIncomeCategorySelected
+                                                          ? 'income-account-hint'
+                                                          : undefined
+                                                }
                                             >
                                                 <SelectValue placeholder="Select account" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem
-                                                    value={NO_ACCOUNT_VALUE}
-                                                    data-testid="account-none-option"
-                                                >
-                                                    None
-                                                </SelectItem>
+                                                {isIncomeCategorySelected ? (
+                                                    <SelectItem
+                                                        value={
+                                                            DEPOSIT_ACCOUNT_PLACEHOLDER
+                                                        }
+                                                    >
+                                                        Select account
+                                                    </SelectItem>
+                                                ) : (
+                                                    <SelectItem
+                                                        value={NO_ACCOUNT_VALUE}
+                                                        data-testid="account-none-option"
+                                                    >
+                                                        None
+                                                    </SelectItem>
+                                                )}
                                                 {accounts.length > 0 && (
                                                     <SelectSeparator />
                                                 )}
@@ -1167,6 +1247,29 @@ export default function Transactions() {
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                        {isIncomeCategorySelected && (
+                                            <p
+                                                id="income-account-hint"
+                                                className="text-muted-foreground text-sm"
+                                                data-testid="income-account-hint"
+                                            >
+                                                This income deposits into the
+                                                selected account.
+                                            </p>
+                                        )}
+                                        {fieldErrors.account_id && (
+                                            <p
+                                                id="account-error"
+                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
+                                                role="alert"
+                                                data-testid="account-error"
+                                            >
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                                <span>
+                                                    {fieldErrors.account_id}
+                                                </span>
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="grid grid-cols-2 items-start gap-4">
                                         <div className="grid content-start gap-2">
@@ -1940,6 +2043,16 @@ export default function Transactions() {
                                                             -{' '}
                                                             {getCategoryName(
                                                                 transaction.category,
+                                                            )}
+                                                            {transaction.category
+                                                                .is_income_category && (
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className="ml-2"
+                                                                    data-testid={`income-badge-${transaction.id}`}
+                                                                >
+                                                                    Income
+                                                                </Badge>
                                                             )}
                                                         </div>
                                                         <div

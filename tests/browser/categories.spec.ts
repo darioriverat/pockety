@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
     await loginAsBrowserTestUser(page);
 });
 
-test('feature 2: categories page shows the 45 active expense categories', async ({
+test('feature 2: categories page shows the 46 active categories', async ({
     page,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
@@ -21,10 +21,11 @@ test('feature 2: categories page shows the 45 active expense categories', async 
     await page.goto('/categories');
 
     await expect(page).toHaveURL(/\/categories$/);
-    await expect(page.getByRole('heading', { name: 'Expense Categories' })).toBeVisible();
-    await expect(page.getByText('Total categories: 45')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Categories' })).toBeVisible();
+    await expect(page.getByText('Total categories: 46')).toBeVisible();
     await expect(page.getByText('C040')).toHaveCount(0);
     await expect(page.getByText('C031')).toHaveCount(1);
+    await expect(page.getByTestId('income-badge-I01')).toBeVisible();
 
     expect(consoleErrors).toEqual([]);
 });

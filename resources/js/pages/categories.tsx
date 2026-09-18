@@ -24,6 +24,7 @@ interface Category {
     name_es: string;
     name_en: string;
     is_debt_category: boolean;
+    is_income_category?: boolean;
     is_active: boolean;
     status: string | null;
 }
@@ -120,8 +121,8 @@ export default function Categories() {
             <PageContainer className="overflow-x-auto">
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                     <PageTitle
-                        title="Expense Categories"
-                        description="View all active expense categories for your finance tracking"
+                        title="Categories"
+                        description="View all active expense and income categories for your finance tracking"
                     />
                     <CategoryLanguageToggle
                         value={language}
@@ -187,6 +188,14 @@ export default function Categories() {
                                                 {category.is_debt_category && (
                                                     <Badge variant="secondary">
                                                         Debt
+                                                    </Badge>
+                                                )}
+                                                {category.is_income_category && (
+                                                    <Badge
+                                                        variant="secondary"
+                                                        data-testid={`income-badge-${category.code}`}
+                                                    >
+                                                        Income
                                                     </Badge>
                                                 )}
                                                 {!category.is_active && (

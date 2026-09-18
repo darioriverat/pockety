@@ -55,6 +55,7 @@ class FinancialSummaryService
      *         category_name_es: string,
      *         category_name_en: string,
      *         is_debt_category: bool,
+     *         is_income_category: bool,
      *         is_depreciation: bool,
      *         total_cad: float,
      *         principal_cad: float,
@@ -85,6 +86,7 @@ class FinancialSummaryService
                 'category_name_es' => $category->name_es,
                 'category_name_en' => $category->name_en,
                 'is_debt_category' => (bool) $category->is_debt_category,
+                'is_income_category' => (bool) $category->is_income_category,
                 'is_depreciation' => $category->code === self::DEPRECIATION_CATEGORY_CODE,
                 'total_cad' => 0.0,
                 'principal_cad' => 0.0,
@@ -108,6 +110,7 @@ class FinancialSummaryService
                     'category_name_es' => $category->name_es,
                     'category_name_en' => $category->name_en,
                     'is_debt_category' => (bool) $category->is_debt_category,
+                    'is_income_category' => (bool) $category->is_income_category,
                     'is_depreciation' => $category->code === self::DEPRECIATION_CATEGORY_CODE,
                     'total_cad' => 0.0,
                     'principal_cad' => 0.0,
@@ -139,6 +142,12 @@ class FinancialSummaryService
             $row['principal_cad'] = round($row['principal_cad'], 2);
             $row['interest_cad'] = round($row['interest_cad'], 2);
             $row['other_cad'] = round($row['other_cad'], 2);
+
+            if (! empty($row['is_income_category'])) {
+                $categoryTotals[] = $row;
+
+                continue;
+            }
 
             $totalRecordedDisbursements += $row['total_cad'];
             $debtPrincipalExcluded += $row['principal_cad'];
@@ -183,7 +192,8 @@ class FinancialSummaryService
      *     amount_cad: float,
      *     amount_usd: float,
      *     amount_cop: float,
-     *     total_cad_equivalent: float
+     *     total_cad_equivalent: float,
+     *     source: string
      * }>
      */
     private function buildIncomeLines(string $period, ExchangeRate $exchangeRate): array
@@ -207,6 +217,44 @@ class FinancialSummaryService
                     $income->getTotalCadEquivalent($exchangeRate),
                     2
                 ),
+                'source' => 'income_line',
+            ];
+        }
+
+        $nextLineNumber = count($lines) + 1;
+
+        $incomeTransactions = Transaction::query()
+            ->income()
+            ->with(['category', 'account'])
+            ->where('period', $period)
+            ->orderBy('date')
+            ->orderBy('id')
+            ->get();
+
+        foreach ($incomeTransactions as $transaction) {
+            $categoryName = $transaction->category?->name_en
+                ?? $transaction->category?->name_es
+                ?? 'Income';
+            $accountName = $transaction->account?->name;
+            $comments = trim((string) ($transaction->comments ?? ''));
+            $description = $comments !== ''
+                ? $comments
+                : ($accountName
+                    ? $categoryName.' via '.$accountName
+                    : $categoryName);
+
+            $lines[] = [
+                'id' => (int) $transaction->id,
+                'description' => $description,
+                'line_number' => $nextLineNumber++,
+                'amount_cad' => (float) ($transaction->amount_cad ?? 0),
+                'amount_usd' => (float) ($transaction->amount_usd ?? 0),
+                'amount_cop' => (float) ($transaction->amount_cop ?? 0),
+                'total_cad_equivalent' => round(
+                    $this->transactionCadEquivalent($transaction, $exchangeRate),
+                    2
+                ),
+                'source' => 'transaction',
             ];
         }
 

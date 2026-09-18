@@ -251,7 +251,7 @@ class AccountController extends Controller
             (float) $transactions->sum(function (Transaction $tx) {
                 $amount = (float) ($tx->amount ?? 0);
 
-                return $tx->is_credit ? -$amount : $amount;
+                return $tx->isInflow() ? -$amount : $amount;
             }),
             2
         );
@@ -283,8 +283,8 @@ class AccountController extends Controller
             }
 
             $amount = (float) ($transaction->amount ?? 0);
-            $isCredit = (bool) $transaction->is_credit;
-            $signedAmount = $isCredit ? $amount : -$amount;
+            $isInflow = $transaction->isInflow();
+            $signedAmount = $isInflow ? $amount : -$amount;
             $runningBalance = round($runningBalance + $signedAmount, 2);
 
             if (! $inRange) {
@@ -305,7 +305,8 @@ class AccountController extends Controller
                 'category_name' => $category?->name_en,
                 'amount' => $transaction->amount,
                 'signed_amount' => $signedAmount,
-                'is_credit' => $isCredit,
+                'is_credit' => $isInflow,
+                'is_income' => $transaction->isIncome(),
                 'currency' => $transaction->currency ?? $currency,
                 'comments' => $transaction->comments,
                 'running_balance' => $runningBalance,
@@ -322,7 +323,7 @@ class AccountController extends Controller
                     break;
                 }
                 $priorAmount = (float) ($transaction->amount ?? 0);
-                $priorSigned = $transaction->is_credit ? $priorAmount : -$priorAmount;
+                $priorSigned = $transaction->isInflow() ? $priorAmount : -$priorAmount;
                 $balanceAtStart = round($balanceAtStart + $priorSigned, 2);
             }
             $filteredStartingBalance = $balanceAtStart;

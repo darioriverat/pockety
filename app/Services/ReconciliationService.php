@@ -20,7 +20,6 @@ class ReconciliationService
     public function __construct(
         private readonly BalanceSheetService $balanceSheetService,
         private readonly FinancialSummaryService $financialSummaryService,
-        private readonly IncomeService $incomeService
     ) {}
 
     /**
@@ -30,8 +29,8 @@ class ReconciliationService
      * - Recorded: the manually-entered balance for the period (0 if not yet entered).
      * - Computed: a "known prior balance" (the most recent recorded balance for a period
      *   strictly before this one; if none exists yet, the current period's own recorded
-     *   balance is used as the baseline) minus the sum of this period's expense
-     *   transactions for the account.
+     *   balance is used as the baseline) minus this period's expense outflows
+     *   plus income/credit inflows for the account.
      * - Variance: Recorded minus Computed.
      *
      * Also includes:
@@ -83,7 +82,6 @@ class ReconciliationService
         $equation = $this->checkAccountingEquation($period);
 
         // Get income and expenses
-        $incomeTotal = $this->incomeService->getTotalCadEquivalent($period);
         $financialSummary = $this->financialSummaryService->getSummary($period);
 
         return [
@@ -91,7 +89,7 @@ class ReconciliationService
             'status' => $accountsBalanced && $equation['is_balanced'] ? 'balanced' : 'unbalanced',
             'accounts' => $results,
             'accounting_equation' => $equation,
-            'income_total_cad' => round($incomeTotal, 2),
+            'income_total_cad' => round((float) $financialSummary['total_income_cad'], 2),
             'expenses_total_cad' => round($financialSummary['total_recorded_disbursements_cad'], 2),
             'net_operating_expenses_cad' => round($financialSummary['net_operating_expenses_cad'], 2),
         ];
@@ -222,15 +220,26 @@ class ReconciliationService
         $baseUsd = $base ? (float) $base->recorded_balance_usd : 0.0;
         $baseCop = $base ? (float) $base->recorded_balance_cop : 0.0;
 
-        $txSums = Transaction::where('account_id', $account->id)
+        $transactions = Transaction::where('account_id', $account->id)
             ->where('period', $period)
-            ->selectRaw('COALESCE(SUM(amount_cad), 0) as sum_cad, COALESCE(SUM(amount_usd), 0) as sum_usd, COALESCE(SUM(amount_cop), 0) as sum_cop')
-            ->first();
+            ->with('category')
+            ->get();
 
-        // Expense amounts are stored as positive values; they reduce account balances.
-        $computedCad = $baseCad - (float) ($txSums->sum_cad ?? 0);
-        $computedUsd = $baseUsd - (float) ($txSums->sum_usd ?? 0);
-        $computedCop = $baseCop - (float) ($txSums->sum_cop ?? 0);
+        $netOutflowCad = 0.0;
+        $netOutflowUsd = 0.0;
+        $netOutflowCop = 0.0;
+
+        foreach ($transactions as $transaction) {
+            $sign = $transaction->isInflow() ? -1 : 1;
+            $netOutflowCad += $sign * (float) ($transaction->amount_cad ?? 0);
+            $netOutflowUsd += $sign * (float) ($transaction->amount_usd ?? 0);
+            $netOutflowCop += $sign * (float) ($transaction->amount_cop ?? 0);
+        }
+
+        // Expenses reduce the computed balance; income and credits increase it.
+        $computedCad = $baseCad - $netOutflowCad;
+        $computedUsd = $baseUsd - $netOutflowUsd;
+        $computedCop = $baseCop - $netOutflowCop;
 
         $recordedCad = $recordedBalance ? (float) $recordedBalance->recorded_balance_cad : 0.0;
         $recordedUsd = $recordedBalance ? (float) $recordedBalance->recorded_balance_usd : 0.0;

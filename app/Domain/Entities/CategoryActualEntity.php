@@ -12,6 +12,7 @@ readonly class CategoryActualEntity
         public bool $isDebtCategory,
         public float $actualCad,
         public int $transactionCount,
+        public bool $isIncomeCategory = false,
     ) {}
 
     /**
@@ -21,6 +22,7 @@ readonly class CategoryActualEntity
      *     category_name_es: string,
      *     category_name_en: string,
      *     is_debt_category: bool,
+     *     is_income_category: bool,
      *     actual_cad: float,
      *     transaction_count: int
      * }
@@ -33,6 +35,7 @@ readonly class CategoryActualEntity
             'category_name_es' => $this->categoryNameEs,
             'category_name_en' => $this->categoryNameEn,
             'is_debt_category' => $this->isDebtCategory,
+            'is_income_category' => $this->isIncomeCategory,
             'actual_cad' => $this->actualCad,
             'transaction_count' => $this->transactionCount,
         ];

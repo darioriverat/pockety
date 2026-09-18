@@ -227,6 +227,15 @@ class DashboardService
             }
         }
 
+        $incomeTransactions = Transaction::query()
+            ->income()
+            ->where('period', $period)
+            ->get();
+
+        foreach ($incomeTransactions as $transaction) {
+            $total += $transaction->cadEquivalent($exchangeRate);
+        }
+
         return $total;
     }
 
@@ -235,7 +244,10 @@ class DashboardService
      */
     private function calculateTotalExpenses(string $period, ExchangeRate $exchangeRate): float
     {
-        $transactions = Transaction::where('period', $period)->get();
+        $transactions = Transaction::query()
+            ->expenses()
+            ->where('period', $period)
+            ->get();
 
         $total = 0.0;
 
@@ -327,9 +339,12 @@ class DashboardService
         /** @var array<int, array{amount: float, count: int}> $aggregates */
         $aggregates = [];
 
-        $transactions = Transaction::forPeriod($period)->get();
+        $transactions = Transaction::forPeriod($period)->with('category')->get();
 
         foreach ($transactions as $transaction) {
+            if ($transaction->isIncome()) {
+                continue;
+            }
             $categoryId = (int) $transaction->category_id;
             $cadEquivalent = $this->transactionToCad($transaction, $exchangeRate);
 
@@ -450,7 +465,7 @@ class DashboardService
 
             $items[] = [
                 'id' => (int) $transaction->id,
-                'type' => 'expense',
+                'type' => $transaction->isIncome() ? 'income' : 'expense',
                 'date' => $date,
                 'period' => (string) $transaction->period,
                 'summary' => implode(' · ', $summaryParts),

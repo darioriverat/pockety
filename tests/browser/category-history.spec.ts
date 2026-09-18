@@ -71,7 +71,7 @@ test('feature 98: user can view all transactions for a category across periods',
 
     // Step 1: Navigate to categories page
     await page.goto('/categories');
-    await expect(page.getByRole('heading', { name: 'Expense Categories' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Categories' })).toBeVisible();
 
     await page.screenshot({
         path: 'verification/test-98-category-history/01-categories-list.png',

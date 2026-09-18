@@ -4,14 +4,12 @@ namespace App\Services;
 
 use App\Domain\Collections\PeriodSummaryCollection;
 use App\Domain\Entities\PeriodSummaryEntity;
-use App\Domain\Services\Contracts\IncomeServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Models\Transaction;
 
 class PeriodHistoryService implements PeriodHistoryServiceInterface
 {
     public function __construct(
-        private readonly IncomeServiceInterface $incomeService,
         private readonly FinancialSummaryService $financialSummaryService,
     ) {}
 
@@ -30,14 +28,13 @@ class PeriodHistoryService implements PeriodHistoryServiceInterface
             ->all();
 
         foreach ($periods as $period) {
-            $incomeTotal = $this->incomeService->getTotalCadEquivalent($period);
-            $expensesTotal = $this->financialSummaryService->getSummary($period)['total_recorded_disbursements_cad'];
+            $summary = $this->financialSummaryService->getSummary($period);
 
             $collection->add(new PeriodSummaryEntity(
                 period: $period,
                 transactionCount: $counts[$period] ?? 0,
-                incomeTotalCad: round($incomeTotal, 2),
-                expensesTotalCad: round((float) $expensesTotal, 2),
+                incomeTotalCad: round((float) $summary['total_income_cad'], 2),
+                expensesTotalCad: round((float) $summary['total_recorded_disbursements_cad'], 2),
             ));
         }
 

@@ -30,6 +30,7 @@ interface Category {
     name_es: string;
     name_en: string;
     is_debt_category: boolean;
+    is_income_category?: boolean;
     is_active: boolean;
     status: string | null;
 }
@@ -226,6 +227,8 @@ export default function CategoryDetail() {
                             trailing={
                                 category?.is_debt_category ? (
                                     <Badge variant="secondary">Debt</Badge>
+                                ) : category?.is_income_category ? (
+                                    <Badge variant="secondary">Income</Badge>
                                 ) : null
                             }
                             data-testid="category-detail-heading"

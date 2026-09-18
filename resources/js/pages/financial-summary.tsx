@@ -42,6 +42,7 @@ interface IncomeLine {
     amount_usd: number;
     amount_cop: number;
     total_cad_equivalent: number;
+    source?: string;
 }
 
 interface CategoryTotal {
@@ -50,6 +51,7 @@ interface CategoryTotal {
     category_name_es: string;
     category_name_en: string;
     is_debt_category: boolean;
+    is_income_category?: boolean;
     is_depreciation: boolean;
     total_cad: number;
     principal_cad: number;
@@ -118,9 +120,10 @@ export default function FinancialSummary() {
     const rowsWithActivity =
         summary?.category_totals.filter(
             (row) =>
-                row.total_cad > 0 ||
-                row.is_debt_category ||
-                row.is_depreciation,
+                !row.is_income_category &&
+                (row.total_cad > 0 ||
+                    row.is_debt_category ||
+                    row.is_depreciation),
         ) ?? [];
 
     return (
@@ -341,9 +344,14 @@ export default function FinancialSummary() {
                                                     summary?.income_lines.map(
                                                         (line) => (
                                                             <tr
-                                                                key={line.id}
+                                                                key={`${line.source ?? 'income_line'}-${line.id}`}
                                                                 className="border-b border-gray-100 dark:border-gray-800"
-                                                                data-testid={`income-line-${line.id}`}
+                                                                data-testid={
+                                                                    line.source ===
+                                                                    'transaction'
+                                                                        ? `income-transaction-${line.id}`
+                                                                        : `income-line-${line.id}`
+                                                                }
                                                             >
                                                                 <td className="py-2 pr-3">
                                                                     {
@@ -571,6 +579,11 @@ export default function FinancialSummary() {
                                                                         {row.is_debt_category && (
                                                                             <Badge variant="outline">
                                                                                 Debt
+                                                                            </Badge>
+                                                                        )}
+                                                                        {row.is_income_category && (
+                                                                            <Badge variant="outline">
+                                                                                Income
                                                                             </Badge>
                                                                         )}
                                                                         {row.is_depreciation && (

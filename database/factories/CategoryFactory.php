@@ -21,8 +21,25 @@ class CategoryFactory extends Factory
             'name_es' => fake()->words(2, true),
             'name_en' => fake()->words(2, true),
             'is_debt_category' => false,
+            'is_income_category' => false,
             'is_active' => true,
             'status' => 'active',
         ];
+    }
+
+    public function income(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_income_category' => true,
+            'is_debt_category' => false,
+        ]);
+    }
+
+    public function debt(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_debt_category' => true,
+            'is_income_category' => false,
+        ]);
     }
 }

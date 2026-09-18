@@ -34,7 +34,12 @@ class CategoryActualsController extends Controller
         );
 
         $totalActual = round(
-            array_sum(array_column($rows, 'actual_cad')),
+            array_sum(array_map(
+                static fn (array $row): float => ! empty($row['is_income_category'])
+                    ? 0.0
+                    : (float) $row['actual_cad'],
+                $rows
+            )),
             2
         );
         $totalTransactions = (int) array_sum(array_column($rows, 'transaction_count'));

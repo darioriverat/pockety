@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Domain\Collections\TransactionCollection;
 use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
+use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -215,6 +216,7 @@ class TransactionService implements TransactionServiceInterface
 
         // Validate category exists
         $this->validateCategory($data['category_id']);
+        $this->validateIncomeRequiresAccount($data);
 
         $data['is_credit'] = (bool) ($data['is_credit'] ?? false);
 
@@ -240,6 +242,8 @@ class TransactionService implements TransactionServiceInterface
         if (isset($data['category_id'])) {
             $this->validateCategory($data['category_id']);
         }
+
+        $this->validateIncomeRequiresAccount($data, $transaction);
 
         if (array_key_exists('is_credit', $data)) {
             $data['is_credit'] = (bool) $data['is_credit'];
@@ -288,6 +292,7 @@ class TransactionService implements TransactionServiceInterface
 
         if (isset($allowed['category_id'])) {
             $this->validateCategory((int) $allowed['category_id']);
+            $this->validateBulkIncomeRequiresAccount($ids, $allowed);
         }
 
         DB::transaction(function () use ($ids, $allowed) {
@@ -380,6 +385,7 @@ class TransactionService implements TransactionServiceInterface
                 'name_es' => $transaction->category->name_es,
                 'name_en' => $transaction->category->name_en,
                 'is_debt_category' => $transaction->category->is_debt_category,
+                'is_income_category' => (bool) $transaction->category->is_income_category,
                 'is_active' => $transaction->category->is_active,
                 'status' => $transaction->category->status,
             ];
@@ -437,6 +443,59 @@ class TransactionService implements TransactionServiceInterface
 
         if (! $exists) {
             throw new \InvalidArgumentException("Category with ID {$categoryId} does not exist");
+        }
+    }
+
+    /**
+     * Income-category transactions must be assigned to the account that received the deposit.
+     *
+     * @param  array{category_id?: int, account_id?: int|null}  $data
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function validateIncomeRequiresAccount(array $data, ?Transaction $existing = null): void
+    {
+        $categoryId = $data['category_id'] ?? $existing?->category_id;
+        if (! $categoryId) {
+            return;
+        }
+
+        $category = Category::find($categoryId);
+        if (! $category?->is_income_category) {
+            return;
+        }
+
+        $accountId = array_key_exists('account_id', $data)
+            ? $data['account_id']
+            : $existing?->account_id;
+
+        if ($accountId === null || $accountId === '') {
+            throw new \InvalidArgumentException('Income transactions must be assigned to a deposit account.');
+        }
+    }
+
+    /**
+     * @param  list<int>  $ids
+     * @param  array{category_id?: int, account_id?: int|null}  $allowed
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function validateBulkIncomeRequiresAccount(array $ids, array $allowed): void
+    {
+        $category = Category::find($allowed['category_id'] ?? null);
+        if (! $category?->is_income_category) {
+            return;
+        }
+
+        $transactions = Transaction::query()->whereIn('id', $ids)->get();
+        foreach ($transactions as $transaction) {
+            $accountId = array_key_exists('account_id', $allowed)
+                ? $allowed['account_id']
+                : $transaction->account_id;
+
+            if ($accountId === null || $accountId === '') {
+                throw new \InvalidArgumentException('Income transactions must be assigned to a deposit account.');
+            }
         }
     }
 }

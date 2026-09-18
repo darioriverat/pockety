@@ -39,7 +39,7 @@ function getDialogCombobox(page: Page, label: string) {
 
 async function selectOption(
     page: Page,
-    label: 'Quincena' | 'Category' | 'Account' | 'Currency' | 'Debt Component',
+    label: 'Quincena' | 'Category' | 'Account' | 'Deposit account' | 'Currency' | 'Debt Component',
     option: string,
 ): Promise<void> {
     const dialog = page.getByTestId('transaction-form-dialog');
@@ -87,7 +87,10 @@ async function fillTransactionForm(
     await selectOption(page, 'Quincena', values.quincena);
     await selectOption(page, 'Category', values.category);
     if (values.account) {
-        await selectOption(page, 'Account', values.account);
+        const accountLabel = values.category.includes('I01')
+            ? 'Deposit account'
+            : 'Account';
+        await selectOption(page, accountLabel, values.account);
     }
     await selectOption(page, 'Currency', values.currency);
     await dialog.getByTestId('transaction-amount-input').fill(values.amount);
@@ -533,6 +536,45 @@ test('feature 14: non-debt transactions do not require a debt component', async 
     const transaction = await getTransactionByComments(request, comments);
 
     expect(transaction.debt_component).toBeNull();
+
+    expect(consoleErrors).toEqual([]);
+});
+
+test('feature 14b: income category transactions deposit into the selected account', async ({
+    page,
+    request,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const comments = 'feature-14b-income-deposit';
+    const account = await createAccount(request, 'Income Deposit Checking');
+
+    await openTransactionsPage(page);
+    await openAddTransactionDialog(page);
+    await fillTransactionForm(page, {
+        date: '2026-01-27',
+        period: '202601',
+        quincena: 'Q1',
+        category: 'I01 - Salary',
+        account: account.name,
+        currency: 'CAD',
+        amount: '500.00',
+        comments,
+    });
+    await expect(page.getByTestId('income-account-hint')).toBeVisible();
+    await expect(page.getByTestId('account-none-option')).toHaveCount(0);
+    await submitTransactionForm(page, 'Create');
+
+    const transactionCard = page
+        .locator('[data-slot="card"]')
+        .filter({ hasText: comments });
+
+    await expect(transactionCard).toContainText('Income');
+    await expect(transactionCard).toContainText(account.name);
+
+    const transaction = await getTransactionByComments(request, comments);
+
+    expect(transaction.account_id).toBe(account.id);
+    expect(transaction.category.is_income_category).toBe(true);
 
     expect(consoleErrors).toEqual([]);
 });

@@ -43,6 +43,52 @@ describe('Categories Page', () => {
         (global.fetch as any).mockReset();
     });
 
+    it('displays an Income badge for income categories', async () => {
+        const mockCategories = {
+            data: [
+                {
+                    id: 1,
+                    code: 'C001',
+                    name_es: 'MERCADO',
+                    name_en: 'Groceries',
+                    is_debt_category: false,
+                    is_income_category: false,
+                    is_active: true,
+                    status: null,
+                },
+                {
+                    id: 47,
+                    code: 'I01',
+                    name_es: 'SALARIO',
+                    name_en: 'Salary',
+                    is_debt_category: false,
+                    is_income_category: true,
+                    is_active: true,
+                    status: null,
+                },
+            ],
+            links: { self: '/api/categories' },
+            meta: { total: 2 },
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => mockCategories,
+        });
+
+        render(<Categories />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('income-badge-I01')).toHaveTextContent(
+                'Income',
+            );
+        });
+
+        expect(
+            screen.queryByTestId('income-badge-C001'),
+        ).not.toBeInTheDocument();
+    });
+
     it('renders category list with delete buttons', async () => {
         const mockCategories = {
             data: [

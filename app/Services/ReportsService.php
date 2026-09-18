@@ -105,12 +105,24 @@ class ReportsService
             }
         }
 
+        $incomeTransactions = Transaction::query()
+            ->income()
+            ->where('period', $period)
+            ->get();
+
+        foreach ($incomeTransactions as $transaction) {
+            $total += $transaction->cadEquivalent($exchangeRate);
+        }
+
         return $total;
     }
 
     private function calculateTotalExpenses(string $period, ExchangeRate $exchangeRate): float
     {
-        $transactions = Transaction::where('period', $period)->get();
+        $transactions = Transaction::query()
+            ->expenses()
+            ->where('period', $period)
+            ->get();
 
         $total = 0.0;
 

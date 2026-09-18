@@ -176,8 +176,9 @@ class CategoryActualsTest extends TestCase
 
         $this->assertContains('C001', $codes);
         $this->assertContains('C004', $codes);
+        $this->assertContains('I01', $codes);
         $this->assertNotContains('C040', $codes);
-        $this->assertEquals(2, $response->json('meta.category_count'));
+        $this->assertEquals(3, $response->json('meta.category_count'));
 
         $c001 = $categories->firstWhere('category_code', 'C001');
         $this->assertEquals(0.0, $c001['actual_cad']);

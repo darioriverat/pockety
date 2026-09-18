@@ -32,6 +32,7 @@ interface CategoryActualRow {
     category_name_es: string;
     category_name_en: string;
     is_debt_category: boolean;
+    is_income_category?: boolean;
     actual_cad: number;
     transaction_count: number;
 }

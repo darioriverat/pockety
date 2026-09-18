@@ -21,17 +21,7 @@ class CategoryService implements CategoryServiceInterface
             ->orderBy('code')
             ->get();
 
-        return $categories->map(function (Category $category) {
-            return new CategoryEntity(
-                id: $category->id,
-                code: $category->code,
-                nameEs: $category->name_es,
-                nameEn: $category->name_en,
-                isDebtCategory: $category->is_debt_category,
-                isActive: $category->is_active,
-                status: $category->status,
-            );
-        })->all();
+        return $categories->map(fn (Category $category) => $this->toEntity($category))->all();
     }
 
     /**
@@ -43,17 +33,7 @@ class CategoryService implements CategoryServiceInterface
     {
         $categories = Category::orderBy('code')->get();
 
-        return $categories->map(function (Category $category) {
-            return new CategoryEntity(
-                id: $category->id,
-                code: $category->code,
-                nameEs: $category->name_es,
-                nameEn: $category->name_en,
-                isDebtCategory: $category->is_debt_category,
-                isActive: $category->is_active,
-                status: $category->status,
-            );
-        })->all();
+        return $categories->map(fn (Category $category) => $this->toEntity($category))->all();
     }
 
     /**
@@ -67,15 +47,7 @@ class CategoryService implements CategoryServiceInterface
             return null;
         }
 
-        return new CategoryEntity(
-            id: $category->id,
-            code: $category->code,
-            nameEs: $category->name_es,
-            nameEn: $category->name_en,
-            isDebtCategory: $category->is_debt_category,
-            isActive: $category->is_active,
-            status: $category->status,
-        );
+        return $this->toEntity($category);
     }
 
     /**
@@ -90,17 +62,7 @@ class CategoryService implements CategoryServiceInterface
             ->orderBy('code')
             ->get();
 
-        return $categories->map(function (Category $category) {
-            return new CategoryEntity(
-                id: $category->id,
-                code: $category->code,
-                nameEs: $category->name_es,
-                nameEn: $category->name_en,
-                isDebtCategory: $category->is_debt_category,
-                isActive: $category->is_active,
-                status: $category->status,
-            );
-        })->all();
+        return $categories->map(fn (Category $category) => $this->toEntity($category))->all();
     }
 
     /**
@@ -169,15 +131,7 @@ class CategoryService implements CategoryServiceInterface
             return null;
         }
 
-        $categoryEntity = new CategoryEntity(
-            id: $category->id,
-            code: $category->code,
-            nameEs: $category->name_es,
-            nameEn: $category->name_en,
-            isDebtCategory: $category->is_debt_category,
-            isActive: $category->is_active,
-            status: $category->status,
-        );
+        $categoryEntity = $this->toEntity($category);
 
         /** @var list<string> $availablePeriods */
         $availablePeriods = Transaction::query()
@@ -264,5 +218,19 @@ class CategoryService implements CategoryServiceInterface
                 ],
             ],
         ];
+    }
+
+    private function toEntity(Category $category): CategoryEntity
+    {
+        return new CategoryEntity(
+            id: $category->id,
+            code: $category->code,
+            nameEs: $category->name_es,
+            nameEn: $category->name_en,
+            isDebtCategory: (bool) $category->is_debt_category,
+            isActive: (bool) $category->is_active,
+            status: $category->status,
+            isIncomeCategory: (bool) $category->is_income_category,
+        );
     }
 }

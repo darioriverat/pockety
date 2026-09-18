@@ -47,6 +47,7 @@ class CategoryActualsService implements CategoryActualsServiceInterface
                 isDebtCategory: (bool) $category->is_debt_category,
                 actualCad: round($stats['actual'], 2),
                 transactionCount: $stats['count'],
+                isIncomeCategory: (bool) $category->is_income_category,
             ));
         }
 

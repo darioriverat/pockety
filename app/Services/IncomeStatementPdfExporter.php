@@ -84,6 +84,7 @@ class IncomeStatementPdfExporter
         $expenseRows = array_values(array_filter(
             $statement['category_totals'],
             fn (array $row): bool => (float) $row['total_cad'] > 0.0
+                && empty($row['is_income_category'])
         ));
 
         if ($expenseRows === []) {

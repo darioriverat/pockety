@@ -18,23 +18,28 @@ class CategoryApiTest extends TestCase
         $this->seed(CategorySeeder::class);
     }
 
-    public function test_get_categories_returns_45_active_with_expected_fields(): void
+    public function test_get_categories_returns_46_active_with_expected_fields(): void
     {
         $response = $this->getJson('/api/categories');
 
         $response->assertOk()
-            ->assertJsonPath('meta.total', 45);
+            ->assertJsonPath('meta.total', 46);
 
         $data = $response->json('data');
-        $this->assertCount(45, $data);
+        $this->assertCount(46, $data);
 
         $sample = $data[0];
         $this->assertArrayHasKey('code', $sample);
         $this->assertArrayHasKey('name_es', $sample);
         $this->assertArrayHasKey('name_en', $sample);
         $this->assertArrayHasKey('is_debt_category', $sample);
+        $this->assertArrayHasKey('is_income_category', $sample);
 
         $codes = array_column($data, 'code');
         $this->assertNotContains('C040', $codes);
+        $this->assertContains('I01', $codes);
+
+        $income = collect($data)->firstWhere('code', 'I01');
+        $this->assertTrue($income['is_income_category']);
     }
 }

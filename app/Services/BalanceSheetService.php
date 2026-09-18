@@ -7,6 +7,7 @@ use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
 use App\Models\FixedAsset;
 use App\Models\FixedAssetValuation;
+use Illuminate\Support\Facades\Log;
 
 class BalanceSheetService
 {
@@ -257,6 +258,19 @@ class BalanceSheetService
 
     private function resolveExchangeRate(string $period): ExchangeRate
     {
-        return ExchangeRate::forPeriod($period);
+        $exchangeRate = ExchangeRate::forPeriod($period);
+
+        if (! $exchangeRate) {
+            Log::warning("No exchange rate found for period {$period}, using defaults");
+
+            return new ExchangeRate([
+                'period' => $period,
+                'usd_cop' => 4400,
+                'usd_cad' => 0.75,
+                'cad_cop' => 3000,
+            ]);
+        }
+
+        return $exchangeRate;
     }
 }

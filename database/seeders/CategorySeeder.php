@@ -10,13 +10,13 @@ class CategorySeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * Seed all 45 active expense categories from the specification.
+     * Seed all 46 active categories from the specification (45 expense + 1 income).
      * C040 is marked as retired (merged into C031).
      */
     public function run(): void
     {
         $categories = [
-            ['code' => 'C001', 'name_es' => 'MERCADO', 'name_en' => 'Groceries', 'is_debt_category' => false],
+            ['code' => 'C001', 'name_es' => 'MERCADO', 'name_en' => 'Groceries', 'is_debt_category' => false, 'is_income_category' => false],
             ['code' => 'C002', 'name_es' => 'REPOSTERÍA', 'name_en' => 'Baking Supplies', 'is_debt_category' => false],
             ['code' => 'C003', 'name_es' => 'ARTESANÍAS', 'name_en' => 'Crafts & Handicrafts', 'is_debt_category' => false],
             ['code' => 'C004', 'name_es' => 'TRANSPORTES', 'name_en' => 'Transportation', 'is_debt_category' => false],
@@ -63,19 +63,23 @@ class CategorySeeder extends Seeder
             ['code' => 'C044', 'name_es' => 'CREDITO FORD ESCAPE', 'name_en' => 'Ford Escape Auto Loan Payment', 'is_debt_category' => true],
             ['code' => 'C045', 'name_es' => 'DEPRECIACIONES', 'name_en' => 'Depreciation', 'is_debt_category' => false],
             ['code' => 'C046', 'name_es' => 'CREDITO CANADIAN TIRE MC', 'name_en' => 'Canadian Tire Mastercard Payment', 'is_debt_category' => true],
+            ['code' => 'I01', 'name_es' => 'SALARIO', 'name_en' => 'Salary', 'is_debt_category' => false, 'is_income_category' => true],
         ];
 
         foreach ($categories as $category) {
-            Category::create([
-                'code' => $category['code'],
-                'name_es' => $category['name_es'],
-                'name_en' => $category['name_en'],
-                'is_debt_category' => $category['is_debt_category'],
-                'is_active' => $category['is_active'] ?? true,
-                'status' => $category['status'] ?? null,
-            ]);
+            Category::updateOrCreate(
+                ['code' => $category['code']],
+                [
+                    'name_es' => $category['name_es'],
+                    'name_en' => $category['name_en'],
+                    'is_debt_category' => $category['is_debt_category'],
+                    'is_income_category' => $category['is_income_category'] ?? false,
+                    'is_active' => $category['is_active'] ?? true,
+                    'status' => $category['status'] ?? null,
+                ]
+            );
         }
 
-        $this->command->info('Successfully seeded 46 categories (45 active + 1 retired)');
+        $this->command->info('Successfully seeded 47 categories (46 active + 1 retired)');
     }
 }

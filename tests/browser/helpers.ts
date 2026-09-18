@@ -7,6 +7,7 @@ export interface ApiCategory {
     name_en: string;
     name_es: string;
     is_debt_category: boolean;
+    is_income_category?: boolean;
 }
 
 export interface ApiTransaction {
