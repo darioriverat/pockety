@@ -235,9 +235,17 @@ class ReconciliationService
         foreach ($transactions as $transaction) {
             $category = $transaction->category;
 
-            // Asset accounts omit non-principal debt (interest) from the roll-forward.
+            // Asset accounts omit debts from the roll-forward.
             if (
                 ! $isLiability
+                && $category?->is_debt_category
+            ) {
+                continue;
+            }
+
+            // Liabilities omit interest charges from the roll-forward.
+            if (
+                $isLiability
                 && $category?->is_debt_category
                 && ! $transaction->isPrincipal()
             ) {
