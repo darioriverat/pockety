@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\AccountBalance;
+use App\Models\ExchangeRate;
 use App\Models\VarianceAcknowledgment;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class ReconciliationService
@@ -17,7 +19,6 @@ class ReconciliationService
     private const VARIANCE_THRESHOLD = 0.01;
 
     public function __construct(
-        private readonly BalanceSheetService $balanceSheetService,
         private readonly FinancialSummaryService $financialSummaryService,
         private readonly TransactionService $transactionService,
     ) {}
@@ -36,7 +37,8 @@ class ReconciliationService
      * - Variance: Recorded minus Computed.
      *
      * Also includes:
-     * - Accounting equation check (Assets = Liabilities + Equity)
+     * - Accounting equation check rolled up from account conciliations
+     *   (Assets = Liabilities + Equity in CAD equivalent of recorded and computed balances)
      * - Income and expense totals for the period
      * - Per-account variance acknowledgment status
      *
@@ -80,8 +82,7 @@ class ReconciliationService
 
         $accountsBalanced = collect($results)->every(fn (array $result) => $result['is_balanced']);
 
-        // Get accounting equation check
-        $equation = $this->checkAccountingEquation($period);
+        $equation = $this->checkAccountingEquation($results, $period);
 
         // Get income and expenses
         $financialSummary = $this->financialSummaryService->getSummary($period);
@@ -162,36 +163,124 @@ class ReconciliationService
     }
 
     /**
-     * Check the accounting equation: Assets = Liabilities + Equity
-     * Returns the residual (should be near zero for a balanced sheet).
+     * Roll up the accounting equation from per-account conciliations.
      *
+     * Each account's recorded and computed CAD/USD/COP amounts are converted to
+     * CAD equivalent, then summed. Liabilities use absolute values. Equity is
+     * Assets − Liabilities. Residual is computed Assets − (Liabilities + Equity).
+     *
+     * Top-level assets_cad / liabilities_cad / equity_cad are the computed CAD
+     * equivalent totals so the equation reflects calculated activity rather than
+     * the recorded balance sheet snapshot.
+     *
+     * @param  list<array<string, mixed>>  $accountResults
      * @return array{
      *     assets_cad: float,
      *     liabilities_cad: float,
      *     equity_cad: float,
      *     residual_cad: float,
-     *     is_balanced: bool
+     *     is_balanced: bool,
+     *     recorded: array{assets_cad: float, liabilities_cad: float, equity_cad: float},
+     *     computed: array{assets_cad: float, liabilities_cad: float, equity_cad: float},
+     *     variance: array{assets_cad: float, liabilities_cad: float, equity_cad: float}
      * }
      */
-    private function checkAccountingEquation(string $period): array
+    private function checkAccountingEquation(array $accountResults, string $period): array
     {
-        $balanceSheet = $this->balanceSheetService->getBalanceSheet($period);
+        $exchangeRate = $this->resolveExchangeRate($period);
 
-        $assetsCad = $balanceSheet['total_assets']['cad'];
-        $liabilitiesCad = $balanceSheet['total_liabilities']['cad'];
-        $equityCad = $balanceSheet['equity']['cad'];
+        $recordedAssets = 0.0;
+        $computedAssets = 0.0;
+        $recordedLiabilities = 0.0;
+        $computedLiabilities = 0.0;
 
-        // Accounting equation: Assets = Liabilities + Equity
-        // Residual = Assets - (Liabilities + Equity), should be near zero
-        $residualCad = round($assetsCad - ($liabilitiesCad + $equityCad), 2);
+        foreach ($accountResults as $result) {
+            $recordedCad = $this->amountsCadEquivalent($result['recorded'], $exchangeRate);
+            $computedCad = $this->amountsCadEquivalent($result['computed'], $exchangeRate);
+
+            if ($result['is_asset']) {
+                $recordedAssets += $recordedCad;
+                $computedAssets += $computedCad;
+            } elseif ($result['is_liability']) {
+                $recordedLiabilities += abs($recordedCad);
+                $computedLiabilities += abs($computedCad);
+            }
+        }
+
+        $recordedAssets = round($recordedAssets, 2);
+        $computedAssets = round($computedAssets, 2);
+        $recordedLiabilities = round($recordedLiabilities, 2);
+        $computedLiabilities = round($computedLiabilities, 2);
+
+        $recordedEquity = round($recordedAssets - $recordedLiabilities, 2);
+        $computedEquity = round($computedAssets - $computedLiabilities, 2);
+        $residualCad = round($computedAssets - ($computedLiabilities + $computedEquity), 2);
 
         return [
-            'assets_cad' => $assetsCad,
-            'liabilities_cad' => $liabilitiesCad,
-            'equity_cad' => $equityCad,
+            'assets_cad' => $computedAssets,
+            'liabilities_cad' => $computedLiabilities,
+            'equity_cad' => $computedEquity,
             'residual_cad' => $residualCad,
             'is_balanced' => abs($residualCad) <= self::VARIANCE_THRESHOLD,
+            'recorded' => [
+                'assets_cad' => $recordedAssets,
+                'liabilities_cad' => $recordedLiabilities,
+                'equity_cad' => $recordedEquity,
+            ],
+            'computed' => [
+                'assets_cad' => $computedAssets,
+                'liabilities_cad' => $computedLiabilities,
+                'equity_cad' => $computedEquity,
+            ],
+            'variance' => [
+                'assets_cad' => round($recordedAssets - $computedAssets, 2),
+                'liabilities_cad' => round($recordedLiabilities - $computedLiabilities, 2),
+                'equity_cad' => round($recordedEquity - $computedEquity, 2),
+            ],
         ];
+    }
+
+    /**
+     * @param  array{cad?: float|int, usd?: float|int, cop?: float|int}  $amounts
+     */
+    private function amountsCadEquivalent(array $amounts, ExchangeRate $exchangeRate): float
+    {
+        $cadEquivalent = 0.0;
+        $cad = (float) ($amounts['cad'] ?? 0);
+        $usd = (float) ($amounts['usd'] ?? 0);
+        $cop = (float) ($amounts['cop'] ?? 0);
+
+        if ($cad != 0.0) {
+            $cadEquivalent += $cad;
+        }
+
+        if ($usd != 0.0) {
+            $cadEquivalent += $exchangeRate->usdToCad($usd);
+        }
+
+        if ($cop != 0.0) {
+            $cadEquivalent += $exchangeRate->copToCad($cop);
+        }
+
+        return $cadEquivalent;
+    }
+
+    private function resolveExchangeRate(string $period): ExchangeRate
+    {
+        $exchangeRate = ExchangeRate::forPeriod($period);
+
+        if (! $exchangeRate) {
+            Log::warning("No exchange rate found for period {$period}, using defaults");
+
+            return new ExchangeRate([
+                'period' => $period,
+                'usd_cop' => 4400,
+                'usd_cad' => 0.75,
+                'cad_cop' => 3000,
+            ]);
+        }
+
+        return $exchangeRate;
     }
 
     /**

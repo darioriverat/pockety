@@ -117,5 +117,17 @@ test('reconciliation: computed balance reflects linked transactions', async ({
         '100',
     );
 
+    const equationCard = page.getByTestId('accounting-equation-card');
+    await expect(equationCard).toBeVisible();
+    await expect(equationCard).toContainText('calculated operations');
+    await expect(equationCard.getByText('Recorded')).toBeVisible();
+    await expect(equationCard.getByText('Computed')).toBeVisible();
+    await expect(equationCard.getByText('Variance')).toBeVisible();
+    await expect(page.getByTestId('assets-recorded')).toBeVisible();
+    await expect(page.getByTestId('assets-total')).toBeVisible();
+    await expect(page.getByTestId('assets-variance')).toBeVisible();
+    await expect(page.getByTestId('equation-currency-USD')).toHaveCount(0);
+    await expect(page.getByTestId('equation-currency-COP')).toHaveCount(0);
+
     expect(consoleErrors).toEqual([]);
 });

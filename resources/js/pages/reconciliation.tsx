@@ -68,12 +68,18 @@ interface AccountReconciliation {
     reviewed_at: string | null;
 }
 
-interface AccountingEquation {
+interface EquationTotals {
     assets_cad: number;
     liabilities_cad: number;
     equity_cad: number;
+}
+
+interface AccountingEquation extends EquationTotals {
     residual_cad: number;
     is_balanced: boolean;
+    recorded?: EquationTotals;
+    computed?: EquationTotals;
+    variance?: EquationTotals;
 }
 
 interface ReconciliationReport {
@@ -100,6 +106,47 @@ const hasSignificantVariance = (account: AccountReconciliation): boolean => {
         Math.abs(account.variance.usd) > VARIANCE_WARNING_THRESHOLD ||
         Math.abs(account.variance.cop) > VARIANCE_WARNING_THRESHOLD
     );
+};
+
+const getEquationRollup = (
+    equation: AccountingEquation,
+): {
+    recorded: EquationTotals;
+    computed: EquationTotals;
+    variance: EquationTotals;
+} => {
+    const computed: EquationTotals = equation.computed ?? {
+        assets_cad: equation.assets_cad,
+        liabilities_cad: equation.liabilities_cad,
+        equity_cad: equation.equity_cad,
+    };
+    const recorded: EquationTotals = equation.recorded ?? computed;
+    const variance: EquationTotals = equation.variance ?? {
+        assets_cad: recorded.assets_cad - computed.assets_cad,
+        liabilities_cad: recorded.liabilities_cad - computed.liabilities_cad,
+        equity_cad: recorded.equity_cad - computed.equity_cad,
+    };
+
+    return { recorded, computed, variance };
+};
+
+const getVarianceColorClass = (varianceValue: number): string => {
+    const isZero = Math.abs(varianceValue) <= 0.01;
+    const isSignificant = Math.abs(varianceValue) > VARIANCE_WARNING_THRESHOLD;
+
+    if (isSignificant) {
+        if (varianceValue < -0.01) {
+            return 'font-medium text-red-600 dark:text-red-400';
+        }
+
+        return 'font-medium text-amber-600 dark:text-amber-400';
+    }
+
+    if (!isZero) {
+        return 'font-medium text-muted-foreground';
+    }
+
+    return 'font-medium text-green-600 dark:text-green-500';
 };
 
 /**
@@ -250,25 +297,8 @@ export default function Reconciliation() {
         const isZero = Math.abs(varianceValue) <= 0.01;
         const isSignificant =
             Math.abs(varianceValue) > VARIANCE_WARNING_THRESHOLD;
-        const isPositive = varianceValue > 0.01;
         const isNegative = varianceValue < -0.01;
-
-        // Determine variance color based on magnitude and direction
-        let varianceColorClass = 'font-medium text-green-600 dark:text-green-500';
-        if (isSignificant) {
-            if (isNegative) {
-                // Significant negative variance: red (critical issue)
-                varianceColorClass =
-                    'font-medium text-red-600 dark:text-red-400';
-            } else if (isPositive) {
-                // Significant positive variance: yellow/amber (warning)
-                varianceColorClass =
-                    'font-medium text-amber-600 dark:text-amber-400';
-            }
-        } else if (!isZero) {
-            // Small non-zero variance: neutral/muted
-            varianceColorClass = 'font-medium text-muted-foreground';
-        }
+        const varianceColorClass = getVarianceColorClass(varianceValue);
 
         return (
             <div
@@ -310,6 +340,45 @@ export default function Reconciliation() {
 
     const unbalancedAccountCount =
         report?.accounts.filter((account) => !account.is_balanced).length ?? 0;
+    const equationRollup = report
+        ? getEquationRollup(report.accounting_equation)
+        : null;
+
+    const renderEquationRow = (
+        label: string,
+        testId: string,
+        recorded: number,
+        computed: number,
+        variance: number,
+    ) => (
+        <div
+            className="grid grid-cols-4 gap-2 border-b py-2 text-sm"
+            data-testid={`equation-row-${testId}`}
+        >
+            <div className="text-muted-foreground">{label}</div>
+            <div data-testid={`${testId}-recorded`}>
+                {formatCurrency(recorded, 'CAD')}
+            </div>
+            <div
+                className="font-semibold"
+                data-testid={
+                    testId === 'assets'
+                        ? 'assets-total'
+                        : testId === 'liabilities'
+                          ? 'liabilities-total'
+                          : 'equity-total'
+                }
+            >
+                {formatCurrency(computed, 'CAD')}
+            </div>
+            <div
+                className={getVarianceColorClass(variance)}
+                data-testid={`${testId}-variance`}
+            >
+                {formatCurrency(variance, 'CAD')}
+            </div>
+        </div>
+    );
 
     return (
         <>
@@ -402,65 +471,48 @@ export default function Reconciliation() {
                     </Alert>
                 )}
 
-                {report && (
+                {report && equationRollup && (
                     <Card data-testid="accounting-equation-card">
                         <CardHeader>
                             <SubsectionHeading data-testid="accounting-equation-heading">
                                 Accounting Equation
                             </SubsectionHeading>
                             <CardDescription>
-                                Assets = Liabilities + Equity for{' '}
-                                {report.period}
+                                Sum of account conciliations in CAD equivalent
+                                for {report.period}. Assets = Liabilities +
+                                Equity using calculated operations.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm text-muted-foreground">
-                                            Assets
-                                        </span>
-                                        <span
-                                            className="font-semibold"
-                                            data-testid="assets-total"
-                                        >
-                                            {formatCurrency(
-                                                report.accounting_equation
-                                                    .assets_cad,
-                                                'CAD',
-                                            )}
-                                        </span>
+                                <div>
+                                    <div className="grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold text-muted-foreground">
+                                        <div>CAD</div>
+                                        <div>Recorded</div>
+                                        <div>Computed</div>
+                                        <div>Variance</div>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm text-muted-foreground">
-                                            Liabilities
-                                        </span>
-                                        <span
-                                            className="font-semibold"
-                                            data-testid="liabilities-total"
-                                        >
-                                            {formatCurrency(
-                                                report.accounting_equation
-                                                    .liabilities_cad,
-                                                'CAD',
-                                            )}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm text-muted-foreground">
-                                            Equity
-                                        </span>
-                                        <span
-                                            className="font-semibold"
-                                            data-testid="equity-total"
-                                        >
-                                            {formatCurrency(
-                                                report.accounting_equation
-                                                    .equity_cad,
-                                                'CAD',
-                                            )}
-                                        </span>
-                                    </div>
+                                    {renderEquationRow(
+                                        'Assets',
+                                        'assets',
+                                        equationRollup.recorded.assets_cad,
+                                        equationRollup.computed.assets_cad,
+                                        equationRollup.variance.assets_cad,
+                                    )}
+                                    {renderEquationRow(
+                                        'Liabilities',
+                                        'liabilities',
+                                        equationRollup.recorded.liabilities_cad,
+                                        equationRollup.computed.liabilities_cad,
+                                        equationRollup.variance.liabilities_cad,
+                                    )}
+                                    {renderEquationRow(
+                                        'Equity',
+                                        'equity',
+                                        equationRollup.recorded.equity_cad,
+                                        equationRollup.computed.equity_cad,
+                                        equationRollup.variance.equity_cad,
+                                    )}
                                     <div className="flex items-center justify-between border-t pt-3">
                                         <span className="text-sm font-medium">
                                             Residual

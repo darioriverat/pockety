@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\Category;
+use App\Models\ExchangeRate;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -394,6 +395,21 @@ class ReconciliationTest extends TestCase
                     'equity_cad',
                     'residual_cad',
                     'is_balanced',
+                    'recorded' => [
+                        'assets_cad',
+                        'liabilities_cad',
+                        'equity_cad',
+                    ],
+                    'computed' => [
+                        'assets_cad',
+                        'liabilities_cad',
+                        'equity_cad',
+                    ],
+                    'variance' => [
+                        'assets_cad',
+                        'liabilities_cad',
+                        'equity_cad',
+                    ],
                 ],
             ],
         ]);
@@ -402,6 +418,97 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(1000, $equation['assets_cad']);
         $this->assertEquals(500, $equation['liabilities_cad']);
         $this->assertEquals(500, $equation['equity_cad']);
+        $this->assertEquals(0, $equation['residual_cad']);
+        $this->assertTrue($equation['is_balanced']);
+        $this->assertEquals(1000, $equation['computed']['assets_cad']);
+        $this->assertEquals(1000, $equation['recorded']['assets_cad']);
+        $this->assertEquals(0, $equation['variance']['assets_cad']);
+    }
+
+    public function test_accounting_equation_sums_computed_account_conciliations(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $assetAccount = Account::create([
+            'name' => 'Test Bank',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $liabilityAccount = Account::create([
+            'name' => 'Test Credit Card',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $category = Category::create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+            'is_debt_category' => false,
+            'is_active' => true,
+        ]);
+
+        ExchangeRate::create([
+            'period' => '202501',
+            'usd_cop' => 3750,
+            'usd_cad' => 1.5,
+            'cad_cop' => 2500,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $assetAccount->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 200,
+            'recorded_balance_cop' => 500000,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $liabilityAccount->id,
+            'period' => '202501',
+            'recorded_balance_cad' => -500,
+            'recorded_balance_usd' => -50,
+            'recorded_balance_cop' => -100000,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $assetAccount->id,
+            'amount_cad' => 100,
+            'amount_usd' => 20,
+            'amount_cop' => 50000,
+        ]);
+
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        $response->assertOk();
+
+        $equation = $response->json('data.accounting_equation');
+
+        // CAD equivalent uses period rates: 1 USD = 1.5 CAD, 1 CAD = 2500 COP.
+        // Recorded assets: 1000 + 200*1.5 + 500000/2500 = 1500
+        // Recorded liabilities: abs(-500 + -50*1.5 + -100000/2500) = 615
+        $this->assertEquals(1500, $equation['recorded']['assets_cad']);
+        $this->assertEquals(615, $equation['recorded']['liabilities_cad']);
+        $this->assertEquals(885, $equation['recorded']['equity_cad']);
+
+        // Computed includes operations: 900 + 180*1.5 + 450000/2500 = 1350
+        $this->assertEquals(1350, $equation['assets_cad']);
+        $this->assertEquals(615, $equation['liabilities_cad']);
+        $this->assertEquals(735, $equation['equity_cad']);
+        $this->assertEquals(1350, $equation['computed']['assets_cad']);
+        $this->assertEquals(615, $equation['computed']['liabilities_cad']);
+        $this->assertEquals(735, $equation['computed']['equity_cad']);
+        $this->assertEquals(150, $equation['variance']['assets_cad']);
+        $this->assertEquals(0, $equation['variance']['liabilities_cad']);
+        $this->assertEquals(150, $equation['variance']['equity_cad']);
         $this->assertEquals(0, $equation['residual_cad']);
         $this->assertTrue($equation['is_balanced']);
     }

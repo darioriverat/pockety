@@ -605,3 +605,80 @@ describe('Reconciliation - Variance Acknowledgment', () => {
         );
     });
 });
+
+describe('Reconciliation - Accounting Equation', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('shows recorded, computed, and variance totals from account conciliations', async () => {
+        const report = {
+            period: '202501',
+            status: 'unbalanced' as const,
+            accounts: [
+                {
+                    account_id: 1,
+                    account_name: 'Test Bank',
+                    account_type: 'bank',
+                    is_asset: true,
+                    is_liability: false,
+                    has_recorded_balance: true,
+                    recorded: { cad: 1000, usd: 200, cop: 500000 },
+                    computed: { cad: 900, usd: 180, cop: 450000 },
+                    variance: { cad: 100, usd: 20, cop: 50000 },
+                    is_balanced: false,
+                    is_reviewed: false,
+                    review_note: null,
+                    reviewed_at: null,
+                },
+            ],
+            accounting_equation: {
+                assets_cad: 1350,
+                liabilities_cad: 615,
+                equity_cad: 735,
+                residual_cad: 0,
+                is_balanced: true,
+                recorded: {
+                    assets_cad: 1500,
+                    liabilities_cad: 615,
+                    equity_cad: 885,
+                },
+                computed: {
+                    assets_cad: 1350,
+                    liabilities_cad: 615,
+                    equity_cad: 735,
+                },
+                variance: {
+                    assets_cad: 150,
+                    liabilities_cad: 0,
+                    equity_cad: 150,
+                },
+            },
+            income_total_cad: 0,
+            expenses_total_cad: 100,
+            net_operating_expenses_cad: 100,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByText('Test Bank');
+
+        expect(screen.getByTestId('assets-recorded')).toHaveTextContent('1,500');
+        expect(screen.getByTestId('assets-total')).toHaveTextContent('1,350');
+        expect(screen.getByTestId('assets-variance')).toHaveTextContent('150');
+        expect(screen.getByTestId('liabilities-total')).toHaveTextContent('615');
+        expect(screen.getByTestId('equity-recorded')).toHaveTextContent('885');
+        expect(screen.getByTestId('equity-total')).toHaveTextContent('735');
+        expect(screen.getByTestId('equity-variance')).toHaveTextContent('150');
+        expect(screen.queryByTestId('equation-currency-USD')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('equation-currency-COP')).not.toBeInTheDocument();
+        expect(
+            screen.getByTestId('accounting-equation-card'),
+        ).toHaveTextContent('CAD equivalent');
+    });
+});
