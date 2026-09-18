@@ -125,7 +125,7 @@ class ReconciliationTest extends TestCase
         $this->assertEquals('balanced', $response->json('data.status'));
     }
 
-    public function test_reconciliation_adds_income_and_subtracts_principal_from_computed_balance(): void
+    public function test_reconciliation_adds_income_and_omits_debt_on_asset_accounts(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -208,10 +208,10 @@ class ReconciliationTest extends TestCase
         $accountData = collect($response->json('data.accounts'))
             ->firstWhere('account_id', $account->id);
 
-        // 1000 - 100 spend + 500 income - 200 principal = 1200 (interest omitted)
+        // 1000 - 100 spend + 500 income = 1400 (principal and interest omitted on assets)
         $this->assertEquals(1000, $accountData['recorded']['cad']);
-        $this->assertEquals(1200, $accountData['computed']['cad']);
-        $this->assertEquals(-200, $accountData['variance']['cad']);
+        $this->assertEquals(1400, $accountData['computed']['cad']);
+        $this->assertEquals(-400, $accountData['variance']['cad']);
         $this->assertFalse($accountData['is_balanced']);
     }
 

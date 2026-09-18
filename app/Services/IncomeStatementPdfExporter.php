@@ -31,6 +31,7 @@ class IncomeStatementPdfExporter
      *         category_name_en: string,
      *         total_cad: float,
      *         is_debt_category: bool,
+     *         is_income_category?: bool,
      *         is_depreciation: bool
      *     }>
      * }  $statement

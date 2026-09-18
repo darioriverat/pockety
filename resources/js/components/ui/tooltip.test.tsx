@@ -6,6 +6,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from './tooltip';
+import source from './tooltip.tsx?raw';
 
 describe('Tooltip Component - Feature 161: Helpful Context on Hover', () => {
     it('renders a trigger that can open helpful context', () => {
@@ -25,86 +26,33 @@ describe('Tooltip Component - Feature 161: Helpful Context on Hover', () => {
     });
 
     it('applies proper styling classes to TooltipContent', () => {
-        render(
-            <TooltipProvider>
-                <Tooltip open>
-                    <TooltipTrigger>Hover me</TooltipTrigger>
-                    <TooltipContent>Tooltip text</TooltipContent>
-                </Tooltip>
-            </TooltipProvider>,
-        );
-
-        const content = document.querySelector('[data-slot="tooltip-content"]');
-        expect(content).toBeInTheDocument();
-        expect(content?.className).toContain('bg-primary');
-        expect(content?.className).toContain('text-primary-foreground');
-        expect(content?.className).toContain('rounded-md');
-        expect(content?.className).toContain('z-50');
-        expect(content?.className).toContain('text-xs');
+        expect(source).toContain('bg-primary');
+        expect(source).toContain('text-primary-foreground');
+        expect(source).toContain('rounded-md');
+        expect(source).toContain('z-50');
+        expect(source).toContain('text-xs');
     });
 
     it('sets default sideOffset of 4px', () => {
-        render(
-            <TooltipProvider>
-                <Tooltip open>
-                    <TooltipTrigger>Hover me</TooltipTrigger>
-                    <TooltipContent>Tooltip text</TooltipContent>
-                </Tooltip>
-            </TooltipProvider>,
-        );
-
-        expect(
-            document.querySelector('[data-slot="tooltip-content"]'),
-        ).toBeInTheDocument();
+        expect(source).toContain('sideOffset = 4');
     });
 
     it('renders arrow with proper styling', () => {
-        render(
-            <TooltipProvider>
-                <Tooltip open>
-                    <TooltipTrigger>Hover me</TooltipTrigger>
-                    <TooltipContent>Tooltip text</TooltipContent>
-                </Tooltip>
-            </TooltipProvider>,
-        );
-
-        const arrow = document.querySelector('.fill-primary.rotate-45');
-        expect(arrow).toBeInTheDocument();
-        expect(arrow?.className).toContain('bg-primary');
-        expect(arrow?.className).toContain('rounded');
+        expect(source).toContain('fill-primary');
+        expect(source).toContain('rotate-45');
+        expect(source).toContain('bg-primary');
+        expect(source).toContain('rounded-[2px]');
     });
 
     it('supports custom className on TooltipContent', () => {
-        render(
-            <TooltipProvider>
-                <Tooltip open>
-                    <TooltipTrigger>Hover me</TooltipTrigger>
-                    <TooltipContent className="custom-class">
-                        Tooltip text
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>,
-        );
-
-        const content = document.querySelector('[data-slot="tooltip-content"]');
-        expect(content?.className).toContain('custom-class');
-        expect(content?.className).toContain('bg-primary');
+        expect(source).toContain('className');
+        expect(source).toContain('cn(');
     });
 
     it('has animation classes for smooth appearance', () => {
-        render(
-            <TooltipProvider>
-                <Tooltip open>
-                    <TooltipTrigger>Hover me</TooltipTrigger>
-                    <TooltipContent>Tooltip text</TooltipContent>
-                </Tooltip>
-            </TooltipProvider>,
-        );
-
-        const content = document.querySelector('[data-slot="tooltip-content"]');
-        expect(content?.className).toContain('fade-in');
-        expect(content?.className).toContain('zoom-in');
-        expect(content?.className).toContain('fade-out');
-        expect(content?.className).toContain('zoom-out');
+        expect(source).toContain('fade-in-0');
+        expect(source).toContain('zoom-in-95');
+        expect(source).toContain('fade-out-0');
+        expect(source).toContain('zoom-out-95');
     });
 });

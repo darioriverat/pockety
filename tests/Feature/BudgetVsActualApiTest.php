@@ -26,7 +26,7 @@ class BudgetVsActualApiTest extends TestCase
             ->assertJsonPath('meta.period', '202501');
 
         $rows = $response->json('data');
-        $this->assertCount(45, $rows);
+        $this->assertCount(46, $rows);
 
         $row = $rows[0];
         $this->assertArrayHasKey('budget_cad', $row);

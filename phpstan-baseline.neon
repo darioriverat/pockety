@@ -7,7 +7,7 @@ parameters:
 			path: app/Domain/Entities/TransactionEntity.php
 
 		-
-			message: '#^Parameter \#1 \$data of static method App\\Domain\\Entities\\CategoryEntity\:\:fromArray\(\) expects array\{id\: int, code\: string, name_es\: string, name_en\: string, is_debt_category\: bool, is_active\: bool, status\?\: string\|null\}, array\<string, mixed\> given\.$#'
+			message: '#^Parameter \#1 \$data of static method App\\Domain\\Entities\\CategoryEntity\:\:fromArray\(\) expects array\{id\: int, code\: string, name_es\: string, name_en\: string, is_debt_category\: bool, is_active\: bool, status\?\: string\|null, is_income_category\?\: bool\}, array\<string, mixed\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Domain/Entities/TransactionEntity.php
@@ -295,6 +295,18 @@ parameters:
 			path: app/Models/Category.php
 
 		-
+			message: '#^Method App\\Models\\Category\:\:scopeIncomeCategories\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^Method App\\Models\\Category\:\:scopeIncomeCategories\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Category.php
+
+		-
 			message: '#^Method App\\Models\\Category\:\:transactions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
 			identifier: missingType.generics
 			count: 1
@@ -475,6 +487,36 @@ parameters:
 			path: app/Models/Transaction.php
 
 		-
+			message: '#^Method App\\Models\\Transaction\:\:scopeExpenses\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
+			message: '#^Method App\\Models\\Transaction\:\:scopeExpenses\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
+			message: '#^Method App\\Models\\Transaction\:\:scopeIncome\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
+			message: '#^Method App\\Models\\Transaction\:\:scopeIncome\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_income_category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
 			message: '#^Method App\\Models\\Transaction\:\:scopePrincipal\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -639,12 +681,36 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_en\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: app/Services/FinancialSummaryService.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_es\.$#'
 			identifier: property.notFound
+			count: 2
+			path: app/Services/FinancialSummaryService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_income_category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/FinancialSummaryService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/FinancialSummaryService.php
+
+		-
+			message: '#^Using nullsafe property access "\?-\>name_en" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/FinancialSummaryService.php
+
+		-
+			message: '#^Using nullsafe property access "\?-\>name_es" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Services/FinancialSummaryService.php
 
@@ -659,6 +725,12 @@ parameters:
 			identifier: argument.unresolvableType
 			count: 1
 			path: app/Services/FinancialSummaryService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_debt_category\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/ReconciliationService.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
@@ -692,6 +764,12 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_debt_category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TransactionService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_income_category\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/TransactionService.php

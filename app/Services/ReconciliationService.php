@@ -30,9 +30,9 @@ class ReconciliationService
      * - Computed: a "known prior balance" (the most recent recorded balance for a period
      *   strictly before this one; if none exists yet, the current period's own recorded
      *   balance is used as the baseline) plus this period's signed transaction deltas.
-     *   Asset accounts: minus regular spend, plus income, minus principal.
+     *   Asset accounts: minus regular spend, plus income. Debt (principal and interest) is omitted.
      *   Liability accounts: plus regular charges, minus income/credits, minus principal.
-     *   Non-principal debt (interest) is omitted on assets and treated as a charge on liabilities.
+     *   Interest is omitted on liabilities.
      * - Variance: Recorded minus Computed.
      *
      * Also includes:

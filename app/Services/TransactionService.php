@@ -469,7 +469,7 @@ class TransactionService implements TransactionServiceInterface
             ? $data['account_id']
             : $existing?->account_id;
 
-        if ($accountId === null || $accountId === '') {
+        if ($accountId === null) {
             throw new \InvalidArgumentException('Income transactions must be assigned to a deposit account.');
         }
     }
@@ -493,7 +493,7 @@ class TransactionService implements TransactionServiceInterface
                 ? $allowed['account_id']
                 : $transaction->account_id;
 
-            if ($accountId === null || $accountId === '') {
+            if ($accountId === null) {
                 throw new \InvalidArgumentException('Income transactions must be assigned to a deposit account.');
             }
         }

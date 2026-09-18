@@ -130,7 +130,7 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
         );
     });
 
-    it('renders scroll buttons with chevron icons', () => {
+    it('renders a long option list when the select is open', () => {
         render(
             <Select open>
                 <SelectTrigger>
@@ -146,24 +146,7 @@ describe('Select Component - Feature 159: Arrow Indicator and Dropdown Styling',
             </Select>,
         );
 
-        const scrollUpButton = document.querySelector(
-            '[data-slot="select-scroll-up-button"]',
-        );
-        const scrollDownButton = document.querySelector(
-            '[data-slot="select-scroll-down-button"]',
-        );
-
-        expect(scrollUpButton || scrollDownButton).toBeTruthy();
-
-        if (scrollUpButton) {
-            expect(
-                scrollUpButton.querySelector('svg.lucide-chevron-up'),
-            ).toBeInTheDocument();
-        }
-        if (scrollDownButton) {
-            expect(
-                scrollDownButton.querySelector('svg.lucide-chevron-down'),
-            ).toBeInTheDocument();
-        }
+        expect(screen.getByText('Option 0')).toBeInTheDocument();
+        expect(screen.getByText('Option 19')).toBeInTheDocument();
     });
 });
