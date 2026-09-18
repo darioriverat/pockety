@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Domain\Collections\TransactionCollection;
 use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
+use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
@@ -347,6 +348,50 @@ class TransactionService implements TransactionServiceInterface
     public function getForPeriod(string $period): array
     {
         return $this->getAll(['period' => $period]);
+    }
+
+    /**
+     * Get transactions for a specific account and period, applying roll-forward rules.
+     *
+     * @param  Account  $account
+     * @param  string  $period
+     * @return TransactionEntity[]
+     */
+    public function getRollForwardTransactionsForAccount(Account $account, string $period): array
+    {
+        $transactions = Transaction::where('account_id', $account->id)
+            ->where('period', $period)
+            ->with('category')
+            ->get();
+
+        $isLiability = $account->isLiability();
+
+        $transactionEntities = [];
+
+        foreach ($transactions as $transaction) {
+            $category = $transaction->category;
+
+            // Asset accounts omit debts from the roll-forward.
+            if (
+                ! $isLiability
+                && $category?->is_debt_category
+            ) {
+                continue;
+            }
+
+            // Liabilities omit interest charges from the roll-forward.
+            if (
+                $isLiability
+                && $category?->is_debt_category
+                && ! $transaction->isPrincipal()
+            ) {
+                continue;
+            }
+
+            $transactionEntities[] = $this->toEntity($transaction);
+        }
+
+        return $transactionEntities;
     }
 
     /**

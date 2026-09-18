@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\AccountBalance;
-use App\Models\Transaction;
 use App\Models\VarianceAcknowledgment;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -20,6 +19,7 @@ class ReconciliationService
     public function __construct(
         private readonly BalanceSheetService $balanceSheetService,
         private readonly FinancialSummaryService $financialSummaryService,
+        private readonly TransactionService $transactionService,
     ) {}
 
     /**
@@ -222,10 +222,8 @@ class ReconciliationService
         $baseUsd = $base ? (float) $base->recorded_balance_usd : 0.0;
         $baseCop = $base ? (float) $base->recorded_balance_cop : 0.0;
 
-        $transactions = Transaction::where('account_id', $account->id)
-            ->where('period', $period)
-            ->with('category')
-            ->get();
+        $transactions = $this->transactionService
+            ->getRollForwardTransactionsForAccount($account, $period);
 
         $isLiability = $account->isLiability();
         $computedCad = $baseCad;
@@ -233,29 +231,10 @@ class ReconciliationService
         $computedCop = $baseCop;
 
         foreach ($transactions as $transaction) {
-            $category = $transaction->category;
-
-            // Asset accounts omit debts from the roll-forward.
-            if (
-                ! $isLiability
-                && $category?->is_debt_category
-            ) {
-                continue;
-            }
-
-            // Liabilities omit interest charges from the roll-forward.
-            if (
-                $isLiability
-                && $category?->is_debt_category
-                && ! $transaction->isPrincipal()
-            ) {
-                continue;
-            }
-
             $sign = $transaction->balanceSign($isLiability);
-            $computedCad += $sign * (float) ($transaction->amount_cad ?? 0);
-            $computedUsd += $sign * (float) ($transaction->amount_usd ?? 0);
-            $computedCop += $sign * (float) ($transaction->amount_cop ?? 0);
+            $computedCad += $sign * (float) ($transaction->amountCad ?? 0);
+            $computedUsd += $sign * (float) ($transaction->amountUsd ?? 0);
+            $computedCop += $sign * (float) ($transaction->amountCop ?? 0);
         }
 
         $recordedCad = $recordedBalance ? (float) $recordedBalance->recorded_balance_cad : 0.0;
