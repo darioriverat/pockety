@@ -19,13 +19,13 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(dialog).toBeVisible();
         await page.screenshot({ path: `${evidence}/${theme}-form.png` });
         await page.getByTestId('transaction-date-input').fill('');
-        await page.getByTestId('transaction-amount-input').fill('-100');
+        await page.getByTestId('transaction-amount-input').fill('0');
         await page.getByTestId('transaction-form-submit').click();
 
         for (const [field, message] of [
             ['date', 'Date is required'],
             ['category', 'Category is required'],
-            ['amount', 'Amount must be a positive number'],
+            ['amount', 'Amount cannot be zero'],
         ]) {
             const error = page.getByTestId(`${field}-error`);
             await expect(error).toBeVisible();

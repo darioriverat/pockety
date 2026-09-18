@@ -619,8 +619,9 @@ test('feature 16: users can delete an existing transaction', async ({
     expect(consoleErrors).toEqual([]);
 });
 
-test('feature 93: transaction form validates that amount is a positive number', async ({
+test('feature 93: transaction form rejects a zero amount and accepts a negative amount', async ({
     page,
+    request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
     const comments = `feature-93-amount-${Date.now()}`;
@@ -633,30 +634,36 @@ test('feature 93: transaction form validates that amount is a positive number', 
     await selectOption(page, 'Quincena', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
-    await page.getByTestId('transaction-amount-input').fill('-100');
+    await page.getByTestId('transaction-amount-input').fill('0');
     await page.getByLabel('Comments').fill(comments);
 
     await page.getByRole('button', { name: 'Create' }).click();
 
     const amountError = page.getByTestId('amount-error');
     await expect(amountError).toBeVisible();
-    await expect(amountError).toContainText(/positive/i);
+    await expect(amountError).toContainText(/cannot be zero/i);
     await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
 
     await page.screenshot({
-        path: 'verification/test-93-amount-positive/01-negative-amount-rejected.png',
+        path: 'verification/test-93-amount-positive/01-zero-amount-rejected.png',
         fullPage: false,
     });
 
-    await page.getByTestId('transaction-amount-input').fill('100.50');
+    await page.getByTestId('transaction-amount-input').fill('-100.50');
     await submitTransactionForm(page, 'Create');
 
-    await expect(
-        page.locator('[data-slot="card"]').filter({ hasText: comments }),
-    ).toBeVisible();
+    const transactionCard = page
+        .locator('[data-slot="card"]')
+        .filter({ hasText: comments });
+
+    await expect(transactionCard).toBeVisible();
+    await expect(transactionCard).toContainText('-$100.50');
+
+    const transaction = await getTransactionByComments(request, comments);
+    expect(transaction.amount_cad).toBe(-100.5);
 
     await page.screenshot({
-        path: 'verification/test-93-amount-positive/02-positive-amount-accepted.png',
+        path: 'verification/test-93-amount-positive/02-negative-amount-accepted.png',
         fullPage: false,
     });
 

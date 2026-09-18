@@ -240,15 +240,15 @@ class DashboardService
         $total = 0.0;
 
         foreach ($transactions as $transaction) {
-            if ($transaction->amount_cad > 0) {
+            if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
                 $total += (float) $transaction->amount_cad;
             }
 
-            if ($transaction->amount_usd > 0) {
+            if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
                 $total += $exchangeRate->usdToCad((float) $transaction->amount_usd);
             }
 
-            if ($transaction->amount_cop > 0) {
+            if ($transaction->amount_cop !== null && (float) $transaction->amount_cop != 0) {
                 $total += $exchangeRate->copToCad((float) $transaction->amount_cop);
             }
         }

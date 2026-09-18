@@ -196,6 +196,55 @@ describe('Transactions - Success Messages', () => {
         });
     });
 
+    it('submits a negative amount when creating a transaction', async () => {
+        render(<Transactions />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+        });
+
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.change(screen.getByTestId('transaction-date-input'), {
+            target: { value: '2025-01-15' },
+        });
+        fireEvent.change(screen.getByTestId('transaction-period-input'), {
+            target: { value: '202501' },
+        });
+
+        fireEvent.click(screen.getByRole('combobox', { name: 'Category' }));
+        const option = await screen.findByRole('option', {
+            name: /Groceries/,
+        });
+        fireEvent.click(option);
+
+        fireEvent.change(screen.getByTestId('transaction-amount-input'), {
+            target: { value: '-25.50' },
+        });
+
+        fireEvent.click(screen.getByTestId('transaction-form-submit'));
+
+        await waitFor(() => {
+            const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([url, init]) =>
+                    String(url) === '/api/transactions' &&
+                    (init as RequestInit | undefined)?.method === 'POST',
+            );
+
+            expect(postCall).toBeDefined();
+            const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
+            expect(body.amount_cad).toBe(-25.5);
+        });
+    });
+
     it('displays success message after updating a transaction', async () => {
         render(<Transactions />);
 

@@ -66,7 +66,8 @@ import {
 } from 'lucide-react';
 
 const PERIOD_FORMAT_ERROR = 'Period must be in YYYYMM format (e.g. 202501)';
-const AMOUNT_POSITIVE_ERROR = 'Amount must be a positive number';
+const AMOUNT_ZERO_ERROR = 'Amount cannot be zero';
+const AMOUNT_INVALID_ERROR = 'Amount must be a valid number';
 const DATE_VALID_ERROR = 'Date must be a valid date.';
 const NO_ACCOUNT_VALUE = 'none';
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
@@ -440,8 +441,10 @@ export default function Transactions() {
             errors.amount = 'Amount is required';
         } else {
             const amountNum = parseFloat(formData.amount);
-            if (Number.isNaN(amountNum) || amountNum <= 0) {
-                errors.amount = AMOUNT_POSITIVE_ERROR;
+            if (Number.isNaN(amountNum)) {
+                errors.amount = AMOUNT_INVALID_ERROR;
+            } else if (amountNum === 0) {
+                errors.amount = AMOUNT_ZERO_ERROR;
             }
         }
 

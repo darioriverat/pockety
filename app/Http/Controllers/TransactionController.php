@@ -139,9 +139,9 @@ class TransactionController extends Controller
                 'quincena' => 'required|in:Q1,Q2',
                 'category_id' => 'required|integer|exists:categories,id',
                 'account_id' => 'nullable|integer|exists:accounts,id',
-                'amount_cad' => 'nullable|numeric|gt:0',
-                'amount_usd' => 'nullable|numeric|gt:0',
-                'amount_cop' => 'nullable|numeric|gt:0',
+                'amount_cad' => $this->amountFieldRules(),
+                'amount_usd' => $this->amountFieldRules(),
+                'amount_cop' => $this->amountFieldRules(),
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'is_credit' => 'nullable|boolean',
@@ -152,9 +152,6 @@ class TransactionController extends Controller
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
                 'quincena.in' => 'The quincena must be Q1 or Q2.',
-                'amount_cad.gt' => 'Amount must be a positive number.',
-                'amount_usd.gt' => 'Amount must be a positive number.',
-                'amount_cop.gt' => 'Amount must be a positive number.',
             ]);
 
             $transaction = $this->service->create($validated);
@@ -191,9 +188,9 @@ class TransactionController extends Controller
                 'quincena' => 'sometimes|required|in:Q1,Q2',
                 'category_id' => 'sometimes|required|integer|exists:categories,id',
                 'account_id' => 'nullable|integer|exists:accounts,id',
-                'amount_cad' => 'nullable|numeric|gt:0',
-                'amount_usd' => 'nullable|numeric|gt:0',
-                'amount_cop' => 'nullable|numeric|gt:0',
+                'amount_cad' => $this->amountFieldRules(),
+                'amount_usd' => $this->amountFieldRules(),
+                'amount_cop' => $this->amountFieldRules(),
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'is_credit' => 'nullable|boolean',
@@ -204,9 +201,6 @@ class TransactionController extends Controller
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
                 'quincena.in' => 'The quincena must be Q1 or Q2.',
-                'amount_cad.gt' => 'Amount must be a positive number.',
-                'amount_usd.gt' => 'Amount must be a positive number.',
-                'amount_cop.gt' => 'Amount must be a positive number.',
             ]);
 
             $transaction = $this->service->update($id, $validated);
@@ -420,5 +414,25 @@ class TransactionController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * @return list<string|\Closure>
+     */
+    private function amountFieldRules(): array
+    {
+        return [
+            'nullable',
+            'numeric',
+            function (string $attribute, mixed $value, \Closure $fail): void {
+                if ($value === null || $value === '') {
+                    return;
+                }
+
+                if ((float) $value == 0.0) {
+                    $fail('Amount cannot be zero.');
+                }
+            },
+        ];
     }
 }

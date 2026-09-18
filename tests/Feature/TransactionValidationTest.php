@@ -89,7 +89,7 @@ class TransactionValidationTest extends TestCase
             ->assertJsonValidationErrors(['quincena']);
     }
 
-    public function test_amount_must_be_positive_rejects_negative(): void
+    public function test_amount_accepts_negative_values(): void
     {
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
@@ -97,18 +97,16 @@ class TransactionValidationTest extends TestCase
             'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => -100,
+            'comments' => 'negative-amount-ok',
         ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['amount_cad']);
-
-        $this->assertStringContainsString(
-            'positive',
-            strtolower($response->json('errors.amount_cad.0'))
-        );
+        $response->assertCreated()
+            ->assertJsonPath('data.amount', -100)
+            ->assertJsonPath('data.amount_cad', -100)
+            ->assertJsonPath('data.currency', 'CAD');
     }
 
-    public function test_amount_must_be_positive_rejects_zero(): void
+    public function test_amount_rejects_zero(): void
     {
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
@@ -120,6 +118,11 @@ class TransactionValidationTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['amount_usd']);
+
+        $this->assertStringContainsString(
+            'zero',
+            strtolower($response->json('errors.amount_usd.0'))
+        );
     }
 
     public function test_amount_accepts_positive_decimal(): void

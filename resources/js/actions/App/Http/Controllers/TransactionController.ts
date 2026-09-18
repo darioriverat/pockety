@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\TransactionController::exportMethod
-* @see app/Http/Controllers/TransactionController.php:350
+* @see app/Http/Controllers/TransactionController.php:344
 * @route '/api/transactions/export'
 */
 export const exportMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ exportMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::exportMethod
-* @see app/Http/Controllers/TransactionController.php:350
+* @see app/Http/Controllers/TransactionController.php:344
 * @route '/api/transactions/export'
 */
 exportMethod.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ exportMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionController::exportMethod
-* @see app/Http/Controllers/TransactionController.php:350
+* @see app/Http/Controllers/TransactionController.php:344
 * @route '/api/transactions/export'
 */
 exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionController::exportMethod
-* @see app/Http/Controllers/TransactionController.php:350
+* @see app/Http/Controllers/TransactionController.php:344
 * @route '/api/transactions/export'
 */
 exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionController::exportMethod
-* @see app/Http/Controllers/TransactionController.php:350
+* @see app/Http/Controllers/TransactionController.php:344
 * @route '/api/transactions/export'
 */
 const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -136,7 +136,7 @@ const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get
 
 /**
 * @see \App\Http\Controllers\TransactionController::exportMethod
-* @see app/Http/Controllers/TransactionController.php:350
+* @see app/Http/Controllers/TransactionController.php:344
 * @route '/api/transactions/export'
 */
 exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -146,7 +146,7 @@ exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'>
 
 /**
 * @see \App\Http\Controllers\TransactionController::exportMethod
-* @see app/Http/Controllers/TransactionController.php:350
+* @see app/Http/Controllers/TransactionController.php:344
 * @route '/api/transactions/export'
 */
 exportMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -163,7 +163,7 @@ exportMethod.form = exportMethodForm
 
 /**
 * @see \App\Http\Controllers\TransactionController::bulkUpdate
-* @see app/Http/Controllers/TransactionController.php:241
+* @see app/Http/Controllers/TransactionController.php:235
 * @route '/api/transactions/bulk'
 */
 export const bulkUpdate = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -178,7 +178,7 @@ bulkUpdate.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::bulkUpdate
-* @see app/Http/Controllers/TransactionController.php:241
+* @see app/Http/Controllers/TransactionController.php:235
 * @route '/api/transactions/bulk'
 */
 bulkUpdate.url = (options?: RouteQueryOptions) => {
@@ -187,7 +187,7 @@ bulkUpdate.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionController::bulkUpdate
-* @see app/Http/Controllers/TransactionController.php:241
+* @see app/Http/Controllers/TransactionController.php:235
 * @route '/api/transactions/bulk'
 */
 bulkUpdate.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -197,7 +197,7 @@ bulkUpdate.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionController::bulkUpdate
-* @see app/Http/Controllers/TransactionController.php:241
+* @see app/Http/Controllers/TransactionController.php:235
 * @route '/api/transactions/bulk'
 */
 const bulkUpdateForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -207,7 +207,7 @@ const bulkUpdateForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'
 
 /**
 * @see \App\Http\Controllers\TransactionController::bulkUpdate
-* @see app/Http/Controllers/TransactionController.php:241
+* @see app/Http/Controllers/TransactionController.php:235
 * @route '/api/transactions/bulk'
 */
 bulkUpdateForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -318,7 +318,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\TransactionController::duplicate
-* @see app/Http/Controllers/TransactionController.php:285
+* @see app/Http/Controllers/TransactionController.php:279
 * @route '/api/transactions/{id}/duplicate'
 */
 export const duplicate = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -333,7 +333,7 @@ duplicate.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::duplicate
-* @see app/Http/Controllers/TransactionController.php:285
+* @see app/Http/Controllers/TransactionController.php:279
 * @route '/api/transactions/{id}/duplicate'
 */
 duplicate.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -360,7 +360,7 @@ duplicate.url = (args: { id: string | number } | [id: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\TransactionController::duplicate
-* @see app/Http/Controllers/TransactionController.php:285
+* @see app/Http/Controllers/TransactionController.php:279
 * @route '/api/transactions/{id}/duplicate'
 */
 duplicate.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -370,7 +370,7 @@ duplicate.post = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\TransactionController::duplicate
-* @see app/Http/Controllers/TransactionController.php:285
+* @see app/Http/Controllers/TransactionController.php:279
 * @route '/api/transactions/{id}/duplicate'
 */
 const duplicateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -380,7 +380,7 @@ const duplicateForm = (args: { id: string | number } | [id: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\TransactionController::duplicate
-* @see app/Http/Controllers/TransactionController.php:285
+* @see app/Http/Controllers/TransactionController.php:279
 * @route '/api/transactions/{id}/duplicate'
 */
 duplicateForm.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -448,7 +448,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:185
+* @see app/Http/Controllers/TransactionController.php:182
 * @route '/api/transactions/{id}'
 */
 export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -463,7 +463,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:185
+* @see app/Http/Controllers/TransactionController.php:182
 * @route '/api/transactions/{id}'
 */
 update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -490,7 +490,7 @@ update.url = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:185
+* @see app/Http/Controllers/TransactionController.php:182
 * @route '/api/transactions/{id}'
 */
 update.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -500,7 +500,7 @@ update.put = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:185
+* @see app/Http/Controllers/TransactionController.php:182
 * @route '/api/transactions/{id}'
 */
 update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -510,7 +510,7 @@ update.patch = (args: { id: string | number } | [id: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:185
+* @see app/Http/Controllers/TransactionController.php:182
 * @route '/api/transactions/{id}'
 */
 const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -525,7 +525,7 @@ const updateForm = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:185
+* @see app/Http/Controllers/TransactionController.php:182
 * @route '/api/transactions/{id}'
 */
 updateForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -540,7 +540,7 @@ updateForm.put = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\TransactionController::update
-* @see app/Http/Controllers/TransactionController.php:185
+* @see app/Http/Controllers/TransactionController.php:182
 * @route '/api/transactions/{id}'
 */
 updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -557,7 +557,7 @@ update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\TransactionController::destroy
-* @see app/Http/Controllers/TransactionController.php:328
+* @see app/Http/Controllers/TransactionController.php:322
 * @route '/api/transactions/{id}'
 */
 export const destroy = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -572,7 +572,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::destroy
-* @see app/Http/Controllers/TransactionController.php:328
+* @see app/Http/Controllers/TransactionController.php:322
 * @route '/api/transactions/{id}'
 */
 destroy.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -599,7 +599,7 @@ destroy.url = (args: { id: string | number } | [id: string | number ] | string |
 
 /**
 * @see \App\Http\Controllers\TransactionController::destroy
-* @see app/Http/Controllers/TransactionController.php:328
+* @see app/Http/Controllers/TransactionController.php:322
 * @route '/api/transactions/{id}'
 */
 destroy.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -609,7 +609,7 @@ destroy.delete = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\TransactionController::destroy
-* @see app/Http/Controllers/TransactionController.php:328
+* @see app/Http/Controllers/TransactionController.php:322
 * @route '/api/transactions/{id}'
 */
 const destroyForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -624,7 +624,7 @@ const destroyForm = (args: { id: string | number } | [id: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\TransactionController::destroy
-* @see app/Http/Controllers/TransactionController.php:328
+* @see app/Http/Controllers/TransactionController.php:322
 * @route '/api/transactions/{id}'
 */
 destroyForm.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

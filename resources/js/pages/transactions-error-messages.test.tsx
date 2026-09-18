@@ -204,11 +204,11 @@ describe('Transaction Error Messages', () => {
             ).toBeInTheDocument();
         });
 
-        // Set amount to invalid value (negative)
+        // Set amount to invalid value (zero)
         const amountInput = screen.getByTestId(
             'transaction-amount-input',
         ) as HTMLInputElement;
-        fireEvent.change(amountInput, { target: { value: '-100' } });
+        fireEvent.change(amountInput, { target: { value: '0' } });
 
         // Submit form
         const submitButton = screen.getByTestId('transaction-form-submit');
@@ -218,9 +218,7 @@ describe('Transaction Error Messages', () => {
         await waitFor(() => {
             const errorElement = screen.getByTestId('amount-error');
             expect(errorElement).toBeInTheDocument();
-            expect(errorElement).toHaveTextContent(
-                'Amount must be a positive number',
-            );
+            expect(errorElement).toHaveTextContent('Amount cannot be zero');
 
             // Check that AlertCircle icon is present
             const icon = errorElement.querySelector('svg');

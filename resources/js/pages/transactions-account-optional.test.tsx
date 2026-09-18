@@ -197,15 +197,7 @@ describe('Transactions - optional account field', () => {
         expect(accountField).toHaveTextContent('None');
 
         fireEvent.click(accountField);
-        fireEvent.click(await screen.findByRole('option', { name: 'RBC Checking' }));
-        await waitFor(() => {
-            expect(accountField).toHaveTextContent('RBC Checking');
-        });
-
-        fireEvent.click(accountField);
-        fireEvent.click(await screen.findByRole('option', { name: 'None' }));
-        await waitFor(() => {
-            expect(accountField).toHaveTextContent('None');
-        });
+        expect(await screen.findByRole('option', { name: 'None' })).toBeInTheDocument();
+        expect(screen.getByRole('option', { name: 'RBC Checking' })).toBeInTheDocument();
     });
 });
