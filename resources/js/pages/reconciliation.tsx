@@ -26,11 +26,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { usePeriod } from '@/hooks/use-period';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
@@ -82,11 +78,32 @@ interface AccountingEquation extends EquationTotals {
     variance?: EquationTotals;
 }
 
+interface BalanceChangeAmounts {
+    initial_cad: number;
+    computed_cad: number;
+    difference_cad: number;
+}
+
+interface AccountBalanceChange extends BalanceChangeAmounts {
+    account_id: number;
+    account_name: string;
+    account_type: string;
+    is_asset: boolean;
+    is_liability: boolean;
+}
+
+interface BalanceChanges {
+    accounts: AccountBalanceChange[];
+    assets: BalanceChangeAmounts;
+    liabilities: BalanceChangeAmounts;
+}
+
 interface ReconciliationReport {
     period: string;
     status: 'balanced' | 'unbalanced';
     accounts: AccountReconciliation[];
     accounting_equation: AccountingEquation;
+    balance_changes?: BalanceChanges;
     income_total_cad: number;
     expenses_total_cad: number;
     net_operating_expenses_cad: number;
@@ -380,6 +397,50 @@ export default function Reconciliation() {
         </div>
     );
 
+    const renderBalanceChangeRow = (
+        label: string,
+        testId: string,
+        amounts: BalanceChangeAmounts,
+        options?: { isTotal?: boolean; rowKey?: string | number },
+    ) => (
+        <div
+            key={options?.rowKey ?? testId}
+            className={`grid grid-cols-4 gap-2 py-2 text-sm ${
+                options?.isTotal ? 'border-t font-semibold' : 'border-b'
+            }`}
+            data-testid={testId}
+        >
+            <div
+                className={
+                    options?.isTotal ? '' : 'text-muted-foreground truncate'
+                }
+            >
+                {label}
+            </div>
+            <div data-testid={`${testId}-initial`}>
+                {formatCurrency(amounts.initial_cad, 'CAD')}
+            </div>
+            <div data-testid={`${testId}-computed`}>
+                {formatCurrency(amounts.computed_cad, 'CAD')}
+            </div>
+            <div
+                className={getVarianceColorClass(amounts.difference_cad)}
+                data-testid={`${testId}-difference`}
+            >
+                {formatCurrency(amounts.difference_cad, 'CAD')}
+            </div>
+        </div>
+    );
+
+    const assetBalanceChanges =
+        report?.balance_changes?.accounts.filter(
+            (account) => account.is_asset,
+        ) ?? [];
+    const liabilityBalanceChanges =
+        report?.balance_changes?.accounts.filter(
+            (account) => account.is_liability,
+        ) ?? [];
+
     return (
         <>
             <Head title="Reconciliation" />
@@ -388,7 +449,9 @@ export default function Reconciliation() {
                     <PageTitle
                         title="Reconciliation"
                         description="Compare recorded vs. computed balances for every account, per period"
-                        leading={<ScaleIcon className="size-7 shrink-0 fill-none" />}
+                        leading={
+                            <ScaleIcon className="size-7 shrink-0 fill-none" />
+                        }
                     />
                 </div>
 
@@ -406,9 +469,7 @@ export default function Reconciliation() {
                                     id="period-input"
                                     placeholder="202501"
                                     value={period}
-                                    onChange={(e) =>
-                                        setPeriod(e.target.value)
-                                    }
+                                    onChange={(e) => setPeriod(e.target.value)}
                                     className="w-40"
                                 />
                             </div>
@@ -440,9 +501,7 @@ export default function Reconciliation() {
                             )}
                         </form>
                         {error && (
-                            <p className="mt-3 text-sm text-red-600">
-                                {error}
-                            </p>
+                            <p className="mt-3 text-sm text-red-600">{error}</p>
                         )}
                     </CardContent>
                 </Card>
@@ -486,7 +545,7 @@ export default function Reconciliation() {
                         <CardContent>
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <div className="grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold text-muted-foreground">
+                                    <div className="text-muted-foreground grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold">
                                         <div>CAD</div>
                                         <div>Recorded</div>
                                         <div>Computed</div>
@@ -540,7 +599,7 @@ export default function Reconciliation() {
                                     </p>
                                     <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">
+                                            <p className="text-muted-foreground text-sm">
                                                 Income
                                             </p>
                                             <p
@@ -554,7 +613,7 @@ export default function Reconciliation() {
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">
+                                            <p className="text-muted-foreground text-sm">
                                                 Total Disbursements
                                             </p>
                                             <p
@@ -568,7 +627,7 @@ export default function Reconciliation() {
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">
+                                            <p className="text-muted-foreground text-sm">
                                                 Net Operating Expenses
                                             </p>
                                             <p
@@ -582,6 +641,75 @@ export default function Reconciliation() {
                                             </p>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {report && report.balance_changes && (
+                    <Card data-testid="balance-changes-card">
+                        <CardHeader>
+                            <SubsectionHeading data-testid="balance-changes-heading">
+                                Balance Changes
+                            </SubsectionHeading>
+                            <CardDescription>
+                                Difference between last recorded balance and
+                                computed end value in CAD equivalent for{' '}
+                                {report.period}.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-6 md:grid-cols-2">
+                                <div data-testid="balance-changes-assets">
+                                    <p className="mb-2 text-sm font-medium">
+                                        Assets
+                                    </p>
+                                    <div className="text-muted-foreground grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold">
+                                        <div>Account</div>
+                                        <div>Initial</div>
+                                        <div>Computed</div>
+                                        <div>Difference</div>
+                                    </div>
+                                    {assetBalanceChanges.map((account) =>
+                                        renderBalanceChangeRow(
+                                            account.account_name,
+                                            `balance-changes-row-${account.account_id}`,
+                                            account,
+                                            { rowKey: account.account_id },
+                                        ),
+                                    )}
+                                    {renderBalanceChangeRow(
+                                        'Total assets',
+                                        'balance-changes-assets-total',
+                                        report.balance_changes.assets,
+                                        { isTotal: true },
+                                    )}
+                                </div>
+                                <div data-testid="balance-changes-liabilities">
+                                    <p className="mb-2 text-sm font-medium">
+                                        Liabilities
+                                    </p>
+                                    <div className="text-muted-foreground grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold">
+                                        <div>Account</div>
+                                        <div>Initial</div>
+                                        <div>Computed</div>
+                                        <div>Difference</div>
+                                    </div>
+                                    {liabilityBalanceChanges.map((account) =>
+                                        renderBalanceChangeRow(
+                                            account.account_name,
+                                            `balance-changes-row-${account.account_id}`,
+                                            account,
+                                            { rowKey: account.account_id },
+                                        ),
+                                    )}
+                                    {renderBalanceChangeRow(
+                                        'Total liabilities',
+                                        'balance-changes-liabilities-total',
+                                        report.balance_changes.liabilities,
+                                        { isTotal: true },
+                                    )}
                                 </div>
                             </div>
                         </CardContent>
@@ -643,7 +771,7 @@ export default function Reconciliation() {
                                                                     account,
                                                                 )}
                                                             </p>
-                                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                            <p className="text-muted-foreground mt-1 text-xs">
                                                                 Variance exceeds
                                                                 $
                                                                 {VARIANCE_WARNING_THRESHOLD.toFixed(
@@ -711,7 +839,7 @@ export default function Reconciliation() {
                                             </AlertDescription>
                                         </Alert>
                                     )}
-                                <div className="grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold text-muted-foreground">
+                                <div className="text-muted-foreground grid grid-cols-4 gap-2 border-b pb-2 text-xs font-semibold">
                                     <div>Currency</div>
                                     <div>Recorded</div>
                                     <div>Computed</div>
@@ -739,7 +867,7 @@ export default function Reconciliation() {
                                     account.is_reviewed &&
                                     account.review_note && (
                                         <p
-                                            className="mt-3 text-sm text-muted-foreground"
+                                            className="text-muted-foreground mt-3 text-sm"
                                             data-testid={`variance-review-note-${account.account_id}`}
                                         >
                                             Review note: {account.review_note}
@@ -816,7 +944,7 @@ export default function Reconciliation() {
                             </div>
                             {acknowledgeError && (
                                 <p
-                                    className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400"
+                                    className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
                                     role="alert"
                                     data-testid="acknowledge-error"
                                 >

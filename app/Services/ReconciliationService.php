@@ -39,6 +39,7 @@ class ReconciliationService
      * Also includes:
      * - Accounting equation check rolled up from account conciliations
      *   (Assets = Liabilities + Equity in CAD equivalent of recorded and computed balances)
+     * - Balance changes: last recorded (initial) vs computed end value per account in CAD
      * - Income and expense totals for the period
      * - Per-account variance acknowledgment status
      *
@@ -47,6 +48,7 @@ class ReconciliationService
      *     status: string,
      *     accounts: array<int, array<string, mixed>>,
      *     accounting_equation: array<string, mixed>,
+     *     balance_changes: array<string, mixed>,
      *     income_total_cad: float,
      *     expenses_total_cad: float,
      *     net_operating_expenses_cad: float
@@ -82,7 +84,9 @@ class ReconciliationService
 
         $accountsBalanced = collect($results)->every(fn (array $result) => $result['is_balanced']);
 
-        $equation = $this->checkAccountingEquation($results, $period);
+        $exchangeRate = $this->resolveExchangeRate($period);
+        $equation = $this->checkAccountingEquation($results, $exchangeRate);
+        $balanceChanges = $this->buildBalanceChanges($results, $exchangeRate);
 
         // Get income and expenses
         $financialSummary = $this->financialSummaryService->getSummary($period);
@@ -92,6 +96,7 @@ class ReconciliationService
             'status' => $accountsBalanced && $equation['is_balanced'] ? 'balanced' : 'unbalanced',
             'accounts' => $results,
             'accounting_equation' => $equation,
+            'balance_changes' => $balanceChanges,
             'income_total_cad' => round((float) $financialSummary['total_income_cad'], 2),
             'expenses_total_cad' => round($financialSummary['total_recorded_disbursements_cad'], 2),
             'net_operating_expenses_cad' => round($financialSummary['net_operating_expenses_cad'], 2),
@@ -185,10 +190,8 @@ class ReconciliationService
      *     variance: array{assets_cad: float, liabilities_cad: float, equity_cad: float}
      * }
      */
-    private function checkAccountingEquation(array $accountResults, string $period): array
+    private function checkAccountingEquation(array $accountResults, ExchangeRate $exchangeRate): array
     {
-        $exchangeRate = $this->resolveExchangeRate($period);
-
         $recordedAssets = 0.0;
         $computedAssets = 0.0;
         $recordedLiabilities = 0.0;
@@ -236,6 +239,83 @@ class ReconciliationService
                 'assets_cad' => round($recordedAssets - $computedAssets, 2),
                 'liabilities_cad' => round($recordedLiabilities - $computedLiabilities, 2),
                 'equity_cad' => round($recordedEquity - $computedEquity, 2),
+            ],
+        ];
+    }
+
+    /**
+     * Per-account CAD equivalent of last recorded (initial) vs computed end value.
+     *
+     * Initial is the most recent recorded balance strictly before this period
+     * (or this period's recorded balance when none exists). Computed is that
+     * baseline plus this period's signed transaction deltas. USD and COP are
+     * converted to CAD with the same rates as the accounting equation.
+     * Liability amounts use absolute values so totals match equation presentation.
+     *
+     * @param  list<array<string, mixed>>  $accountResults
+     * @return array{
+     *     accounts: list<array<string, mixed>>,
+     *     assets: array{initial_cad: float, computed_cad: float, difference_cad: float},
+     *     liabilities: array{initial_cad: float, computed_cad: float, difference_cad: float}
+     * }
+     */
+    private function buildBalanceChanges(array $accountResults, ExchangeRate $exchangeRate): array
+    {
+        $accounts = [];
+        $assetsInitial = 0.0;
+        $assetsComputed = 0.0;
+        $liabilitiesInitial = 0.0;
+        $liabilitiesComputed = 0.0;
+
+        foreach ($accountResults as $result) {
+            $initialCad = $this->amountsCadEquivalent($result['initial'], $exchangeRate);
+            $computedCad = $this->amountsCadEquivalent($result['computed'], $exchangeRate);
+
+            if ($result['is_liability']) {
+                $initialCad = abs($initialCad);
+                $computedCad = abs($computedCad);
+            }
+
+            $initialCad = round($initialCad, 2);
+            $computedCad = round($computedCad, 2);
+            $differenceCad = round($computedCad - $initialCad, 2);
+
+            $accounts[] = [
+                'account_id' => $result['account_id'],
+                'account_name' => $result['account_name'],
+                'account_type' => $result['account_type'],
+                'is_asset' => $result['is_asset'],
+                'is_liability' => $result['is_liability'],
+                'initial_cad' => $initialCad,
+                'computed_cad' => $computedCad,
+                'difference_cad' => $differenceCad,
+            ];
+
+            if ($result['is_asset']) {
+                $assetsInitial += $initialCad;
+                $assetsComputed += $computedCad;
+            } elseif ($result['is_liability']) {
+                $liabilitiesInitial += $initialCad;
+                $liabilitiesComputed += $computedCad;
+            }
+        }
+
+        $assetsInitial = round($assetsInitial, 2);
+        $assetsComputed = round($assetsComputed, 2);
+        $liabilitiesInitial = round($liabilitiesInitial, 2);
+        $liabilitiesComputed = round($liabilitiesComputed, 2);
+
+        return [
+            'accounts' => $accounts,
+            'assets' => [
+                'initial_cad' => $assetsInitial,
+                'computed_cad' => $assetsComputed,
+                'difference_cad' => round($assetsComputed - $assetsInitial, 2),
+            ],
+            'liabilities' => [
+                'initial_cad' => $liabilitiesInitial,
+                'computed_cad' => $liabilitiesComputed,
+                'difference_cad' => round($liabilitiesComputed - $liabilitiesInitial, 2),
             ],
         ];
     }
@@ -345,6 +425,11 @@ class ReconciliationService
             'is_asset' => $account->isAsset(),
             'is_liability' => $account->isLiability(),
             'has_recorded_balance' => (bool) $recordedBalance,
+            'initial' => [
+                'cad' => round($baseCad, 2),
+                'usd' => round($baseUsd, 2),
+                'cop' => round($baseCop, 2),
+            ],
             'recorded' => [
                 'cad' => round($recordedCad, 2),
                 'usd' => round($recordedUsd, 2),

@@ -62,6 +62,7 @@ class ReconciliationTest extends TestCase
 
         $this->assertNotNull($accountData);
         $this->assertEquals(1000, $accountData['recorded']['cad']);
+        $this->assertEquals(1000, $accountData['initial']['cad']);
         $this->assertEquals(900, $accountData['computed']['cad']);
         $this->assertEquals(100, $accountData['variance']['cad']);
         $this->assertFalse($accountData['is_balanced']);
@@ -120,6 +121,7 @@ class ReconciliationTest extends TestCase
             ->firstWhere('account_id', $account->id);
 
         $this->assertEquals(850, $accountData['recorded']['cad']);
+        $this->assertEquals(900, $accountData['initial']['cad']);
         $this->assertEquals(850, $accountData['computed']['cad']);
         $this->assertEquals(0, $accountData['variance']['cad']);
         $this->assertTrue($accountData['is_balanced']);
@@ -511,6 +513,180 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(133.33, $equation['variance']['equity_cad']);
         $this->assertEquals(0, $equation['residual_cad']);
         $this->assertTrue($equation['is_balanced']);
+    }
+
+    public function test_reconciliation_includes_balance_changes_in_cad_equivalent(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $checking = Account::create([
+            'name' => 'Checking',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $savings = Account::create([
+            'name' => 'Savings',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $creditCard = Account::create([
+            'name' => 'Credit Card',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $category = Category::create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+            'is_debt_category' => false,
+            'is_active' => true,
+        ]);
+
+        ExchangeRate::create([
+            'period' => '202502',
+            'usd_cop' => 3750,
+            'usd_cad' => 1.5,
+            'cad_cop' => 2500,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $checking->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 150,
+            'recorded_balance_cop' => 250000,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $savings->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 500,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $creditCard->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 400,
+            'recorded_balance_usd' => 60,
+            'recorded_balance_cop' => 50000,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $checking->id,
+            'period' => '202502',
+            'recorded_balance_cad' => 800,
+            'recorded_balance_usd' => 150,
+            'recorded_balance_cop' => 250000,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $savings->id,
+            'period' => '202502',
+            'recorded_balance_cad' => 500,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $creditCard->id,
+            'period' => '202502',
+            'recorded_balance_cad' => 450,
+            'recorded_balance_usd' => 60,
+            'recorded_balance_cop' => 50000,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-10',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $checking->id,
+            'amount_cad' => 100,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-12',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $category->id,
+            'account_id' => $creditCard->id,
+            'amount_cad' => 50,
+        ]);
+
+        $response = $this->getJson('/api/periods/202502/reconciliation');
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [
+                'balance_changes' => [
+                    'accounts' => [
+                        [
+                            'account_id',
+                            'account_name',
+                            'account_type',
+                            'is_asset',
+                            'is_liability',
+                            'initial_cad',
+                            'computed_cad',
+                            'difference_cad',
+                        ],
+                    ],
+                    'assets' => [
+                        'initial_cad',
+                        'computed_cad',
+                        'difference_cad',
+                    ],
+                    'liabilities' => [
+                        'initial_cad',
+                        'computed_cad',
+                        'difference_cad',
+                    ],
+                ],
+            ],
+        ]);
+
+        $changes = $response->json('data.balance_changes');
+        $checkingChange = collect($changes['accounts'])->firstWhere('account_id', $checking->id);
+        $savingsChange = collect($changes['accounts'])->firstWhere('account_id', $savings->id);
+        $creditChange = collect($changes['accounts'])->firstWhere('account_id', $creditCard->id);
+
+        // CAD equivalent: USD / usd_cad, COP / cad_cop (1.5 and 2500).
+        // Checking initial: 1000 + 150/1.5 + 250000/2500 = 1200
+        // Checking computed: 900 + 100 + 100 = 1100, difference -100
+        $this->assertNotNull($checkingChange);
+        $this->assertTrue($checkingChange['is_asset']);
+        $this->assertEquals(1200.0, $checkingChange['initial_cad']);
+        $this->assertEquals(1100.0, $checkingChange['computed_cad']);
+        $this->assertEquals(-100.0, $checkingChange['difference_cad']);
+
+        $this->assertNotNull($savingsChange);
+        $this->assertEquals(500.0, $savingsChange['initial_cad']);
+        $this->assertEquals(500.0, $savingsChange['computed_cad']);
+        $this->assertEquals(0.0, $savingsChange['difference_cad']);
+
+        // Credit card initial: abs(400 + 60/1.5 + 50000/2500) = 460
+        // Charge +50 CAD → computed abs(450 + 40 + 20) = 510, difference 50
+        $this->assertNotNull($creditChange);
+        $this->assertTrue($creditChange['is_liability']);
+        $this->assertEquals(460.0, $creditChange['initial_cad']);
+        $this->assertEquals(510.0, $creditChange['computed_cad']);
+        $this->assertEquals(50.0, $creditChange['difference_cad']);
+
+        $this->assertEquals(1700.0, $changes['assets']['initial_cad']);
+        $this->assertEquals(1600.0, $changes['assets']['computed_cad']);
+        $this->assertEquals(-100.0, $changes['assets']['difference_cad']);
+        $this->assertEquals(460.0, $changes['liabilities']['initial_cad']);
+        $this->assertEquals(510.0, $changes['liabilities']['computed_cad']);
+        $this->assertEquals(50.0, $changes['liabilities']['difference_cad']);
     }
 
     public function test_reconciliation_detects_unbalanced_accounting_equation(): void

@@ -129,5 +129,31 @@ test('reconciliation: computed balance reflects linked transactions', async ({
     await expect(page.getByTestId('equation-currency-USD')).toHaveCount(0);
     await expect(page.getByTestId('equation-currency-COP')).toHaveCount(0);
 
+    const changesCard = page.getByTestId('balance-changes-card');
+    await changesCard.scrollIntoViewIfNeeded();
+    await expect(changesCard).toBeVisible();
+    await expect(changesCard).toContainText('CAD equivalent');
+    await expect(page.getByTestId('balance-changes-heading')).toContainText(
+        'Balance Changes',
+    );
+    await expect(
+        page.getByTestId(`balance-changes-row-${account.id}`),
+    ).toContainText('Test Bank');
+    await expect(
+        page.getByTestId(`balance-changes-row-${account.id}-initial`),
+    ).toContainText('1,000');
+    await expect(
+        page.getByTestId(`balance-changes-row-${account.id}-computed`),
+    ).toContainText('900');
+    await expect(
+        page.getByTestId(`balance-changes-row-${account.id}-difference`),
+    ).toContainText('100');
+    await expect(
+        page.getByTestId('balance-changes-assets-total-difference'),
+    ).toContainText('100');
+    await expect(
+        page.getByTestId('balance-changes-liabilities-total-difference'),
+    ).toContainText('0.00');
+
     expect(consoleErrors).toEqual([]);
 });

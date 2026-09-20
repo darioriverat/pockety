@@ -6,7 +6,9 @@ import Reconciliation from './reconciliation';
 vi.mock('@inertiajs/react', () => ({
     Head: () => null,
     Link: ({ children, href, ...props }: any) => (
-        <a href={href} {...props}>{children}</a>
+        <a href={href} {...props}>
+            {children}
+        </a>
     ),
 }));
 
@@ -74,7 +76,11 @@ describe('Reconciliation - Variance Warnings', () => {
     const mockReport = {
         period: '202501',
         status: 'unbalanced' as const,
-        accounts: [mockAccountWithLargeVariance, mockAccountWithSmallVariance, mockAccountBalanced],
+        accounts: [
+            mockAccountWithLargeVariance,
+            mockAccountWithSmallVariance,
+            mockAccountBalanced,
+        ],
         accounting_equation: {
             assets_cad: 1485,
             liabilities_cad: 200,
@@ -213,7 +219,9 @@ describe('Reconciliation - Variance Warnings', () => {
         // Should show investigate link for unbalanced account
         const investigateLink = screen.queryByTestId('investigate-link-1');
         expect(investigateLink).toBeTruthy();
-        expect(investigateLink?.getAttribute('href')).toBe('/accounts/1?period=202501');
+        expect(investigateLink?.getAttribute('href')).toBe(
+            '/accounts/1?period=202501',
+        );
     });
 
     it('does not show investigate transactions link for balanced accounts', async () => {
@@ -361,11 +369,16 @@ describe('Reconciliation - Variance Color Highlighting', () => {
         await screen.findByText('Account With Negative Variance');
 
         const accountCard = screen.getByTestId('account-reconciliation-100');
-        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const varianceAmounts = accountCard.querySelectorAll(
+            '[data-testid="variance-amount"]',
+        );
         const cadVariance = varianceAmounts[0];
 
         expect(cadVariance).toHaveClass('text-red-600');
-        expect(cadVariance).toHaveAttribute('data-variance-state', 'negative-significant');
+        expect(cadVariance).toHaveAttribute(
+            'data-variance-state',
+            'negative-significant',
+        );
     });
 
     it('displays positive significant variance in amber/yellow', async () => {
@@ -395,11 +408,16 @@ describe('Reconciliation - Variance Color Highlighting', () => {
         await screen.findByText('Account With Positive Variance');
 
         const accountCard = screen.getByTestId('account-reconciliation-101');
-        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const varianceAmounts = accountCard.querySelectorAll(
+            '[data-testid="variance-amount"]',
+        );
         const cadVariance = varianceAmounts[0];
 
         expect(cadVariance).toHaveClass('text-amber-600');
-        expect(cadVariance).toHaveAttribute('data-variance-state', 'positive-significant');
+        expect(cadVariance).toHaveAttribute(
+            'data-variance-state',
+            'positive-significant',
+        );
     });
 
     it('displays zero variance in green', async () => {
@@ -429,7 +447,9 @@ describe('Reconciliation - Variance Color Highlighting', () => {
         await screen.findByText('Account With Zero Variance');
 
         const accountCard = screen.getByTestId('account-reconciliation-102');
-        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const varianceAmounts = accountCard.querySelectorAll(
+            '[data-testid="variance-amount"]',
+        );
         const cadVariance = varianceAmounts[0];
 
         expect(cadVariance).toHaveClass('text-green-600');
@@ -463,7 +483,9 @@ describe('Reconciliation - Variance Color Highlighting', () => {
         await screen.findByText('Account With Minor Variance');
 
         const accountCard = screen.getByTestId('account-reconciliation-103');
-        const varianceAmounts = accountCard.querySelectorAll('[data-testid="variance-amount"]');
+        const varianceAmounts = accountCard.querySelectorAll(
+            '[data-testid="variance-amount"]',
+        );
         const cadVariance = varianceAmounts[0];
 
         expect(cadVariance).toHaveClass('text-muted-foreground');
@@ -518,9 +540,9 @@ describe('Reconciliation - Variance Acknowledgment', () => {
         fireEvent.click(screen.getByText('View Reconciliation'));
         await screen.findByText('Ack Bank');
 
-        expect(
-            screen.getByTestId('acknowledge-variance-10'),
-        ).toHaveTextContent('Acknowledge Variance');
+        expect(screen.getByTestId('acknowledge-variance-10')).toHaveTextContent(
+            'Acknowledge Variance',
+        );
     });
 
     it('shows reviewed badge and note after acknowledgment', async () => {
@@ -594,7 +616,9 @@ describe('Reconciliation - Variance Acknowledgment', () => {
         fireEvent.click(screen.getByTestId('acknowledge-submit'));
 
         await waitFor(() => {
-            expect(screen.getByTestId('variance-reviewed-10')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('variance-reviewed-10'),
+            ).toBeInTheDocument();
         });
         expect(screen.getByTestId('variance-review-note-10')).toHaveTextContent(
             'Bank fee pending',
@@ -668,17 +692,197 @@ describe('Reconciliation - Accounting Equation', () => {
         fireEvent.click(screen.getByText('View Reconciliation'));
         await screen.findByText('Test Bank');
 
-        expect(screen.getByTestId('assets-recorded')).toHaveTextContent('1,500');
+        expect(screen.getByTestId('assets-recorded')).toHaveTextContent(
+            '1,500',
+        );
         expect(screen.getByTestId('assets-total')).toHaveTextContent('1,350');
         expect(screen.getByTestId('assets-variance')).toHaveTextContent('150');
-        expect(screen.getByTestId('liabilities-total')).toHaveTextContent('615');
+        expect(screen.getByTestId('liabilities-total')).toHaveTextContent(
+            '615',
+        );
         expect(screen.getByTestId('equity-recorded')).toHaveTextContent('885');
         expect(screen.getByTestId('equity-total')).toHaveTextContent('735');
         expect(screen.getByTestId('equity-variance')).toHaveTextContent('150');
-        expect(screen.queryByTestId('equation-currency-USD')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('equation-currency-COP')).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId('equation-currency-USD'),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId('equation-currency-COP'),
+        ).not.toBeInTheDocument();
         expect(
             screen.getByTestId('accounting-equation-card'),
         ).toHaveTextContent('CAD equivalent');
+    });
+});
+
+describe('Reconciliation - Balance Changes', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('shows per-account CAD differences and asset/liability totals', async () => {
+        const report = {
+            period: '202502',
+            status: 'unbalanced' as const,
+            accounts: [
+                {
+                    account_id: 1,
+                    account_name: 'Checking',
+                    account_type: 'bank',
+                    is_asset: true,
+                    is_liability: false,
+                    has_recorded_balance: true,
+                    recorded: { cad: 800, usd: 150, cop: 250000 },
+                    computed: { cad: 900, usd: 150, cop: 250000 },
+                    variance: { cad: -100, usd: 0, cop: 0 },
+                    is_balanced: false,
+                    is_reviewed: false,
+                    review_note: null,
+                    reviewed_at: null,
+                },
+                {
+                    account_id: 2,
+                    account_name: 'Savings',
+                    account_type: 'bank',
+                    is_asset: true,
+                    is_liability: false,
+                    has_recorded_balance: true,
+                    recorded: { cad: 500, usd: 0, cop: 0 },
+                    computed: { cad: 500, usd: 0, cop: 0 },
+                    variance: { cad: 0, usd: 0, cop: 0 },
+                    is_balanced: true,
+                    is_reviewed: false,
+                    review_note: null,
+                    reviewed_at: null,
+                },
+                {
+                    account_id: 3,
+                    account_name: 'Credit Card',
+                    account_type: 'liability',
+                    is_asset: false,
+                    is_liability: true,
+                    has_recorded_balance: true,
+                    recorded: { cad: 450, usd: 60, cop: 50000 },
+                    computed: { cad: 450, usd: 60, cop: 50000 },
+                    variance: { cad: 0, usd: 0, cop: 0 },
+                    is_balanced: true,
+                    is_reviewed: false,
+                    review_note: null,
+                    reviewed_at: null,
+                },
+            ],
+            accounting_equation: {
+                assets_cad: 1600,
+                liabilities_cad: 510,
+                equity_cad: 1090,
+                residual_cad: 0,
+                is_balanced: true,
+            },
+            balance_changes: {
+                accounts: [
+                    {
+                        account_id: 1,
+                        account_name: 'Checking',
+                        account_type: 'bank',
+                        is_asset: true,
+                        is_liability: false,
+                        initial_cad: 1200,
+                        computed_cad: 1100,
+                        difference_cad: -100,
+                    },
+                    {
+                        account_id: 2,
+                        account_name: 'Savings',
+                        account_type: 'bank',
+                        is_asset: true,
+                        is_liability: false,
+                        initial_cad: 500,
+                        computed_cad: 500,
+                        difference_cad: 0,
+                    },
+                    {
+                        account_id: 3,
+                        account_name: 'Credit Card',
+                        account_type: 'liability',
+                        is_asset: false,
+                        is_liability: true,
+                        initial_cad: 460,
+                        computed_cad: 510,
+                        difference_cad: 50,
+                    },
+                ],
+                assets: {
+                    initial_cad: 1700,
+                    computed_cad: 1600,
+                    difference_cad: -100,
+                },
+                liabilities: {
+                    initial_cad: 460,
+                    computed_cad: 510,
+                    difference_cad: 50,
+                },
+            },
+            income_total_cad: 0,
+            expenses_total_cad: 150,
+            net_operating_expenses_cad: 150,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByTestId('balance-changes-card');
+
+        const card = screen.getByTestId('balance-changes-card');
+        expect(screen.getByTestId('balance-changes-heading')).toHaveTextContent(
+            'Balance Changes',
+        );
+        expect(card).toHaveTextContent('CAD equivalent');
+        expect(card).toHaveTextContent('202502');
+
+        expect(screen.getByTestId('balance-changes-row-1')).toHaveTextContent(
+            'Checking',
+        );
+        expect(
+            screen.getByTestId('balance-changes-row-1-initial'),
+        ).toHaveTextContent('1,200');
+        expect(
+            screen.getByTestId('balance-changes-row-1-computed'),
+        ).toHaveTextContent('1,100');
+        expect(
+            screen.getByTestId('balance-changes-row-1-difference'),
+        ).toHaveTextContent('100');
+
+        expect(screen.getByTestId('balance-changes-row-2')).toHaveTextContent(
+            'Savings',
+        );
+        expect(screen.getByTestId('balance-changes-row-3')).toHaveTextContent(
+            'Credit Card',
+        );
+        expect(
+            screen.getByTestId('balance-changes-row-3-difference'),
+        ).toHaveTextContent('50');
+
+        expect(
+            screen.getByTestId('balance-changes-assets-total-difference'),
+        ).toHaveTextContent('100');
+        expect(
+            screen.getByTestId('balance-changes-liabilities-total-difference'),
+        ).toHaveTextContent('50');
+        expect(screen.getByTestId('balance-changes-assets')).toHaveTextContent(
+            'Total assets',
+        );
+        expect(
+            screen.getByTestId('balance-changes-liabilities'),
+        ).toHaveTextContent('Total liabilities');
+        expect(
+            screen.queryByTestId('equation-currency-USD'),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId('equation-currency-COP'),
+        ).not.toBeInTheDocument();
     });
 });
