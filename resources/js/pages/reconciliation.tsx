@@ -759,12 +759,6 @@ export default function Reconciliation() {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <p
-                                className="bg-muted/50 mb-4 rounded-md px-3 py-2 font-mono text-sm"
-                                data-testid="records-check-formula"
-                            >
-                                {report.records_check.formula}
-                            </p>
                             <div className="max-w-xl space-y-0">
                                 <div
                                     className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"

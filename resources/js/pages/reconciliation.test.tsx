@@ -952,8 +952,11 @@ describe('Reconciliation - Records Check', () => {
         expect(screen.getByTestId('records-check-heading')).toHaveTextContent(
             'Records Check',
         );
-        expect(screen.getByTestId('records-check-formula')).toHaveTextContent(
-            'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+        expect(
+            screen.queryByTestId('records-check-formula'),
+        ).not.toBeInTheDocument();
+        expect(screen.getByTestId('records-check-card')).not.toHaveTextContent(
+            'Income − Net Operating Expenses',
         );
         expect(screen.getByTestId('records-check-income')).toHaveTextContent(
             '1,000',

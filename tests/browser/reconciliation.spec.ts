@@ -161,12 +161,13 @@ test('reconciliation: computed balance reflects linked transactions', async ({
     await expect(page.getByTestId('records-check-heading')).toContainText(
         'Records Check',
     );
-    await expect(page.getByTestId('records-check-formula')).toContainText(
-        'Income − Net Operating Expenses',
-    );
-    await expect(page.getByTestId('records-check-formula')).toContainText(
-        'Down payments + Interest',
-    );
+    await expect(page.getByTestId('records-check-formula')).toHaveCount(0);
+    await expect(page.getByTestId('records-check-income')).toBeVisible();
+    await expect(
+        page.getByTestId('records-check-net-operating-expenses'),
+    ).toBeVisible();
+    await expect(page.getByTestId('records-check-down-payments')).toBeVisible();
+    await expect(page.getByTestId('records-check-interest')).toBeVisible();
     await expect(page.getByTestId('records-check-result')).toHaveText('$0.00');
     await expect(page.getByTestId('records-check-status')).toContainText(
         'Closes',
