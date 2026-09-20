@@ -193,7 +193,7 @@ class CategoryActualsTest extends TestCase
             'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
-            'amount_usd' => 40.00, // 40 * 0.75 = 30 CAD
+            'amount_usd' => 40.00, // 40 / 0.75 = 53.33 CAD
             'amount_cop' => 6000.00, // 6000 / 3000 = 2 CAD
             'comments' => 'Multi-currency',
         ]);
@@ -202,7 +202,7 @@ class CategoryActualsTest extends TestCase
 
         $response->assertOk();
         $c001 = collect($response->json('data.categories'))->firstWhere('category_code', 'C001');
-        $this->assertEquals(132.0, $c001['actual_cad']);
+        $this->assertEquals(155.33, $c001['actual_cad']);
     }
 
     public function test_category_actuals_rejects_invalid_period_format(): void

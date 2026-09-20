@@ -207,8 +207,8 @@ class BalanceSheetTest extends TestCase
         $response = $this->getJson('/api/balance-sheet?period=202501');
 
         $response->assertOk();
-        // 100 USD * 0.75 = 75 CAD
-        $response->assertJsonPath('data.total_assets.cad', 75);
+        // 100 USD / 0.75 = 133.33 CAD
+        $response->assertJsonPath('data.total_assets.cad', 133.33);
     }
 
     public function test_period_query_is_required_for_query_string_endpoint(): void

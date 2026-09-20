@@ -174,7 +174,7 @@ class ReportsTest extends TestCase
         ExchangeRate::create([
             'period' => $period,
             'usd_cop' => 4400,
-            'usd_cad' => 1.33, // 1 USD = 1.33 CAD
+            'usd_cad' => 1.33,
             'cad_cop' => 3300, // 1 CAD = 3300 COP
         ]);
 
@@ -193,7 +193,7 @@ class ReportsTest extends TestCase
             'description' => 'USD Bonus',
             'line_number' => 2,
             'amount_cad' => 0,
-            'amount_usd' => 1000.00, // Should convert to 1330 CAD
+            'amount_usd' => 1000.00, // Should convert to 751.88 CAD (1000 / 1.33)
             'amount_cop' => 0,
         ]);
 
@@ -219,9 +219,9 @@ class ReportsTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('reports-ytd')
             ->where('ytd_totals.year', $year)
-            ->where('ytd_totals.ytd_income_cad', 4330) // 3000 CAD + 1330 CAD (from USD)
+            ->where('ytd_totals.ytd_income_cad', 3751.88) // 3000 CAD + 751.88 CAD (from USD)
             ->where('ytd_totals.ytd_expenses_cad', 500) // 500 CAD (from COP)
-            ->where('ytd_totals.ytd_net_cad', 3830)
+            ->where('ytd_totals.ytd_net_cad', 3251.88)
         );
     }
 

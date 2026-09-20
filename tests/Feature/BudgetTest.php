@@ -288,7 +288,7 @@ class BudgetTest extends TestCase
             'is_recurring' => false,
         ]);
 
-        // USD 200 → 200 * 0.75 = 150 CAD
+        // USD 200 → 200 / 0.75 = 266.67 CAD
         Transaction::create([
             'date' => '2025-01-06',
             'period' => '202501',
@@ -318,9 +318,9 @@ class BudgetTest extends TestCase
 
         $row = collect($response->json('data'))->firstWhere('category_code', 'C001');
 
-        // 300 + 150 + 166.67 = 616.67
-        $this->assertEquals(616.67, $row['actual_cad']);
-        $this->assertEquals(-183.33, $row['variance_cad']);
+        // 300 + 266.67 + 166.67 = 733.34
+        $this->assertEquals(733.34, $row['actual_cad']);
+        $this->assertEquals(-66.66, $row['variance_cad']);
         $this->assertFalse($row['is_over_budget']);
     }
 

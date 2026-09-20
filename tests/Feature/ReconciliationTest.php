@@ -492,23 +492,23 @@ class ReconciliationTest extends TestCase
 
         $equation = $response->json('data.accounting_equation');
 
-        // CAD equivalent uses period rates: 1 USD = 1.5 CAD, 1 CAD = 2500 COP.
-        // Recorded assets: 1000 + 200*1.5 + 500000/2500 = 1500
-        // Recorded liabilities: abs(-500 + -50*1.5 + -100000/2500) = 615
-        $this->assertEquals(1500, $equation['recorded']['assets_cad']);
-        $this->assertEquals(615, $equation['recorded']['liabilities_cad']);
-        $this->assertEquals(885, $equation['recorded']['equity_cad']);
+        // CAD equivalent: USD / usd_cad, COP / cad_cop (1.5 and 2500).
+        // Recorded assets: 1000 + 200/1.5 + 500000/2500 = 1333.33
+        // Recorded liabilities: abs(-500 + -50/1.5 + -100000/2500) = 573.33
+        $this->assertEquals(1333.33, $equation['recorded']['assets_cad']);
+        $this->assertEquals(573.33, $equation['recorded']['liabilities_cad']);
+        $this->assertEquals(760.0, $equation['recorded']['equity_cad']);
 
-        // Computed includes operations: 900 + 180*1.5 + 450000/2500 = 1350
-        $this->assertEquals(1350, $equation['assets_cad']);
-        $this->assertEquals(615, $equation['liabilities_cad']);
-        $this->assertEquals(735, $equation['equity_cad']);
-        $this->assertEquals(1350, $equation['computed']['assets_cad']);
-        $this->assertEquals(615, $equation['computed']['liabilities_cad']);
-        $this->assertEquals(735, $equation['computed']['equity_cad']);
-        $this->assertEquals(150, $equation['variance']['assets_cad']);
+        // Computed includes operations: 900 + 180/1.5 + 450000/2500 = 1200
+        $this->assertEquals(1200, $equation['assets_cad']);
+        $this->assertEquals(573.33, $equation['liabilities_cad']);
+        $this->assertEquals(626.67, $equation['equity_cad']);
+        $this->assertEquals(1200, $equation['computed']['assets_cad']);
+        $this->assertEquals(573.33, $equation['computed']['liabilities_cad']);
+        $this->assertEquals(626.67, $equation['computed']['equity_cad']);
+        $this->assertEquals(133.33, $equation['variance']['assets_cad']);
         $this->assertEquals(0, $equation['variance']['liabilities_cad']);
-        $this->assertEquals(150, $equation['variance']['equity_cad']);
+        $this->assertEquals(133.33, $equation['variance']['equity_cad']);
         $this->assertEquals(0, $equation['residual_cad']);
         $this->assertTrue($equation['is_balanced']);
     }
