@@ -46,7 +46,7 @@ class ExchangeRate extends Model
      */
     public function usdToCad(float $amount): float
     {
-        return round($amount * (float) $this->usd_cad, 2);
+        return round($amount / (float) $this->usd_cad, 2);
     }
 
     /**
