@@ -661,12 +661,12 @@ class ReconciliationTest extends TestCase
 
         // CAD equivalent: USD / usd_cad, COP / cad_cop (1.5 and 2500).
         // Checking initial: 1000 + 150/1.5 + 250000/2500 = 1200
-        // Checking computed: 900 + 100 + 100 = 1100, difference -100
+        // Checking computed: 900 + 100 + 100 = 1100, difference 100 (initial − computed)
         $this->assertNotNull($checkingChange);
         $this->assertTrue($checkingChange['is_asset']);
         $this->assertEquals(1200.0, $checkingChange['initial_cad']);
         $this->assertEquals(1100.0, $checkingChange['computed_cad']);
-        $this->assertEquals(-100.0, $checkingChange['difference_cad']);
+        $this->assertEquals(100.0, $checkingChange['difference_cad']);
 
         $this->assertNotNull($savingsChange);
         $this->assertEquals(500.0, $savingsChange['initial_cad']);
@@ -674,19 +674,19 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(0.0, $savingsChange['difference_cad']);
 
         // Credit card initial: abs(400 + 60/1.5 + 50000/2500) = 460
-        // Charge +50 CAD → computed abs(450 + 40 + 20) = 510, difference 50
+        // Charge +50 CAD → computed abs(450 + 40 + 20) = 510, difference -50
         $this->assertNotNull($creditChange);
         $this->assertTrue($creditChange['is_liability']);
         $this->assertEquals(460.0, $creditChange['initial_cad']);
         $this->assertEquals(510.0, $creditChange['computed_cad']);
-        $this->assertEquals(50.0, $creditChange['difference_cad']);
+        $this->assertEquals(-50.0, $creditChange['difference_cad']);
 
         $this->assertEquals(1700.0, $changes['assets']['initial_cad']);
         $this->assertEquals(1600.0, $changes['assets']['computed_cad']);
-        $this->assertEquals(-100.0, $changes['assets']['difference_cad']);
+        $this->assertEquals(100.0, $changes['assets']['difference_cad']);
         $this->assertEquals(460.0, $changes['liabilities']['initial_cad']);
         $this->assertEquals(510.0, $changes['liabilities']['computed_cad']);
-        $this->assertEquals(50.0, $changes['liabilities']['difference_cad']);
+        $this->assertEquals(-50.0, $changes['liabilities']['difference_cad']);
     }
 
     public function test_reconciliation_detects_unbalanced_accounting_equation(): void

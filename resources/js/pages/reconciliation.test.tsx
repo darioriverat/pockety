@@ -788,7 +788,7 @@ describe('Reconciliation - Balance Changes', () => {
                         is_liability: false,
                         initial_cad: 1200,
                         computed_cad: 1100,
-                        difference_cad: -100,
+                        difference_cad: 100,
                     },
                     {
                         account_id: 2,
@@ -808,18 +808,18 @@ describe('Reconciliation - Balance Changes', () => {
                         is_liability: true,
                         initial_cad: 460,
                         computed_cad: 510,
-                        difference_cad: 50,
+                        difference_cad: -50,
                     },
                 ],
                 assets: {
                     initial_cad: 1700,
                     computed_cad: 1600,
-                    difference_cad: -100,
+                    difference_cad: 100,
                 },
                 liabilities: {
                     initial_cad: 460,
                     computed_cad: 510,
-                    difference_cad: 50,
+                    difference_cad: -50,
                 },
             },
             income_total_cad: 0,
@@ -854,7 +854,10 @@ describe('Reconciliation - Balance Changes', () => {
         ).toHaveTextContent('1,100');
         expect(
             screen.getByTestId('balance-changes-row-1-difference'),
-        ).toHaveTextContent('100');
+        ).toHaveTextContent('$100.00');
+        expect(
+            screen.getByTestId('balance-changes-row-1-difference'),
+        ).not.toHaveTextContent('-$');
 
         expect(screen.getByTestId('balance-changes-row-2')).toHaveTextContent(
             'Savings',
@@ -864,14 +867,14 @@ describe('Reconciliation - Balance Changes', () => {
         );
         expect(
             screen.getByTestId('balance-changes-row-3-difference'),
-        ).toHaveTextContent('50');
+        ).toHaveTextContent('-$50.00');
 
         expect(
             screen.getByTestId('balance-changes-assets-total-difference'),
-        ).toHaveTextContent('100');
+        ).toHaveTextContent('$100.00');
         expect(
             screen.getByTestId('balance-changes-liabilities-total-difference'),
-        ).toHaveTextContent('50');
+        ).toHaveTextContent('-$50.00');
         expect(screen.getByTestId('balance-changes-assets')).toHaveTextContent(
             'Total assets',
         );

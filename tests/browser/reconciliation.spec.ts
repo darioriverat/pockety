@@ -147,10 +147,10 @@ test('reconciliation: computed balance reflects linked transactions', async ({
     ).toContainText('900');
     await expect(
         page.getByTestId(`balance-changes-row-${account.id}-difference`),
-    ).toContainText('100');
+    ).toHaveText('$100.00');
     await expect(
         page.getByTestId('balance-changes-assets-total-difference'),
-    ).toContainText('100');
+    ).toHaveText('$100.00');
     await expect(
         page.getByTestId('balance-changes-liabilities-total-difference'),
     ).toContainText('0.00');

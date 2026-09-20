@@ -250,6 +250,8 @@ class ReconciliationService
      * (or this period's recorded balance when none exists). Computed is that
      * baseline plus this period's signed transaction deltas. USD and COP are
      * converted to CAD with the same rates as the accounting equation.
+     * Difference is initial minus computed so a drop from last recorded
+     * (initial bigger than the end value) is a positive amount.
      * Liability amounts use absolute values so totals match equation presentation.
      *
      * @param  list<array<string, mixed>>  $accountResults
@@ -278,7 +280,7 @@ class ReconciliationService
 
             $initialCad = round($initialCad, 2);
             $computedCad = round($computedCad, 2);
-            $differenceCad = round($computedCad - $initialCad, 2);
+            $differenceCad = round($initialCad - $computedCad, 2);
 
             $accounts[] = [
                 'account_id' => $result['account_id'],
@@ -310,12 +312,12 @@ class ReconciliationService
             'assets' => [
                 'initial_cad' => $assetsInitial,
                 'computed_cad' => $assetsComputed,
-                'difference_cad' => round($assetsComputed - $assetsInitial, 2),
+                'difference_cad' => round($assetsInitial - $assetsComputed, 2),
             ],
             'liabilities' => [
                 'initial_cad' => $liabilitiesInitial,
                 'computed_cad' => $liabilitiesComputed,
-                'difference_cad' => round($liabilitiesComputed - $liabilitiesInitial, 2),
+                'difference_cad' => round($liabilitiesInitial - $liabilitiesComputed, 2),
             ],
         ];
     }
