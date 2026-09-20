@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
+use App\Models\Transaction;
 use App\Models\VarianceAcknowledgment;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -40,6 +41,8 @@ class ReconciliationService
      * - Accounting equation check rolled up from account conciliations
      *   (Assets = Liabilities + Equity in CAD equivalent of recorded and computed balances)
      * - Balance changes: last recorded (initial) vs computed end value per account in CAD
+     * - Records check: Income − Net Operating Expenses + Total assets difference
+     *   − Total liabilities difference + Down payments + Interest (should be $0.00)
      * - Income and expense totals for the period
      * - Per-account variance acknowledgment status
      *
@@ -49,6 +52,7 @@ class ReconciliationService
      *     accounts: array<int, array<string, mixed>>,
      *     accounting_equation: array<string, mixed>,
      *     balance_changes: array<string, mixed>,
+     *     records_check: array<string, mixed>,
      *     income_total_cad: float,
      *     expenses_total_cad: float,
      *     net_operating_expenses_cad: float
@@ -90,6 +94,16 @@ class ReconciliationService
 
         // Get income and expenses
         $financialSummary = $this->financialSummaryService->getSummary($period);
+        $incomeTotalCad = round((float) $financialSummary['total_income_cad'], 2);
+        $expensesTotalCad = round($financialSummary['total_recorded_disbursements_cad'], 2);
+        $netOperatingExpensesCad = round($financialSummary['net_operating_expenses_cad'], 2);
+        $recordsCheck = $this->buildRecordsCheck(
+            $incomeTotalCad,
+            $netOperatingExpensesCad,
+            $balanceChanges,
+            $period,
+            $exchangeRate,
+        );
 
         return [
             'period' => $period,
@@ -97,9 +111,10 @@ class ReconciliationService
             'accounts' => $results,
             'accounting_equation' => $equation,
             'balance_changes' => $balanceChanges,
-            'income_total_cad' => round((float) $financialSummary['total_income_cad'], 2),
-            'expenses_total_cad' => round($financialSummary['total_recorded_disbursements_cad'], 2),
-            'net_operating_expenses_cad' => round($financialSummary['net_operating_expenses_cad'], 2),
+            'records_check' => $recordsCheck,
+            'income_total_cad' => $incomeTotalCad,
+            'expenses_total_cad' => $expensesTotalCad,
+            'net_operating_expenses_cad' => $netOperatingExpensesCad,
         ];
     }
 
@@ -320,6 +335,85 @@ class ReconciliationService
                 'difference_cad' => round($liabilitiesInitial - $liabilitiesComputed, 2),
             ],
         ];
+    }
+
+    /**
+     * Cross-check that the month's records close.
+     *
+     * Income − Net Operating Expenses + Total assets difference
+     * − Total liabilities difference + Down payments + Interest.
+     * Down payments are the CAD equivalent of principal transactions;
+     * interest is the CAD equivalent of interest transactions. The result
+     * should be 0.
+     *
+     * @param  array{
+     *     accounts: list<array<string, mixed>>,
+     *     assets: array{initial_cad: float, computed_cad: float, difference_cad: float},
+     *     liabilities: array{initial_cad: float, computed_cad: float, difference_cad: float}
+     * }  $balanceChanges
+     * @return array{
+     *     formula: string,
+     *     income_cad: float,
+     *     net_operating_expenses_cad: float,
+     *     assets_difference_cad: float,
+     *     liabilities_difference_cad: float,
+     *     down_payments_cad: float,
+     *     interest_cad: float,
+     *     result_cad: float,
+     *     is_balanced: bool
+     * }
+     */
+    private function buildRecordsCheck(
+        float $incomeCad,
+        float $netOperatingExpensesCad,
+        array $balanceChanges,
+        string $period,
+        ExchangeRate $exchangeRate
+    ): array {
+        $assetsDifference = round((float) $balanceChanges['assets']['difference_cad'], 2);
+        $liabilitiesDifference = round((float) $balanceChanges['liabilities']['difference_cad'], 2);
+        $downPayments = $this->sumDebtComponentCad($period, 'principal', $exchangeRate);
+        $interest = $this->sumDebtComponentCad($period, 'interest', $exchangeRate);
+
+        $result = round(
+            $incomeCad
+            - $netOperatingExpensesCad
+            + $assetsDifference
+            - $liabilitiesDifference
+            + $downPayments
+            + $interest,
+            2
+        );
+
+        return [
+            'formula' => 'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+            'income_cad' => $incomeCad,
+            'net_operating_expenses_cad' => $netOperatingExpensesCad,
+            'assets_difference_cad' => $assetsDifference,
+            'liabilities_difference_cad' => $liabilitiesDifference,
+            'down_payments_cad' => $downPayments,
+            'interest_cad' => $interest,
+            'result_cad' => $result,
+            'is_balanced' => abs($result) <= self::VARIANCE_THRESHOLD,
+        ];
+    }
+
+    /**
+     * CAD equivalent of all transactions with the given debt component in the period.
+     */
+    private function sumDebtComponentCad(string $period, string $component, ExchangeRate $exchangeRate): float
+    {
+        $total = 0.0;
+
+        foreach (Transaction::forPeriod($period)->where('debt_component', $component)->get() as $transaction) {
+            $total += $this->amountsCadEquivalent([
+                'cad' => (float) ($transaction->amount_cad ?? 0),
+                'usd' => (float) ($transaction->amount_usd ?? 0),
+                'cop' => (float) ($transaction->amount_cop ?? 0),
+            ], $exchangeRate);
+        }
+
+        return round($total, 2);
     }
 
     /**

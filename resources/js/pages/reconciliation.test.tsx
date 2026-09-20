@@ -889,3 +889,144 @@ describe('Reconciliation - Balance Changes', () => {
         ).not.toBeInTheDocument();
     });
 });
+
+describe('Reconciliation - Records Check', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('shows the month-close formula, terms, and result', async () => {
+        const report = {
+            period: '202502',
+            status: 'unbalanced' as const,
+            accounts: [
+                {
+                    account_id: 1,
+                    account_name: 'Checking',
+                    account_type: 'bank',
+                    is_asset: true,
+                    is_liability: false,
+                    has_recorded_balance: true,
+                    recorded: { cad: 1700, usd: 0, cop: 0 },
+                    computed: { cad: 1700, usd: 0, cop: 0 },
+                    variance: { cad: 0, usd: 0, cop: 0 },
+                    is_balanced: true,
+                    is_reviewed: false,
+                    review_note: null,
+                    reviewed_at: null,
+                },
+            ],
+            accounting_equation: {
+                assets_cad: 1700,
+                liabilities_cad: 650,
+                equity_cad: 1050,
+                residual_cad: 0,
+                is_balanced: true,
+            },
+            records_check: {
+                formula:
+                    'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+                income_cad: 1000,
+                net_operating_expenses_cad: 450,
+                assets_difference_cad: 300,
+                liabilities_difference_cad: 150,
+                down_payments_cad: 200,
+                interest_cad: 100,
+                result_cad: 1000,
+                is_balanced: false,
+            },
+            income_total_cad: 1000,
+            expenses_total_cad: 650,
+            net_operating_expenses_cad: 450,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByTestId('records-check-card');
+
+        expect(screen.getByTestId('records-check-heading')).toHaveTextContent(
+            'Records Check',
+        );
+        expect(screen.getByTestId('records-check-formula')).toHaveTextContent(
+            'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+        );
+        expect(screen.getByTestId('records-check-income')).toHaveTextContent(
+            '1,000',
+        );
+        expect(
+            screen.getByTestId('records-check-net-operating-expenses'),
+        ).toHaveTextContent('450');
+        expect(
+            screen.getByTestId('records-check-assets-difference'),
+        ).toHaveTextContent('300');
+        expect(
+            screen.getByTestId('records-check-liabilities-difference'),
+        ).toHaveTextContent('150');
+        expect(
+            screen.getByTestId('records-check-down-payments'),
+        ).toHaveTextContent('200');
+        expect(screen.getByTestId('records-check-interest')).toHaveTextContent(
+            '100',
+        );
+        expect(screen.getByTestId('records-check-result')).toHaveTextContent(
+            '$1,000.00',
+        );
+        expect(screen.getByTestId('records-check-status')).toHaveTextContent(
+            'Does not close',
+        );
+        expect(screen.getByTestId('records-check-card')).toHaveTextContent(
+            '$0.00',
+        );
+    });
+
+    it('marks a zero result as closing', async () => {
+        const report = {
+            period: '202501',
+            status: 'unbalanced' as const,
+            accounts: [],
+            accounting_equation: {
+                assets_cad: 0,
+                liabilities_cad: 0,
+                equity_cad: 0,
+                residual_cad: 0,
+                is_balanced: true,
+            },
+            records_check: {
+                formula:
+                    'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+                income_cad: 0,
+                net_operating_expenses_cad: 100,
+                assets_difference_cad: 100,
+                liabilities_difference_cad: 0,
+                down_payments_cad: 0,
+                interest_cad: 0,
+                result_cad: 0,
+                is_balanced: true,
+            },
+            income_total_cad: 0,
+            expenses_total_cad: 100,
+            net_operating_expenses_cad: 100,
+        };
+
+        (global.fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: report }),
+        });
+
+        render(<Reconciliation />);
+        fireEvent.click(screen.getByText('View Reconciliation'));
+        await screen.findByTestId('records-check-card');
+
+        expect(screen.getByTestId('records-check-result')).toHaveTextContent(
+            '$0.00',
+        );
+        expect(screen.getByTestId('records-check-status')).toHaveTextContent(
+            'Closes',
+        );
+    });
+});

@@ -155,5 +155,22 @@ test('reconciliation: computed balance reflects linked transactions', async ({
         page.getByTestId('balance-changes-liabilities-total-difference'),
     ).toContainText('0.00');
 
+    const recordsCard = page.getByTestId('records-check-card');
+    await recordsCard.scrollIntoViewIfNeeded();
+    await expect(recordsCard).toBeVisible();
+    await expect(page.getByTestId('records-check-heading')).toContainText(
+        'Records Check',
+    );
+    await expect(page.getByTestId('records-check-formula')).toContainText(
+        'Income − Net Operating Expenses',
+    );
+    await expect(page.getByTestId('records-check-formula')).toContainText(
+        'Down payments + Interest',
+    );
+    await expect(page.getByTestId('records-check-result')).toHaveText('$0.00');
+    await expect(page.getByTestId('records-check-status')).toContainText(
+        'Closes',
+    );
+
     expect(consoleErrors).toEqual([]);
 });

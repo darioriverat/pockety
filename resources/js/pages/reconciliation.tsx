@@ -98,12 +98,25 @@ interface BalanceChanges {
     liabilities: BalanceChangeAmounts;
 }
 
+interface RecordsCheck {
+    formula: string;
+    income_cad: number;
+    net_operating_expenses_cad: number;
+    assets_difference_cad: number;
+    liabilities_difference_cad: number;
+    down_payments_cad: number;
+    interest_cad: number;
+    result_cad: number;
+    is_balanced: boolean;
+}
+
 interface ReconciliationReport {
     period: string;
     status: 'balanced' | 'unbalanced';
     accounts: AccountReconciliation[];
     accounting_equation: AccountingEquation;
     balance_changes?: BalanceChanges;
+    records_check?: RecordsCheck;
     income_total_cad: number;
     expenses_total_cad: number;
     net_operating_expenses_cad: number;
@@ -710,6 +723,154 @@ export default function Reconciliation() {
                                         report.balance_changes.liabilities,
                                         { isTotal: true },
                                     )}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {report && report.records_check && (
+                    <Card data-testid="records-check-card">
+                        <CardHeader>
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <SubsectionHeading data-testid="records-check-heading">
+                                        Records Check
+                                    </SubsectionHeading>
+                                    <CardDescription>
+                                        Confirms the month&apos;s records close.
+                                        The result should be $0.00 when nothing
+                                        is missing.
+                                    </CardDescription>
+                                </div>
+                                <Badge
+                                    variant="outline"
+                                    className={
+                                        report.records_check.is_balanced
+                                            ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+                                            : 'border-amber-500 bg-amber-50 text-amber-900 dark:border-amber-500 dark:bg-amber-950/60 dark:text-amber-200'
+                                    }
+                                    data-testid="records-check-status"
+                                >
+                                    {report.records_check.is_balanced
+                                        ? 'Closes'
+                                        : 'Does not close'}
+                                </Badge>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <p
+                                className="bg-muted/50 mb-4 rounded-md px-3 py-2 font-mono text-sm"
+                                data-testid="records-check-formula"
+                            >
+                                {report.records_check.formula}
+                            </p>
+                            <div className="max-w-xl space-y-0">
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-income"
+                                >
+                                    <span className="text-muted-foreground">
+                                        Income
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check.income_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-net-operating-expenses"
+                                >
+                                    <span className="text-muted-foreground">
+                                        − Net Operating Expenses
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check
+                                                .net_operating_expenses_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-assets-difference"
+                                >
+                                    <span className="text-muted-foreground">
+                                        + Total assets difference
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check
+                                                .assets_difference_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-liabilities-difference"
+                                >
+                                    <span className="text-muted-foreground">
+                                        − Total liabilities difference
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check
+                                                .liabilities_difference_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-down-payments"
+                                >
+                                    <span className="text-muted-foreground">
+                                        + Down payments
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check
+                                                .down_payments_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-interest"
+                                >
+                                    <span className="text-muted-foreground">
+                                        + Interest
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check.interest_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-[1fr_auto] gap-4 border-t pt-3">
+                                    <span className="text-sm font-medium">
+                                        Result
+                                    </span>
+                                    <span
+                                        className={`text-lg font-semibold tabular-nums ${
+                                            report.records_check.is_balanced
+                                                ? 'text-green-600'
+                                                : 'text-red-600'
+                                        }`}
+                                        data-testid="records-check-result"
+                                    >
+                                        {formatCurrency(
+                                            report.records_check.result_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
                                 </div>
                             </div>
                         </CardContent>
