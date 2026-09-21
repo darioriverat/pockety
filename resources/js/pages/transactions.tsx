@@ -120,6 +120,7 @@ interface Transaction {
     amount: number | null;
     comments: string | null;
     is_recurring: boolean;
+    is_credit: boolean;
     debt_component: string | null;
     category: Category;
 }
@@ -156,6 +157,7 @@ interface TransactionFormData {
     amount: string;
     comments: string;
     is_recurring: boolean;
+    is_credit: boolean;
     debt_component: 'principal' | 'interest' | '';
 }
 
@@ -216,6 +218,7 @@ export default function Transactions() {
             amount: '',
             comments: '',
             is_recurring: false,
+            is_credit: false,
             debt_component: '',
         };
     });
@@ -341,6 +344,7 @@ export default function Transactions() {
             amount: (target.amount ?? 0).toString(),
             comments: target.comments || '',
             is_recurring: target.is_recurring,
+            is_credit: Boolean(target.is_credit),
             debt_component: (target.debt_component || '') as
                 | 'principal'
                 | 'interest'
@@ -480,6 +484,7 @@ export default function Transactions() {
                     : null,
             comments: formData.comments || null,
             is_recurring: formData.is_recurring,
+            is_credit: isIncomeCategorySelected ? false : formData.is_credit,
             debt_component: formData.debt_component || null,
         };
 
@@ -591,6 +596,7 @@ export default function Transactions() {
             amount: (transaction.amount ?? 0).toString(),
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
+            is_credit: Boolean(transaction.is_credit),
             debt_component: (transaction.debt_component || '') as 'principal' | 'interest' | '',
         });
         setIsDialogOpen(true);
@@ -614,6 +620,7 @@ export default function Transactions() {
             amount: (transaction.amount ?? 0).toString(),
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
+            is_credit: Boolean(transaction.is_credit),
             debt_component: (transaction.debt_component || '') as
                 | 'principal'
                 | 'interest'
@@ -750,6 +757,7 @@ export default function Transactions() {
             amount: '',
             comments: '',
             is_recurring: false,
+            is_credit: false,
             debt_component: '',
         });
     };
@@ -1120,6 +1128,10 @@ export default function Transactions() {
                                                 setFormData({
                                                     ...formData,
                                                     category_id: value,
+                                                    is_credit:
+                                                        nextCategory?.is_income_category
+                                                            ? false
+                                                            : formData.is_credit,
                                                     debt_component:
                                                         nextCategory?.is_debt_category
                                                             ? formData.debt_component
@@ -1381,6 +1393,28 @@ export default function Transactions() {
                                             Recurring transaction
                                         </Label>
                                     </div>
+                                    {!isIncomeCategorySelected && (
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id="is_credit"
+                                                checked={formData.is_credit}
+                                                onCheckedChange={(checked) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        is_credit:
+                                                            checked === true,
+                                                    })
+                                                }
+                                                data-testid="is-credit-checkbox"
+                                            />
+                                            <Label
+                                                htmlFor="is_credit"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                Credit (refund / deposit)
+                                            </Label>
+                                        </div>
+                                    )}
                                     {formData.category_id &&
                                         categories.find(
                                             (c) =>
@@ -2012,6 +2046,14 @@ export default function Transactions() {
                                                     {transaction.is_recurring && (
                                                         <Badge variant="secondary">
                                                             Recurring
+                                                        </Badge>
+                                                    )}
+                                                    {transaction.is_credit && (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            data-testid={`transaction-credit-badge-${transaction.id}`}
+                                                        >
+                                                            Credit
                                                         </Badge>
                                                     )}
                                                 </div>

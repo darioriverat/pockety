@@ -93,13 +93,14 @@ describe('Transactions - Required Field Validation', () => {
         for (const name of [
             'Date (YYYY-MM-DD)', 'Period (YYYYMM)', 'Quincena', 'Category',
             'Account', 'Currency', 'Amount', 'Comments', 'Recurring transaction',
+            'Credit (refund / deposit)',
         ]) {
             const control = within(dialog).getByLabelText(name, { exact: true });
             expect(control).toHaveAccessibleName(name);
             expect(dialog.querySelector(`label[for="${control.id}"]`)).toBeVisible();
         }
         fireEvent.click(within(dialog).getByText('Recurring transaction'));
-        expect(within(dialog).getByRole('checkbox')).toBeChecked();
+        expect(within(dialog).getByRole('checkbox', { name: 'Recurring transaction' })).toBeChecked();
     });
 
     it('displays error when date field is empty on submit', async () => {

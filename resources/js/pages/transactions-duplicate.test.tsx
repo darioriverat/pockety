@@ -175,6 +175,7 @@ describe('Transactions duplicate', () => {
             expect(body.category_id).toBe(1);
             expect(body.amount_cad).toBe(42.75);
             expect(body.comments).toBe('Duplicate me');
+            expect(body.is_credit).toBe(false);
         });
     });
 });

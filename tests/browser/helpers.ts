@@ -24,6 +24,7 @@ export interface ApiTransaction {
     amount: number;
     comments: string | null;
     is_recurring: boolean;
+    is_credit: boolean;
     debt_component: 'principal' | 'interest' | null;
     category: ApiCategory;
 }
@@ -39,6 +40,7 @@ export interface TransactionPayload {
     amount_cop?: number | null;
     comments?: string | null;
     is_recurring?: boolean;
+    is_credit?: boolean;
     debt_component?: 'principal' | 'interest' | null;
 }
 

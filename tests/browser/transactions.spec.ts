@@ -77,6 +77,7 @@ async function fillTransactionForm(
         amount: string;
         comments?: string;
         isRecurring?: boolean;
+        isCredit?: boolean;
         debtComponent?: 'Principal' | 'Interest';
     },
 ): Promise<void> {
@@ -101,6 +102,10 @@ async function fillTransactionForm(
 
     if (values.isRecurring) {
         await dialog.getByLabel('Recurring transaction').click();
+    }
+
+    if (values.isCredit) {
+        await dialog.getByLabel('Credit (refund / deposit)').click();
     }
 
     if (values.debtComponent) {
@@ -443,6 +448,40 @@ test('feature 11: user can mark a transaction as recurring', async ({
     const transaction = await getTransactionByComments(request, comments);
 
     expect(transaction.is_recurring).toBe(true);
+
+    expect(consoleErrors).toEqual([]);
+});
+
+test('user can mark a transaction as a credit refund or deposit', async ({
+    page,
+    request,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const comments = `feature-credit-${Date.now()}`;
+
+    await openTransactionsPage(page);
+    await openAddTransactionDialog(page);
+    await fillTransactionForm(page, {
+        date: '2026-01-23',
+        period: '202601',
+        quincena: 'Q1',
+        category: 'C001 - Groceries',
+        currency: 'CAD',
+        amount: '25.00',
+        comments,
+        isCredit: true,
+    });
+    await submitTransactionForm(page, 'Create');
+
+    const transactionCard = page
+        .locator('[data-slot="card"]')
+        .filter({ hasText: comments });
+
+    await expect(transactionCard).toContainText('Credit');
+
+    const transaction = await getTransactionByComments(request, comments);
+
+    expect(transaction.is_credit).toBe(true);
 
     expect(consoleErrors).toEqual([]);
 });

@@ -36,7 +36,7 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(dialog).toBeVisible();
         await page.screenshot({ animations: 'disabled', path: `verification/test-143-form-presentation/${theme}-01-form.png` });
 
-        const ids = ['date', 'period', 'quincena', 'category', 'account', 'currency', 'amount', 'comments', 'is_recurring'];
+        const ids = ['date', 'period', 'quincena', 'category', 'account', 'currency', 'amount', 'comments', 'is_recurring', 'is_credit'];
         for (const id of ids) {
             await expect(dialog.locator(`label[for="${id}"]`)).toBeVisible();
             await expect(dialog.locator(`#${id}`)).toHaveAccessibleName(/\S/);
@@ -85,6 +85,8 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(dialog.locator('label[for="debt_component"]')).toBeVisible();
         await expect(debt).toHaveAccessibleName(/Debt Component/i);
         await dialog.locator('#is_recurring').click();
+        await page.keyboard.press('Tab');
+        await expect(dialog.locator('#is_credit')).toBeFocused();
         await page.keyboard.press('Tab');
         await expect(debt).toBeFocused();
         await expect(debt).toBeInViewport();
