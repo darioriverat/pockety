@@ -106,6 +106,7 @@ interface RecordsCheck {
     liabilities_difference_cad: number;
     down_payments_cad: number;
     interest_cad: number;
+    debt_payments_cad: number;
     result_cad: number;
     is_balanced: boolean;
 }
@@ -739,8 +740,11 @@ export default function Reconciliation() {
                                     </SubsectionHeading>
                                     <CardDescription>
                                         Confirms the month&apos;s records close.
-                                        The result should be $0.00 when nothing
-                                        is missing.
+                                        Spends marked as paying a debt are
+                                        omitted from net operating expenses so
+                                        a missing cash source shows up. The
+                                        result should be $0.00 when nothing is
+                                        missing.
                                     </CardDescription>
                                 </div>
                                 <Badge
@@ -844,6 +848,21 @@ export default function Reconciliation() {
                                     <span className="tabular-nums">
                                         {formatCurrency(
                                             report.records_check.interest_cad,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-debt-payments"
+                                >
+                                    <span className="text-muted-foreground">
+                                        − Debt payments
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check
+                                                .debt_payments_cad ?? 0,
                                             'CAD',
                                         )}
                                     </span>

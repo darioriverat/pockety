@@ -121,6 +121,7 @@ interface Transaction {
     comments: string | null;
     is_recurring: boolean;
     is_credit: boolean;
+    is_debt_payment: boolean;
     debt_component: string | null;
     category: Category;
 }
@@ -158,6 +159,7 @@ interface TransactionFormData {
     comments: string;
     is_recurring: boolean;
     is_credit: boolean;
+    is_debt_payment: boolean;
     debt_component: 'principal' | 'interest' | '';
 }
 
@@ -219,6 +221,7 @@ export default function Transactions() {
             comments: '',
             is_recurring: false,
             is_credit: false,
+            is_debt_payment: false,
             debt_component: '',
         };
     });
@@ -227,6 +230,9 @@ export default function Transactions() {
     );
     const isIncomeCategorySelected = Boolean(
         selectedFormCategory?.is_income_category,
+    );
+    const isDebtCategorySelected = Boolean(
+        selectedFormCategory?.is_debt_category,
     );
     const [filters, setFilters] = useState<FilterState>(() => {
         const params =
@@ -345,6 +351,7 @@ export default function Transactions() {
             comments: target.comments || '',
             is_recurring: target.is_recurring,
             is_credit: Boolean(target.is_credit),
+            is_debt_payment: Boolean(target.is_debt_payment),
             debt_component: (target.debt_component || '') as
                 | 'principal'
                 | 'interest'
@@ -454,6 +461,14 @@ export default function Transactions() {
                 'Income transactions must be assigned to a deposit account.';
         }
 
+        if (
+            formData.is_debt_payment &&
+            (!formData.account_id || formData.account_id === NO_ACCOUNT_VALUE)
+        ) {
+            errors.account_id =
+                'Debt payment transactions must be assigned to the account the money left.';
+        }
+
         if (!formData.amount.trim()) {
             errors.amount = 'Amount is required';
         } else {
@@ -485,6 +500,10 @@ export default function Transactions() {
             comments: formData.comments || null,
             is_recurring: formData.is_recurring,
             is_credit: isIncomeCategorySelected ? false : formData.is_credit,
+            is_debt_payment:
+                isIncomeCategorySelected || isDebtCategorySelected
+                    ? false
+                    : formData.is_debt_payment,
             debt_component: formData.debt_component || null,
         };
 
@@ -550,7 +569,8 @@ export default function Transactions() {
                     'Failed to save transaction';
                 if (
                     typeof message === 'string' &&
-                    message.toLowerCase().includes('deposit account')
+                    (message.toLowerCase().includes('deposit account') ||
+                        message.toLowerCase().includes('money left'))
                 ) {
                     setFieldErrors((prev) => ({
                         ...prev,
@@ -597,6 +617,7 @@ export default function Transactions() {
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
             is_credit: Boolean(transaction.is_credit),
+            is_debt_payment: Boolean(transaction.is_debt_payment),
             debt_component: (transaction.debt_component || '') as 'principal' | 'interest' | '',
         });
         setIsDialogOpen(true);
@@ -621,6 +642,7 @@ export default function Transactions() {
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
             is_credit: Boolean(transaction.is_credit),
+            is_debt_payment: Boolean(transaction.is_debt_payment),
             debt_component: (transaction.debt_component || '') as
                 | 'principal'
                 | 'interest'
@@ -758,6 +780,7 @@ export default function Transactions() {
             comments: '',
             is_recurring: false,
             is_credit: false,
+            is_debt_payment: false,
             debt_component: '',
         });
     };
@@ -1132,6 +1155,11 @@ export default function Transactions() {
                                                         nextCategory?.is_income_category
                                                             ? false
                                                             : formData.is_credit,
+                                                    is_debt_payment:
+                                                        nextCategory?.is_income_category ||
+                                                        nextCategory?.is_debt_category
+                                                            ? false
+                                                            : formData.is_debt_payment,
                                                     debt_component:
                                                         nextCategory?.is_debt_category
                                                             ? formData.debt_component
@@ -1403,6 +1431,10 @@ export default function Transactions() {
                                                         ...formData,
                                                         is_credit:
                                                             checked === true,
+                                                        is_debt_payment:
+                                                            checked === true
+                                                                ? false
+                                                                : formData.is_debt_payment,
                                                     })
                                                 }
                                                 data-testid="is-credit-checkbox"
@@ -1415,6 +1447,38 @@ export default function Transactions() {
                                             </Label>
                                         </div>
                                     )}
+                                    {!isIncomeCategorySelected &&
+                                        !isDebtCategorySelected && (
+                                            <div className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id="is_debt_payment"
+                                                    checked={
+                                                        formData.is_debt_payment
+                                                    }
+                                                    onCheckedChange={(
+                                                        checked,
+                                                    ) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            is_debt_payment:
+                                                                checked ===
+                                                                true,
+                                                            is_credit:
+                                                                checked === true
+                                                                    ? false
+                                                                    : formData.is_credit,
+                                                        })
+                                                    }
+                                                    data-testid="is-debt-payment-checkbox"
+                                                />
+                                                <Label
+                                                    htmlFor="is_debt_payment"
+                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                >
+                                                    Paying a debt (cash source)
+                                                </Label>
+                                            </div>
+                                        )}
                                     {formData.category_id &&
                                         categories.find(
                                             (c) =>
@@ -2054,6 +2118,14 @@ export default function Transactions() {
                                                             data-testid={`transaction-credit-badge-${transaction.id}`}
                                                         >
                                                             Credit
+                                                        </Badge>
+                                                    )}
+                                                    {transaction.is_debt_payment && (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            data-testid={`transaction-debt-payment-badge-${transaction.id}`}
+                                                        >
+                                                            Debt payment
                                                         </Badge>
                                                     )}
                                                 </div>

@@ -181,6 +181,7 @@ class CategoryService implements CategoryServiceInterface
                 'comments' => $transaction->comments,
                 'is_recurring' => $transaction->is_recurring,
                 'is_credit' => (bool) $transaction->is_credit,
+                'is_debt_payment' => (bool) $transaction->is_debt_payment,
                 'debt_component' => $transaction->debt_component,
             ];
 

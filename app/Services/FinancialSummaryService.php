@@ -28,7 +28,8 @@ class FinancialSummaryService
      * total for the month, including debt/credit-card payment categories.
      *
      * Net Operating Expenses (Gasto Real): Total Recorded Disbursements
-     * minus debt PRINCIPAL payments minus depreciation (C045).
+     * minus debt PRINCIPAL payments minus depreciation (C045)
+     * minus complementary cash spends marked as paying a debt.
      * Debt INTEREST remains included.
      *
      * @return array{
@@ -40,6 +41,7 @@ class FinancialSummaryService
      *     debt_principal_excluded_cad: float,
      *     depreciation_excluded_cad: float,
      *     debt_interest_included_cad: float,
+     *     debt_payments_excluded_cad: float,
      *     income_lines: list<array{
      *         id: int,
      *         description: string,
@@ -78,6 +80,7 @@ class FinancialSummaryService
         $transactions = Transaction::forPeriod($period)->with('category')->get();
 
         $totalsByCategory = [];
+        $debtPaymentsExcluded = 0.0;
 
         foreach ($categories as $category) {
             $totalsByCategory[$category->id] = [
@@ -129,6 +132,14 @@ class FinancialSummaryService
             } else {
                 $totalsByCategory[$categoryId]['other_cad'] += $cadEquivalent;
             }
+
+            if (
+                $transaction->is_debt_payment
+                && $transaction->debt_component !== 'principal'
+                && empty($totalsByCategory[$categoryId]['is_income_category'])
+            ) {
+                $debtPaymentsExcluded += $cadEquivalent;
+            }
         }
 
         $categoryTotals = [];
@@ -167,7 +178,8 @@ class FinancialSummaryService
 
         $netOperatingExpenses = $totalRecordedDisbursements
             - $debtPrincipalExcluded
-            - $depreciationExcluded;
+            - $depreciationExcluded
+            - $debtPaymentsExcluded;
         $netOperatingExpenses = round($netOperatingExpenses, 2);
 
         return [
@@ -179,6 +191,7 @@ class FinancialSummaryService
             'debt_principal_excluded_cad' => round($debtPrincipalExcluded, 2),
             'depreciation_excluded_cad' => round($depreciationExcluded, 2),
             'debt_interest_included_cad' => round($debtInterestIncluded, 2),
+            'debt_payments_excluded_cad' => round($debtPaymentsExcluded, 2),
             'income_lines' => $incomeLines,
             'category_totals' => $categoryTotals,
         ];

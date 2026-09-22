@@ -145,6 +145,7 @@ class TransactionController extends Controller
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'is_credit' => 'nullable|boolean',
+                'is_debt_payment' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
             ], [
                 'date.required' => 'Date must be a valid date.',
@@ -194,6 +195,7 @@ class TransactionController extends Controller
                 'comments' => 'nullable|string|max:1000',
                 'is_recurring' => 'nullable|boolean',
                 'is_credit' => 'nullable|boolean',
+                'is_debt_payment' => 'nullable|boolean',
                 'debt_component' => 'nullable|in:principal,interest',
             ], [
                 'date.required' => 'Date must be a valid date.',
@@ -384,6 +386,8 @@ class TransactionController extends Controller
                 'Amount',
                 'Comments',
                 'Recurring',
+                'Credit',
+                'Debt Payment',
                 'Debt Component',
             ]);
 
@@ -406,6 +410,8 @@ class TransactionController extends Controller
                     $data['amount'] ?? '',
                     $data['comments'] ?? '',
                     $data['is_recurring'] ? 'Yes' : 'No',
+                    $data['is_credit'] ? 'Yes' : 'No',
+                    $data['is_debt_payment'] ? 'Yes' : 'No',
                     $data['debt_component'] ?? '',
                 ]);
             }

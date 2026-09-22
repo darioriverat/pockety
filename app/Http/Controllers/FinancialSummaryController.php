@@ -39,6 +39,7 @@ class FinancialSummaryController extends Controller
                 'debt_principal_excluded_cad' => $summary['debt_principal_excluded_cad'],
                 'depreciation_excluded_cad' => $summary['depreciation_excluded_cad'],
                 'debt_interest_included_cad' => $summary['debt_interest_included_cad'],
+                'debt_payments_excluded_cad' => $summary['debt_payments_excluded_cad'],
                 'income_lines' => $summary['income_lines'],
                 'category_totals' => $summary['category_totals'],
             ],

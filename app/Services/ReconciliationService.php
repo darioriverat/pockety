@@ -42,7 +42,10 @@ class ReconciliationService
      *   (Assets = Liabilities + Equity in CAD equivalent of recorded and computed balances)
      * - Balance changes: last recorded (initial) vs computed end value per account in CAD
      * - Records check: Income − Net Operating Expenses + Total assets difference
-     *   − Total liabilities difference + Down payments + Interest (should be $0.00)
+     *   − Total liabilities difference + Down payments + Interest − Debt payments
+     *   (should be $0.00). Debt payments are the cash that should have left assets
+     *   to fund principal + interest. Complementary spends marked as paying a debt
+     *   are omitted from net operating expenses so a missing bank outflow shows up.
      * - Income and expense totals for the period
      * - Per-account variance acknowledgment status
      *
@@ -341,9 +344,12 @@ class ReconciliationService
      * Cross-check that the month's records close.
      *
      * Income − Net Operating Expenses + Total assets difference
-     * − Total liabilities difference + Down payments + Interest.
+     * − Total liabilities difference + Down payments + Interest − Debt payments.
      * Down payments are the CAD equivalent of principal transactions;
-     * interest is the CAD equivalent of interest transactions. The result
+     * interest is the CAD equivalent of interest transactions.
+     * Debt payments are principal + interest: the cash that should have left
+     * an asset account to fund those records. Complementary spends marked as
+     * paying a debt are omitted from net operating expenses. The result
      * should be 0.
      *
      * @param  array{
@@ -359,6 +365,7 @@ class ReconciliationService
      *     liabilities_difference_cad: float,
      *     down_payments_cad: float,
      *     interest_cad: float,
+     *     debt_payments_cad: float,
      *     result_cad: float,
      *     is_balanced: bool
      * }
@@ -374,6 +381,7 @@ class ReconciliationService
         $liabilitiesDifference = round((float) $balanceChanges['liabilities']['difference_cad'], 2);
         $downPayments = $this->sumDebtComponentCad($period, 'principal', $exchangeRate);
         $interest = $this->sumDebtComponentCad($period, 'interest', $exchangeRate);
+        $debtPayments = round($downPayments + $interest, 2);
 
         $result = round(
             $incomeCad
@@ -381,18 +389,20 @@ class ReconciliationService
             + $assetsDifference
             - $liabilitiesDifference
             + $downPayments
-            + $interest,
+            + $interest
+            - $debtPayments,
             2
         );
 
         return [
-            'formula' => 'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+            'formula' => 'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest − Debt payments',
             'income_cad' => $incomeCad,
             'net_operating_expenses_cad' => $netOperatingExpensesCad,
             'assets_difference_cad' => $assetsDifference,
             'liabilities_difference_cad' => $liabilitiesDifference,
             'down_payments_cad' => $downPayments,
             'interest_cad' => $interest,
+            'debt_payments_cad' => $debtPayments,
             'result_cad' => $result,
             'is_balanced' => abs($result) <= self::VARIANCE_THRESHOLD,
         ];

@@ -170,5 +170,7 @@ class TransactionFilterTest extends TestCase
         $this->assertSame('detail-check', $row['comments']);
         $this->assertSame('RBC Checking', $row['account']['name']);
         $this->assertSame('C001', $row['category']['code']);
+        $this->assertFalse($row['is_debt_payment']);
+        $this->assertFalse($row['is_credit']);
     }
 }

@@ -460,6 +460,7 @@ HTML;
         $principalExcluded = e($formatCad($summary['debt_principal_excluded_cad']));
         $depreciationExcluded = e($formatCad($summary['depreciation_excluded_cad']));
         $interestIncluded = e($formatCad($summary['debt_interest_included_cad']));
+        $debtPaymentsExcluded = e($formatCad($summary['debt_payments_excluded_cad']));
         $periodLabel = e($period);
 
         $debtBadges = '';
@@ -500,6 +501,7 @@ HTML;
     <div class="stat"><strong>Debt Principal Excluded</strong><span data-testid="debt-principal-excluded">{$principalExcluded}</span></div>
     <div class="stat"><strong>Depreciation Excluded</strong><span data-testid="depreciation-excluded">{$depreciationExcluded}</span></div>
     <div class="stat"><strong>Debt Interest Included</strong><span data-testid="debt-interest-included">{$interestIncluded}</span></div>
+    <div class="stat"><strong>Debt Payments Excluded</strong><span data-testid="debt-payments-excluded">{$debtPaymentsExcluded}</span></div>
   </div>
   <div class="badges" data-testid="debt-category-codes">{$debtBadges}</div>
   <table data-testid="financial-summary-table">

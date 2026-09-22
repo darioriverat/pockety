@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,7 @@ class Transaction extends Model
         'comments',
         'is_recurring',
         'is_credit',
+        'is_debt_payment',
         'debt_component',
     ];
 
@@ -29,6 +31,7 @@ class Transaction extends Model
         'date' => 'date',
         'is_recurring' => 'boolean',
         'is_credit' => 'boolean',
+        'is_debt_payment' => 'boolean',
         'amount_cad' => 'decimal:2',
         'amount_usd' => 'decimal:2',
         'amount_cop' => 'decimal:2',
@@ -192,6 +195,25 @@ class Transaction extends Model
     public function isPrincipal(): bool
     {
         return $this->debt_component === 'principal';
+    }
+
+    /**
+     * Whether this transaction is the cash outflow that funds a debt payment.
+     */
+    public function isDebtPayment(): bool
+    {
+        return (bool) $this->is_debt_payment;
+    }
+
+    /**
+     * Scope to complementary cash spends that pay a debt.
+     *
+     * @param  Builder<Transaction>  $query
+     * @return Builder<Transaction>
+     */
+    public function scopeDebtPayment(Builder $query): Builder
+    {
+        return $query->where('is_debt_payment', true);
     }
 
     /**

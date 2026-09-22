@@ -53,6 +53,15 @@ const groceries = {
     is_income_category: false,
 };
 
+const debtCategory = {
+    id: 44,
+    code: 'C044',
+    name_es: 'CREDITO FORD ESCAPE',
+    name_en: 'Ford Escape Auto Loan Payment',
+    is_debt_category: true,
+    is_income_category: false,
+};
+
 const incomeCategory = {
     id: 47,
     code: 'I01',
@@ -68,7 +77,7 @@ const account = {
     type: 'bank',
 };
 
-const creditTransaction = {
+const debtPaymentTransaction = {
     id: 123,
     date: '2025-01-15',
     period: '202501',
@@ -76,15 +85,15 @@ const creditTransaction = {
     category_id: groceries.id,
     account_id: account.id,
     account,
-    amount_cad: 75.0,
+    amount_cad: 110.0,
     amount_usd: null,
     amount_cop: null,
     currency: 'CAD',
-    amount: 75.0,
-    comments: 'grocery-refund',
+    amount: 110.0,
+    comments: 'loan-cash-source',
     is_recurring: false,
-    is_credit: true,
-    is_debt_payment: false,
+    is_credit: false,
+    is_debt_payment: true,
     debt_component: null,
     category: groceries,
 };
@@ -97,7 +106,7 @@ function jsonResponse(data: unknown, init?: { ok?: boolean; status?: number }) {
     } as Response;
 }
 
-describe('Transactions - credit (refund / deposit)', () => {
+describe('Transactions - paying a debt (cash source)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -106,7 +115,7 @@ describe('Transactions - credit (refund / deposit)', () => {
 
             if (url.startsWith('/api/categories')) {
                 return jsonResponse({
-                    data: [groceries, incomeCategory],
+                    data: [groceries, debtCategory, incomeCategory],
                 });
             }
 
@@ -117,7 +126,7 @@ describe('Transactions - credit (refund / deposit)', () => {
             if (url === '/api/transactions' && init?.method === 'POST') {
                 return jsonResponse(
                     {
-                        data: { ...creditTransaction, id: 999 },
+                        data: { ...debtPaymentTransaction, id: 999 },
                         message: 'Transaction created successfully',
                     },
                     { status: 201 },
@@ -126,14 +135,14 @@ describe('Transactions - credit (refund / deposit)', () => {
 
             if (url.startsWith('/api/transactions/') && init?.method === 'PUT') {
                 return jsonResponse({
-                    data: creditTransaction,
+                    data: debtPaymentTransaction,
                     message: 'Transaction updated successfully',
                 });
             }
 
             if (url.startsWith('/api/transactions')) {
                 return jsonResponse({
-                    data: [creditTransaction],
+                    data: [debtPaymentTransaction],
                     links: { self: '/api/transactions' },
                     meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
                 });
@@ -143,17 +152,17 @@ describe('Transactions - credit (refund / deposit)', () => {
         });
     });
 
-    it('shows a Credit badge on credit transactions', async () => {
+    it('shows a Debt payment badge on flagged transactions', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
             expect(
-                screen.getByTestId('transaction-credit-badge-123'),
-            ).toHaveTextContent('Credit');
+                screen.getByTestId('transaction-debt-payment-badge-123'),
+            ).toHaveTextContent('Debt payment');
         });
     });
 
-    it('submits is_credit when the credit checkbox is checked', async () => {
+    it('submits is_debt_payment when the paying-a-debt checkbox is checked', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
@@ -166,7 +175,7 @@ describe('Transactions - credit (refund / deposit)', () => {
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
+        expect(screen.getByTestId('is-debt-payment-checkbox')).toBeInTheDocument();
 
         fireEvent.change(screen.getByTestId('transaction-date-input'), {
             target: { value: '2025-01-20' },
@@ -176,12 +185,27 @@ describe('Transactions - credit (refund / deposit)', () => {
         });
 
         fireEvent.click(screen.getByTestId('transaction-category-field'));
-        fireEvent.click(await screen.findByRole('option', { name: /Groceries/ }));
+        fireEvent.click(await screen.findByRole('option', { name: /C001 - Groceries/ }));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('transaction-category-field')).toHaveTextContent(
+                'Groceries',
+            );
+        });
+
+        fireEvent.click(screen.getByTestId('account-field'));
+        fireEvent.click(await screen.findByRole('option', { name: 'RBC Checking' }));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('account-field')).toHaveTextContent(
+                'RBC Checking',
+            );
+        });
 
         fireEvent.change(screen.getByTestId('transaction-amount-input'), {
-            target: { value: '75' },
+            target: { value: '110' },
         });
-        fireEvent.click(screen.getByLabelText('Credit (refund / deposit)'));
+        fireEvent.click(screen.getByLabelText('Paying a debt (cash source)'));
         fireEvent.click(screen.getByTestId('transaction-form-submit'));
 
         await waitFor(() => {
@@ -193,12 +217,13 @@ describe('Transactions - credit (refund / deposit)', () => {
 
             expect(postCall).toBeDefined();
             const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
-            expect(body.is_credit).toBe(true);
-            expect(body.amount_cad).toBe(75);
+            expect(body.is_debt_payment).toBe(true);
+            expect(body.account_id).toBe(account.id);
+            expect(body.amount_cad).toBe(110);
         });
     });
 
-    it('prefills the credit checkbox when editing a credit transaction', async () => {
+    it('prefills the debt payment checkbox when editing', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
@@ -211,13 +236,13 @@ describe('Transactions - credit (refund / deposit)', () => {
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('is-credit-checkbox')).toHaveAttribute(
+        expect(screen.getByTestId('is-debt-payment-checkbox')).toHaveAttribute(
             'data-state',
             'checked',
         );
     });
 
-    it('copies is_credit when duplicating a credit transaction', async () => {
+    it('copies is_debt_payment when duplicating', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
@@ -232,7 +257,7 @@ describe('Transactions - credit (refund / deposit)', () => {
             );
         });
 
-        expect(screen.getByTestId('is-credit-checkbox')).toHaveAttribute(
+        expect(screen.getByTestId('is-debt-payment-checkbox')).toHaveAttribute(
             'data-state',
             'checked',
         );
@@ -248,11 +273,11 @@ describe('Transactions - credit (refund / deposit)', () => {
 
             expect(postCall).toBeDefined();
             const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
-            expect(body.is_credit).toBe(true);
+            expect(body.is_debt_payment).toBe(true);
         });
     });
 
-    it('hides the credit checkbox for income categories', async () => {
+    it('hides the debt payment checkbox for debt categories', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
@@ -265,13 +290,41 @@ describe('Transactions - credit (refund / deposit)', () => {
             expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
+        expect(screen.getByTestId('is-debt-payment-checkbox')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('transaction-category-field'));
+        fireEvent.click(
+            await screen.findByRole('option', { name: /C044 - Ford Escape Auto Loan Payment/ }),
+        );
+
+        await waitFor(() => {
+            expect(
+                screen.queryByTestId('is-debt-payment-checkbox'),
+            ).not.toBeInTheDocument();
+        });
+        expect(screen.getByTestId('debt-component-select')).toBeInTheDocument();
+    });
+
+    it('hides the debt payment checkbox for income categories', async () => {
+        render(<Transactions />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+        });
 
         fireEvent.click(screen.getByTestId('transaction-category-field'));
         fireEvent.click(await screen.findByRole('option', { name: /I01 - Salary/ }));
 
         await waitFor(() => {
-            expect(screen.queryByTestId('is-credit-checkbox')).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId('is-debt-payment-checkbox'),
+            ).not.toBeInTheDocument();
         });
     });
 });

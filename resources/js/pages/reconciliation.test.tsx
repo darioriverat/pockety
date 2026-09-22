@@ -925,14 +925,15 @@ describe('Reconciliation - Records Check', () => {
             },
             records_check: {
                 formula:
-                    'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+                    'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest − Debt payments',
                 income_cad: 1000,
                 net_operating_expenses_cad: 450,
                 assets_difference_cad: 300,
                 liabilities_difference_cad: 150,
                 down_payments_cad: 200,
                 interest_cad: 100,
-                result_cad: 1000,
+                debt_payments_cad: 300,
+                result_cad: 700,
                 is_balanced: false,
             },
             income_total_cad: 1000,
@@ -976,8 +977,11 @@ describe('Reconciliation - Records Check', () => {
         expect(screen.getByTestId('records-check-interest')).toHaveTextContent(
             '100',
         );
+        expect(
+            screen.getByTestId('records-check-debt-payments'),
+        ).toHaveTextContent('300');
         expect(screen.getByTestId('records-check-result')).toHaveTextContent(
-            '$1,000.00',
+            '$700.00',
         );
         expect(screen.getByTestId('records-check-status')).toHaveTextContent(
             'Does not close',
@@ -1001,13 +1005,14 @@ describe('Reconciliation - Records Check', () => {
             },
             records_check: {
                 formula:
-                    'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest',
+                    'Income − Net Operating Expenses + Total assets difference − Total liabilities difference + Down payments + Interest − Debt payments',
                 income_cad: 0,
                 net_operating_expenses_cad: 100,
                 assets_difference_cad: 100,
                 liabilities_difference_cad: 0,
                 down_payments_cad: 0,
                 interest_cad: 0,
+                debt_payments_cad: 0,
                 result_cad: 0,
                 is_balanced: true,
             },

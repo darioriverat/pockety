@@ -34,6 +34,7 @@ describe('FinancialSummary income statement PDF export', () => {
                         debt_principal_excluded_cad: 500,
                         depreciation_excluded_cad: 75,
                         debt_interest_included_cad: 50,
+                        debt_payments_excluded_cad: 0,
                         income_lines: [
                             {
                                 id: 1,

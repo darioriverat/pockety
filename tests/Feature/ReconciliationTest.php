@@ -75,7 +75,8 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(0, $check['liabilities_difference_cad']);
         $this->assertEquals(0, $check['down_payments_cad']);
         $this->assertEquals(0, $check['interest_cad']);
-        // 0 − 100 + 100 − 0 + 0 + 0 = 0
+        $this->assertEquals(0, $check['debt_payments_cad']);
+        // 0 − 100 + 100 − 0 + 0 + 0 − 0 = 0
         $this->assertEquals(0, $check['result_cad']);
         $this->assertTrue($check['is_balanced']);
     }
@@ -837,6 +838,7 @@ class ReconciliationTest extends TestCase
                     'liabilities_difference_cad',
                     'down_payments_cad',
                     'interest_cad',
+                    'debt_payments_cad',
                     'result_cad',
                     'is_balanced',
                 ],
@@ -853,11 +855,13 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(150.0, $check['liabilities_difference_cad']);
         $this->assertEquals(200.0, $check['down_payments_cad']);
         $this->assertEquals(100.0, $check['interest_cad']);
-        // 1000 − 450 + 300 − 150 + 200 + 100 = 1000
-        $this->assertEquals(1000.0, $check['result_cad']);
+        $this->assertEquals(300.0, $check['debt_payments_cad']);
+        // 1000 − 450 + 300 − 150 + 200 + 100 − 300 = 700
+        $this->assertEquals(700.0, $check['result_cad']);
         $this->assertFalse($check['is_balanced']);
         $this->assertStringContainsString('Down payments', $check['formula']);
         $this->assertStringContainsString('Interest', $check['formula']);
+        $this->assertStringContainsString('Debt payments', $check['formula']);
         $this->assertStringContainsString('Net Operating Expenses', $check['formula']);
     }
 
@@ -1015,5 +1019,175 @@ class ReconciliationTest extends TestCase
             'error',
             'Cannot acknowledge a balanced account with zero variance'
         );
+    }
+
+    public function test_records_check_closes_when_debt_cash_source_is_flagged(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $bank = Account::create([
+            'name' => 'Checking',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $loan = Account::create([
+            'name' => 'Auto Loan',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $expense = Category::factory()->create([
+            'code' => 'C001',
+            'name_es' => 'MERCADO',
+            'name_en' => 'Groceries',
+        ]);
+
+        $debt = Category::factory()->debt()->create([
+            'code' => 'C044',
+            'name_es' => 'CREDITO FORD ESCAPE',
+            'name_en' => 'Ford Escape Auto Loan Payment',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $bank->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $loan->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 500,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-15',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $debt->id,
+            'account_id' => $loan->id,
+            'amount_cad' => 100,
+            'debt_component' => 'principal',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-15',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $debt->id,
+            'account_id' => $loan->id,
+            'amount_cad' => 10,
+            'debt_component' => 'interest',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-15',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $expense->id,
+            'account_id' => $bank->id,
+            'amount_cad' => 110,
+            'is_debt_payment' => true,
+        ]);
+
+        $response = $this->getJson('/api/periods/202502/reconciliation');
+
+        $response->assertOk();
+
+        $check = $response->json('data.records_check');
+
+        $this->assertEquals(10.0, $check['net_operating_expenses_cad']);
+        $this->assertEquals(110.0, $check['assets_difference_cad']);
+        $this->assertEquals(100.0, $check['liabilities_difference_cad']);
+        $this->assertEquals(100.0, $check['down_payments_cad']);
+        $this->assertEquals(10.0, $check['interest_cad']);
+        $this->assertEquals(110.0, $check['debt_payments_cad']);
+        // 0 − 10 + 110 − 100 + 100 + 10 − 110 = 0
+        $this->assertEquals(0.0, $check['result_cad']);
+        $this->assertTrue($check['is_balanced']);
+    }
+
+    public function test_records_check_detects_missing_debt_cash_source(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $bank = Account::create([
+            'name' => 'Checking',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $loan = Account::create([
+            'name' => 'Auto Loan',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $debt = Category::factory()->debt()->create([
+            'code' => 'C044',
+            'name_es' => 'CREDITO FORD ESCAPE',
+            'name_en' => 'Ford Escape Auto Loan Payment',
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $bank->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $loan->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 500,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-15',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $debt->id,
+            'account_id' => $loan->id,
+            'amount_cad' => 100,
+            'debt_component' => 'principal',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-02-15',
+            'period' => '202502',
+            'quincena' => 'Q1',
+            'category_id' => $debt->id,
+            'account_id' => $loan->id,
+            'amount_cad' => 10,
+            'debt_component' => 'interest',
+        ]);
+
+        $response = $this->getJson('/api/periods/202502/reconciliation');
+
+        $response->assertOk();
+
+        $check = $response->json('data.records_check');
+
+        $this->assertEquals(10.0, $check['net_operating_expenses_cad']);
+        $this->assertEquals(0.0, $check['assets_difference_cad']);
+        $this->assertEquals(100.0, $check['liabilities_difference_cad']);
+        $this->assertEquals(110.0, $check['debt_payments_cad']);
+        // 0 − 10 + 0 − 100 + 100 + 10 − 110 = -110
+        $this->assertEquals(-110.0, $check['result_cad']);
+        $this->assertFalse($check['is_balanced']);
     }
 }

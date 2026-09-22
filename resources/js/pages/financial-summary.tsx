@@ -68,6 +68,7 @@ interface FinancialSummaryData {
     debt_principal_excluded_cad: number;
     depreciation_excluded_cad: number;
     debt_interest_included_cad: number;
+    debt_payments_excluded_cad: number;
     income_lines: IncomeLine[];
     category_totals: CategoryTotal[];
 }
@@ -242,8 +243,8 @@ export default function FinancialSummary() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="text-xs text-muted-foreground">
-                                        Gasto Real — excludes principal &amp;
-                                        depreciation
+                                        Gasto Real — excludes principal,
+                                        depreciation, and debt-payment spends
                                     </CardContent>
                                 </Card>
                                 <Card>
@@ -413,6 +414,15 @@ export default function FinancialSummary() {
                                                 summary?.depreciation_excluded_cad,
                                             )}
                                         </p>
+                                        <p className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                                            <MinusCircle className="h-4 w-4" />
+                                            Debt payments (cash source):{' '}
+                                            <span data-testid="debt-payments-excluded">
+                                                {formatCad(
+                                                    summary?.debt_payments_excluded_cad,
+                                                )}
+                                            </span>
+                                        </p>
                                         <p>
                                             Debt interest included:{' '}
                                             <strong
@@ -433,7 +443,8 @@ export default function FinancialSummary() {
                                         </CardTitle>
                                         <CardDescription>
                                             Included in Total Recorded
-                                            Disbursements; principal excluded
+                                            Disbursements; principal and
+                                            complementary cash spends excluded
                                             from Net Operating Expenses
                                         </CardDescription>
                                     </CardHeader>

@@ -36,7 +36,7 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(dialog).toBeVisible();
         await page.screenshot({ animations: 'disabled', path: `verification/test-143-form-presentation/${theme}-01-form.png` });
 
-        const ids = ['date', 'period', 'quincena', 'category', 'account', 'currency', 'amount', 'comments', 'is_recurring', 'is_credit'];
+        const ids = ['date', 'period', 'quincena', 'category', 'account', 'currency', 'amount', 'comments', 'is_recurring', 'is_credit', 'is_debt_payment'];
         for (const id of ids) {
             await expect(dialog.locator(`label[for="${id}"]`)).toBeVisible();
             await expect(dialog.locator(`#${id}`)).toHaveAccessibleName(/\S/);

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\FinancialSummaryController::exportPdf
-* @see app/Http/Controllers/FinancialSummaryController.php:63
+* @see app/Http/Controllers/FinancialSummaryController.php:64
 * @route '/api/financial-summary/export'
 */
 export const exportPdf = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ exportPdf.definition = {
 
 /**
 * @see \App\Http\Controllers\FinancialSummaryController::exportPdf
-* @see app/Http/Controllers/FinancialSummaryController.php:63
+* @see app/Http/Controllers/FinancialSummaryController.php:64
 * @route '/api/financial-summary/export'
 */
 exportPdf.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ exportPdf.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\FinancialSummaryController::exportPdf
-* @see app/Http/Controllers/FinancialSummaryController.php:63
+* @see app/Http/Controllers/FinancialSummaryController.php:64
 * @route '/api/financial-summary/export'
 */
 exportPdf.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ exportPdf.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\FinancialSummaryController::exportPdf
-* @see app/Http/Controllers/FinancialSummaryController.php:63
+* @see app/Http/Controllers/FinancialSummaryController.php:64
 * @route '/api/financial-summary/export'
 */
 exportPdf.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ exportPdf.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\FinancialSummaryController::exportPdf
-* @see app/Http/Controllers/FinancialSummaryController.php:63
+* @see app/Http/Controllers/FinancialSummaryController.php:64
 * @route '/api/financial-summary/export'
 */
 const exportPdfForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const exportPdfForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 
 /**
 * @see \App\Http\Controllers\FinancialSummaryController::exportPdf
-* @see app/Http/Controllers/FinancialSummaryController.php:63
+* @see app/Http/Controllers/FinancialSummaryController.php:64
 * @route '/api/financial-summary/export'
 */
 exportPdfForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ exportPdfForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 
 /**
 * @see \App\Http\Controllers\FinancialSummaryController::exportPdf
-* @see app/Http/Controllers/FinancialSummaryController.php:63
+* @see app/Http/Controllers/FinancialSummaryController.php:64
 * @route '/api/financial-summary/export'
 */
 exportPdfForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

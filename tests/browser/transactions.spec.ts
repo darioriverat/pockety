@@ -78,6 +78,7 @@ async function fillTransactionForm(
         comments?: string;
         isRecurring?: boolean;
         isCredit?: boolean;
+        isDebtPayment?: boolean;
         debtComponent?: 'Principal' | 'Interest';
     },
 ): Promise<void> {
@@ -106,6 +107,10 @@ async function fillTransactionForm(
 
     if (values.isCredit) {
         await dialog.getByLabel('Credit (refund / deposit)').click();
+    }
+
+    if (values.isDebtPayment) {
+        await dialog.getByLabel('Paying a debt (cash source)').click();
     }
 
     if (values.debtComponent) {
@@ -482,6 +487,43 @@ test('user can mark a transaction as a credit refund or deposit', async ({
     const transaction = await getTransactionByComments(request, comments);
 
     expect(transaction.is_credit).toBe(true);
+
+    expect(consoleErrors).toEqual([]);
+});
+
+test('user can mark a complementary spend as paying a debt', async ({
+    page,
+    request,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+    const comments = `feature-debt-payment-${Date.now()}`;
+    const account = await createAccount(request, 'Debt Payment Checking');
+
+    await openTransactionsPage(page);
+    await openAddTransactionDialog(page);
+    await fillTransactionForm(page, {
+        date: '2026-01-23',
+        period: '202601',
+        quincena: 'Q1',
+        category: 'C001 - Groceries',
+        account: account.name,
+        currency: 'CAD',
+        amount: '110.00',
+        comments,
+        isDebtPayment: true,
+    });
+    await submitTransactionForm(page, 'Create');
+
+    const transactionCard = page
+        .locator('[data-slot="card"]')
+        .filter({ hasText: comments });
+
+    await expect(transactionCard).toContainText('Debt payment');
+
+    const transaction = await getTransactionByComments(request, comments);
+
+    expect(transaction.is_debt_payment).toBe(true);
+    expect(transaction.account_id).toBe(account.id);
 
     expect(consoleErrors).toEqual([]);
 });

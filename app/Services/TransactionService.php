@@ -208,7 +208,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Create a new transaction.
      *
-     * @param  array{date: string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, debt_component?: string|null}  $data
+     * @param  array{date: string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data
      */
     public function create(array $data): TransactionEntity
     {
@@ -218,8 +218,10 @@ class TransactionService implements TransactionServiceInterface
         // Validate category exists
         $this->validateCategory($data['category_id']);
         $this->validateIncomeRequiresAccount($data);
+        $this->validateDebtPayment($data);
 
         $data['is_credit'] = (bool) ($data['is_credit'] ?? false);
+        $data['is_debt_payment'] = (bool) ($data['is_debt_payment'] ?? false);
 
         $transaction = Transaction::create($data);
         $transaction->load(['category', 'account']);
@@ -230,7 +232,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Update an existing transaction.
      *
-     * @param  array{date?: string, period?: string, quincena?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, debt_component?: string|null}  $data
+     * @param  array{date?: string, period?: string, quincena?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data
      */
     public function update(int $id, array $data): TransactionEntity
     {
@@ -245,9 +247,14 @@ class TransactionService implements TransactionServiceInterface
         }
 
         $this->validateIncomeRequiresAccount($data, $transaction);
+        $this->validateDebtPayment($data, $transaction);
 
         if (array_key_exists('is_credit', $data)) {
             $data['is_credit'] = (bool) $data['is_credit'];
+        }
+
+        if (array_key_exists('is_debt_payment', $data)) {
+            $data['is_debt_payment'] = (bool) $data['is_debt_payment'];
         }
 
         $transaction->update($data);
@@ -336,6 +343,7 @@ class TransactionService implements TransactionServiceInterface
             'comments' => $source->comments,
             'is_recurring' => $source->is_recurring,
             'is_credit' => (bool) $source->is_credit,
+            'is_debt_payment' => (bool) $source->is_debt_payment,
             'debt_component' => $source->debt_component,
         ];
 
@@ -353,8 +361,6 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Get transactions for a specific account and period, applying roll-forward rules.
      *
-     * @param  Account  $account
-     * @param  string  $period
      * @return TransactionEntity[]
      */
     public function getRollForwardTransactionsForAccount(Account $account, string $period): array
@@ -446,6 +452,7 @@ class TransactionService implements TransactionServiceInterface
             'comments' => $transaction->comments,
             'is_recurring' => $transaction->is_recurring,
             'is_credit' => (bool) $transaction->is_credit,
+            'is_debt_payment' => (bool) $transaction->is_debt_payment,
             'debt_component' => $transaction->debt_component,
         ];
 
@@ -542,6 +549,61 @@ class TransactionService implements TransactionServiceInterface
 
         if ($accountId === null) {
             throw new \InvalidArgumentException('Income transactions must be assigned to a deposit account.');
+        }
+    }
+
+    /**
+     * Complementary cash used to pay a debt must be a regular spend on an account.
+     *
+     * @param  array{category_id?: int, account_id?: int|null, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function validateDebtPayment(array $data, ?Transaction $existing = null): void
+    {
+        $isDebtPayment = array_key_exists('is_debt_payment', $data)
+            ? (bool) $data['is_debt_payment']
+            : (bool) $existing?->is_debt_payment;
+
+        if (! $isDebtPayment) {
+            return;
+        }
+
+        $categoryId = $data['category_id'] ?? $existing?->category_id;
+        $category = $categoryId
+            ? Category::query()->whereKey($categoryId)->first()
+            : null;
+
+        if ($category?->is_income_category) {
+            throw new \InvalidArgumentException('Income transactions cannot be marked as debt payments.');
+        }
+
+        if ($category?->is_debt_category) {
+            throw new \InvalidArgumentException('Debt-category transactions use principal or interest, not the debt payment flag.');
+        }
+
+        $isCredit = array_key_exists('is_credit', $data)
+            ? (bool) $data['is_credit']
+            : (bool) $existing?->is_credit;
+
+        if ($isCredit) {
+            throw new \InvalidArgumentException('A credit transaction cannot also be a debt payment.');
+        }
+
+        $debtComponent = array_key_exists('debt_component', $data)
+            ? $data['debt_component']
+            : $existing?->debt_component;
+
+        if ($debtComponent) {
+            throw new \InvalidArgumentException('Principal and interest records cannot also be marked as the cash debt payment.');
+        }
+
+        $accountId = array_key_exists('account_id', $data)
+            ? $data['account_id']
+            : $existing?->account_id;
+
+        if ($accountId === null) {
+            throw new \InvalidArgumentException('Debt payment transactions must be assigned to the account the money left.');
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Account;
 use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Income;
@@ -210,6 +211,58 @@ class FinancialSummaryTest extends TestCase
         $this->assertEquals(500.0, $c044['principal_cad']);
         $this->assertEquals(50.0, $c044['interest_cad']);
         $this->assertEquals(550.0, $c044['total_cad']);
+    }
+
+    public function test_net_operating_expenses_excludes_complementary_debt_payment_spends(): void
+    {
+        $bank = Account::create([
+            'name' => 'Checking',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-10',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->groceries->id,
+            'account_id' => $bank->id,
+            'amount_cad' => 110.00,
+            'is_debt_payment' => true,
+            'comments' => 'Loan cash source',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->fordEscape->id,
+            'amount_cad' => 100.00,
+            'debt_component' => 'principal',
+            'comments' => 'FORD ESC CAPITAL',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'quincena' => 'Q1',
+            'category_id' => $this->fordEscape->id,
+            'amount_cad' => 10.00,
+            'debt_component' => 'interest',
+            'comments' => 'FORD ESC INTERESES',
+        ]);
+
+        $response = $this->getJson('/api/financial-summary?period=202501');
+
+        // Disbursements = 110 + 100 + 10 = 220
+        // Net operating = 220 - 100 principal - 110 debt-payment spend = 10 (interest)
+        $response->assertOk()
+            ->assertJsonPath('data.total_recorded_disbursements_cad', 220)
+            ->assertJsonPath('data.net_operating_expenses_cad', 10)
+            ->assertJsonPath('data.debt_principal_excluded_cad', 100)
+            ->assertJsonPath('data.debt_payments_excluded_cad', 110)
+            ->assertJsonPath('data.debt_interest_included_cad', 10);
     }
 
     public function test_period_is_required_for_financial_summary_api(): void
