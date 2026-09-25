@@ -381,6 +381,7 @@ class ReconciliationService
         $liabilitiesDifference = round((float) $balanceChanges['liabilities']['difference_cad'], 2);
         $downPayments = $this->sumDebtComponentCad($period, 'principal', $exchangeRate);
         $interest = $this->sumDebtComponentCad($period, 'interest', $exchangeRate);
+        $noAccountCredits = $this->sumNoAccountCredits($period, $exchangeRate);
         $debtPayments = round($downPayments + $interest, 2);
 
         $result = round(
@@ -390,7 +391,8 @@ class ReconciliationService
             - $liabilitiesDifference
             + $downPayments
             + $interest
-            - $debtPayments,
+            - $debtPayments
+            - $noAccountCredits,
             2
         );
 
@@ -403,6 +405,7 @@ class ReconciliationService
             'down_payments_cad' => $downPayments,
             'interest_cad' => $interest,
             'debt_payments_cad' => $debtPayments,
+            'no_account_credits_cad' => $noAccountCredits,
             'result_cad' => $result,
             'is_balanced' => abs($result) <= self::VARIANCE_THRESHOLD,
         ];
@@ -416,6 +419,24 @@ class ReconciliationService
         $total = 0.0;
 
         foreach (Transaction::forPeriod($period)->where('debt_component', $component)->get() as $transaction) {
+            $total += $this->amountsCadEquivalent([
+                'cad' => (float) ($transaction->amount_cad ?? 0),
+                'usd' => (float) ($transaction->amount_usd ?? 0),
+                'cop' => (float) ($transaction->amount_cop ?? 0),
+            ], $exchangeRate);
+        }
+
+        return round($total, 2);
+    }
+
+    /**
+     * CAD equivalent of all transactions marked as credits in the period.
+     */
+    private function sumNoAccountCredits(string $period, ExchangeRate $exchangeRate): float
+    {
+        $total = 0.0;
+
+        foreach (Transaction::forPeriod($period)->where('is_credit', true)->whereNull('account_id')->get() as $transaction) {
             $total += $this->amountsCadEquivalent([
                 'cad' => (float) ($transaction->amount_cad ?? 0),
                 'usd' => (float) ($transaction->amount_usd ?? 0),

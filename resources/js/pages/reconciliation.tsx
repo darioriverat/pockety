@@ -107,6 +107,7 @@ interface RecordsCheck {
     down_payments_cad: number;
     interest_cad: number;
     debt_payments_cad: number;
+    no_account_credits_cad: number;
     result_cad: number;
     is_balanced: boolean;
 }
@@ -863,6 +864,21 @@ export default function Reconciliation() {
                                         {formatCurrency(
                                             report.records_check
                                                 .debt_payments_cad ?? 0,
+                                            'CAD',
+                                        )}
+                                    </span>
+                                </div>
+                                <div
+                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
+                                    data-testid="records-check-no-account-credits"
+                                >
+                                    <span className="text-muted-foreground">
+                                        − No Account Credits
+                                    </span>
+                                    <span className="tabular-nums">
+                                        {formatCurrency(
+                                            report.records_check
+                                                .no_account_credits_cad ?? 0,
                                             'CAD',
                                         )}
                                     </span>
