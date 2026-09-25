@@ -16,12 +16,19 @@ tasks:
             -w /var/www/vhosts web_app \
             /bin/bash -l
   dev:
-    desc: Run the development server in the web container
+    desc: Run the front-end development server in the web container
     cmds:
       - |
         docker exec -it -u appuser \
             -w /var/www/vhosts web_app \
             "npm" "run" "dev"
+  build:
+    desc: Build the front-end assets
+    cmds:
+      - |
+        docker exec -it -u appuser \
+            -w /var/www/vhosts web_app \
+            "npm" "run" "build"
   backend-tests:
     desc: Execute backend tests
     cmds:
