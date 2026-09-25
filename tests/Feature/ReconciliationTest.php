@@ -6,6 +6,8 @@ use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\Category;
 use App\Models\ExchangeRate;
+use App\Models\FixedAsset;
+use App\Models\FixedAssetValuation;
 use App\Models\Income;
 use App\Models\Transaction;
 use App\Models\User;
@@ -524,6 +526,84 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(133.33, $equation['variance']['assets_cad']);
         $this->assertEquals(0, $equation['variance']['liabilities_cad']);
         $this->assertEquals(133.33, $equation['variance']['equity_cad']);
+        $this->assertEquals(0, $equation['residual_cad']);
+        $this->assertTrue($equation['is_balanced']);
+    }
+
+    public function test_accounting_equation_includes_fixed_assets_in_assets(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $assetAccount = Account::create([
+            'name' => 'Test Bank',
+            'type' => 'bank',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        $liabilityAccount = Account::create([
+            'name' => 'Test Credit Card',
+            'type' => 'liability',
+            'primary_currency' => 'CAD',
+            'is_active' => true,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $assetAccount->id,
+            'period' => '202501',
+            'recorded_balance_cad' => 1000,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        AccountBalance::create([
+            'account_id' => $liabilityAccount->id,
+            'period' => '202501',
+            'recorded_balance_cad' => -500,
+            'recorded_balance_usd' => 0,
+            'recorded_balance_cop' => 0,
+        ]);
+
+        $valuedAsset = FixedAsset::create([
+            'name' => 'Ford Escape',
+            'initial_value_cad' => 30000,
+            'is_active' => true,
+        ]);
+        FixedAssetValuation::create([
+            'fixed_asset_id' => $valuedAsset->id,
+            'period' => '202501',
+            'book_value_cad' => 25000,
+        ]);
+
+        FixedAsset::create([
+            'name' => 'Laptop',
+            'initial_value_cad' => 2000,
+            'is_active' => true,
+        ]);
+
+        FixedAsset::create([
+            'name' => 'Sold Car',
+            'initial_value_cad' => 9000,
+            'is_active' => false,
+        ]);
+
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        $response->assertOk();
+
+        $equation = $response->json('data.accounting_equation');
+
+        // Account assets 1000 + Ford Escape book value 25000 + Laptop initial 2000.
+        // Inactive Sold Car is excluded. Liabilities stay 500.
+        $this->assertEquals(28000, $equation['assets_cad']);
+        $this->assertEquals(28000, $equation['recorded']['assets_cad']);
+        $this->assertEquals(28000, $equation['computed']['assets_cad']);
+        $this->assertEquals(0, $equation['variance']['assets_cad']);
+        $this->assertEquals(500, $equation['liabilities_cad']);
+        $this->assertEquals(27500, $equation['equity_cad']);
+        $this->assertEquals(27500, $equation['recorded']['equity_cad']);
+        $this->assertEquals(27500, $equation['computed']['equity_cad']);
         $this->assertEquals(0, $equation['residual_cad']);
         $this->assertTrue($equation['is_balanced']);
     }

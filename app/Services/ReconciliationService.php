@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
+use App\Models\FixedAsset;
 use App\Models\Transaction;
 use App\Models\VarianceAcknowledgment;
 use Illuminate\Database\Schema\Blueprint;
@@ -38,7 +39,8 @@ class ReconciliationService
      * - Variance: Recorded minus Computed.
      *
      * Also includes:
-     * - Accounting equation check rolled up from account conciliations
+     * - Accounting equation check rolled up from account conciliations plus
+     *   fixed asset book values
      *   (Assets = Liabilities + Equity in CAD equivalent of recorded and computed balances)
      * - Balance changes: last recorded (initial) vs computed end value per account in CAD
      * - Records check: Income − Net Operating Expenses + Total assets difference
@@ -92,7 +94,7 @@ class ReconciliationService
         $accountsBalanced = collect($results)->every(fn (array $result) => $result['is_balanced']);
 
         $exchangeRate = $this->resolveExchangeRate($period);
-        $equation = $this->checkAccountingEquation($results, $exchangeRate);
+        $equation = $this->checkAccountingEquation($results, $exchangeRate, $period);
         $balanceChanges = $this->buildBalanceChanges($results, $exchangeRate);
 
         // Get income and expenses
@@ -189,8 +191,11 @@ class ReconciliationService
      * Roll up the accounting equation from per-account conciliations.
      *
      * Each account's recorded and computed CAD/USD/COP amounts are converted to
-     * CAD equivalent, then summed. Liabilities use absolute values. Equity is
-     * Assets − Liabilities. Residual is computed Assets − (Liabilities + Equity).
+     * CAD equivalent, then summed. Active fixed asset book values for the period
+     * are included in assets on both the recorded and computed sides (the period
+     * valuation, or the initial value when none exists). Liabilities use absolute
+     * values. Equity is Assets − Liabilities. Residual is computed Assets −
+     * (Liabilities + Equity).
      *
      * Top-level assets_cad / liabilities_cad / equity_cad are the computed CAD
      * equivalent totals so the equation reflects calculated activity rather than
@@ -208,7 +213,7 @@ class ReconciliationService
      *     variance: array{assets_cad: float, liabilities_cad: float, equity_cad: float}
      * }
      */
-    private function checkAccountingEquation(array $accountResults, ExchangeRate $exchangeRate): array
+    private function checkAccountingEquation(array $accountResults, ExchangeRate $exchangeRate, string $period): array
     {
         $recordedAssets = 0.0;
         $computedAssets = 0.0;
@@ -227,6 +232,10 @@ class ReconciliationService
                 $computedLiabilities += abs($computedCad);
             }
         }
+
+        $fixedAssetsCad = $this->fixedAssetsBookValueCad($period);
+        $recordedAssets += $fixedAssetsCad;
+        $computedAssets += $fixedAssetsCad;
 
         $recordedAssets = round($recordedAssets, 2);
         $computedAssets = round($computedAssets, 2);
@@ -259,6 +268,33 @@ class ReconciliationService
                 'equity_cad' => round($recordedEquity - $computedEquity, 2),
             ],
         ];
+    }
+
+    /**
+     * CAD book value of active fixed assets for a period.
+     *
+     * Uses the valuation recorded for the period. When none exists, falls back
+     * to the asset's initial value, matching the balance sheet.
+     */
+    private function fixedAssetsBookValueCad(string $period): float
+    {
+        $total = 0.0;
+
+        foreach (FixedAsset::active()->orderBy('name')->get() as $fixedAsset) {
+            $valuation = $fixedAsset->valuationForPeriod($period);
+
+            if ($valuation !== null) {
+                $total += (float) $valuation->book_value_cad;
+
+                continue;
+            }
+
+            if ($fixedAsset->initial_value_cad !== null) {
+                $total += (float) $fixedAsset->initial_value_cad;
+            }
+        }
+
+        return $total;
     }
 
     /**

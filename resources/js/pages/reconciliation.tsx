@@ -552,9 +552,10 @@ export default function Reconciliation() {
                                 Accounting Equation
                             </SubsectionHeading>
                             <CardDescription>
-                                Sum of account conciliations in CAD equivalent
-                                for {report.period}. Assets = Liabilities +
-                                Equity using calculated operations.
+                                Sum of account conciliations and fixed asset
+                                book values in CAD equivalent for{' '}
+                                {report.period}. Assets = Liabilities + Equity
+                                using calculated operations.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
