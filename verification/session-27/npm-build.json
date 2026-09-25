@@ -1,1 +1,0 @@
-{"success":false,"exit_code":1,"filter":"DOESNOTEXIST","output":"PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\nRuntime:       PHP 8.4.25\nConfiguration: \/var\/www\/vhosts\/phpunit.xml\n\n\u001b[30;43mNo tests executed!\u001b[0m"}

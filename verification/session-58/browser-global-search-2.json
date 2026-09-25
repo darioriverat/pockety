@@ -1,1 +1,0 @@
-{"success":true,"exit_code":0,"filter":"Global search","output":"\nRunning 1 test using 1 worker\n\n  \u2713  1 [chromium] \u203a tests\/browser\/global-search.spec.ts:9:5 \u203a Global search \u203a search box returns accounts, transactions, and categories by type (1.9s)\n\n  1 passed (2.5s)"}

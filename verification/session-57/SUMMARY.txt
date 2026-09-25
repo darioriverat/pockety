@@ -1,5 +1,0 @@
-login_status=200
-ytd_2025={"year":2025,"from_period":"202501","to_period":"202512","ytd_income_cad":10500,"ytd_expenses_cad":1800,"ytd_net_cad":8700,"period_count":12}
-ytd_2026={"year":2026,"from_period":"202601","to_period":"202609","ytd_income_cad":0,"ytd_expenses_cad":0,"ytd_net_cad":0,"period_count":9}
-reviewed=1
-unbalanced=1

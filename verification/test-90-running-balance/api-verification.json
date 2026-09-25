@@ -1,9 +1,0 @@
-{
-  "account_id": 26,
-  "starting_balance": 1000,
-  "current_balance": 700,
-  "newest_running": 700,
-  "oldest_running": 900,
-  "newest_comments": "rb-verify-second",
-  "ok": true
-}
