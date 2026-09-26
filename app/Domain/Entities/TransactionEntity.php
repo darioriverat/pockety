@@ -139,7 +139,7 @@ readonly class TransactionEntity
 
     public function isIncome(): bool
     {
-        return $this->category?->isIncomeCategory ?? false;
+        return $this->category !== null && $this->category->isIncomeCategory;
     }
 
     /**

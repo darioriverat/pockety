@@ -11,15 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {
     Tooltip,
     TooltipContent,
@@ -38,8 +29,6 @@ import {
     AlertTriangle,
     CheckCircle2,
     ExternalLink,
-    ClipboardCheck,
-    AlertCircle,
 } from 'lucide-react';
 
 interface CurrencyAmounts {
@@ -59,9 +48,6 @@ interface AccountReconciliation {
     computed: CurrencyAmounts;
     variance: CurrencyAmounts;
     is_balanced: boolean;
-    is_reviewed: boolean;
-    review_note: string | null;
-    reviewed_at: string | null;
 }
 
 interface EquationTotals {
@@ -206,13 +192,6 @@ export default function Reconciliation() {
     const [report, setReport] = useState<ReconciliationReport | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [acknowledgeAccount, setAcknowledgeAccount] =
-        useState<AccountReconciliation | null>(null);
-    const [acknowledgeNote, setAcknowledgeNote] = useState('');
-    const [acknowledgeSubmitting, setAcknowledgeSubmitting] = useState(false);
-    const [acknowledgeError, setAcknowledgeError] = useState<string | null>(
-        null,
-    );
 
     const loadReconciliation = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -245,77 +224,6 @@ export default function Reconciliation() {
             setReport(null);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const openAcknowledgeDialog = (account: AccountReconciliation) => {
-        setAcknowledgeAccount(account);
-        setAcknowledgeNote(account.review_note ?? '');
-        setAcknowledgeError(null);
-    };
-
-    const submitAcknowledgment = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!acknowledgeAccount || !report) {
-            return;
-        }
-
-        setAcknowledgeSubmitting(true);
-        setAcknowledgeError(null);
-
-        try {
-            const response = await fetch(
-                `/api/periods/${report.period}/reconciliation/${acknowledgeAccount.account_id}/acknowledge`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json',
-                    },
-                    body: JSON.stringify({
-                        note: acknowledgeNote.trim() || null,
-                    }),
-                },
-            );
-
-            if (!response.ok) {
-                const payload = await response.json().catch(() => null);
-                throw new Error(
-                    payload?.error ?? 'Failed to acknowledge variance',
-                );
-            }
-
-            const json = await response.json();
-            const acknowledgment = json.data as {
-                is_reviewed: boolean;
-                review_note: string | null;
-                reviewed_at: string | null;
-            };
-
-            setReport({
-                ...report,
-                accounts: report.accounts.map((account) =>
-                    account.account_id === acknowledgeAccount.account_id
-                        ? {
-                              ...account,
-                              is_reviewed: acknowledgment.is_reviewed,
-                              review_note: acknowledgment.review_note,
-                              reviewed_at: acknowledgment.reviewed_at,
-                          }
-                        : account,
-                ),
-            });
-            setAcknowledgeAccount(null);
-            setAcknowledgeNote('');
-        } catch (err) {
-            setAcknowledgeError(
-                err instanceof Error
-                    ? err.message
-                    : 'Failed to acknowledge variance',
-            );
-        } finally {
-            setAcknowledgeSubmitting(false);
         }
     };
 
@@ -539,8 +447,8 @@ export default function Reconciliation() {
                             {unbalancedAccountCount === 1 ? 'has' : 'have'} a
                             non-zero difference between recorded and computed
                             balances for period {report.period}. Review each
-                            account below — investigate transactions or
-                            acknowledge expected variances.
+                            account below and investigate the transactions
+                            behind each difference.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -974,17 +882,6 @@ export default function Reconciliation() {
                                                     </Tooltip>
                                                 </TooltipProvider>
                                             )}
-                                        {!account.is_balanced &&
-                                            account.is_reviewed && (
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-emerald-600 text-emerald-700 dark:text-emerald-400"
-                                                    data-testid={`variance-reviewed-${account.account_id}`}
-                                                >
-                                                    <ClipboardCheck className="size-3.5 shrink-0 fill-none" />
-                                                    Reviewed
-                                                </Badge>
-                                            )}
                                         <Badge
                                             variant={
                                                 account.is_balanced
@@ -1025,8 +922,7 @@ export default function Reconciliation() {
                                                 )}{' '}
                                                 threshold. Investigate
                                                 transactions to resolve the
-                                                difference, or acknowledge the
-                                                variance if it is expected.
+                                                difference.
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -1054,18 +950,8 @@ export default function Reconciliation() {
                                     'COP',
                                     account,
                                 )}
-                                {!account.is_balanced &&
-                                    account.is_reviewed &&
-                                    account.review_note && (
-                                        <p
-                                            className="text-muted-foreground mt-3 text-sm"
-                                            data-testid={`variance-review-note-${account.account_id}`}
-                                        >
-                                            Review note: {account.review_note}
-                                        </p>
-                                    )}
                                 {!account.is_balanced && (
-                                    <div className="mt-4 flex flex-wrap items-center gap-3 border-t pt-4">
+                                    <div className="mt-4 border-t pt-4">
                                         <TextLink
                                             href={`/accounts/${account.account_id}?period=${report.period}`}
                                             className="inline-flex items-center gap-2 text-sm"
@@ -1076,95 +962,12 @@ export default function Reconciliation() {
                                             </span>
                                             <ExternalLink className="h-4 w-4" />
                                         </TextLink>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() =>
-                                                openAcknowledgeDialog(account)
-                                            }
-                                            data-testid={`acknowledge-variance-${account.account_id}`}
-                                        >
-                                            {account.is_reviewed
-                                                ? 'Update Acknowledgment'
-                                                : 'Acknowledge Variance'}
-                                        </Button>
                                     </div>
                                 )}
                             </CardContent>
                         </Card>
                     ))}
             </PageContainer>
-
-            <Dialog
-                open={acknowledgeAccount !== null}
-                onOpenChange={(open) => {
-                    if (!open) {
-                        setAcknowledgeAccount(null);
-                        setAcknowledgeError(null);
-                    }
-                }}
-            >
-                <DialogContent data-testid="acknowledge-variance-dialog">
-                    <form onSubmit={submitAcknowledgment}>
-                        <DialogHeader>
-                            <DialogTitle>Acknowledge Variance</DialogTitle>
-                            <DialogDescription>
-                                Mark the variance for{' '}
-                                {acknowledgeAccount?.account_name ??
-                                    'this account'}{' '}
-                                as reviewed. The variance amount still shows;
-                                this only records that you acknowledged it.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-3 py-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="acknowledge-note">
-                                    Optional note
-                                </Label>
-                                <Textarea
-                                    id="acknowledge-note"
-                                    value={acknowledgeNote}
-                                    onChange={(e) =>
-                                        setAcknowledgeNote(e.target.value)
-                                    }
-                                    placeholder="e.g. Timing difference pending bank statement"
-                                    rows={3}
-                                    data-testid="acknowledge-note-input"
-                                />
-                            </div>
-                            {acknowledgeError && (
-                                <p
-                                    className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
-                                    role="alert"
-                                    data-testid="acknowledge-error"
-                                >
-                                    <AlertCircle className="h-4 w-4 shrink-0" />
-                                    <span>{acknowledgeError}</span>
-                                </p>
-                            )}
-                        </div>
-                        <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setAcknowledgeAccount(null)}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={acknowledgeSubmitting}
-                                data-testid="acknowledge-submit"
-                            >
-                                {acknowledgeSubmitting
-                                    ? 'Saving…'
-                                    : 'Acknowledge Variance'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
         </>
     );
 }

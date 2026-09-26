@@ -541,18 +541,6 @@ parameters:
 			path: app/Models/Transaction.php
 
 		-
-			message: '#^Class App\\Models\\VarianceAcknowledgment uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Models/VarianceAcknowledgment.php
-
-		-
-			message: '#^Method App\\Models\\VarianceAcknowledgment\:\:account\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Models/VarianceAcknowledgment.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$recorded_balance_cad\.$#'
 			identifier: property.notFound
 			count: 1
@@ -727,12 +715,6 @@ parameters:
 			path: app/Services/FinancialSummaryService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_debt_category\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/ReconciliationService.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
 			identifier: property.notFound
 			count: 1
@@ -745,55 +727,13 @@ parameters:
 			path: app/Services/SearchService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_active\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_debt_category\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_income_category\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/TransactionService.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_en\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_es\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/TransactionService.php

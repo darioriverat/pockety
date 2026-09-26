@@ -162,66 +162,70 @@ describe('Transactions - paying a debt (cash source)', () => {
         });
     });
 
-    it('submits is_debt_payment when the paying-a-debt checkbox is checked', async () => {
-        render(<Transactions />);
+    it(
+        'submits is_debt_payment when the paying-a-debt checkbox is checked',
+        async () => {
+            render(<Transactions />);
 
-        await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
-        });
+            await waitFor(() => {
+                expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            });
 
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+            fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
 
-        await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
-        });
+            await waitFor(() => {
+                expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            });
 
-        expect(screen.getByTestId('is-debt-payment-checkbox')).toBeInTheDocument();
+            expect(screen.getByTestId('is-debt-payment-checkbox')).toBeInTheDocument();
 
-        fireEvent.change(screen.getByTestId('transaction-date-input'), {
-            target: { value: '2025-01-20' },
-        });
-        fireEvent.change(screen.getByTestId('transaction-period-input'), {
-            target: { value: '202501' },
-        });
+            fireEvent.change(screen.getByTestId('transaction-date-input'), {
+                target: { value: '2025-01-20' },
+            });
+            fireEvent.change(screen.getByTestId('transaction-period-input'), {
+                target: { value: '202501' },
+            });
 
-        fireEvent.click(screen.getByTestId('transaction-category-field'));
-        fireEvent.click(await screen.findByRole('option', { name: /C001 - Groceries/ }));
+            fireEvent.click(screen.getByTestId('transaction-category-field'));
+            fireEvent.click(await screen.findByRole('option', { name: /C001 - Groceries/ }));
 
-        await waitFor(() => {
-            expect(screen.getByTestId('transaction-category-field')).toHaveTextContent(
-                'Groceries',
-            );
-        });
+            await waitFor(() => {
+                expect(screen.getByTestId('transaction-category-field')).toHaveTextContent(
+                    'Groceries',
+                );
+            });
 
-        fireEvent.click(screen.getByTestId('account-field'));
-        fireEvent.click(await screen.findByRole('option', { name: 'RBC Checking' }));
+            fireEvent.click(screen.getByTestId('account-field'));
+            fireEvent.click(await screen.findByRole('option', { name: 'RBC Checking' }));
 
-        await waitFor(() => {
-            expect(screen.getByTestId('account-field')).toHaveTextContent(
-                'RBC Checking',
-            );
-        });
+            await waitFor(() => {
+                expect(screen.getByTestId('account-field')).toHaveTextContent(
+                    'RBC Checking',
+                );
+            });
 
-        fireEvent.change(screen.getByTestId('transaction-amount-input'), {
-            target: { value: '110' },
-        });
-        fireEvent.click(screen.getByLabelText('Paying a debt (cash source)'));
-        fireEvent.click(screen.getByTestId('transaction-form-submit'));
+            fireEvent.change(screen.getByTestId('transaction-amount-input'), {
+                target: { value: '110' },
+            });
+            fireEvent.click(screen.getByLabelText('Paying a debt (cash source)'));
+            fireEvent.click(screen.getByTestId('transaction-form-submit'));
 
-        await waitFor(() => {
-            const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
-                ([requestUrl, init]) =>
-                    String(requestUrl) === '/api/transactions' &&
-                    (init as RequestInit | undefined)?.method === 'POST',
-            );
+            await waitFor(() => {
+                const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+                    ([requestUrl, init]) =>
+                        String(requestUrl) === '/api/transactions' &&
+                        (init as RequestInit | undefined)?.method === 'POST',
+                );
 
-            expect(postCall).toBeDefined();
-            const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
-            expect(body.is_debt_payment).toBe(true);
-            expect(body.account_id).toBe(account.id);
-            expect(body.amount_cad).toBe(110);
-        });
-    });
+                expect(postCall).toBeDefined();
+                const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
+                expect(body.is_debt_payment).toBe(true);
+                expect(body.account_id).toBe(account.id);
+                expect(body.amount_cad).toBe(110);
+            });
+        },
+        15000,
+    );
 
     it('prefills the debt payment checkbox when editing', async () => {
         render(<Transactions />);

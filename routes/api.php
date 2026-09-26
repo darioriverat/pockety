@@ -92,9 +92,6 @@ Route::get('/category-actuals', [CategoryActualsController::class, 'index'])->na
 
 // Reconciliation API
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');
-Route::post('/periods/{period}/reconciliation/{accountId}/acknowledge', [ReconciliationController::class, 'acknowledge'])
-    ->name('periods.reconciliation.acknowledge')
-    ->whereNumber('accountId');
 
 // Budget vs actual alias (period in path)
 Route::get('/periods/{period}/budget-vs-actual', [BudgetController::class, 'reportForPeriod'])

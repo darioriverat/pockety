@@ -152,7 +152,6 @@ class FinancialSummaryService
         $depreciationExcluded = 0.0;
         $debtInterestIncluded = 0.0;
 
-
         $noAccountCreditExcluded = 0.0;
 
         foreach ($totalsByCategory as $row) {
@@ -188,9 +187,7 @@ class FinancialSummaryService
         $netOperatingExpenses = $totalRecordedDisbursements
             - $debtPrincipalExcluded
             - $depreciationExcluded
-            - $debtPaymentsExcluded
-            //- $noAccountCreditExcluded
-            ;
+            - $debtPaymentsExcluded;
         $netOperatingExpenses = round($netOperatingExpenses, 2);
 
         return [

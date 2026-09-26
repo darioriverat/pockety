@@ -1,5 +1,4 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
-import reconciliationAcee99 from './reconciliation'
 /**
 * @see \App\Http\Controllers\PeriodHistoryController::history
 * @see app/Http/Controllers/PeriodHistoryController.php:20
@@ -164,7 +163,7 @@ compare.form = compareForm
 
 /**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
-* @see app/Http/Controllers/ReconciliationController.php:22
+* @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
 */
 export const reconciliation = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -179,7 +178,7 @@ reconciliation.definition = {
 
 /**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
-* @see app/Http/Controllers/ReconciliationController.php:22
+* @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
 */
 reconciliation.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -206,7 +205,7 @@ reconciliation.url = (args: { period: string | number } | [period: string | numb
 
 /**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
-* @see app/Http/Controllers/ReconciliationController.php:22
+* @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
 */
 reconciliation.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -216,7 +215,7 @@ reconciliation.get = (args: { period: string | number } | [period: string | numb
 
 /**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
-* @see app/Http/Controllers/ReconciliationController.php:22
+* @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
 */
 reconciliation.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -226,7 +225,7 @@ reconciliation.head = (args: { period: string | number } | [period: string | num
 
 /**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
-* @see app/Http/Controllers/ReconciliationController.php:22
+* @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
 */
 const reconciliationForm = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -236,7 +235,7 @@ const reconciliationForm = (args: { period: string | number } | [period: string 
 
 /**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
-* @see app/Http/Controllers/ReconciliationController.php:22
+* @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
 */
 reconciliationForm.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -246,7 +245,7 @@ reconciliationForm.get = (args: { period: string | number } | [period: string | 
 
 /**
 * @see \App\Http\Controllers\ReconciliationController::reconciliation
-* @see app/Http/Controllers/ReconciliationController.php:22
+* @see app/Http/Controllers/ReconciliationController.php:20
 * @route '/api/periods/{period}/reconciliation'
 */
 reconciliationForm.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -462,7 +461,7 @@ balanceSheet.form = balanceSheetForm
 const periods = {
     history: Object.assign(history, history),
     compare: Object.assign(compare, compare),
-    reconciliation: Object.assign(reconciliation, reconciliationAcee99),
+    reconciliation: Object.assign(reconciliation, reconciliation),
     budgetVsActual: Object.assign(budgetVsActual, budgetVsActual),
     balanceSheet: Object.assign(balanceSheet, balanceSheet),
 }

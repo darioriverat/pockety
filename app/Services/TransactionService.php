@@ -375,6 +375,7 @@ class TransactionService implements TransactionServiceInterface
         $transactionEntities = [];
 
         foreach ($transactions as $transaction) {
+            /** @var Category|null $category */
             $category = $transaction->category;
 
             // Asset accounts omit debts from the roll-forward.
@@ -402,6 +403,8 @@ class TransactionService implements TransactionServiceInterface
 
     /**
      * Sum the amounts of roll-forward transactions for a specific account and period.
+     *
+     * @return array{cad: float, usd: float, cop: float}
      */
     public function sumRollForwardAmountsForAccount(Account $account, string $period): array
     {
@@ -456,16 +459,19 @@ class TransactionService implements TransactionServiceInterface
             'debt_component' => $transaction->debt_component,
         ];
 
-        if ($transaction->relationLoaded('category') && $transaction->category) {
+        /** @var Category|null $category */
+        $category = $transaction->category;
+
+        if ($transaction->relationLoaded('category') && $category instanceof Category) {
             $data['category'] = [
-                'id' => $transaction->category->id,
-                'code' => $transaction->category->code,
-                'name_es' => $transaction->category->name_es,
-                'name_en' => $transaction->category->name_en,
-                'is_debt_category' => $transaction->category->is_debt_category,
-                'is_income_category' => (bool) $transaction->category->is_income_category,
-                'is_active' => $transaction->category->is_active,
-                'status' => $transaction->category->status,
+                'id' => $category->id,
+                'code' => $category->code,
+                'name_es' => $category->name_es,
+                'name_en' => $category->name_en,
+                'is_debt_category' => $category->is_debt_category,
+                'is_income_category' => (bool) $category->is_income_category,
+                'is_active' => $category->is_active,
+                'status' => $category->status,
             ];
         }
 
