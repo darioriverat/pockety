@@ -22,7 +22,7 @@ test('feature 42-45: income entry UI supports multi-currency lines and totals', 
         page.getByRole('button', { name: 'Add Income' }),
     ).toBeVisible();
 
-    await page.getByLabel('Period').fill('202501');
+    await page.getByRole('textbox', { name: 'Period', exact: true }).fill('202501');
     await page.getByRole('button', { name: 'Load Period' }).click();
 
     await page.getByRole('button', { name: 'Add Income' }).click();

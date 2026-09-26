@@ -28,10 +28,25 @@ test.describe('Global search', () => {
         const accountsPayload = (await accountsResponse.json()) as {
             data: Array<{ id: number; name: string }>;
         };
-        const rbcAccount =
-            accountsPayload.data.find((item) =>
-                item.name.toUpperCase().includes('RBC'),
-            ) ?? accountsPayload.data[0];
+        let rbcAccount = accountsPayload.data.find((item) =>
+            item.name.toUpperCase().includes('RBC'),
+        );
+
+        if (!rbcAccount) {
+            const createAccountResponse = await request.post('/api/accounts', {
+                data: {
+                    name: 'RBC Checking',
+                    type: 'bank',
+                    primary_currency: 'CAD',
+                },
+            });
+            expect(createAccountResponse.ok()).toBeTruthy();
+            const createdAccount = (await createAccountResponse.json()) as {
+                data: { id: number; name: string };
+            };
+            rbcAccount = createdAccount.data;
+        }
+
         expect(rbcAccount).toBeTruthy();
 
         const createResponse = await request.post('/api/transactions', {

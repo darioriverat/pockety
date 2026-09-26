@@ -47,6 +47,48 @@ test.describe('Session 57 live verification', () => {
         const consoleErrors = trackConsoleErrors(page);
         await loginAsBrowserTestUser(page);
 
+        await page.evaluate(async () => {
+            const accountResponse = await fetch('/api/accounts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: 'Session 57 Variance Account',
+                    type: 'bank',
+                    primary_currency: 'CAD',
+                }),
+            });
+            const account = await accountResponse.json();
+
+            await fetch('/api/account-balances', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    account_id: account.data.id,
+                    period: '202501',
+                    recorded_balance_cad: '1000.00',
+                    recorded_balance_usd: '0.00',
+                    recorded_balance_cop: '0.00',
+                }),
+            });
+
+            const categoriesResponse = await fetch('/api/categories');
+            const categories = await categoriesResponse.json();
+
+            await fetch('/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: '2025-01-15',
+                    period: '202501',
+                    quincena: 'Q1',
+                    category_id: categories.data[0].id,
+                    account_id: account.data.id,
+                    amount_cad: '25.00',
+                    comments: 'Session 57 large variance',
+                }),
+            });
+        });
+
         await page.goto('/reconciliation');
         await page.locator('#period-input').fill('202501');
         await page.getByRole('button', { name: 'View Reconciliation' }).click();
@@ -55,8 +97,9 @@ test.describe('Session 57 live verification', () => {
             page.getByTestId('reconciliation-status'),
         ).toBeVisible();
 
-        // Existing seeded unbalanced account from prior sessions
-        const warning = page.locator('[data-testid^="variance-warning-"]').first();
+        const warning = page
+            .locator('[data-account-name="Session 57 Variance Account"]')
+            .getByTestId(/^variance-warning-\d+$/);
         await expect(warning).toBeVisible({ timeout: 10000 });
 
         await page.screenshot({

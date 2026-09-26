@@ -12,7 +12,13 @@ for (const theme of ['light', 'dark'] as const) {
         
         // Navigate to transactions page and open add transaction form
         await page.getByTestId('nav-link-transactions').click();
-        await page.getByRole('button', { name: 'Add Transaction', exact: true }).click();
+        await expect(page).toHaveURL(/\/transactions/);
+        const addButton = page.getByRole('button', {
+            name: 'Add Transaction',
+            exact: true,
+        });
+        await expect(addButton).toBeVisible();
+        await addButton.click();
         
         const dialog = page.getByTestId('transaction-form-dialog');
         await expect(dialog).toBeVisible();
@@ -24,12 +30,13 @@ for (const theme of ['light', 'dark'] as const) {
         });
         
         // Step 3: Verify checkbox uses custom styling (not browser default)
-        const checkbox = dialog.locator('#is_recurring');
+        const checkbox = dialog.getByRole('checkbox', {
+            name: 'Recurring transaction',
+        });
         await expect(checkbox).toBeVisible();
         
-        // Check that Radix UI checkbox is being used (has data-slot attribute)
-        const checkboxRoot = checkbox.locator('xpath=..');
-        await expect(checkboxRoot).toHaveAttribute('data-slot', 'checkbox');
+        // Radix checkbox root carries data-slot, not its wrapper
+        await expect(checkbox).toHaveAttribute('data-slot', 'checkbox');
         
         // Verify custom styling classes are present
         const checkboxClasses = await checkbox.evaluate((el) => el.className);

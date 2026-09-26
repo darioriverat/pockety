@@ -9,13 +9,20 @@ for (const theme of ['light', 'dark'] as const) {
         await page.emulateMedia({ colorScheme: theme });
         await page.setViewportSize({ width: 1440, height: 900 });
         await loginAsBrowserTestUser(page);
+
+        // Sidebar tooltips are shown when the sidebar is collapsed to icons.
+        await page.getByTestId('nav-menu-trigger').click();
+        await expect(
+            page.locator('[data-slot="sidebar"][data-variant="inset"]'),
+        ).toHaveAttribute('data-state', 'collapsed');
         
-        // Step 1: Navigate to page with tooltips (app header navigation icons)
-        // The Repository and Documentation icons in the header have tooltips
+        // Step 1: Navigate to page with tooltips (sidebar footer icons)
+        // The Repository and Documentation icons have tooltips
         
         // Step 2 & 3: Hover over tooltip trigger and take screenshot
-        // Find the Repository icon button in the header
-        const repoLink = page.locator('a[href*="github.com"]').first();
+        const repoLink = page
+            .getByTestId('app-sidebar')
+            .getByRole('link', { name: 'Repository' });
         await expect(repoLink).toBeVisible();
         
         // Take screenshot before hover
@@ -56,7 +63,7 @@ for (const theme of ['light', 'dark'] as const) {
         expect(isAbove || isBelow || isLeft || isRight).toBe(true);
         
         // Step 6: Verify tooltip disappears on mouse out
-        await page.mouse.move(0, 0); // Move mouse away
+        await page.mouse.move(900, 300);
         await page.waitForTimeout(200);
         
         await expect(tooltip).not.toBeVisible();
@@ -68,7 +75,9 @@ for (const theme of ['light', 'dark'] as const) {
         });
         
         // Test Documentation tooltip as well
-        const docsLink = page.locator('a[href*="laravel.com"]').first();
+        const docsLink = page
+            .getByTestId('app-sidebar')
+            .getByRole('link', { name: 'Documentation' });
         await docsLink.hover();
         await page.waitForTimeout(300);
         
@@ -100,7 +109,7 @@ for (const theme of ['light', 'dark'] as const) {
         expect(tooltipStyles.padding).toContain('12px'); // px-3 py-1.5
         
         // Test focus-based tooltip (keyboard accessibility)
-        await page.mouse.move(0, 0); // Move mouse away
+        await page.mouse.move(900, 300);
         await page.waitForTimeout(200);
         await expect(tooltip).not.toBeVisible();
         

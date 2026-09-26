@@ -188,7 +188,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (
                                     <Tooltip key={item.title}>
-                                        <TooltipTrigger>
+                                        <TooltipTrigger asChild>
                                             <a
                                                 href={toUrl(item.href)}
                                                 target="_blank"

@@ -69,7 +69,7 @@ for (const theme of ['light', 'dark'] as const) {
         expect(parseFloat(dropdownStyles.borderRadius)).toBeGreaterThan(0);
         
         // Step 6: Select an item and verify selected state is highlighted
-        const option = page.getByRole('option', { name: /C001.*MERCADO/i });
+        const option = page.getByRole('option', { name: /C001.*(Groceries|MERCADO)/i });
         await expect(option).toBeVisible();
         await option.click();
         
@@ -95,7 +95,7 @@ for (const theme of ['light', 'dark'] as const) {
         });
         
         // Verify check icon is visible on selected item
-        const selectedOption = page.getByRole('option', { name: /C001.*MERCADO/i });
+        const selectedOption = page.getByRole('option', { name: /C001.*(Groceries|MERCADO)/i });
         const checkIcon = selectedOption.locator('svg.lucide-check');
         await expect(checkIcon).toBeVisible();
         

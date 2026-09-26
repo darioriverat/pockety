@@ -26,20 +26,22 @@ test('feature 40: imported accounts list shows Canadian and Colombian institutio
 
     await page.goto('/accounts');
     await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible();
-    await expect(page.getByText('Assets')).toBeVisible();
-    await expect(page.getByText('Liabilities')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Assets' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Liabilities' })).toBeVisible();
 
-    // Canadian institutions
-    await expect(page.getByText(/RBC/)).toBeVisible();
-    await expect(page.getByText(/CIBC/)).toBeVisible();
+    // Canadian institutions. Several imported accounts share these names.
+    await expect(page.getByText(/RBC/).first()).toBeVisible();
+    await expect(page.getByText(/CIBC/).first()).toBeVisible();
     await expect(page.getByText(/TD Bank/)).toBeVisible();
     await expect(page.getByText('Wise')).toBeVisible();
 
     // Colombian institutions
-    await expect(page.getByText(/Bancolombia/)).toBeVisible();
+    await expect(page.getByText(/Bancolombia/).first()).toBeVisible();
     await expect(page.getByText('Davivienda')).toBeVisible();
     await expect(page.getByText('Nequi')).toBeVisible();
-    await expect(page.getByText('Éxito')).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Éxito', exact: true }),
+    ).toBeVisible();
 
     // Type + currencies shown on an account card
     await expect(page.getByText('Bank Account').first()).toBeVisible();
@@ -77,6 +79,8 @@ test('feature 95: Account form validates that account name is unique', async ({
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
+    // Earlier tests import historical accounts, including "RBC Checking".
+    resetBrowserState();
     await loginAsBrowserTestUser(page);
 
     await page.goto('/accounts');
