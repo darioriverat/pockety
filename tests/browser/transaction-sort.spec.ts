@@ -9,7 +9,7 @@ async function getCategories(request: APIRequestContext) {
     const response = await request.get('/api/categories');
     expect(response.ok()).toBeTruthy();
     const body = (await response.json()) as {
-        data: Array<{ id: number; code: string; name_en: string }>;
+        data: Array<{ id: number; code: string; name: string }>;
     };
     return body.data;
 }
@@ -216,13 +216,13 @@ test('feature 122: user can sort transactions table by category', async ({
     const categories = await getCategories(request);
 
     const groceries =
-        categories.find((c) => c.name_en === 'Groceries') ?? categories[0];
+        categories.find((c) => c.name === 'Groceries') ?? categories[0];
     const transport =
-        categories.find((c) => c.name_en === 'Transportation') ??
+        categories.find((c) => c.name === 'Transportation') ??
         categories.find((c) => c.code === 'C004') ??
         categories[1];
     const utilities =
-        categories.find((c) => c.name_en === 'Utilities') ??
+        categories.find((c) => c.name === 'Utilities') ??
         categories.find((c) => c.code === 'C010') ??
         categories[2];
 
@@ -263,16 +263,13 @@ test('feature 122: user can sort transactions table by category', async ({
         .poll(async () => {
             const cats = await rowCategories(page);
             return cats.map((text) => {
-                if (text.includes('Groceries') || text.includes('MERCADO')) {
+                if (text.includes('Groceries')) {
                     return 'Groceries';
                 }
-                if (
-                    text.includes('Transportation') ||
-                    text.includes('TRANSPORTES')
-                ) {
+                if (text.includes('Transportation')) {
                     return 'Transportation';
                 }
-                if (text.includes('Utilities') || text.includes('SERVICIOS')) {
+                if (text.includes('Utilities')) {
                     return 'Utilities';
                 }
                 return text;
@@ -295,16 +292,13 @@ test('feature 122: user can sort transactions table by category', async ({
         .poll(async () => {
             const cats = await rowCategories(page);
             return cats.map((text) => {
-                if (text.includes('Groceries') || text.includes('MERCADO')) {
+                if (text.includes('Groceries')) {
                     return 'Groceries';
                 }
-                if (
-                    text.includes('Transportation') ||
-                    text.includes('TRANSPORTES')
-                ) {
+                if (text.includes('Transportation')) {
                     return 'Transportation';
                 }
-                if (text.includes('Utilities') || text.includes('SERVICIOS')) {
+                if (text.includes('Utilities')) {
                     return 'Utilities';
                 }
                 return text;

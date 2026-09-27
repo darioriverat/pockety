@@ -37,15 +37,13 @@ import {
 interface CategoryOption {
     id: number;
     code: string;
-    name_es: string;
-    name_en: string;
+    name: string;
 }
 
 interface BudgetRow {
     category_id: number;
     category_code: string;
-    category_name_es: string;
-    category_name_en: string;
+    category_name: string;
     budget_cad: number | null;
     actual_cad: number;
     variance_cad: number | null;
@@ -295,9 +293,7 @@ export default function Budgets() {
                                                     key={category.code}
                                                     value={category.code}
                                                 >
-                                                    {category.code} —{' '}
-                                                    {category.name_es} /{' '}
-                                                    {category.name_en}
+                                                    {category.code} — {category.name}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -470,7 +466,7 @@ export default function Budgets() {
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                                                         {row.category_code}{' '}
                                                         <span className="font-normal text-gray-500">
-                                                            {row.category_name_es}
+                                                            {row.category_name}
                                                         </span>
                                                     </td>
                                                     <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300">

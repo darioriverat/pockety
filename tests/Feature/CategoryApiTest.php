@@ -30,8 +30,7 @@ class CategoryApiTest extends TestCase
 
         $sample = $data[0];
         $this->assertArrayHasKey('code', $sample);
-        $this->assertArrayHasKey('name_es', $sample);
-        $this->assertArrayHasKey('name_en', $sample);
+        $this->assertArrayHasKey('name', $sample);
         $this->assertArrayHasKey('is_debt_category', $sample);
         $this->assertArrayHasKey('is_income_category', $sample);
 

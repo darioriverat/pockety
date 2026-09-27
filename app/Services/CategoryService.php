@@ -226,8 +226,7 @@ class CategoryService implements CategoryServiceInterface
         return new CategoryEntity(
             id: $category->id,
             code: $category->code,
-            nameEs: $category->name_es,
-            nameEn: $category->name_en,
+            name: $category->name,
             isDebtCategory: (bool) $category->is_debt_category,
             isActive: (bool) $category->is_active,
             status: $category->status,

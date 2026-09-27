@@ -26,8 +26,7 @@ class PeriodHistoryTest extends TestCase
 
         $this->groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);

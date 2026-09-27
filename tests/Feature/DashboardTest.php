@@ -63,7 +63,7 @@ class DashboardTest extends TestCase
         ]);
 
         // Create category and account
-        $category = Category::factory()->create(['code' => 'C001', 'name_en' => 'Groceries']);
+        $category = Category::factory()->create(['code' => 'C001', 'name' => 'Groceries']);
         $account = Account::factory()->create(['type' => 'bank', 'name' => 'Test Bank']);
 
         // Create expense transaction
@@ -408,33 +408,27 @@ class DashboardTest extends TestCase
 
         $c001 = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
         ]);
         $c006 = Category::factory()->create([
             'code' => 'C006',
-            'name_es' => 'COMIDAS CALLE',
-            'name_en' => 'Dining Out',
+            'name' => 'Dining Out',
         ]);
         $c004 = Category::factory()->create([
             'code' => 'C004',
-            'name_es' => 'TRANSPORTES',
-            'name_en' => 'Transportation',
+            'name' => 'Transportation',
         ]);
         $c008 = Category::factory()->create([
             'code' => 'C008',
-            'name_es' => 'SERVICIOS',
-            'name_en' => 'Utilities',
+            'name' => 'Utilities',
         ]);
         $c005 = Category::factory()->create([
             'code' => 'C005',
-            'name_es' => 'HOGAR',
-            'name_en' => 'Household',
+            'name' => 'Household',
         ]);
         $c007 = Category::factory()->create([
             'code' => 'C007',
-            'name_es' => 'JUGUETES NIÑAS',
-            'name_en' => "Kids' Toys",
+            'name' => "Kids' Toys",
         ]);
 
         $spendByCategory = [
@@ -508,8 +502,7 @@ class DashboardTest extends TestCase
         ]);
         $category = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
         ]);
 
         $older = Transaction::create([

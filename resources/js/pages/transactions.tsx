@@ -34,10 +34,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { CategoryLanguageToggle } from '@/components/category-language-toggle';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
-import { useCategoryLanguage } from '@/hooks/use-category-language';
 import { usePeriod } from '@/hooks/use-period';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
@@ -93,8 +91,7 @@ function isValidTransactionDate(value: string): boolean {
 interface Category {
     id: number;
     code: string;
-    name_es: string;
-    name_en: string;
+    name: string;
     is_debt_category: boolean;
     is_income_category?: boolean;
 }
@@ -174,7 +171,6 @@ interface FilterState {
 
 export default function Transactions() {
     const { period, setPeriod } = usePeriod();
-    const { language, setLanguage, getCategoryName } = useCategoryLanguage();
     const periods = generatePeriods();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -871,10 +867,6 @@ export default function Transactions() {
                         data-testid="transactions-heading"
                     />
                     <div className="flex flex-wrap items-center gap-3">
-                        <CategoryLanguageToggle
-                            value={language}
-                            onChange={setLanguage}
-                        />
                         <div className="flex gap-2">
                         <Button
                             variant="outline"
@@ -949,7 +941,7 @@ export default function Transactions() {
                                                             data-testid={`bulk-category-option-${cat.code}`}
                                                         >
                                                             {cat.code} -{' '}
-                                                            {getCategoryName(cat)}
+                                                            {cat.name}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -1099,7 +1091,7 @@ export default function Transactions() {
                                         </div>
                                         <div className="grid content-start gap-2">
                                             <Label htmlFor="quincena">
-                                                Quincena
+                                                Pay period
                                             </Label>
                                             <Select
                                                 value={formData.quincena}
@@ -1115,7 +1107,7 @@ export default function Transactions() {
                                                 <SelectTrigger
                                                     className="w-full"
                                                     id="quincena"
-                                                    aria-label="Quincena"
+                                                    aria-label="Pay period"
                                                 >
                                                     <SelectValue />
                                                 </SelectTrigger>
@@ -1188,7 +1180,7 @@ export default function Transactions() {
                                                         value={cat.id.toString()}
                                                     >
                                                         {cat.code} -{' '}
-                                                        {getCategoryName(cat)}
+                                                        {cat.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -1609,7 +1601,7 @@ export default function Transactions() {
                                 data-testid="category-detail-heading"
                             >
                                 {detailCategory.code} —{' '}
-                                {getCategoryName(detailCategory)}
+                                {detailCategory.name}
                             </CardTitle>
                             <CardDescription>
                                 Detailed transactions for period{' '}
@@ -1730,7 +1722,7 @@ export default function Transactions() {
                                                 key={cat.id}
                                                 value={cat.id.toString()}
                                             >
-                                                {cat.code} - {getCategoryName(cat)}
+                                                {cat.code} - {cat.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -1738,7 +1730,7 @@ export default function Transactions() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="filter-quincena">Quincena</Label>
+                                <Label htmlFor="filter-quincena">Pay period</Label>
                                 <Select
                                     value={filters.quincena || 'all'}
                                     onValueChange={(value) =>
@@ -2155,9 +2147,7 @@ export default function Transactions() {
                                                                     .category.code
                                                             }{' '}
                                                             -{' '}
-                                                            {getCategoryName(
-                                                                transaction.category,
-                                                            )}
+                                                            {transaction.category.name}
                                                             {transaction.category
                                                                 .is_income_category && (
                                                                 <Badge

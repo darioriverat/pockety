@@ -27,24 +27,21 @@ class CategoryActualsTest extends TestCase
 
         $this->groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         $this->transport = Category::factory()->create([
             'code' => 'C004',
-            'name_es' => 'TRANSPORTES',
-            'name_en' => 'Transportation',
+            'name' => 'Transportation',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         Category::factory()->create([
             'code' => 'C040',
-            'name_es' => 'MESADA NIÑAS',
-            'name_en' => 'Kids Allowance (retired)',
+            'name' => 'Kids Allowance (retired)',
             'is_debt_category' => false,
             'is_active' => false,
         ]);

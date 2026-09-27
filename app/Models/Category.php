@@ -12,8 +12,7 @@ class Category extends Model
 
     protected $fillable = [
         'code',
-        'name_es',
-        'name_en',
+        'name',
         'is_debt_category',
         'is_income_category',
         'is_active',
@@ -64,23 +63,5 @@ class Category extends Model
     public function scopeIncomeCategories($query)
     {
         return $query->where('is_income_category', true);
-    }
-
-    /**
-     * Get the display name based on locale.
-     */
-    public function getDisplayNameAttribute(): string
-    {
-        $locale = app()->getLocale();
-
-        return $locale === 'es' ? $this->name_es : $this->name_en;
-    }
-
-    /**
-     * Get both Spanish and English names formatted.
-     */
-    public function getFullNameAttribute(): string
-    {
-        return "{$this->name_es} / {$this->name_en}";
     }
 }

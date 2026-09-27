@@ -30,7 +30,6 @@ vi.mock('@inertiajs/react', () => ({
                     id: 1,
                     name: 'Test User',
                     email: 'test@example.com',
-                    category_language: 'en',
                 },
             },
         },
@@ -47,8 +46,7 @@ vi.mock('@/hooks/use-period', () => ({
 const groceries = {
     id: 1,
     code: 'C001',
-    name_es: 'MERCADO',
-    name_en: 'Groceries',
+    name: 'Groceries',
     is_debt_category: false,
     is_income_category: false,
 };
@@ -56,8 +54,7 @@ const groceries = {
 const incomeCategory = {
     id: 47,
     code: 'I01',
-    name_es: 'SALARIO',
-    name_en: 'Salary',
+    name: 'Salary',
     is_debt_category: false,
     is_income_category: true,
 };

@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -11,18 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
-import { CategoryLanguageToggle } from '@/components/category-language-toggle';
 import TextLink from '@/components/text-link';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
-import { useCategoryLanguage } from '@/hooks/use-category-language';
-import type { Auth } from '@/types';
 
 interface Category {
     id: number;
     code: string;
-    name_es: string;
-    name_en: string;
+    name: string;
     is_debt_category: boolean;
     is_income_category?: boolean;
     is_active: boolean;
@@ -39,18 +35,7 @@ interface ApiResponse {
     };
 }
 
-type PageProps = {
-    auth?: Auth;
-};
-
 export default function Categories() {
-    const { auth } = usePage<PageProps>().props;
-    const { language, setLanguage, getCategoryName } = useCategoryLanguage(
-        auth?.user?.category_language === 'es' ||
-            auth?.user?.category_language === 'en'
-            ? auth.user.category_language
-            : undefined,
-    );
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -124,10 +109,6 @@ export default function Categories() {
                         title="Categories"
                         description="View all active expense and income categories for your finance tracking"
                     />
-                    <CategoryLanguageToggle
-                        value={language}
-                        onChange={setLanguage}
-                    />
                 </div>
 
                 {error && (
@@ -162,7 +143,7 @@ export default function Categories() {
 
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {categories.map((category) => {
-                                const displayName = getCategoryName(category);
+                                const displayName = category.name;
 
                                 return (
                                 <Card
@@ -231,11 +212,8 @@ export default function Categories() {
                                                     data-testid={`category-name-${category.code}`}
                                                 >
                                                     <span className="font-medium">
-                                                        {language === 'es'
-                                                            ? 'ES:'
-                                                            : 'EN:'}
-                                                    </span>{' '}
-                                                    {displayName}
+                                                        {displayName}
+                                                    </span>
                                                 </div>
                                                 {category.status && (
                                                     <div className="text-xs text-muted-foreground mt-2">

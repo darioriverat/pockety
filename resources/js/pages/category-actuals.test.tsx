@@ -36,8 +36,7 @@ describe('CategoryActuals page', () => {
             {
                 category_id: 1,
                 category_code: 'C001',
-                category_name_es: 'MERCADO',
-                category_name_en: 'Groceries',
+                category_name: 'Groceries',
                 is_debt_category: false,
                 actual_cad: 150.25,
                 transaction_count: 2,
@@ -45,8 +44,7 @@ describe('CategoryActuals page', () => {
             {
                 category_id: 2,
                 category_code: 'C004',
-                category_name_es: 'TRANSPORTES',
-                category_name_en: 'Transportation',
+                category_name: 'Transportation',
                 is_debt_category: false,
                 actual_cad: 0,
                 transaction_count: 0,

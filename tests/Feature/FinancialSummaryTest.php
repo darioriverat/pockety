@@ -31,32 +31,28 @@ class FinancialSummaryTest extends TestCase
 
         $this->groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         $this->fordEscape = Category::factory()->create([
             'code' => 'C044',
-            'name_es' => 'CREDITO FORD ESCAPE',
-            'name_en' => 'Ford Escape Auto Loan Payment',
+            'name' => 'Ford Escape Auto Loan Payment',
             'is_debt_category' => true,
             'is_active' => true,
         ]);
 
         $this->depreciation = Category::factory()->create([
             'code' => 'C045',
-            'name_es' => 'DEPRECIACIONES',
-            'name_en' => 'Depreciation',
+            'name' => 'Depreciation',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         Category::factory()->create([
             'code' => 'C009',
-            'name_es' => 'CRÉDITO DAVIVIENDA',
-            'name_en' => 'Davivienda Credit Payment',
+            'name' => 'Davivienda Credit Payment',
             'is_debt_category' => true,
             'is_active' => true,
         ]);
@@ -349,7 +345,7 @@ class FinancialSummaryTest extends TestCase
         $this->assertStringContainsString('Primary Salary', $pdf);
         $this->assertStringContainsString('Total Income', $pdf);
         $this->assertStringContainsString('C001', $pdf);
-        $this->assertStringContainsString('MERCADO', $pdf);
+        $this->assertStringContainsString('Groceries', $pdf);
         $this->assertStringContainsString('Net Operating Expenses', $pdf);
     }
 

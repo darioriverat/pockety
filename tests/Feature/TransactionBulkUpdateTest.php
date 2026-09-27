@@ -26,16 +26,14 @@ class TransactionBulkUpdateTest extends TestCase
 
         $this->groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         $this->baking = Category::factory()->create([
             'code' => 'C002',
-            'name_es' => 'REPOSTERÍA',
-            'name_en' => 'Baking Supplies',
+            'name' => 'Baking Supplies',
             'is_debt_category' => false,
             'is_active' => true,
         ]);

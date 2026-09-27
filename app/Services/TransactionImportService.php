@@ -178,7 +178,7 @@ class TransactionImportService
 
         $comments = strtolower($comments);
 
-        // Check if this is a debt category (categories starting with CRÉDITO or CREDITO)
+        // Check if this is a debt category
         $category = Category::where('code', $categoryCode)->first();
         if (! $category || ! $category->is_debt_category) {
             return null;

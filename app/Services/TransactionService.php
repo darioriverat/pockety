@@ -123,7 +123,7 @@ class TransactionService implements TransactionServiceInterface
             'category' => $query
                 ->leftJoin('categories', 'transactions.category_id', '=', 'categories.id')
                 ->select('transactions.*')
-                ->orderBy('categories.name_en', $sortDir)
+                ->orderBy('categories.name', $sortDir)
                 ->orderBy('categories.code', $sortDir)
                 ->orderBy('transactions.id', $sortDir),
             default => $query->orderBy('date', $sortDir)->orderBy('id', $sortDir),
@@ -182,8 +182,7 @@ class TransactionService implements TransactionServiceInterface
                     ->orWhereHas('category', function (Builder $categoryQuery) use ($search) {
                         $categoryQuery
                             ->where('code', 'like', '%'.$search.'%')
-                            ->orWhere('name_en', 'like', '%'.$search.'%')
-                            ->orWhere('name_es', 'like', '%'.$search.'%');
+                            ->orWhere('name', 'like', '%'.$search.'%');
                     });
             });
         }
@@ -466,8 +465,7 @@ class TransactionService implements TransactionServiceInterface
             $data['category'] = [
                 'id' => $category->id,
                 'code' => $category->code,
-                'name_es' => $category->name_es,
-                'name_en' => $category->name_en,
+                'name' => $category->name,
                 'is_debt_category' => $category->is_debt_category,
                 'is_income_category' => (bool) $category->is_income_category,
                 'is_active' => $category->is_active,

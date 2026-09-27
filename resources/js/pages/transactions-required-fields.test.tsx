@@ -15,7 +15,6 @@ vi.mock('@inertiajs/react', () => ({
                     id: 1,
                     name: 'Test User',
                     email: 'test@example.com',
-                    category_language: 'en',
                 },
             },
         },
@@ -43,8 +42,7 @@ const mockFetch = (url: string) => {
                         {
                             id: 1,
                             code: 'C001',
-                            name_es: 'MERCADO',
-                            name_en: 'Groceries',
+                            name: 'Groceries',
                             is_debt_category: false,
                         },
                     ],
@@ -91,7 +89,7 @@ describe('Transactions - Required Field Validation', () => {
         fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
         const dialog = await screen.findByTestId('transaction-form-dialog');
         for (const name of [
-            'Date (YYYY-MM-DD)', 'Period (YYYYMM)', 'Quincena', 'Category',
+            'Date (YYYY-MM-DD)', 'Period (YYYYMM)', 'Pay period', 'Category',
             'Account', 'Currency', 'Amount', 'Comments', 'Recurring transaction',
             'Credit (refund / deposit)',
         ]) {

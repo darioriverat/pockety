@@ -26,22 +26,19 @@ class TransactionSortTest extends TestCase
 
         $this->groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_active' => true,
         ]);
 
         $this->transport = Category::factory()->create([
             'code' => 'C004',
-            'name_es' => 'TRANSPORTES',
-            'name_en' => 'Transportation',
+            'name' => 'Transportation',
             'is_active' => true,
         ]);
 
         $this->utilities = Category::factory()->create([
             'code' => 'C010',
-            'name_es' => 'SERVICIOS',
-            'name_en' => 'Utilities',
+            'name' => 'Utilities',
             'is_active' => true,
         ]);
     }
@@ -172,14 +169,14 @@ class TransactionSortTest extends TestCase
         $asc->assertOk();
         $this->assertSame(
             ['Groceries', 'Transportation', 'Utilities'],
-            collect($asc->json('data'))->pluck('category.name_en')->all()
+            collect($asc->json('data'))->pluck('category.name')->all()
         );
 
         $desc = $this->getJson('/api/transactions?period=202609&sort_by=category&sort_dir=desc&page=1&per_page=25');
         $desc->assertOk();
         $this->assertSame(
             ['Utilities', 'Transportation', 'Groceries'],
-            collect($desc->json('data'))->pluck('category.name_en')->all()
+            collect($desc->json('data'))->pluck('category.name')->all()
         );
     }
 

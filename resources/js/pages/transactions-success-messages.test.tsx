@@ -31,7 +31,6 @@ vi.mock('@inertiajs/react', () => ({
                     id: 1,
                     name: 'Test User',
                     email: 'test@example.com',
-                    category_language: 'en',
                 },
             },
         },
@@ -64,8 +63,7 @@ const baseTransaction = {
     category: {
         id: 1,
         code: 'C001',
-        name_es: 'MERCADO',
-        name_en: 'Groceries',
+        name: 'Groceries',
         is_debt_category: false,
     },
 };
@@ -85,8 +83,7 @@ describe('Transactions - Success Messages', () => {
                             {
                                 id: 1,
                                 code: 'C001',
-                                name_es: 'MERCADO',
-                                name_en: 'Groceries',
+                                name: 'Groceries',
                                 is_debt_category: false,
                             },
                         ],
@@ -308,8 +305,7 @@ describe('Transactions - Success Messages', () => {
                             {
                                 id: 1,
                                 code: 'C001',
-                                name_es: 'MERCADO',
-                                name_en: 'Groceries',
+                                name: 'Groceries',
                                 is_debt_category: false,
                             },
                         ],

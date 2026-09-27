@@ -4,8 +4,7 @@ import { expect, type Page } from '@playwright/test';
 export interface ApiCategory {
     id: number;
     code: string;
-    name_en: string;
-    name_es: string;
+    name: string;
     is_debt_category: boolean;
     is_income_category?: boolean;
 }

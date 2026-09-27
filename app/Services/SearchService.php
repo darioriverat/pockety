@@ -117,8 +117,7 @@ class SearchService implements SearchServiceInterface
             ->where(function ($query) use ($like) {
                 $query
                     ->where('code', 'like', $like)
-                    ->orWhere('name_en', 'like', $like)
-                    ->orWhere('name_es', 'like', $like);
+                    ->orWhere('name', 'like', $like);
             })
             ->orderBy('code')
             ->limit($limit)
@@ -128,8 +127,8 @@ class SearchService implements SearchServiceInterface
             $collection->add(new SearchHitEntity(
                 type: 'category',
                 id: $category->code,
-                title: $category->code.' — '.$category->name_en,
-                subtitle: $category->name_es,
+                title: $category->code.' — '.$category->name,
+                subtitle: null,
                 url: '/categories/'.$category->code,
             ));
         }

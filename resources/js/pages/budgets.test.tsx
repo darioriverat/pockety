@@ -28,14 +28,12 @@ describe('Budgets - Budget vs Actual Colors', () => {
             {
                 id: 1,
                 code: 'C001',
-                name_es: 'MERCADO',
-                name_en: 'Groceries',
+                name: 'Groceries',
             },
             {
                 id: 2,
                 code: 'C002',
-                name_es: 'REPOSTERÍA',
-                name_en: 'Baking',
+                name: 'Baking',
             },
         ],
     };
@@ -43,8 +41,7 @@ describe('Budgets - Budget vs Actual Colors', () => {
     const createBudgetRow = (overrides = {}) => ({
         category_id: 1,
         category_code: 'C001',
-        category_name_es: 'MERCADO',
-        category_name_en: 'Groceries',
+        category_name: 'Groceries',
         budget_cad: 1000,
         actual_cad: 800,
         variance_cad: -200,

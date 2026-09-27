@@ -54,7 +54,7 @@ describe('GlobalSearch', () => {
                             type: 'category',
                             id: 'C050',
                             title: 'C050 — RBC Fees',
-                            subtitle: 'COMISIONES RBC',
+                            subtitle: 'Bank fees',
                             url: '/categories/C050',
                         },
                     ],

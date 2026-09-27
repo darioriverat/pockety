@@ -29,7 +29,6 @@ vi.mock('@inertiajs/react', () => ({
                     id: 1,
                     name: 'Test',
                     email: 'test@example.com',
-                    category_language: 'en',
                 },
             },
         },
@@ -49,8 +48,7 @@ describe('Categories Page', () => {
                 {
                     id: 1,
                     code: 'C001',
-                    name_es: 'MERCADO',
-                    name_en: 'Groceries',
+                    name: 'Groceries',
                     is_debt_category: false,
                     is_income_category: false,
                     is_active: true,
@@ -59,8 +57,7 @@ describe('Categories Page', () => {
                 {
                     id: 47,
                     code: 'I01',
-                    name_es: 'SALARIO',
-                    name_en: 'Salary',
+                    name: 'Salary',
                     is_debt_category: false,
                     is_income_category: true,
                     is_active: true,
@@ -95,8 +92,7 @@ describe('Categories Page', () => {
                 {
                     id: 1,
                     code: 'C001',
-                    name_es: 'MERCADO',
-                    name_en: 'Groceries',
+                    name: 'Groceries',
                     is_debt_category: false,
                     is_active: true,
                     status: null,
@@ -104,8 +100,7 @@ describe('Categories Page', () => {
                 {
                     id: 2,
                     code: 'C004',
-                    name_es: 'TRANSPORTES',
-                    name_en: 'Transportation',
+                    name: 'Transportation',
                     is_debt_category: false,
                     is_active: true,
                     status: null,
@@ -133,73 +128,9 @@ describe('Categories Page', () => {
             );
         });
 
-        // Language toggle is available
-        expect(screen.getByTestId('category-language-toggle')).toBeInTheDocument();
-        fireEvent.click(screen.getByTestId('category-language-toggle-es'));
-
-        await waitFor(() => {
-            expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
-                'MERCADO',
-            );
-            expect(screen.getByTestId('category-name-C004')).toHaveTextContent(
-                'TRANSPORTES',
-            );
-        });
-
-        fireEvent.click(screen.getByTestId('category-language-toggle-en'));
-
-        await waitFor(() => {
-            expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
-                'Groceries',
-            );
-        });
-
         // Should have delete buttons
         const deleteButtons = screen.getAllByRole('button');
         expect(deleteButtons.length).toBeGreaterThan(0);
-    });
-
-    it('toggles category names between Spanish and English', async () => {
-        const mockCategories = {
-            data: [
-                {
-                    id: 1,
-                    code: 'C001',
-                    name_es: 'MERCADO',
-                    name_en: 'Groceries',
-                    is_debt_category: false,
-                    is_active: true,
-                    status: null,
-                },
-            ],
-            links: { self: '/api/categories' },
-            meta: { total: 1 },
-        };
-
-        (global.fetch as any).mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockCategories,
-        });
-
-        render(<Categories />);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
-                'Groceries',
-            );
-        });
-
-        fireEvent.click(screen.getByTestId('category-language-toggle-es'));
-        expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
-            'MERCADO',
-        );
-        expect(screen.queryByText('Groceries')).not.toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('category-language-toggle-en'));
-        expect(screen.getByTestId('category-name-C001')).toHaveTextContent(
-            'Groceries',
-        );
-        expect(screen.queryByText('MERCADO')).not.toBeInTheDocument();
     });
 
     it('prevents deletion of category with transactions', async () => {
@@ -208,8 +139,7 @@ describe('Categories Page', () => {
                 {
                     id: 1,
                     code: 'C001',
-                    name_es: 'MERCADO',
-                    name_en: 'Groceries',
+                    name: 'Groceries',
                     is_debt_category: false,
                     is_active: true,
                     status: null,
@@ -273,8 +203,7 @@ describe('Categories Page', () => {
                 {
                     id: 1,
                     code: 'C001',
-                    name_es: 'MERCADO',
-                    name_en: 'Groceries',
+                    name: 'Groceries',
                     is_debt_category: false,
                     is_active: true,
                     status: null,
@@ -282,8 +211,7 @@ describe('Categories Page', () => {
                 {
                     id: 2,
                     code: 'C004',
-                    name_es: 'TRANSPORTES',
-                    name_en: 'Transportation',
+                    name: 'Transportation',
                     is_debt_category: false,
                     is_active: true,
                     status: null,
@@ -343,8 +271,7 @@ describe('Categories Page', () => {
                 {
                     id: 1,
                     code: 'C001',
-                    name_es: 'MERCADO',
-                    name_en: 'Groceries',
+                    name: 'Groceries',
                     is_debt_category: false,
                     is_active: true,
                     status: null,

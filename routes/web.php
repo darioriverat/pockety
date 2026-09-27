@@ -334,7 +334,7 @@ HTML;
         $rowHtml = '';
         foreach ($rowsWithBudget as $row) {
             $code = e($row['category_code']);
-            $name = e($row['category_name_es']);
+            $name = e($row['category_name']);
             $budget = e($formatCad($row['budget_cad']));
             $actual = e($formatCad($row['actual_cad']));
             $variance = e($formatCad($row['variance_cad']));
@@ -431,7 +431,7 @@ HTML;
             }
 
             $code = e($row['category_code']);
-            $name = e($row['category_name_es']);
+            $name = e($row['category_name']);
             $total = e($formatCad($row['total_cad']));
             $principal = e($formatCad($row['principal_cad']));
             $interest = e($formatCad($row['interest_cad']));
@@ -972,13 +972,12 @@ HTML;
         $rows = '';
         foreach ($report->all() as $entity) {
             $code = e($entity->categoryCode);
-            $name = e($entity->categoryNameEs);
-            $nameEn = e($entity->categoryNameEn);
+            $name = e($entity->categoryName);
             $tx = e((string) $entity->transactionCount);
             $amount = e($formatCad($entity->actualCad));
             $rows .= "<tr data-testid=\"category-actual-row-{$code}\" data-category-code=\"{$code}\">"
                 ."<td><a data-testid=\"category-actual-link-{$code}\" href=\"/transactions?period={$period}&category={$code}\">{$code}</a></td>"
-                ."<td>{$name} <span style=\"color:#78716c\">{$nameEn}</span></td>"
+                ."<td>{$name}</td>"
                 ."<td data-testid=\"category-actual-tx-{$code}\">{$tx}</td>"
                 ."<td data-testid=\"category-actual-amount-{$code}\">{$amount}</td>"
                 ."</tr>\n";
@@ -1071,7 +1070,7 @@ HTML;
 
         $category = Category::query()->where('code', $categoryCode)->first();
         $categoryLabel = $category
-            ? e($category->code.' — '.$category->name_es.' / '.$category->name_en)
+            ? e($category->code.' — '.$category->name)
             : e($categoryCode);
 
         $rows = '';

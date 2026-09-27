@@ -16,18 +16,6 @@ vi.mock('@inertiajs/react', () => ({
     }) => <a href={href}>{children}</a>,
 }));
 
-// Mock hooks
-vi.mock('@/hooks/use-category-language', () => ({
-    useCategoryLanguage: () => ({
-        language: 'en',
-        setLanguage: vi.fn(),
-        getCategoryName: (category: {
-            name_en: string;
-            name_es: string;
-        }) => category.name_en,
-    }),
-}));
-
 vi.mock('@/hooks/use-period', () => ({
     usePeriod: () => ({
         period: '202601',
@@ -72,8 +60,7 @@ describe('Transaction Error Messages', () => {
                             {
                                 id: 1,
                                 code: 'C001',
-                                name_es: 'MERCADO',
-                                name_en: 'Groceries',
+                                name: 'Groceries',
                                 is_debt_category: false,
                             },
                         ],
@@ -163,8 +150,7 @@ describe('Transaction Error Messages', () => {
                             {
                                 id: 1,
                                 code: 'C001',
-                                name_es: 'MERCADO',
-                                name_en: 'Groceries',
+                                name: 'Groceries',
                                 is_debt_category: false,
                             },
                         ],
@@ -248,8 +234,7 @@ describe('Transaction Error Messages', () => {
                             {
                                 id: 1,
                                 code: 'C001',
-                                name_es: 'MERCADO',
-                                name_en: 'Groceries',
+                                name: 'Groceries',
                                 is_debt_category: false,
                             },
                         ],

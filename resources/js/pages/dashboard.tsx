@@ -108,8 +108,7 @@ interface AssetsLiabilitiesChart {
 interface TopSpendingCategory {
     category_id: number;
     category_code: string;
-    category_name_es: string;
-    category_name_en: string;
+    category_name: string;
     amount_cad: number;
     amount_usd: number;
     amount_cop: number;
@@ -136,8 +135,7 @@ interface RecentActivityItem {
     amount_usd: number | null;
     amount_cop: number | null;
     category_code: string | null;
-    category_name_en: string | null;
-    category_name_es: string | null;
+    category_name: string | null;
     account_name: string | null;
     comments: string | null;
     detail_url: string;
@@ -721,8 +719,7 @@ function TopSpendingCategoriesWidget({
                                                 <span className="text-muted-foreground mr-1.5 font-mono text-xs">
                                                     {category.category_code}
                                                 </span>
-                                                {category.category_name_es} /{' '}
-                                                {category.category_name_en}
+                                                {category.category_name}
                                             </p>
                                         </div>
                                         <div className="shrink-0 text-right">

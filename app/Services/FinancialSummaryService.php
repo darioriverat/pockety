@@ -54,8 +54,7 @@ class FinancialSummaryService
      *     category_totals: list<array{
      *         category_id: int,
      *         category_code: string,
-     *         category_name_es: string,
-     *         category_name_en: string,
+     *         category_name: string,
      *         is_debt_category: bool,
      *         is_income_category: bool,
      *         is_depreciation: bool,
@@ -86,8 +85,7 @@ class FinancialSummaryService
             $totalsByCategory[$category->id] = [
                 'category_id' => $category->id,
                 'category_code' => $category->code,
-                'category_name_es' => $category->name_es,
-                'category_name_en' => $category->name_en,
+                'category_name' => $category->name,
                 'is_debt_category' => (bool) $category->is_debt_category,
                 'is_income_category' => (bool) $category->is_income_category,
                 'is_depreciation' => $category->code === self::DEPRECIATION_CATEGORY_CODE,
@@ -111,8 +109,7 @@ class FinancialSummaryService
                 $totalsByCategory[$categoryId] = [
                     'category_id' => $category->id,
                     'category_code' => $category->code,
-                    'category_name_es' => $category->name_es,
-                    'category_name_en' => $category->name_en,
+                    'category_name' => $category->name,
                     'is_debt_category' => (bool) $category->is_debt_category,
                     'is_income_category' => (bool) $category->is_income_category,
                     'is_depreciation' => $category->code === self::DEPRECIATION_CATEGORY_CODE,
@@ -254,9 +251,7 @@ class FinancialSummaryService
             ->get();
 
         foreach ($incomeTransactions as $transaction) {
-            $categoryName = $transaction->category?->name_en
-                ?? $transaction->category?->name_es
-                ?? 'Income';
+            $categoryName = $transaction->category?->name ?? 'Income';
             $accountName = $transaction->account?->name;
             $comments = trim((string) ($transaction->comments ?? ''));
             $description = $comments !== ''

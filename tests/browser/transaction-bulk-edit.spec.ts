@@ -15,7 +15,7 @@ test.describe('Bulk edit transactions', () => {
         const categoriesResponse = await request.get('/api/categories');
         expect(categoriesResponse.ok()).toBeTruthy();
         const categoriesPayload = (await categoriesResponse.json()) as {
-            data: Array<{ id: number; code: string; name_en: string }>;
+            data: Array<{ id: number; code: string; name: string }>;
         };
         const c001 = categoriesPayload.data.find((item) => item.code === 'C001');
         const c002 = categoriesPayload.data.find((item) => item.code === 'C002');
@@ -65,7 +65,7 @@ test.describe('Bulk edit transactions', () => {
         await page.getByTestId('bulk-category-select').click();
         await page
             .getByRole('option', {
-                name: `${c002!.code} - ${c002!.name_en}`,
+                name: `${c002!.code} - ${c002!.name}`,
                 exact: true,
             })
             .click();

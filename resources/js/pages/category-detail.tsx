@@ -27,8 +27,7 @@ import { ArrowLeft, Tags } from 'lucide-react';
 interface Category {
     id: number;
     code: string;
-    name_es: string;
-    name_en: string;
+    name: string;
     is_debt_category: boolean;
     is_income_category?: boolean;
     is_active: boolean;
@@ -196,7 +195,7 @@ export default function CategoryDetail() {
             <Head
                 title={
                     category
-                        ? `${category.code} — ${category.name_en}`
+                        ? `${category.code} — ${category.name}`
                         : 'Category Details'
                 }
             />
@@ -215,14 +214,10 @@ export default function CategoryDetail() {
                         <PageTitle
                             title={
                                 category
-                                    ? `${category.code} — ${category.name_en}`
+                                    ? `${category.code} — ${category.name}`
                                     : 'Loading...'
                             }
-                            description={
-                                category
-                                    ? `ES: ${category.name_es} · Transaction history across all periods`
-                                    : 'Transaction history across all periods'
-                            }
+                            description="Transaction history across all periods"
                             leading={<Tags className="size-7 shrink-0 fill-none" />}
                             trailing={
                                 category?.is_debt_category ? (

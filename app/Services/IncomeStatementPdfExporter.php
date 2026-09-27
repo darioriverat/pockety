@@ -27,8 +27,7 @@ class IncomeStatementPdfExporter
      *     }>,
      *     category_totals: list<array{
      *         category_code: string,
-     *         category_name_es: string,
-     *         category_name_en: string,
+     *         category_name: string,
      *         total_cad: float,
      *         is_debt_category: bool,
      *         is_income_category?: bool,
@@ -102,7 +101,7 @@ class IncomeStatementPdfExporter
                 $suffix = $flags === [] ? '' : ' ('.implode(', ', $flags).')';
                 $pdf->row([
                     [
-                        'text' => $row['category_code'].' '.$row['category_name_es'].$suffix,
+                        'text' => $row['category_code'].' '.$row['category_name'].$suffix,
                         'width' => self::COL_LABEL,
                     ],
                     [

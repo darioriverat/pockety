@@ -375,7 +375,7 @@ class TransactionController extends Controller
             fputcsv($file, [
                 'Date',
                 'Period',
-                'Quincena',
+                'Pay Period',
                 'Category Code',
                 'Category Name',
                 'Account',
@@ -401,7 +401,7 @@ class TransactionController extends Controller
                     $data['period'],
                     $data['quincena'],
                     $data['category']['code'] ?? '',
-                    $data['category']['name_en'] ?? '',
+                    $data['category']['name'] ?? '',
                     $accountName,
                     $data['amount_cad'] ?? '',
                     $data['amount_usd'] ?? '',

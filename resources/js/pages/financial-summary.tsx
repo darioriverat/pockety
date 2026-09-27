@@ -48,8 +48,7 @@ interface IncomeLine {
 interface CategoryTotal {
     category_id: number;
     category_code: string;
-    category_name_es: string;
-    category_name_en: string;
+    category_name: string;
     is_debt_category: boolean;
     is_income_category?: boolean;
     is_depreciation: boolean;
@@ -558,7 +557,7 @@ export default function FinancialSummary() {
                                                                         row.category_code
                                                                     }{' '}
                                                                     {
-                                                                        row.category_name_es
+                                                                        row.category_name
                                                                     }
                                                                 </td>
                                                                 <td

@@ -24,7 +24,6 @@ class BrowserTestSeeder extends Seeder
                 'password' => 'password',
                 'email_verified_at' => now(),
                 'default_currency' => 'CAD',
-                'category_language' => 'en',
             ],
         );
     }

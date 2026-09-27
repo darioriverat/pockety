@@ -15,7 +15,7 @@ test.describe('Duplicate transaction', () => {
         const categoriesResponse = await request.get('/api/categories');
         expect(categoriesResponse.ok()).toBeTruthy();
         const categoriesPayload = (await categoriesResponse.json()) as {
-            data: Array<{ id: number; code: string; name_en: string }>;
+            data: Array<{ id: number; code: string; name: string }>;
         };
         const c001 = categoriesPayload.data.find((item) => item.code === 'C001');
         expect(c001).toBeTruthy();

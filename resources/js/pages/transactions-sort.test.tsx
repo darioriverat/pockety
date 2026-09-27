@@ -30,7 +30,6 @@ vi.mock('@inertiajs/react', () => ({
                     id: 1,
                     name: 'Test User',
                     email: 'test@example.com',
-                    category_language: 'en',
                 },
             },
         },
@@ -48,22 +47,19 @@ const categories = [
     {
         id: 1,
         code: 'C001',
-        name_es: 'MERCADO',
-        name_en: 'Groceries',
+        name: 'Groceries',
         is_debt_category: false,
     },
     {
         id: 2,
         code: 'C004',
-        name_es: 'TRANSPORTES',
-        name_en: 'Transportation',
+        name: 'Transportation',
         is_debt_category: false,
     },
     {
         id: 3,
         code: 'C010',
-        name_es: 'SERVICIOS',
-        name_en: 'Utilities',
+        name: 'Utilities',
         is_debt_category: false,
     },
 ];

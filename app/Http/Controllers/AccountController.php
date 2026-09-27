@@ -303,7 +303,7 @@ class AccountController extends Controller
                 'date' => $txDate,
                 'period' => $transaction->period,
                 'category_code' => $category?->code,
-                'category_name' => $category?->name_en,
+                'category_name' => $category?->name,
                 'amount' => $transaction->amount,
                 'signed_amount' => $signedAmount,
                 'is_credit' => $transaction->isInflow(),

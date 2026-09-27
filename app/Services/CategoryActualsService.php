@@ -42,8 +42,7 @@ class CategoryActualsService implements CategoryActualsServiceInterface
             $collection->add(new CategoryActualEntity(
                 categoryId: (int) $category->id,
                 categoryCode: (string) $category->code,
-                categoryNameEs: (string) $category->name_es,
-                categoryNameEn: (string) $category->name_en,
+                categoryName: (string) $category->name,
                 isDebtCategory: (bool) $category->is_debt_category,
                 actualCad: round($stats['actual'], 2),
                 transactionCount: $stats['count'],

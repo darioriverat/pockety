@@ -33,7 +33,7 @@ for (const theme of ['light', 'dark'] as const) {
         const categoriesResponse = await request.get('/api/categories');
         expect(categoriesResponse.ok()).toBeTruthy();
         const categoriesPayload = (await categoriesResponse.json()) as {
-            data: Array<{ id: number; code: string; name_en: string }>;
+            data: Array<{ id: number; code: string; name: string }>;
         };
         const groceries = categoriesPayload.data.find(
             (item) => item.code === 'C001',
@@ -54,7 +54,7 @@ for (const theme of ['light', 'dark'] as const) {
             '202501',
         );
         await page.getByRole('combobox', { name: 'Category' }).click();
-        await page.getByRole('option', { name: /Groceries|MERCADO/ }).click();
+        await page.getByRole('option', { name: /Groceries/ }).click();
         await page.getByTestId('transaction-amount-input').fill('42.00');
         await page.getByTestId('transaction-form-submit').click();
 

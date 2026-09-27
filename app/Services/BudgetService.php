@@ -58,8 +58,7 @@ class BudgetService
      *     rows: list<array{
      *         category_id: int,
      *         category_code: string,
-     *         category_name_es: string,
-     *         category_name_en: string,
+     *         category_name: string,
      *         budget_cad: float|null,
      *         actual_cad: float,
      *         variance_cad: float|null,
@@ -107,8 +106,7 @@ class BudgetService
             $rows[] = [
                 'category_id' => $category->id,
                 'category_code' => $category->code,
-                'category_name_es' => $category->name_es,
-                'category_name_en' => $category->name_en,
+                'category_name' => $category->name,
                 'budget_cad' => $budgetCad,
                 'actual_cad' => $actualCad,
                 'variance_cad' => $varianceCad,

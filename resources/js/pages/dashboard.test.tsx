@@ -74,8 +74,7 @@ type MockPage = {
             categories: Array<{
                 category_id: number;
                 category_code: string;
-                category_name_es: string;
-                category_name_en: string;
+                category_name: string;
                 amount_cad: number;
                 percentage: number;
                 transaction_count: number;
@@ -93,8 +92,7 @@ type MockPage = {
                 amount_usd: number | null;
                 amount_cop: number | null;
                 category_code: string | null;
-                category_name_en: string | null;
-                category_name_es: string | null;
+                category_name: string | null;
                 account_name: string | null;
                 comments: string | null;
                 detail_url: string;
@@ -191,8 +189,7 @@ const mockPage: MockPage = {
                 {
                     category_id: 1,
                     category_code: 'C001',
-                    category_name_es: 'MERCADO',
-                    category_name_en: 'Groceries',
+                    category_name: 'Groceries',
                     amount_cad: 800,
                     percentage: 40,
                     transaction_count: 4,
@@ -200,8 +197,7 @@ const mockPage: MockPage = {
                 {
                     category_id: 2,
                     category_code: 'C006',
-                    category_name_es: 'COMIDAS CALLE',
-                    category_name_en: 'Dining Out / Takeout',
+                    category_name: 'Dining Out / Takeout',
                     amount_cad: 500,
                     percentage: 25,
                     transaction_count: 3,
@@ -209,8 +205,7 @@ const mockPage: MockPage = {
                 {
                     category_id: 3,
                     category_code: 'C004',
-                    category_name_es: 'TRANSPORTES',
-                    category_name_en: 'Transportation',
+                    category_name: 'Transportation',
                     amount_cad: 350,
                     percentage: 17.5,
                     transaction_count: 2,
@@ -218,8 +213,7 @@ const mockPage: MockPage = {
                 {
                     category_id: 4,
                     category_code: 'C008',
-                    category_name_es: 'SERVICIOS',
-                    category_name_en: 'Utilities',
+                    category_name: 'Utilities',
                     amount_cad: 250,
                     percentage: 12.5,
                     transaction_count: 1,
@@ -227,8 +221,7 @@ const mockPage: MockPage = {
                 {
                     category_id: 5,
                     category_code: 'C005',
-                    category_name_es: 'HOGAR',
-                    category_name_en: 'Household',
+                    category_name: 'Household',
                     amount_cad: 100,
                     percentage: 5,
                     transaction_count: 1,
@@ -243,13 +236,12 @@ const mockPage: MockPage = {
                     type: 'expense',
                     date: '2026-01-20',
                     period: '202601',
-                    summary: 'Groceries / MERCADO · via RBC Chequing · Weekly shop',
+                    summary: 'Groceries · via RBC Chequing · Weekly shop',
                     amount_cad: 85.5,
                     amount_usd: null,
                     amount_cop: null,
                     category_code: 'C001',
-                    category_name_en: 'Groceries',
-                    category_name_es: 'MERCADO',
+                    category_name: 'Groceries',
                     account_name: 'RBC Chequing',
                     comments: 'Weekly shop',
                     detail_url: '/transactions?period=202601&highlight=101',
@@ -264,8 +256,7 @@ const mockPage: MockPage = {
                     amount_usd: null,
                     amount_cop: null,
                     category_code: null,
-                    category_name_en: null,
-                    category_name_es: null,
+                    category_name: null,
                     account_name: null,
                     comments: null,
                     detail_url: '/income',
@@ -275,13 +266,12 @@ const mockPage: MockPage = {
                     type: 'expense',
                     date: '2026-01-18',
                     period: '202601',
-                    summary: 'Transportation / TRANSPORTES · via Wise',
+                    summary: 'Transportation · via Wise',
                     amount_cad: 42,
                     amount_usd: null,
                     amount_cop: null,
                     category_code: 'C004',
-                    category_name_en: 'Transportation',
-                    category_name_es: 'TRANSPORTES',
+                    category_name: 'Transportation',
                     account_name: 'Wise',
                     comments: null,
                     detail_url: '/transactions?period=202601&highlight=99',
@@ -580,7 +570,6 @@ describe('Dashboard feature', () => {
             /40\.0%/,
         );
         expect(screen.getByTestId('top-spending-bar-C001')).toBeDefined();
-        expect(screen.getAllByText(/MERCADO/).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Groceries/).length).toBeGreaterThan(0);
         expect(screen.getByTestId('top-spending-row-C006')).toBeDefined();
         expect(screen.getByTestId('top-spending-row-C005')).toBeDefined();

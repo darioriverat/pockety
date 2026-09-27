@@ -30,7 +30,6 @@ vi.mock('@inertiajs/react', () => ({
                     id: 1,
                     name: 'Test User',
                     email: 'test@example.com',
-                    category_language: 'en',
                 },
             },
         },
@@ -69,8 +68,7 @@ const transactionWithAccount = {
     category: {
         id: 1,
         code: 'C001',
-        name_es: 'MERCADO',
-        name_en: 'Groceries',
+        name: 'Groceries',
         is_debt_category: false,
     },
 };
@@ -96,8 +94,7 @@ describe('Transactions - optional account field', () => {
                         {
                             id: 1,
                             code: 'C001',
-                            name_es: 'MERCADO',
-                            name_en: 'Groceries',
+                            name: 'Groceries',
                             is_debt_category: false,
                         },
                     ],

@@ -7,8 +7,7 @@ readonly class CategoryEntity
     public function __construct(
         public int $id,
         public string $code,
-        public string $nameEs,
-        public string $nameEn,
+        public string $name,
         public bool $isDebtCategory,
         public bool $isActive,
         public ?string $status = null,
@@ -18,15 +17,14 @@ readonly class CategoryEntity
     /**
      * Create from array (useful for batch creation).
      *
-     * @param  array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_active: bool, status?: string|null, is_income_category?: bool}  $data
+     * @param  array{id: int, code: string, name: string, is_debt_category: bool, is_active: bool, status?: string|null, is_income_category?: bool}  $data
      */
     public static function fromArray(array $data): self
     {
         return new self(
             id: $data['id'],
             code: $data['code'],
-            nameEs: $data['name_es'],
-            nameEn: $data['name_en'],
+            name: $data['name'],
             isDebtCategory: $data['is_debt_category'],
             isActive: $data['is_active'],
             status: $data['status'] ?? null,
@@ -37,15 +35,14 @@ readonly class CategoryEntity
     /**
      * Convert to array for JSON serialization.
      *
-     * @return array{id: int, code: string, name_es: string, name_en: string, is_debt_category: bool, is_income_category: bool, is_active: bool, status: string|null}
+     * @return array{id: int, code: string, name: string, is_debt_category: bool, is_income_category: bool, is_active: bool, status: string|null}
      */
     public function toArray(): array
     {
         return [
             'id' => $this->id,
             'code' => $this->code,
-            'name_es' => $this->nameEs,
-            'name_en' => $this->nameEn,
+            'name' => $this->name,
             'is_debt_category' => $this->isDebtCategory,
             'is_income_category' => $this->isIncomeCategory,
             'is_active' => $this->isActive,

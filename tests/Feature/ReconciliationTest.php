@@ -32,8 +32,7 @@ class ReconciliationTest extends TestCase
 
         $category = Category::create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -97,8 +96,7 @@ class ReconciliationTest extends TestCase
 
         $category = Category::create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -157,20 +155,17 @@ class ReconciliationTest extends TestCase
 
         $expenseCategory = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
         ]);
 
         $incomeCategory = Category::factory()->income()->create([
             'code' => 'I02',
-            'name_es' => 'SALARIO',
-            'name_en' => 'Salary',
+            'name' => 'Salary',
         ]);
 
         $debtCategory = Category::factory()->debt()->create([
             'code' => 'C044',
-            'name_es' => 'CREDITO FORD ESCAPE',
-            'name_en' => 'Ford Escape Auto Loan Payment',
+            'name' => 'Ford Escape Auto Loan Payment',
         ]);
 
         AccountBalance::create([
@@ -247,8 +242,7 @@ class ReconciliationTest extends TestCase
 
         $debtCategory = Category::factory()->debt()->create([
             'code' => 'C044',
-            'name_es' => 'CREDITO FORD ESCAPE',
-            'name_en' => 'Ford Escape Auto Loan Payment',
+            'name' => 'Ford Escape Auto Loan Payment',
         ]);
 
         AccountBalance::create([
@@ -295,13 +289,11 @@ class ReconciliationTest extends TestCase
         ]);
 
         $expenseCategory = Category::factory()->create([
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
         ]);
 
         $debtCategory = Category::factory()->debt()->create([
-            'name_es' => 'CREDITO VISA',
-            'name_en' => 'Visa Payment',
+            'name' => 'Visa Payment',
         ]);
 
         AccountBalance::create([
@@ -463,8 +455,7 @@ class ReconciliationTest extends TestCase
 
         $category = Category::create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -636,8 +627,7 @@ class ReconciliationTest extends TestCase
 
         $category = Category::create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -803,16 +793,14 @@ class ReconciliationTest extends TestCase
 
         $grocery = Category::create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         $debt = Category::factory()->debt()->create([
             'code' => 'C010',
-            'name_es' => 'CREDITO VISA',
-            'name_en' => 'Visa Payment',
+            'name' => 'Visa Payment',
         ]);
 
         ExchangeRate::create([
@@ -986,8 +974,7 @@ class ReconciliationTest extends TestCase
 
         $category = Category::create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -1028,14 +1015,12 @@ class ReconciliationTest extends TestCase
 
         $expense = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
         ]);
 
         $debt = Category::factory()->debt()->create([
             'code' => 'C044',
-            'name_es' => 'CREDITO FORD ESCAPE',
-            'name_en' => 'Ford Escape Auto Loan Payment',
+            'name' => 'Ford Escape Auto Loan Payment',
         ]);
 
         AccountBalance::create([
@@ -1122,8 +1107,7 @@ class ReconciliationTest extends TestCase
 
         $debt = Category::factory()->debt()->create([
             'code' => 'C044',
-            'name_es' => 'CREDITO FORD ESCAPE',
-            'name_en' => 'Ford Escape Auto Loan Payment',
+            'name' => 'Ford Escape Auto Loan Payment',
         ]);
 
         AccountBalance::create([

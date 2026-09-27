@@ -32,16 +32,14 @@ class TransactionDebtPaymentTest extends TestCase
 
         $this->groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         $this->debt = Category::factory()->debt()->create([
             'code' => 'C044',
-            'name_es' => 'CREDITO FORD ESCAPE',
-            'name_en' => 'Ford Escape Auto Loan Payment',
+            'name' => 'Ford Escape Auto Loan Payment',
         ]);
 
         $this->income = Category::query()->where('code', 'I01')->firstOrFail();

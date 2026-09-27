@@ -30,22 +30,15 @@ test('feature 2: categories page shows the 46 active categories', async ({
     expect(consoleErrors).toEqual([]);
 });
 
-test('feature 3: categories show both Spanish and English names', async ({
-    page,
-}) => {
+test('feature 3: categories show English names', async ({ page }) => {
     const consoleErrors = trackConsoleErrors(page);
 
     await page.goto('/categories');
 
-    await expect(page.getByTestId('category-language-toggle')).toBeVisible();
-
-    await page.getByTestId('category-language-toggle-es').click();
-    await expect(page.getByTestId('category-name-C001')).toContainText('MERCADO');
-    await expect(page.getByTestId('category-name-C001')).toContainText('ES:');
-
-    await page.getByTestId('category-language-toggle-en').click();
     await expect(page.getByTestId('category-name-C001')).toContainText('Groceries');
-    await expect(page.getByTestId('category-name-C001')).toContainText('EN:');
+    await expect(page.getByTestId('category-name-C004')).toContainText(
+        'Transportation',
+    );
 
     expect(consoleErrors).toEqual([]);
 });

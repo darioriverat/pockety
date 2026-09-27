@@ -50,8 +50,7 @@ describe('FinancialSummary income statement PDF export', () => {
                             {
                                 category_id: 1,
                                 category_code: 'C001',
-                                category_name_es: 'MERCADO',
-                                category_name_en: 'Groceries',
+                                category_name: 'Groceries',
                                 is_debt_category: false,
                                 is_depreciation: false,
                                 total_cad: 100,

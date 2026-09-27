@@ -18,8 +18,7 @@ class CategoryFactory extends Factory
 
         return [
             'code' => $code,
-            'name_es' => fake()->words(2, true),
-            'name_en' => fake()->words(2, true),
+            'name' => fake()->words(2, true),
             'is_debt_category' => false,
             'is_income_category' => false,
             'is_active' => true,

@@ -47,16 +47,14 @@ class SearchTest extends TestCase
 
         $groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
 
         Category::factory()->create([
             'code' => 'C002',
-            'name_es' => 'REPOSTERÍA',
-            'name_en' => 'Baking Supplies',
+            'name' => 'Baking Supplies',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -118,8 +116,7 @@ class SearchTest extends TestCase
 
         $category = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -146,8 +143,7 @@ class SearchTest extends TestCase
     {
         Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_debt_category' => false,
             'is_active' => true,
         ]);
@@ -171,8 +167,7 @@ class SearchTest extends TestCase
 
         Category::factory()->create([
             'code' => 'C099',
-            'name_en' => 'RBC Fee',
-            'name_es' => 'COMISION RBC',
+            'name' => 'RBC Fee',
             'is_active' => false,
         ]);
 

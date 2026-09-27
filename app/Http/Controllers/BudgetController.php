@@ -184,8 +184,7 @@ class BudgetController extends Controller
             // CSV header
             fputcsv($file, [
                 'Category Code',
-                'Category Name (Spanish)',
-                'Category Name (English)',
+                'Category Name',
                 'Budget (CAD)',
                 'Actual (CAD)',
                 'Variance (CAD)',
@@ -197,8 +196,7 @@ class BudgetController extends Controller
             foreach ($report['rows'] as $row) {
                 fputcsv($file, [
                     $row['category_code'],
-                    $row['category_name_es'],
-                    $row['category_name_en'],
+                    $row['category_name'],
                     $row['budget_cad'] !== null ? number_format($row['budget_cad'], 2, '.', '') : '',
                     number_format($row['actual_cad'], 2, '.', ''),
                     $row['variance_cad'] !== null ? number_format($row['variance_cad'], 2, '.', '') : '',
@@ -210,7 +208,6 @@ class BudgetController extends Controller
             // Add totals row
             fputcsv($file, [
                 'TOTAL',
-                '',
                 '',
                 number_format($report['totals']['budget_cad'], 2, '.', ''),
                 number_format($report['totals']['actual_cad'], 2, '.', ''),

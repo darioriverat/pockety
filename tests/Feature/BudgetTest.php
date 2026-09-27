@@ -26,8 +26,7 @@ class BudgetTest extends TestCase
 
         $this->category = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_active' => true,
         ]);
 

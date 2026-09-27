@@ -27,15 +27,13 @@ class TransactionFilterTest extends TestCase
 
         $this->groceries = Category::factory()->create([
             'code' => 'C001',
-            'name_es' => 'MERCADO',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_active' => true,
         ]);
 
         $this->transport = Category::factory()->create([
             'code' => 'C004',
-            'name_es' => 'TRANSPORTES',
-            'name_en' => 'Transportation',
+            'name' => 'Transportation',
             'is_active' => true,
         ]);
 

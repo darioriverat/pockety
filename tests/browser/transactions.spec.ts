@@ -39,7 +39,7 @@ function getDialogCombobox(page: Page, label: string) {
 
 async function selectOption(
     page: Page,
-    label: 'Quincena' | 'Category' | 'Account' | 'Deposit account' | 'Currency' | 'Debt Component',
+    label: 'Pay period' | 'Category' | 'Account' | 'Deposit account' | 'Currency' | 'Debt Component',
     option: string,
 ): Promise<void> {
     const dialog = page.getByTestId('transaction-form-dialog');
@@ -86,7 +86,7 @@ async function fillTransactionForm(
 
     await dialog.getByTestId('transaction-date-input').fill(values.date);
     await dialog.getByTestId('transaction-period-input').fill(values.period);
-    await selectOption(page, 'Quincena', values.quincena);
+    await selectOption(page, 'Pay period', values.quincena);
     await selectOption(page, 'Category', values.category);
     if (values.account) {
         const accountLabel = values.category.includes('I01')
@@ -417,8 +417,7 @@ test('feature 10: transactions display category descriptions from the category l
     const transaction = await getTransactionByComments(request, comments);
 
     expect(transaction.category.code).toBe('C001');
-    expect(transaction.category.name_en).toBe('Groceries');
-    expect(transaction.category.name_es).toBe('MERCADO');
+    expect(transaction.category.name).toBe('Groceries');
 
     expect(consoleErrors).toEqual([]);
 });
@@ -754,7 +753,7 @@ test('feature 93: transaction form rejects a zero amount and accepts a negative 
 
     await page.getByTestId('transaction-date-input').fill('2026-01-15');
     await page.getByTestId('transaction-period-input').fill('202601');
-    await selectOption(page, 'Quincena', 'Q1');
+    await selectOption(page, 'Pay period', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
     await page.getByTestId('transaction-amount-input').fill('0');
@@ -804,7 +803,7 @@ test('feature 94: transaction form validates that date is a valid date', async (
 
     await page.getByTestId('transaction-date-input').fill('2025-13-45');
     await page.getByTestId('transaction-period-input').fill('202601');
-    await selectOption(page, 'Quincena', 'Q1');
+    await selectOption(page, 'Pay period', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
     await page.getByTestId('transaction-amount-input').fill('100.50');
@@ -848,7 +847,7 @@ test('feature 83: system validates period format as YYYYMM', async ({
 
     await page.getByTestId('transaction-date-input').fill('2025-01-15');
     await page.getByTestId('transaction-period-input').fill('2025-01');
-    await selectOption(page, 'Quincena', 'Q1');
+    await selectOption(page, 'Pay period', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
     await page.getByTestId('transaction-amount-input').fill('42.00');
@@ -903,7 +902,7 @@ test('feature 84: system validates quincena as Q1 or Q2 only', async ({
     await page.getByTestId('transaction-date-input').fill('2026-01-16');
     await page.getByTestId('transaction-period-input').fill('202601');
 
-    await getDialogCombobox(page, 'Quincena').click();
+    await getDialogCombobox(page, 'Pay period').click();
     const options = page.getByRole('option');
     await expect(options).toHaveCount(2);
     await expect(page.getByRole('option', { name: 'Q1', exact: true })).toBeVisible();

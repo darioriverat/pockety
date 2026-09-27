@@ -29,8 +29,7 @@ import { ChartColumn, RefreshCw, XCircle } from 'lucide-react';
 interface CategoryActualRow {
     category_id: number;
     category_code: string;
-    category_name_es: string;
-    category_name_en: string;
+    category_name: string;
     is_debt_category: boolean;
     is_income_category?: boolean;
     actual_cad: number;
@@ -265,10 +264,7 @@ export default function CategoryActuals() {
                                                 </td>
                                                 <td className="px-3 py-2 text-gray-700 dark:text-gray-300">
                                                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                                                        {row.category_name_es}
-                                                    </span>
-                                                    <span className="ml-2 text-gray-500 dark:text-gray-400">
-                                                        {row.category_name_en}
+                                                        {row.category_name}
                                                     </span>
                                                 </td>
                                                 <td

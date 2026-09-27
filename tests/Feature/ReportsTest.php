@@ -55,7 +55,7 @@ class ReportsTest extends TestCase
         }
 
         // Create category and account
-        $category = Category::factory()->create(['code' => 'C001', 'name_en' => 'Groceries']);
+        $category = Category::factory()->create(['code' => 'C001', 'name' => 'Groceries']);
         $account = Account::factory()->create(['type' => 'bank', 'name' => 'Test Bank']);
 
         // Create income for each month
@@ -198,7 +198,7 @@ class ReportsTest extends TestCase
         ]);
 
         // Create category and account
-        $category = Category::factory()->create(['code' => 'C001', 'name_en' => 'Groceries']);
+        $category = Category::factory()->create(['code' => 'C001', 'name' => 'Groceries']);
         $account = Account::factory()->create(['type' => 'bank', 'name' => 'Test Bank']);
 
         // Create expense in COP

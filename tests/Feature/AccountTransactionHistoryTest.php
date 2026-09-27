@@ -26,7 +26,7 @@ class AccountTransactionHistoryTest extends TestCase
 
         $category = Category::factory()->create([
             'code' => 'C001',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_active' => true,
         ]);
 
@@ -132,7 +132,7 @@ class AccountTransactionHistoryTest extends TestCase
 
         $category = Category::factory()->create([
             'code' => 'C001',
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_active' => true,
         ]);
 
@@ -242,12 +242,12 @@ class AccountTransactionHistoryTest extends TestCase
         ]);
 
         $expenseCategory = Category::factory()->create([
-            'name_en' => 'Groceries',
+            'name' => 'Groceries',
             'is_active' => true,
         ]);
 
         $debtCategory = Category::factory()->debt()->create([
-            'name_en' => 'Visa Payment',
+            'name' => 'Visa Payment',
             'is_active' => true,
         ]);
 

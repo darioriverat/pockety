@@ -111,7 +111,7 @@ test('feature 116: user can generate PDF report of income statement for a period
     expect(pdfText).toContain('Salary CAD PDF Export');
     expect(pdfText).toContain('Side Project USD');
     expect(pdfText).toContain('C001');
-    expect(pdfText).toContain('MERCADO');
+    expect(pdfText).toContain('Groceries');
     expect(pdfText).toContain('Net Operating Expenses');
 
     await page.screenshot({

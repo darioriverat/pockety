@@ -7,7 +7,7 @@ parameters:
 			path: app/Domain/Entities/TransactionEntity.php
 
 		-
-			message: '#^Parameter \#1 \$data of static method App\\Domain\\Entities\\CategoryEntity\:\:fromArray\(\) expects array\{id\: int, code\: string, name_es\: string, name_en\: string, is_debt_category\: bool, is_active\: bool, status\?\: string\|null, is_income_category\?\: bool\}, array\<string, mixed\> given\.$#'
+			message: '#^Parameter \#1 \$data of static method App\\Domain\\Entities\\CategoryEntity\:\:fromArray\(\) expects array\{id\: int, code\: string, name\: string, is_debt_category\: bool, is_active\: bool, status\?\: string\|null, is_income_category\?\: bool\}, array\<string, mixed\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Domain/Entities/TransactionEntity.php
@@ -591,19 +591,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
-			count: 2
-			path: app/Services/DashboardService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_en\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/DashboardService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_es\.$#'
-			identifier: property.notFound
-			count: 2
+			count: 4
 			path: app/Services/DashboardService.php
 
 		-
@@ -667,18 +655,6 @@ parameters:
 			path: app/Services/FinancialSummaryService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_en\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/FinancialSummaryService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name_es\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/FinancialSummaryService.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_income_category\.$#'
 			identifier: property.notFound
 			count: 1
@@ -687,17 +663,11 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 3
 			path: app/Services/FinancialSummaryService.php
 
 		-
-			message: '#^Using nullsafe property access "\?-\>name_en" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: app/Services/FinancialSummaryService.php
-
-		-
-			message: '#^Using nullsafe property access "\?-\>name_es" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			message: '#^Using nullsafe property access "\?-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Services/FinancialSummaryService.php

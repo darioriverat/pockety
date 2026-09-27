@@ -50,8 +50,7 @@ const unfilteredResponse = {
         category: {
             id: 1,
             code: 'C001',
-            name_es: 'MERCADO',
-            name_en: 'Groceries',
+            name: 'Groceries',
             is_debt_category: false,
             is_active: true,
             status: null,

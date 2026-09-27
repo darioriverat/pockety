@@ -7,8 +7,7 @@ readonly class CategoryActualEntity
     public function __construct(
         public int $categoryId,
         public string $categoryCode,
-        public string $categoryNameEs,
-        public string $categoryNameEn,
+        public string $categoryName,
         public bool $isDebtCategory,
         public float $actualCad,
         public int $transactionCount,
@@ -19,8 +18,7 @@ readonly class CategoryActualEntity
      * @return array{
      *     category_id: int,
      *     category_code: string,
-     *     category_name_es: string,
-     *     category_name_en: string,
+     *     category_name: string,
      *     is_debt_category: bool,
      *     is_income_category: bool,
      *     actual_cad: float,
@@ -32,8 +30,7 @@ readonly class CategoryActualEntity
         return [
             'category_id' => $this->categoryId,
             'category_code' => $this->categoryCode,
-            'category_name_es' => $this->categoryNameEs,
-            'category_name_en' => $this->categoryNameEn,
+            'category_name' => $this->categoryName,
             'is_debt_category' => $this->isDebtCategory,
             'is_income_category' => $this->isIncomeCategory,
             'actual_cad' => $this->actualCad,

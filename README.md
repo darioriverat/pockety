@@ -9,7 +9,7 @@ Pockety replaces a Google Sheets-based personal finance system with a programmat
 - Manages **bank accounts, investments, credit cards, and loans**
 - Performs monthly **reconciliation** (recorded vs computed balances)
 - Generates **balance sheets** (Assets = Liabilities + Equity)
-- Supports **45 expense categories** with Spanish/English names
+- Supports **45 expense categories** with English names
 - Distinguishes **debt principal vs interest** to prevent double-counting expenses
 - Handles **multi-country finances** (Canada and Colombia)
 

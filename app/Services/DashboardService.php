@@ -323,8 +323,7 @@ class DashboardService
      *     categories: list<array{
      *         category_id: int,
      *         category_code: string,
-     *         category_name_es: string,
-     *         category_name_en: string,
+     *         category_name: string,
      *         amount_cad: float,
      *         percentage: float,
      *         transaction_count: int
@@ -387,8 +386,7 @@ class DashboardService
             $categories[] = [
                 'category_id' => (int) $category->id,
                 'category_code' => (string) $category->code,
-                'category_name_es' => (string) $category->name_es,
-                'category_name_en' => (string) $category->name_en,
+                'category_name' => (string) $category->name,
                 'amount_cad' => $amount,
                 'amount_usd' => $exchangeRate->cadToUsd($aggregates[$categoryId]['amount']),
                 'amount_cop' => $exchangeRate->cadToCop($aggregates[$categoryId]['amount']),
@@ -422,8 +420,7 @@ class DashboardService
      *         amount_usd: float|null,
      *         amount_cop: float|null,
      *         category_code: string|null,
-     *         category_name_en: string|null,
-     *         category_name_es: string|null,
+     *         category_name: string|null,
      *         account_name: string|null,
      *         comments: string|null,
      *         detail_url: string
@@ -454,9 +451,7 @@ class DashboardService
             $account = $transaction->account;
             $date = $transaction->date?->format('Y-m-d') ?? '';
             $comments = $transaction->comments ? trim((string) $transaction->comments) : '';
-            $categoryLabel = $category
-                ? trim($category->name_en.' / '.$category->name_es)
-                : 'Expense';
+            $categoryLabel = $category?->name ?: 'Expense';
             $summaryParts = array_filter([
                 $categoryLabel,
                 $account?->name ? 'via '.$account->name : null,
@@ -473,8 +468,7 @@ class DashboardService
                 'amount_usd' => $transaction->amount_usd !== null ? (float) $transaction->amount_usd : null,
                 'amount_cop' => $transaction->amount_cop !== null ? (float) $transaction->amount_cop : null,
                 'category_code' => $category?->code,
-                'category_name_en' => $category?->name_en,
-                'category_name_es' => $category?->name_es,
+                'category_name' => $category?->name,
                 'account_name' => $account?->name,
                 'comments' => $comments !== '' ? $comments : null,
                 'detail_url' => '/transactions?period='.urlencode((string) $transaction->period).'&highlight='.$transaction->id,
@@ -505,8 +499,7 @@ class DashboardService
                 'amount_usd' => $income->amount_usd !== null ? (float) $income->amount_usd : null,
                 'amount_cop' => $income->amount_cop !== null ? (float) $income->amount_cop : null,
                 'category_code' => null,
-                'category_name_en' => null,
-                'category_name_es' => null,
+                'category_name' => null,
                 'account_name' => null,
                 'comments' => $notes !== '' ? $notes : null,
                 'detail_url' => '/income',
