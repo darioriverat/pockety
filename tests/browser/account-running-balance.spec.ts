@@ -60,7 +60,6 @@ test('feature 90: account transaction history shows running balance after each t
         data: {
             date: '2025-01-05',
             period: '202501',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: account.id,
             amount_cad: 100,
@@ -72,7 +71,6 @@ test('feature 90: account transaction history shows running balance after each t
         data: {
             date: '2025-01-20',
             period: '202501',
-            quincena: 'Q2',
             category_id: categoryId,
             account_id: account.id,
             amount_cad: 200,

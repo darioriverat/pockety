@@ -48,7 +48,6 @@ const baseTransaction = {
     id: 55,
     date: '2025-01-15',
     period: '202501',
-    quincena: 'Q1',
     category_id: 1,
     account_id: null,
     account: null,

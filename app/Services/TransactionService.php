@@ -26,7 +26,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Get all transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, quincena?: string, currency?: string, is_recurring?: bool|string, search?: mixed, sort_by?: string, sort_dir?: string}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, currency?: string, is_recurring?: bool|string, search?: mixed, sort_by?: string, sort_dir?: string}  $filters
      * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array
@@ -49,7 +49,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Get a paginated page of transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, quincena?: string, currency?: string, is_recurring?: bool|string, search?: mixed, sort_by?: string, sort_dir?: string}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, currency?: string, is_recurring?: bool|string, search?: mixed, sort_by?: string, sort_dir?: string}  $filters
      * @return array{data: TransactionEntity[], total: int, page: int, per_page: int, last_page: int}
      */
     public function getPaginated(array $filters = [], int $page = 1, int $perPage = self::DEFAULT_PER_PAGE): array
@@ -133,7 +133,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Build a filtered transactions query, or null when filters guarantee no results.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, quincena?: string, currency?: string, is_recurring?: bool|string, search?: mixed}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int|string, currency?: string, is_recurring?: bool|string, search?: mixed}  $filters
      * @return Builder<Transaction>|null
      */
     private function buildFilteredQuery(array $filters): ?Builder
@@ -160,10 +160,6 @@ class TransactionService implements TransactionServiceInterface
 
         if (isset($filters['account_id']) && $filters['account_id'] !== '' && $filters['account_id'] !== 0) {
             $query->forAccount((int) $filters['account_id']);
-        }
-
-        if (isset($filters['quincena']) && $filters['quincena'] !== '') {
-            $query->forQuincena($filters['quincena']);
         }
 
         if (isset($filters['currency']) && $filters['currency'] !== '') {
@@ -207,7 +203,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Create a new transaction.
      *
-     * @param  array{date: string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data
+     * @param  array{date: string, period: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data
      */
     public function create(array $data): TransactionEntity
     {
@@ -231,7 +227,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Update an existing transaction.
      *
-     * @param  array{date?: string, period?: string, quincena?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data
+     * @param  array{date?: string, period?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data
      */
     public function update(int $id, array $data): TransactionEntity
     {
@@ -324,7 +320,7 @@ class TransactionService implements TransactionServiceInterface
     /**
      * Duplicate an existing transaction.
      *
-     * @param  array{date?: string, period?: string, quincena?: string}  $overrides
+     * @param  array{date?: string, period?: string}  $overrides
      */
     public function duplicate(int $id, array $overrides = []): TransactionEntity
     {
@@ -333,7 +329,6 @@ class TransactionService implements TransactionServiceInterface
         $data = [
             'date' => $overrides['date'] ?? $source->date,
             'period' => $overrides['period'] ?? $source->period,
-            'quincena' => $overrides['quincena'] ?? $source->quincena,
             'category_id' => $source->category_id,
             'account_id' => $source->account_id,
             'amount_cad' => $source->amount_cad,
@@ -445,7 +440,6 @@ class TransactionService implements TransactionServiceInterface
             'id' => $transaction->id,
             'date' => $transaction->date,
             'period' => $transaction->period,
-            'quincena' => $transaction->quincena,
             'category_id' => $transaction->category_id,
             'account_id' => $transaction->account_id,
             'amount_cad' => $transaction->amount_cad !== null ? (float) $transaction->amount_cad : null,

@@ -52,7 +52,6 @@ async function seedRecentActivityData(
         data: {
             date: '2026-01-21',
             period: '202601',
-            quincena: 'Q2',
             category_id: category!.id,
             account_id: account.data.id,
             amount_cad: 67.4,

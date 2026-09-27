@@ -90,7 +90,6 @@ class ReportsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 1000.00,
@@ -101,7 +100,6 @@ class ReportsTest extends TestCase
         Transaction::create([
             'date' => '2025-02-15',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 1500.00,
@@ -112,7 +110,6 @@ class ReportsTest extends TestCase
         Transaction::create([
             'date' => '2025-03-15',
             'period' => '202503',
-            'quincena' => 'Q2',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 2000.00,
@@ -205,7 +202,6 @@ class ReportsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => $period,
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 0,

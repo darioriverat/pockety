@@ -172,7 +172,6 @@ class CategoryService implements CategoryServiceInterface
                 'id' => $transaction->id,
                 'date' => $transaction->date,
                 'period' => $transaction->period,
-                'quincena' => $transaction->quincena,
                 'category_id' => $transaction->category_id,
                 'account_id' => $transaction->account_id,
                 'amount_cad' => $transaction->amount_cad !== null ? (float) $transaction->amount_cad : null,

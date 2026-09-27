@@ -13,7 +13,6 @@ export interface ApiTransaction {
     id: number;
     date: string;
     period: string;
-    quincena: 'Q1' | 'Q2';
     category_id: number;
     account_id: number | null;
     amount_cad: number | null;
@@ -32,7 +31,6 @@ export interface ApiTransaction {
 export interface TransactionPayload {
     date: string;
     period: string;
-    quincena: 'Q1' | 'Q2';
     category_id: number;
     account_id?: number | null;
     amount_cad?: number | null;

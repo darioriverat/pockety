@@ -31,7 +31,6 @@ test.describe('data table presentation', () => {
                     data: {
                         date: `2026-09-0${index + 1}`,
                         period: '202609',
-                        quincena: 'Q1',
                         category_id: categoryId,
                         amount_cad: amount,
                         comments: `table-style-row-${index}`,

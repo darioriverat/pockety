@@ -87,7 +87,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 200.00,
             'comments' => 'Groceries',
@@ -96,7 +95,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-12',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->fordEscape->id,
             'amount_cad' => 550.00,
             'debt_component' => 'principal',
@@ -124,7 +122,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
             'comments' => 'Groceries',
@@ -133,7 +130,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->fordEscape->id,
             'amount_cad' => 500.00,
             'debt_component' => 'principal',
@@ -143,7 +139,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->fordEscape->id,
             'amount_cad' => 50.00,
             'debt_component' => 'interest',
@@ -153,7 +148,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-20',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $this->depreciation->id,
             'amount_cad' => 75.00,
             'comments' => 'Depreciation',
@@ -176,7 +170,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->fordEscape->id,
             'amount_cad' => 500.00,
             'debt_component' => 'principal',
@@ -186,7 +179,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->fordEscape->id,
             'amount_cad' => 50.00,
             'debt_component' => 'interest',
@@ -221,7 +213,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $bank->id,
             'amount_cad' => 110.00,
@@ -232,7 +223,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->fordEscape->id,
             'amount_cad' => 100.00,
             'debt_component' => 'principal',
@@ -242,7 +232,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->fordEscape->id,
             'amount_cad' => 10.00,
             'debt_component' => 'interest',
@@ -287,7 +276,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 200.00,
             'comments' => 'Groceries',
@@ -320,7 +308,6 @@ class FinancialSummaryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 125.00,
             'comments' => 'Groceries PDF',

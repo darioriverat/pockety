@@ -10,7 +10,6 @@ readonly class TransactionEntity
         public int $id,
         public DateTimeInterface $date,
         public string $period,
-        public string $quincena,
         public int $categoryId,
         public ?int $accountId,
         public ?float $amountCad,
@@ -29,7 +28,7 @@ readonly class TransactionEntity
     /**
      * Create from array (useful for batch creation).
      *
-     * @param  array{id: int, date: DateTimeInterface|string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null, category?: array<string, mixed>}  $data
+     * @param  array{id: int, date: DateTimeInterface|string, period: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null, category?: array<string, mixed>}  $data
      */
     public static function fromArray(array $data): self
     {
@@ -37,7 +36,6 @@ readonly class TransactionEntity
             id: $data['id'],
             date: $data['date'] instanceof DateTimeInterface ? $data['date'] : new \DateTime($data['date']),
             period: $data['period'],
-            quincena: $data['quincena'],
             categoryId: $data['category_id'],
             accountId: $data['account_id'] ?? null,
             amountCad: isset($data['amount_cad']) && $data['amount_cad'] !== null ? (float) $data['amount_cad'] : null,
@@ -56,7 +54,7 @@ readonly class TransactionEntity
     /**
      * Convert to array for JSON serialization.
      *
-     * @return array{id: int, date: string, period: string, quincena: string, category_id: int, account_id: int|null, amount_cad: float|null, amount_usd: float|null, amount_cop: float|null, currency: string|null, amount: float|null, comments: string|null, is_recurring: bool, is_credit: bool, is_debt_payment: bool, debt_component: string|null, category?: array<string, mixed>}
+     * @return array{id: int, date: string, period: string, category_id: int, account_id: int|null, amount_cad: float|null, amount_usd: float|null, amount_cop: float|null, currency: string|null, amount: float|null, comments: string|null, is_recurring: bool, is_credit: bool, is_debt_payment: bool, debt_component: string|null, category?: array<string, mixed>}
      */
     public function toArray(): array
     {
@@ -64,7 +62,6 @@ readonly class TransactionEntity
             'id' => $this->id,
             'date' => $this->date->format('Y-m-d'),
             'period' => $this->period,
-            'quincena' => $this->quincena,
             'category_id' => $this->categoryId,
             'account_id' => $this->accountId,
             'amount_cad' => $this->amountCad,

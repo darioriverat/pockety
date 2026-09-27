@@ -69,7 +69,6 @@ test('liability account: charges are + red and principal is - green', async ({
         data: {
             date: '2025-01-05',
             period: '202501',
-            quincena: 'Q1',
             category_id: expenseId,
             account_id: account.id,
             amount_cad: 150,
@@ -84,7 +83,6 @@ test('liability account: charges are + red and principal is - green', async ({
         data: {
             date: '2025-01-20',
             period: '202501',
-            quincena: 'Q2',
             category_id: debtId,
             account_id: account.id,
             amount_cad: 250,

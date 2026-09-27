@@ -24,7 +24,6 @@ test.describe('responsive tables on mobile', () => {
             data: {
                 date: '2026-09-10',
                 period: '202609',
-                quincena: 'Q1',
                 category_id: categoryId,
                 amount_cad: 42.5,
                 comments: 'responsive-table-mobile-row',

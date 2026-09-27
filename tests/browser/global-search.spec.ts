@@ -53,7 +53,6 @@ test.describe('Global search', () => {
             data: {
                 date: '2025-01-15',
                 period: '202501',
-                quincena: 'Q1',
                 category_id: category.id,
                 account_id: rbcAccount.id,
                 amount_cad: 12.34,

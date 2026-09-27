@@ -84,7 +84,6 @@ class PeriodHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 125.50,
             'comments' => 'Jan groceries',
@@ -93,7 +92,6 @@ class PeriodHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-20',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'amount_cad' => 74.50,
             'comments' => 'More groceries',
@@ -102,7 +100,6 @@ class PeriodHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-02-05',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 40.00,
             'comments' => 'Feb groceries',

@@ -39,7 +39,6 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
         data: {
             date: '2025-01-10',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 400,
             comments: 'Budget test CAD 1',
@@ -49,7 +48,6 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
         data: {
             date: '2025-01-20',
             period: '202501',
-            quincena: 'Q2',
             category_id: c001!.id,
             amount_cad: 350,
             comments: 'Budget test CAD 2',
@@ -85,7 +83,6 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
         data: {
             date: '2025-01-25',
             period: '202501',
-            quincena: 'Q2',
             category_id: c001!.id,
             amount_cad: 150,
             comments: 'Budget overspend',

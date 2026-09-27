@@ -43,7 +43,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 100.00,
@@ -54,7 +53,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-20',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 200.00,
@@ -103,7 +101,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-02-01',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 50.00,
@@ -148,7 +145,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2024-12-15',
             'period' => '202412',
-            'quincena' => 'Q2',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 50.00,
@@ -159,7 +155,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 100.00,
@@ -170,7 +165,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-20',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 200.00,
@@ -181,7 +175,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 50.00,
@@ -262,7 +255,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $expenseCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 100.00,
@@ -273,7 +265,6 @@ class AccountTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-20',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $debtCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 200.00,

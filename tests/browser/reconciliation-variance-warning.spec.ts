@@ -71,7 +71,6 @@ test.describe('Reconciliation - Variance Warnings', () => {
                 body: JSON.stringify({
                     date: '2025-01-15',
                     period: '202501',
-                    quincena: 'Q1',
                     category_id: firstCategory.id,
                     account_id: account.id,
                     amount_cad: '25.00', // Creates variance of $25
@@ -173,7 +172,6 @@ test.describe('Reconciliation - Variance Warnings', () => {
                 body: JSON.stringify({
                     date: '2025-01-15',
                     period: '202501',
-                    quincena: 'Q1',
                     category_id: firstCategory.id,
                     account_id: account.data.id,
                     amount_cad: '5.00', // Creates variance of only $5

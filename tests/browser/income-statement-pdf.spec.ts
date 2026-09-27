@@ -60,7 +60,6 @@ test('feature 116: user can generate PDF report of income statement for a period
         data: {
             date: '2025-01-12',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 180,
             comments: 'Groceries for income statement PDF',

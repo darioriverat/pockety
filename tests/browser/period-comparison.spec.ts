@@ -70,7 +70,6 @@ async function seedComparisonData(request: APIRequestContext): Promise<void> {
         data: {
             date: '2025-01-15',
             period: '202501',
-            quincena: 'Q1',
             category_id: groceries!.id,
             account_id: bank.data.id,
             amount_cad: 1000,
@@ -83,7 +82,6 @@ async function seedComparisonData(request: APIRequestContext): Promise<void> {
         data: {
             date: '2025-02-15',
             period: '202502',
-            quincena: 'Q1',
             category_id: groceries!.id,
             account_id: bank.data.id,
             amount_cad: 800,

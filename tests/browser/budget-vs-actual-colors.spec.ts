@@ -40,7 +40,6 @@ async function createTransaction(
         data: {
             date: '2025-01-15',
             period: '202501',
-            quincena: 'Q1',
             category_id: category!.id,
             amount_cad: amount,
             amount_usd: null,

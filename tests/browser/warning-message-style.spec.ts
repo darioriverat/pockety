@@ -62,7 +62,6 @@ async function seedUnreconciledAccount(
         data: {
             date: '2025-01-15',
             period: '202501',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: accountId,
             amount_cad: 75,

@@ -45,7 +45,6 @@ class CategoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
             'comments' => 'Test transaction',
@@ -106,7 +105,6 @@ class CategoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
             'comments' => 'Test transaction',

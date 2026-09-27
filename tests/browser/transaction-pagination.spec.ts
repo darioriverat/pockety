@@ -27,7 +27,6 @@ async function seedTransactions(
             data: {
                 date: `2026-09-${String(day).padStart(2, '0')}`,
                 period: '202609',
-                quincena: i <= 15 ? 'Q1' : 'Q2',
                 category_id: categoryId,
                 amount_cad: i,
                 comments: `pagination-feature-92-${i}`,

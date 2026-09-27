@@ -24,7 +24,6 @@ test.describe('Delete transaction confirmation dialog', () => {
             data: {
                 date: '2025-01-23',
                 period: '202501',
-                quincena: 'Q1',
                 category_id: c001!.id,
                 amount_cad: 18.75,
                 comments: 'Confirm-delete source',

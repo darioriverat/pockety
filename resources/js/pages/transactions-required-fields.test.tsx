@@ -89,7 +89,7 @@ describe('Transactions - Required Field Validation', () => {
         fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
         const dialog = await screen.findByTestId('transaction-form-dialog');
         for (const name of [
-            'Date (YYYY-MM-DD)', 'Period (YYYYMM)', 'Pay period', 'Category',
+            'Date (YYYY-MM-DD)', 'Period (YYYYMM)', 'Category',
             'Account', 'Currency', 'Amount', 'Comments', 'Recurring transaction',
             'Credit (refund / deposit)',
         ]) {

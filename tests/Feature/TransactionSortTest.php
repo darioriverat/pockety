@@ -48,7 +48,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-10',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 10,
             'comments' => 'mid',
@@ -57,7 +56,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-01',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 20,
             'comments' => 'early',
@@ -66,7 +64,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-20',
             'period' => '202609',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'amount_cad' => 30,
             'comments' => 'late',
@@ -95,7 +92,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-01',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 50,
             'comments' => 'fifty',
@@ -104,7 +100,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-02',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_usd' => 10,
             'comments' => 'ten-usd',
@@ -113,7 +108,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-03',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 25,
             'comments' => 'twenty-five',
@@ -140,7 +134,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-01',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->utilities->id,
             'amount_cad' => 5,
             'comments' => 'utilities',
@@ -149,7 +142,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-02',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 5,
             'comments' => 'groceries',
@@ -158,7 +150,6 @@ class TransactionSortTest extends TestCase
         Transaction::create([
             'date' => '2026-09-03',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->transport->id,
             'amount_cad' => 5,
             'comments' => 'transport',

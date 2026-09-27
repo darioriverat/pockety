@@ -33,7 +33,6 @@ class TransactionCrudTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2026-09-15',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 42.50,
             'comments' => 'crud-create',
@@ -44,7 +43,7 @@ class TransactionCrudTest extends TestCase
             ->assertJsonPath('data.comments', 'crud-create')
             ->assertJsonPath('data.amount_cad', 42.5)
             ->assertJsonStructure([
-                'data' => ['id', 'date', 'period', 'quincena', 'category_id'],
+                'data' => ['id', 'date', 'period', 'category_id'],
                 'links' => ['self', 'index'],
             ]);
 
@@ -59,7 +58,6 @@ class TransactionCrudTest extends TestCase
         $created = $this->postJson('/api/transactions', [
             'date' => '2026-09-15',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 10,
             'comments' => 'crud-show',
@@ -81,7 +79,6 @@ class TransactionCrudTest extends TestCase
         $created = $this->postJson('/api/transactions', [
             'date' => '2026-09-15',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 10,
             'comments' => 'crud-before',
@@ -90,7 +87,6 @@ class TransactionCrudTest extends TestCase
         $response = $this->json($method, '/api/transactions/'.$created['id'], [
             'date' => '2026-09-16',
             'period' => '202609',
-            'quincena' => 'Q2',
             'category_id' => $this->category->id,
             'amount_cad' => 99.99,
             'comments' => 'crud-after',
@@ -100,7 +96,7 @@ class TransactionCrudTest extends TestCase
             ->assertJsonPath('message', 'Transaction updated successfully')
             ->assertJsonPath('data.comments', 'crud-after')
             ->assertJsonPath('data.amount_cad', 99.99)
-            ->assertJsonPath('data.quincena', 'Q2');
+            ->assertJsonPath('data.date', '2026-09-16');
 
         $this->assertDatabaseHas('transactions', [
             'id' => $created['id'],
@@ -113,7 +109,6 @@ class TransactionCrudTest extends TestCase
         $created = $this->postJson('/api/transactions', [
             'date' => '2026-09-15',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 10,
             'comments' => 'crud-delete',
@@ -149,7 +144,6 @@ class TransactionCrudTest extends TestCase
         $created = $this->postJson('/api/transactions', [
             'date' => '2026-09-15',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'account_id' => $account->id,
             'amount_cad' => 10,
@@ -161,7 +155,6 @@ class TransactionCrudTest extends TestCase
         $response = $this->putJson('/api/transactions/'.$created['id'], [
             'date' => '2026-09-15',
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'account_id' => null,
             'amount_cad' => 10,
@@ -181,7 +174,6 @@ class TransactionCrudTest extends TestCase
     {
         $response = $this->postJson('/api/transactions', [
             'period' => '202609',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 10,
         ]);

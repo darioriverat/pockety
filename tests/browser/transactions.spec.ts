@@ -39,7 +39,7 @@ function getDialogCombobox(page: Page, label: string) {
 
 async function selectOption(
     page: Page,
-    label: 'Pay period' | 'Category' | 'Account' | 'Deposit account' | 'Currency' | 'Debt Component',
+    label: 'Category' | 'Account' | 'Deposit account' | 'Currency' | 'Debt Component',
     option: string,
 ): Promise<void> {
     const dialog = page.getByTestId('transaction-form-dialog');
@@ -70,7 +70,6 @@ async function fillTransactionForm(
     values: {
         date: string;
         period: string;
-        quincena: 'Q1' | 'Q2';
         category: string;
         account?: string;
         currency: 'CAD' | 'USD' | 'COP';
@@ -86,7 +85,6 @@ async function fillTransactionForm(
 
     await dialog.getByTestId('transaction-date-input').fill(values.date);
     await dialog.getByTestId('transaction-period-input').fill(values.period);
-    await selectOption(page, 'Pay period', values.quincena);
     await selectOption(page, 'Category', values.category);
     if (values.account) {
         const accountLabel = values.category.includes('I01')
@@ -213,7 +211,6 @@ test('feature 5: user can create a CAD expense transaction', async ({
     await fillTransactionForm(page, {
         date: '2026-01-05',
         period: '202601',
-        quincena: 'Q1',
         category: 'C001 - Groceries',
         currency: 'CAD',
         amount: '100.50',
@@ -227,7 +224,7 @@ test('feature 5: user can create a CAD expense transaction', async ({
 
     await expect(transactionCard).toContainText('$100.50');
     await expect(transactionCard).toContainText('CAD');
-    await expect(transactionCard).toContainText('2026-01-05 | Period: 202601 - Q1');
+    await expect(transactionCard).toContainText('2026-01-05 | Period: 202601');
     await expect(transactionCard).toContainText('C001 - Groceries');
     await expect(transactionCard).toContainText(comments);
 
@@ -257,7 +254,6 @@ test('feature 6: user can create a USD expense transaction', async ({
     await fillTransactionForm(page, {
         date: '2026-01-10',
         period: '202601',
-        quincena: 'Q1',
         category: 'C001 - Groceries',
         currency: 'USD',
         amount: '50.00',
@@ -293,7 +289,6 @@ test('feature 7: user can create a COP expense transaction', async ({
     await fillTransactionForm(page, {
         date: '2026-01-15',
         period: '202601',
-        quincena: 'Q1',
         category: 'C001 - Groceries',
         currency: 'COP',
         amount: '500000',
@@ -336,7 +331,6 @@ test('feature 8: transactions reject multiple currency amounts', async ({
         data: {
             date: '2026-01-20',
             period: '202601',
-            quincena: 'Q1',
             category_id: category.id,
             amount_cad: 100,
             amount_usd: 25,
@@ -367,7 +361,6 @@ test('feature 9: transaction category is validated against the category catalog'
         data: {
             date: '2026-01-21',
             period: '202601',
-            quincena: 'Q1',
             category_id: 999999,
             amount_cad: 10,
         },
@@ -400,7 +393,6 @@ test('feature 10: transactions display category descriptions from the category l
     await fillTransactionForm(page, {
         date: '2026-01-22',
         period: '202601',
-        quincena: 'Q1',
         category: 'C001 - Groceries',
         currency: 'CAD',
         amount: '19.99',
@@ -434,7 +426,6 @@ test('feature 11: user can mark a transaction as recurring', async ({
     await fillTransactionForm(page, {
         date: '2026-01-23',
         period: '202601',
-        quincena: 'Q1',
         category: 'C001 - Groceries',
         currency: 'CAD',
         amount: '30.00',
@@ -468,7 +459,6 @@ test('user can mark a transaction as a credit refund or deposit', async ({
     await fillTransactionForm(page, {
         date: '2026-01-23',
         period: '202601',
-        quincena: 'Q1',
         category: 'C001 - Groceries',
         currency: 'CAD',
         amount: '25.00',
@@ -503,7 +493,6 @@ test('user can mark a complementary spend as paying a debt', async ({
     await fillTransactionForm(page, {
         date: '2026-01-23',
         period: '202601',
-        quincena: 'Q1',
         category: 'C001 - Groceries',
         account: account.name,
         currency: 'CAD',
@@ -539,7 +528,6 @@ test('feature 12: debt payment transactions can store principal as the debt comp
     await fillTransactionForm(page, {
         date: '2026-01-24',
         period: '202601',
-        quincena: 'Q1',
         category: 'C044 - Ford Escape Auto Loan Payment',
         currency: 'CAD',
         amount: '75.00',
@@ -573,7 +561,6 @@ test('feature 13: debt payment transactions can store interest as the debt compo
     await fillTransactionForm(page, {
         date: '2026-01-25',
         period: '202601',
-        quincena: 'Q1',
         category: 'C044 - Ford Escape Auto Loan Payment',
         currency: 'CAD',
         amount: '25.00',
@@ -633,7 +620,6 @@ test('feature 14b: income category transactions deposit into the selected accoun
     await fillTransactionForm(page, {
         date: '2026-01-27',
         period: '202601',
-        quincena: 'Q1',
         category: 'I01 - Salary',
         account: account.name,
         currency: 'CAD',
@@ -671,7 +657,6 @@ test('feature 15: users can edit an existing transaction', async ({
     await createTransaction(request, {
         date: '2026-01-27',
         period: '202601',
-        quincena: 'Q1',
         category_id: category.id,
         amount_cad: 90,
         comments: originalComments,
@@ -714,7 +699,6 @@ test('feature 16: users can delete an existing transaction', async ({
     await createTransaction(request, {
         date: '2026-01-28',
         period: '202601',
-        quincena: 'Q1',
         category_id: category.id,
         amount_cad: 60,
         comments,
@@ -753,7 +737,6 @@ test('feature 93: transaction form rejects a zero amount and accepts a negative 
 
     await page.getByTestId('transaction-date-input').fill('2026-01-15');
     await page.getByTestId('transaction-period-input').fill('202601');
-    await selectOption(page, 'Pay period', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
     await page.getByTestId('transaction-amount-input').fill('0');
@@ -803,7 +786,6 @@ test('feature 94: transaction form validates that date is a valid date', async (
 
     await page.getByTestId('transaction-date-input').fill('2025-13-45');
     await page.getByTestId('transaction-period-input').fill('202601');
-    await selectOption(page, 'Pay period', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
     await page.getByTestId('transaction-amount-input').fill('100.50');
@@ -847,7 +829,6 @@ test('feature 83: system validates period format as YYYYMM', async ({
 
     await page.getByTestId('transaction-date-input').fill('2025-01-15');
     await page.getByTestId('transaction-period-input').fill('2025-01');
-    await selectOption(page, 'Pay period', 'Q1');
     await selectOption(page, 'Category', 'C001 - Groceries');
     await selectOption(page, 'Currency', 'CAD');
     await page.getByTestId('transaction-amount-input').fill('42.00');
@@ -890,52 +871,6 @@ test('feature 83: system validates period format as YYYYMM', async ({
     expect(consoleErrors).toEqual([]);
 });
 
-test('feature 84: system validates quincena as Q1 or Q2 only', async ({
-    page,
-}) => {
-    const consoleErrors = trackConsoleErrors(page);
-    const comments = `feature-84-quincena-${Date.now()}`;
-
-    await openTransactionsPage(page);
-    await openAddTransactionDialog(page);
-
-    await page.getByTestId('transaction-date-input').fill('2026-01-16');
-    await page.getByTestId('transaction-period-input').fill('202601');
-
-    await getDialogCombobox(page, 'Pay period').click();
-    const options = page.getByRole('option');
-    await expect(options).toHaveCount(2);
-    await expect(page.getByRole('option', { name: 'Q1', exact: true })).toBeVisible();
-    await expect(page.getByRole('option', { name: 'Q2', exact: true })).toBeVisible();
-    await expect(page.getByRole('option', { name: 'Q3' })).toHaveCount(0);
-
-    await page.screenshot({
-        path: 'verification/test-84-quincena/01-quincena-options.png',
-        fullPage: false,
-    });
-
-    await page.getByRole('option', { name: 'Q1', exact: true }).click();
-    await selectOption(page, 'Category', 'C001 - Groceries');
-    await selectOption(page, 'Currency', 'CAD');
-    await page.getByTestId('transaction-amount-input').fill('15.00');
-    await page.getByLabel('Comments').fill(comments);
-    await submitTransactionForm(page, 'Create');
-
-    await expect(
-        page.locator('[data-slot="card"]').filter({ hasText: comments }),
-    ).toBeVisible();
-    await expect(
-        page.locator('[data-slot="card"]').filter({ hasText: comments }),
-    ).toContainText('Q1');
-
-    await page.screenshot({
-        path: 'verification/test-84-quincena/02-quincena-q1-accepted.png',
-        fullPage: false,
-    });
-
-    expect(consoleErrors).toEqual([]);
-});
-
 test('users can unset and reassign the account on a transaction', async ({
     page,
     request,
@@ -948,7 +883,6 @@ test('users can unset and reassign the account on a transaction', async ({
     const created = await createTransaction(request, {
         date: '2026-01-29',
         period: '202601',
-        quincena: 'Q1',
         category_id: category.id,
         account_id: account.id,
         amount_cad: 42,

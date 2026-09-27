@@ -38,7 +38,6 @@ interface Transaction {
     id: number;
     date: string;
     period: string;
-    quincena: string;
     amount: number | null;
     currency: string | null;
     amount_cad: number | null;

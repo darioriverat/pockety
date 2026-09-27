@@ -76,7 +76,6 @@ class CategoryActualsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
             'comments' => 'First groceries',
@@ -85,7 +84,6 @@ class CategoryActualsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 50.25,
             'comments' => 'Second groceries',
@@ -94,7 +92,6 @@ class CategoryActualsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-20',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $this->transport->id,
             'amount_cad' => 30.00,
             'comments' => 'Bus',
@@ -104,7 +101,6 @@ class CategoryActualsTest extends TestCase
         Transaction::create([
             'date' => '2025-02-01',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 999.00,
             'comments' => 'Feb groceries',
@@ -134,7 +130,6 @@ class CategoryActualsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
             'comments' => 'Initial',
@@ -149,7 +144,6 @@ class CategoryActualsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-25',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'amount_cad' => 42.50,
             'comments' => 'Added later',
@@ -187,7 +181,6 @@ class CategoryActualsTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
             'amount_usd' => 40.00, // 40 / 0.75 = 53.33 CAD

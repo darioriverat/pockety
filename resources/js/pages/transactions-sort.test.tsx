@@ -84,7 +84,6 @@ function makeTransaction(
         id,
         date: overrides.date ?? '2026-09-10',
         period: '202609',
-        quincena: 'Q1',
         category_id: category.id,
         account_id: null,
         account: null,

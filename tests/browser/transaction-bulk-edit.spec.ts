@@ -28,7 +28,6 @@ test.describe('Bulk edit transactions', () => {
                 data: {
                     date: '2025-01-20',
                     period: '202501',
-                    quincena: 'Q1',
                     category_id: c001!.id,
                     amount_cad: 21.5,
                     comments,

@@ -89,7 +89,6 @@ describe('Transactions duplicate', () => {
                                 id: 10,
                                 date: '2025-01-10',
                                 period: '202501',
-                                quincena: 'Q1',
                                 category_id: 1,
                                 account_id: null,
                                 account: null,

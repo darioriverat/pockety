@@ -21,7 +21,7 @@ class TransactionController extends Controller
      * Get all transactions with optional filtering and pagination.
      *
      * GET /api/transactions
-     * Query params: period, category_id, category (code), account_id, quincena, currency,
+     * Query params: period, category_id, category (code), account_id, currency,
      *               is_recurring, search, sort_by, sort_dir, page, per_page
      */
     public function index(Request $request): JsonResponse
@@ -31,7 +31,6 @@ class TransactionController extends Controller
             'category_id',
             'category',
             'account_id',
-            'quincena',
             'currency',
             'is_recurring',
             'search',
@@ -136,7 +135,6 @@ class TransactionController extends Controller
             $validated = $request->validate([
                 'date' => 'required|date_format:Y-m-d',
                 'period' => 'required|string|size:6|regex:/^\d{6}$/',
-                'quincena' => 'required|in:Q1,Q2',
                 'category_id' => 'required|integer|exists:categories,id',
                 'account_id' => 'nullable|integer|exists:accounts,id',
                 'amount_cad' => $this->amountFieldRules(),
@@ -152,7 +150,6 @@ class TransactionController extends Controller
                 'date.date_format' => 'Date must be a valid date.',
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
-                'quincena.in' => 'The quincena must be Q1 or Q2.',
             ]);
 
             $transaction = $this->service->create($validated);
@@ -186,7 +183,6 @@ class TransactionController extends Controller
             $validated = $request->validate([
                 'date' => 'sometimes|required|date_format:Y-m-d',
                 'period' => 'sometimes|required|string|size:6|regex:/^\d{6}$/',
-                'quincena' => 'sometimes|required|in:Q1,Q2',
                 'category_id' => 'sometimes|required|integer|exists:categories,id',
                 'account_id' => 'nullable|integer|exists:accounts,id',
                 'amount_cad' => $this->amountFieldRules(),
@@ -202,7 +198,6 @@ class TransactionController extends Controller
                 'date.date_format' => 'Date must be a valid date.',
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
-                'quincena.in' => 'The quincena must be Q1 or Q2.',
             ]);
 
             $transaction = $this->service->update($id, $validated);
@@ -284,12 +279,10 @@ class TransactionController extends Controller
             $validated = $request->validate([
                 'date' => 'sometimes|required|date_format:Y-m-d',
                 'period' => 'sometimes|required|string|size:6|regex:/^\d{6}$/',
-                'quincena' => 'sometimes|required|in:Q1,Q2',
             ], [
                 'date.date_format' => 'Date must be a valid date.',
                 'period.size' => 'The period must be in YYYYMM format.',
                 'period.regex' => 'The period must be in YYYYMM format.',
-                'quincena.in' => 'The quincena must be Q1 or Q2.',
             ]);
 
             $transaction = $this->service->duplicate($id, $validated);
@@ -341,7 +334,7 @@ class TransactionController extends Controller
      * Export transactions to CSV.
      *
      * GET /api/transactions/export
-     * Query params: period, category_id, category (code), account_id, quincena, currency, is_recurring
+     * Query params: period, category_id, category (code), account_id, currency, is_recurring
      */
     public function export(Request $request): StreamedResponse
     {
@@ -350,7 +343,6 @@ class TransactionController extends Controller
             'category_id',
             'category',
             'account_id',
-            'quincena',
             'currency',
             'is_recurring',
         ]);
@@ -375,7 +367,6 @@ class TransactionController extends Controller
             fputcsv($file, [
                 'Date',
                 'Period',
-                'Pay Period',
                 'Category Code',
                 'Category Name',
                 'Account',
@@ -399,7 +390,6 @@ class TransactionController extends Controller
                 fputcsv($file, [
                     $data['date'],
                     $data['period'],
-                    $data['quincena'],
                     $data['category']['code'] ?? '',
                     $data['category']['name'] ?? '',
                     $accountName,

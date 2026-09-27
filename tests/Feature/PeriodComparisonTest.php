@@ -113,7 +113,6 @@ class PeriodComparisonTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->bank->id,
             'amount_cad' => 1000,
@@ -123,7 +122,6 @@ class PeriodComparisonTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->bank->id,
             'amount_cad' => 800,

@@ -31,7 +31,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
             'period' => '2025-01',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 100.50,
         ]);
@@ -50,7 +49,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
             'period' => '01/2025',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 100.50,
         ]);
@@ -64,7 +62,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 100.50,
             'comments' => 'valid-period-format',
@@ -74,26 +71,11 @@ class TransactionValidationTest extends TestCase
             ->assertJsonPath('data.period', '202501');
     }
 
-    public function test_quincena_must_be_q1_or_q2(): void
-    {
-        $response = $this->postJson('/api/transactions', [
-            'date' => '2025-01-15',
-            'period' => '202501',
-            'quincena' => 'Q3',
-            'category_id' => $this->category->id,
-            'amount_cad' => 50,
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['quincena']);
-    }
-
     public function test_amount_accepts_negative_values(): void
     {
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => -100,
             'comments' => 'negative-amount-ok',
@@ -110,7 +92,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_usd' => 0,
         ]);
@@ -129,7 +110,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 100.50,
             'comments' => 'positive-amount-ok',
@@ -145,7 +125,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-13-45',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 100.50,
         ]);
@@ -164,7 +143,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '15/01/2025',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 100.50,
         ]);
@@ -178,7 +156,6 @@ class TransactionValidationTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 42.00,
             'comments' => 'valid-date-ok',

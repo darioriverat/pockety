@@ -60,7 +60,6 @@ test('feature 91: user can filter account transaction history by date range', as
         data: {
             date: '2024-12-15',
             period: '202412',
-            quincena: 'Q2',
             category_id: categoryId,
             account_id: account.id,
             amount_cad: 50,
@@ -71,7 +70,6 @@ test('feature 91: user can filter account transaction history by date range', as
         data: {
             date: '2025-01-05',
             period: '202501',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: account.id,
             amount_cad: 100,
@@ -82,7 +80,6 @@ test('feature 91: user can filter account transaction history by date range', as
         data: {
             date: '2025-01-20',
             period: '202501',
-            quincena: 'Q2',
             category_id: categoryId,
             account_id: account.id,
             amount_cad: 200,
@@ -93,7 +90,6 @@ test('feature 91: user can filter account transaction history by date range', as
         data: {
             date: '2025-02-10',
             period: '202502',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: account.id,
             amount_cad: 50,

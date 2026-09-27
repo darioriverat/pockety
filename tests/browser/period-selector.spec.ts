@@ -46,7 +46,6 @@ test('feature: user can navigate to different periods using period selector', as
         data: {
             date: '2025-01-10',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 100,
             comments: 'January groceries',
@@ -57,7 +56,6 @@ test('feature: user can navigate to different periods using period selector', as
         data: {
             date: '2025-02-10',
             period: '202502',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 250,
             comments: 'February groceries',

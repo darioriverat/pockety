@@ -93,7 +93,6 @@ class AccountImportTest extends TestCase
         $tx = Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => null,
             'amount_cad' => 500.00,

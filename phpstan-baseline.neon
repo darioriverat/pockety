@@ -1,7 +1,7 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Offset ''account'' on array\{id\: int, date\: DateTimeInterface\|string, period\: string, quincena\: string, category_id\: int, account_id\?\: int\|null, amount_cad\?\: float\|string\|null, amount_usd\?\: float\|string\|null, \.\.\.\} on left side of \?\? does not exist\.$#'
+			message: '#^Offset ''account'' on array\{id\: int, date\: DateTimeInterface\|string, period\: string, category_id\: int, account_id\?\: int\|null, amount_cad\?\: float\|string\|null, amount_usd\?\: float\|string\|null, amount_cop\?\: float\|string\|null, \.\.\.\} on left side of \?\? does not exist\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
 			path: app/Domain/Entities/TransactionEntity.php
@@ -463,18 +463,6 @@ parameters:
 			path: app/Models/Transaction.php
 
 		-
-			message: '#^Method App\\Models\\Transaction\:\:scopeForQuincena\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/Transaction.php
-
-		-
-			message: '#^Method App\\Models\\Transaction\:\:scopeForQuincena\(\) has parameter \$query with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Models/Transaction.php
-
-		-
 			message: '#^Method App\\Models\\Transaction\:\:scopeInterest\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -727,7 +715,7 @@ parameters:
 			path: routes/web.php
 
 		-
-			message: '#^Offset ''account'' on array\{id\: int, date\: string, period\: string, quincena\: string, category_id\: int, account_id\: int\|null, amount_cad\: float\|null, amount_usd\: float\|null, \.\.\.\} in isset\(\) does not exist\.$#'
+			message: '#^Offset ''account'' on array\{id\: int, date\: string, period\: string, category_id\: int, account_id\: int\|null, amount_cad\: float\|null, amount_usd\: float\|null, amount_cop\: float\|null, \.\.\.\} in isset\(\) does not exist\.$#'
 			identifier: isset.offset
 			count: 1
 			path: routes/web.php

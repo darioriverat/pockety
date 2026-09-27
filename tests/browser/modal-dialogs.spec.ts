@@ -61,7 +61,6 @@ async function openDeleteDialog(
         data: {
             date: '2025-03-12',
             period: '202503',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 12.5,
             comments: 'Modal dialog verification txn',

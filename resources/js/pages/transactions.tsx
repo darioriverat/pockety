@@ -106,7 +106,6 @@ interface Transaction {
     id: number;
     date: string;
     period: string;
-    quincena: string;
     category_id: number;
     account_id: number | null;
     account?: Account | null;
@@ -148,7 +147,6 @@ interface PaginationMeta {
 interface TransactionFormData {
     date: string;
     period: string;
-    quincena: 'Q1' | 'Q2';
     category_id: string;
     account_id: string;
     currency: 'CAD' | 'USD' | 'COP';
@@ -163,7 +161,6 @@ interface TransactionFormData {
 interface FilterState {
     period: string;
     category_id: string;
-    quincena: string;
     currency: string;
     is_recurring: string;
     search: string;
@@ -209,7 +206,6 @@ export default function Transactions() {
         return {
             date: today,
             period: periodFromDate(today) ?? '',
-            quincena: 'Q1',
             category_id: '',
             account_id: '',
             currency: 'CAD',
@@ -239,7 +235,6 @@ export default function Transactions() {
         return {
             period: urlPeriod || period,
             category_id: '',
-            quincena: '',
             currency: '',
             is_recurring: '',
             search: '',
@@ -339,7 +334,6 @@ export default function Transactions() {
         setFormData({
             date: target.date,
             period: target.period,
-            quincena: target.quincena as 'Q1' | 'Q2',
             category_id: target.category_id.toString(),
             account_id: target.account_id?.toString() ?? '',
             currency: (target.currency ?? 'CAD') as 'CAD' | 'USD' | 'COP',
@@ -391,7 +385,6 @@ export default function Transactions() {
             const params = new URLSearchParams();
             if (filters.period) params.append('period', filters.period);
             if (filters.category_id) params.append('category_id', filters.category_id);
-            if (filters.quincena) params.append('quincena', filters.quincena);
             if (filters.currency) params.append('currency', filters.currency);
             if (filters.is_recurring) params.append('is_recurring', filters.is_recurring);
             if (filters.search.trim()) params.append('search', filters.search.trim());
@@ -487,7 +480,6 @@ export default function Transactions() {
         const payload: Record<string, unknown> = {
             date: formData.date.trim(),
             period: formData.period.trim(),
-            quincena: formData.quincena,
             category_id: parseInt(formData.category_id),
             account_id:
                 formData.account_id && formData.account_id !== NO_ACCOUNT_VALUE
@@ -602,7 +594,6 @@ export default function Transactions() {
         setFormData({
             date: transaction.date,
             period: transaction.period,
-            quincena: transaction.quincena as 'Q1' | 'Q2',
             category_id: transaction.category_id.toString(),
             account_id: transaction.account_id?.toString() ?? '',
             currency: (transaction.currency ?? 'CAD') as
@@ -627,7 +618,6 @@ export default function Transactions() {
         setFormData({
             date: transaction.date,
             period: transaction.period,
-            quincena: transaction.quincena as 'Q1' | 'Q2',
             category_id: transaction.category_id.toString(),
             account_id: transaction.account_id?.toString() ?? '',
             currency: (transaction.currency ?? 'CAD') as
@@ -686,7 +676,6 @@ export default function Transactions() {
         if (filters.period) params.append('period', filters.period);
         if (filters.category_id)
             params.append('category_id', filters.category_id);
-        if (filters.quincena) params.append('quincena', filters.quincena);
         if (filters.currency) params.append('currency', filters.currency);
         if (filters.is_recurring)
             params.append('is_recurring', filters.is_recurring);
@@ -768,7 +757,6 @@ export default function Transactions() {
         setFormData({
             date: today,
             period: periodFromDate(today) ?? '',
-            quincena: 'Q1',
             category_id: '',
             account_id: '',
             currency: 'CAD',
@@ -808,7 +796,6 @@ export default function Transactions() {
         updateFilters({
             period,
             category_id: '',
-            quincena: '',
             currency: '',
             is_recurring: '',
             search: '',
@@ -840,7 +827,6 @@ export default function Transactions() {
 
     const hasActiveFilters =
         filters.category_id !== '' ||
-        filters.quincena !== '' ||
         filters.currency !== '' ||
         filters.is_recurring !== '' ||
         filters.search !== '';
@@ -1044,83 +1030,49 @@ export default function Transactions() {
                                             </p>
                                         )}
                                     </div>
-                                    <div className="grid grid-cols-2 items-start gap-4">
-                                        <div className="grid content-start gap-2">
-                                            <Label htmlFor="period">
-                                                Period (YYYYMM)
-                                            </Label>
-                                            <Input
-                                                id="period"
-                                                value={formData.period}
-                                                data-testid="transaction-period-input"
-                                                onChange={(e) => {
-                                                    setFormError(null);
-                                                    setFieldErrors((prev) => ({ ...prev, period: '' }));
-                                                    setFormData({
-                                                        ...formData,
-                                                        period: e.target.value,
-                                                    });
-                                                }}
-                                                placeholder="202501"
-                                                aria-invalid={!!fieldErrors.period}
-                                                aria-describedby={
-                                                    fieldErrors.period
-                                                        ? 'period-error transaction-period-hint'
-                                                        : 'transaction-period-hint'
-                                                }
-                                                required
-                                            />
-                                            {fieldErrors.period && (
-                                                <p
-                                                    id="period-error"
-                                                    className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
-                                                    role="alert"
-                                                    data-testid="period-error"
-                                                >
-                                                    <AlertCircle className="h-4 w-4 shrink-0" />
-                                                    <span>{fieldErrors.period}</span>
-                                                </p>
-                                            )}
+                                    <div className="grid content-start gap-2">
+                                        <Label htmlFor="period">
+                                            Period (YYYYMM)
+                                        </Label>
+                                        <Input
+                                            id="period"
+                                            value={formData.period}
+                                            data-testid="transaction-period-input"
+                                            onChange={(e) => {
+                                                setFormError(null);
+                                                setFieldErrors((prev) => ({ ...prev, period: '' }));
+                                                setFormData({
+                                                    ...formData,
+                                                    period: e.target.value,
+                                                });
+                                            }}
+                                            placeholder="202501"
+                                            aria-invalid={!!fieldErrors.period}
+                                            aria-describedby={
+                                                fieldErrors.period
+                                                    ? 'period-error transaction-period-hint'
+                                                    : 'transaction-period-hint'
+                                            }
+                                            required
+                                        />
+                                        {fieldErrors.period && (
                                             <p
-                                                id="transaction-period-hint"
-                                                className="text-muted-foreground text-xs"
-                                                data-testid="transaction-period-hint"
+                                                id="period-error"
+                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
+                                                role="alert"
+                                                data-testid="period-error"
                                             >
-                                                Auto-filled from date
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                                <span>{fieldErrors.period}</span>
                                             </p>
-                                        </div>
-                                        <div className="grid content-start gap-2">
-                                            <Label htmlFor="quincena">
-                                                Pay period
-                                            </Label>
-                                            <Select
-                                                value={formData.quincena}
-                                                onValueChange={(value) =>
-                                                    setFormData({
-                                                        ...formData,
-                                                        quincena: value as
-                                                            | 'Q1'
-                                                            | 'Q2',
-                                                    })
-                                                }
-                                            >
-                                                <SelectTrigger
-                                                    className="w-full"
-                                                    id="quincena"
-                                                    aria-label="Pay period"
-                                                >
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Q1">
-                                                        Q1
-                                                    </SelectItem>
-                                                    <SelectItem value="Q2">
-                                                        Q2
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                        )}
+                                        <p
+                                            id="transaction-period-hint"
+                                            className="text-muted-foreground text-xs"
+                                            data-testid="transaction-period-hint"
+                                        >
+                                            Auto-filled from date
+                                        </p>
                                     </div>
                                     <div className="grid content-start gap-2">
                                         <Label htmlFor="category">
@@ -1652,7 +1604,7 @@ export default function Transactions() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-period">Period</Label>
                                 <Select
@@ -1725,29 +1677,6 @@ export default function Transactions() {
                                                 {cat.code} - {cat.name}
                                             </SelectItem>
                                         ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="filter-quincena">Pay period</Label>
-                                <Select
-                                    value={filters.quincena || 'all'}
-                                    onValueChange={(value) =>
-                                        updateFilters({
-                                            ...filters,
-                                            quincena:
-                                                value === 'all' ? '' : value,
-                                        })
-                                    }
-                                >
-                                    <SelectTrigger id="filter-quincena">
-                                        <SelectValue placeholder="All" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="Q1">Q1</SelectItem>
-                                        <SelectItem value="Q2">Q2</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -2133,8 +2062,7 @@ export default function Transactions() {
                                                             <span className="font-medium">
                                                                 Period:
                                                             </span>{' '}
-                                                            {transaction.period} -{' '}
-                                                            {transaction.quincena}
+                                                            {transaction.period}
                                                         </div>
                                                         <div
                                                             data-testid={`transaction-category-${transaction.id}`}

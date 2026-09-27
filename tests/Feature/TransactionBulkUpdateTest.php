@@ -44,7 +44,6 @@ class TransactionBulkUpdateTest extends TestCase
         $first = Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 25.5,
             'comments' => 'Bulk A',
@@ -53,7 +52,6 @@ class TransactionBulkUpdateTest extends TestCase
         $second = Transaction::create([
             'date' => '2025-01-11',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 40,
             'comments' => 'Bulk B',
@@ -62,7 +60,6 @@ class TransactionBulkUpdateTest extends TestCase
         $untouched = Transaction::create([
             'date' => '2025-01-12',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 15,
             'comments' => 'Leave alone',

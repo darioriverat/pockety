@@ -77,7 +77,6 @@ const debtPaymentTransaction = {
     id: 123,
     date: '2025-01-15',
     period: '202501',
-    quincena: 'Q1',
     category_id: groceries.id,
     account_id: account.id,
     account,

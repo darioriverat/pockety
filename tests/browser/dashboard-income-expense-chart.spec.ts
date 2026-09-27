@@ -69,7 +69,6 @@ async function seedIncomeExpenseData(
             data: {
                 date: `${year}-${month}-10`,
                 period,
-                quincena: 'Q1',
                 category_id: category!.id,
                 account_id: account.data.id,
                 amount_cad: 1500 + index * 50,

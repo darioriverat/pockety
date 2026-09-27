@@ -36,7 +36,7 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(dialog).toBeVisible();
         await page.screenshot({ animations: 'disabled', path: `verification/test-143-form-presentation/${theme}-01-form.png` });
 
-        const ids = ['date', 'period', 'quincena', 'category', 'account', 'currency', 'amount', 'comments', 'is_recurring', 'is_credit', 'is_debt_payment'];
+        const ids = ['date', 'period', 'category', 'account', 'currency', 'amount', 'comments', 'is_recurring', 'is_credit', 'is_debt_payment'];
         for (const id of ids) {
             await expect(dialog.locator(`label[for="${id}"]`)).toBeVisible();
             await expect(dialog.locator(`#${id}`)).toHaveAccessibleName(/\S/);
@@ -55,7 +55,7 @@ for (const theme of ['light', 'dark'] as const) {
             expect(focusStyle.shadow).not.toBe('none');
             await page.screenshot({ animations: 'disabled', path: `verification/test-143-form-presentation/${theme}-focus-${id}.png` });
         }
-        for (const [left, right] of [['period', 'quincena'], ['currency', 'amount']]) {
+        for (const [left, right] of [['currency', 'amount']]) {
             const a = await dialog.locator(`#${left}`).boundingBox();
             const b = await dialog.locator(`#${right}`).boundingBox();
             expect(Math.abs(a!.y - b!.y)).toBeLessThanOrEqual(1);

@@ -39,7 +39,6 @@ test.describe('currency amount formatting', () => {
             data: {
                 date: '2026-09-11',
                 period: '202609',
-                quincena: 'Q1',
                 category_id: categoryId,
                 amount_cad: 1234.56,
                 comments: 'currency-format-cad',
@@ -53,7 +52,6 @@ test.describe('currency amount formatting', () => {
             data: {
                 date: '2026-09-12',
                 period: '202609',
-                quincena: 'Q1',
                 category_id: categoryId,
                 amount_usd: 1234.56,
                 comments: 'currency-format-usd',
@@ -67,7 +65,6 @@ test.describe('currency amount formatting', () => {
             data: {
                 date: '2026-09-13',
                 period: '202609',
-                quincena: 'Q1',
                 category_id: categoryId,
                 amount_cop: 2000000,
                 comments: 'currency-format-cop',

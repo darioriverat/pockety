@@ -201,7 +201,6 @@ class BudgetTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 400.00,
             'amount_usd' => 0,
@@ -213,7 +212,6 @@ class BudgetTest extends TestCase
         Transaction::create([
             'date' => '2025-01-20',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $this->category->id,
             'amount_cad' => 350.00,
             'amount_usd' => 0,
@@ -247,7 +245,6 @@ class BudgetTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 900.00,
             'amount_usd' => 0,
@@ -278,7 +275,6 @@ class BudgetTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 300.00,
             'amount_usd' => 0,
@@ -291,7 +287,6 @@ class BudgetTest extends TestCase
         Transaction::create([
             'date' => '2025-01-06',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 0,
             'amount_usd' => 200.00,
@@ -304,7 +299,6 @@ class BudgetTest extends TestCase
         Transaction::create([
             'date' => '2025-01-07',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->category->id,
             'amount_cad' => 0,
             'amount_usd' => 0,

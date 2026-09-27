@@ -35,7 +35,6 @@ class TransactionDuplicateTest extends TestCase
         $source = Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 42.75,
             'comments' => 'Original for duplicate',
@@ -69,7 +68,6 @@ class TransactionDuplicateTest extends TestCase
         $source = Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_usd' => 15.5,
             'comments' => 'Override date',
@@ -78,13 +76,11 @@ class TransactionDuplicateTest extends TestCase
         $response = $this->postJson("/api/transactions/{$source->id}/duplicate", [
             'date' => '2026-09-15',
             'period' => '202609',
-            'quincena' => 'Q2',
         ]);
 
         $response->assertCreated();
         $response->assertJsonPath('data.date', '2026-09-15');
         $response->assertJsonPath('data.period', '202609');
-        $response->assertJsonPath('data.quincena', 'Q2');
         $response->assertJsonPath('data.amount_usd', 15.5);
         $response->assertJsonPath('data.comments', 'Override date');
         $response->assertJsonPath('data.category.code', 'C001');

@@ -10,7 +10,7 @@ interface TransactionServiceInterface
     /**
      * Get all transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool, search?: string, sort_by?: string, sort_dir?: string}  $filters  Optional filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, currency?: string, is_recurring?: bool, search?: string, sort_by?: string, sort_dir?: string}  $filters  Optional filters
      * @return TransactionEntity[]
      */
     public function getAll(array $filters = []): array;
@@ -18,7 +18,7 @@ interface TransactionServiceInterface
     /**
      * Get a paginated page of transactions with optional filtering.
      *
-     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, quincena?: string, currency?: string, is_recurring?: bool, search?: string, sort_by?: string, sort_dir?: string}  $filters
+     * @param  array{period?: string, category_id?: int|string, category?: string, account_id?: int, currency?: string, is_recurring?: bool, search?: string, sort_by?: string, sort_dir?: string}  $filters
      * @return array{data: TransactionEntity[], total: int, page: int, per_page: int, last_page: int}
      */
     public function getPaginated(array $filters = [], int $page = 1, int $perPage = 50): array;
@@ -31,7 +31,7 @@ interface TransactionServiceInterface
     /**
      * Create a new transaction.
      *
-     * @param  array{date: string, period: string, quincena: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data  Transaction data
+     * @param  array{date: string, period: string, category_id: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data  Transaction data
      *
      * @throws \InvalidArgumentException If validation fails
      */
@@ -41,7 +41,7 @@ interface TransactionServiceInterface
      * Update an existing transaction.
      *
      * @param  int  $id  Transaction ID
-     * @param  array{date?: string, period?: string, quincena?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data  Updated data
+     * @param  array{date?: string, period?: string, category_id?: int, account_id?: int|null, amount_cad?: float|string|null, amount_usd?: float|string|null, amount_cop?: float|string|null, comments?: string|null, is_recurring?: bool, is_credit?: bool, is_debt_payment?: bool, debt_component?: string|null}  $data  Updated data
      *
      * @throws \InvalidArgumentException If validation fails
      */
@@ -65,7 +65,7 @@ interface TransactionServiceInterface
     /**
      * Duplicate an existing transaction, optionally overriding date/period.
      *
-     * @param  array{date?: string, period?: string, quincena?: string}  $overrides
+     * @param  array{date?: string, period?: string}  $overrides
      */
     public function duplicate(int $id, array $overrides = []): TransactionEntity;
 

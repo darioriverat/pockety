@@ -48,7 +48,6 @@ class TransactionFilterTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 40.00,
@@ -59,7 +58,6 @@ class TransactionFilterTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->transport->id,
             'account_id' => $this->account->id,
             'amount_cad' => 20.00,
@@ -70,7 +68,6 @@ class TransactionFilterTest extends TestCase
         Transaction::create([
             'date' => '2025-02-05',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 15.00,
@@ -101,7 +98,6 @@ class TransactionFilterTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 40.00,
@@ -112,7 +108,6 @@ class TransactionFilterTest extends TestCase
         Transaction::create([
             'date' => '2025-01-06',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $other->id,
             'amount_cad' => 20.00,
@@ -132,7 +127,6 @@ class TransactionFilterTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'amount_cad' => 10.00,
             'is_recurring' => false,
@@ -150,7 +144,6 @@ class TransactionFilterTest extends TestCase
         Transaction::create([
             'date' => '2025-01-12',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 88.25,

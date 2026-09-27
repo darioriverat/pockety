@@ -80,7 +80,6 @@ test.describe('Session 57 live verification', () => {
                 body: JSON.stringify({
                     date: '2025-01-15',
                     period: '202501',
-                    quincena: 'Q1',
                     category_id: categories.data[0].id,
                     account_id: account.data.id,
                     amount_cad: '25.00',

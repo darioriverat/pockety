@@ -57,7 +57,6 @@ class TransactionDebtPaymentTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'account_id' => $this->bank->id,
             'amount_cad' => 110,
@@ -82,7 +81,6 @@ class TransactionDebtPaymentTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'amount_cad' => 110,
             'is_debt_payment' => true,
@@ -100,7 +98,6 @@ class TransactionDebtPaymentTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $this->income->id,
             'account_id' => $this->bank->id,
             'amount_cad' => 500,
@@ -116,7 +113,6 @@ class TransactionDebtPaymentTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'account_id' => $this->bank->id,
             'amount_cad' => 25,
@@ -133,7 +129,6 @@ class TransactionDebtPaymentTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $this->debt->id,
             'account_id' => $this->bank->id,
             'amount_cad' => 100,
@@ -153,7 +148,6 @@ class TransactionDebtPaymentTest extends TestCase
         $source = Transaction::create([
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $this->groceries->id,
             'account_id' => $this->bank->id,
             'amount_cad' => 110,

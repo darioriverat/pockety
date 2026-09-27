@@ -70,7 +70,6 @@ class IncomeCategoryTransactionTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->incomeCategory->id,
             'amount_cad' => 500,
             'comments' => 'salary-no-account',
@@ -85,7 +84,6 @@ class IncomeCategoryTransactionTest extends TestCase
         $response = $this->postJson('/api/transactions', [
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->incomeCategory->id,
             'account_id' => $this->account->id,
             'amount_cad' => 2500.50,
@@ -125,7 +123,6 @@ class IncomeCategoryTransactionTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->incomeCategory->id,
             'account_id' => $this->account->id,
             'amount_cad' => 500,
@@ -160,7 +157,6 @@ class IncomeCategoryTransactionTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->incomeCategory->id,
             'account_id' => $this->account->id,
             'amount_cad' => 500,
@@ -183,7 +179,6 @@ class IncomeCategoryTransactionTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->expenseCategory->id,
             'account_id' => $this->account->id,
             'amount_cad' => 200,
@@ -193,7 +188,6 @@ class IncomeCategoryTransactionTest extends TestCase
         Transaction::create([
             'date' => '2025-02-12',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->incomeCategory->id,
             'account_id' => $this->account->id,
             'amount_cad' => 800,
@@ -226,7 +220,6 @@ class IncomeCategoryTransactionTest extends TestCase
         $created = $this->postJson('/api/transactions', [
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->expenseCategory->id,
             'amount_cad' => 100,
             'comments' => 'needs-account-later',
@@ -247,7 +240,6 @@ class IncomeCategoryTransactionTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->expenseCategory->id,
             'amount_cad' => 200,
             'comments' => 'groceries-actual',
@@ -256,7 +248,6 @@ class IncomeCategoryTransactionTest extends TestCase
         Transaction::create([
             'date' => '2025-02-12',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->incomeCategory->id,
             'account_id' => $this->account->id,
             'amount_cad' => 800,

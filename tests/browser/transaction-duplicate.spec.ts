@@ -24,7 +24,6 @@ test.describe('Duplicate transaction', () => {
             data: {
                 date: '2025-01-18',
                 period: '202501',
-                quincena: 'Q1',
                 category_id: c001!.id,
                 amount_cad: 33.25,
                 comments: 'Duplicate source txn',

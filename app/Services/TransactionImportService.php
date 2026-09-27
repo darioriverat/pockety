@@ -127,7 +127,6 @@ class TransactionImportService
         Transaction::create([
             'date' => $date->format('Y-m-d'),
             'period' => (string) $data['periodo'],
-            'quincena' => $data['quincena'],
             'category_id' => $categoryId,
             'account_id' => $accountId,
             'amount_cad' => $amountCad,

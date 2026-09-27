@@ -53,7 +53,6 @@ const transactionWithAccount = {
     id: 123,
     date: '2025-01-15',
     period: '202501',
-    quincena: 'Q1',
     category_id: 1,
     account_id: account.id,
     account,

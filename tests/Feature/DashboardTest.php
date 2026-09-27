@@ -70,7 +70,6 @@ class DashboardTest extends TestCase
         Transaction::create([
             'date' => '2026-01-15',
             'period' => $period,
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 1500.00,
@@ -187,7 +186,6 @@ class DashboardTest extends TestCase
         Transaction::create([
             'date' => '2026-01-15',
             'period' => $period,
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $unbalancedAccount->id,
             'amount_cad' => 100.00,
@@ -280,7 +278,6 @@ class DashboardTest extends TestCase
         Transaction::create([
             'date' => '2026-01-10',
             'period' => '202601',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 1200.00,
@@ -291,7 +288,6 @@ class DashboardTest extends TestCase
         Transaction::create([
             'date' => '2026-06-10',
             'period' => '202606',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 1800.00,
@@ -444,7 +440,6 @@ class DashboardTest extends TestCase
             Transaction::create([
                 'date' => '2026-01-15',
                 'period' => $period,
-                'quincena' => 'Q1',
                 'category_id' => $category->id,
                 'account_id' => $account->id,
                 'amount_cad' => $amount,
@@ -457,7 +452,6 @@ class DashboardTest extends TestCase
         Transaction::create([
             'date' => '2026-02-15',
             'period' => '202602',
-            'quincena' => 'Q1',
             'category_id' => $c001->id,
             'account_id' => $account->id,
             'amount_cad' => 9999.00,
@@ -508,7 +502,6 @@ class DashboardTest extends TestCase
         $older = Transaction::create([
             'date' => '2026-01-10',
             'period' => $period,
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 20.00,
@@ -520,7 +513,6 @@ class DashboardTest extends TestCase
         $newer = Transaction::create([
             'date' => '2026-01-22',
             'period' => $period,
-            'quincena' => 'Q2',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 55.25,
@@ -571,7 +563,6 @@ class DashboardTest extends TestCase
             Transaction::create([
                 'date' => sprintf('2026-01-%02d', min($i, 28)),
                 'period' => $period,
-                'quincena' => $i <= 15 ? 'Q1' : 'Q2',
                 'category_id' => $category->id,
                 'account_id' => $account->id,
                 'amount_cad' => 10 + $i,

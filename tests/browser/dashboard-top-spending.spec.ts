@@ -57,7 +57,6 @@ async function seedTopSpendingData(
             data: {
                 date: '2026-01-15',
                 period: '202601',
-                quincena: 'Q1',
                 category_id: category.id,
                 account_id: account.data.id,
                 amount_cad: row.amount,

@@ -44,7 +44,6 @@ class CategoryTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 100.00,
@@ -55,7 +54,6 @@ class CategoryTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 250.50,
@@ -71,7 +69,6 @@ class CategoryTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q2',
             'category_id' => $other->id,
             'account_id' => $this->account->id,
             'amount_cad' => 999.00,
@@ -104,7 +101,6 @@ class CategoryTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-01-05',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 100.00,
@@ -115,7 +111,6 @@ class CategoryTransactionHistoryTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $this->groceries->id,
             'account_id' => $this->account->id,
             'amount_cad' => 200.00,

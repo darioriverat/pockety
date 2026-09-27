@@ -14,7 +14,6 @@ class Transaction extends Model
     protected $fillable = [
         'date',
         'period',
-        'quincena',
         'category_id',
         'account_id',
         'amount_cad',
@@ -106,14 +105,6 @@ class Transaction extends Model
     public function scopeForAccount($query, int $accountId)
     {
         return $query->where('account_id', $accountId);
-    }
-
-    /**
-     * Scope to filter by quincena.
-     */
-    public function scopeForQuincena($query, string $quincena)
-    {
-        return $query->where('quincena', $quincena);
     }
 
     /**

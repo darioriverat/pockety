@@ -33,7 +33,6 @@ class TransactionPaginationTest extends TestCase
             Transaction::create([
                 'date' => sprintf('2026-09-%02d', min($i, 28)),
                 'period' => '202609',
-                'quincena' => $i <= 15 ? 'Q1' : 'Q2',
                 'category_id' => $this->category->id,
                 'amount_cad' => $i,
                 'comments' => "pagination-tx-{$i}",
@@ -71,7 +70,6 @@ class TransactionPaginationTest extends TestCase
             Transaction::create([
                 'date' => '2026-09-01',
                 'period' => '202609',
-                'quincena' => 'Q1',
                 'category_id' => $this->category->id,
                 'amount_cad' => 10,
                 'comments' => "size-tx-{$i}",
@@ -105,7 +103,6 @@ class TransactionPaginationTest extends TestCase
             Transaction::create([
                 'date' => '2026-09-01',
                 'period' => '202609',
-                'quincena' => 'Q1',
                 'category_id' => $this->category->id,
                 'amount_cad' => 10,
                 'comments' => "all-tx-{$i}",

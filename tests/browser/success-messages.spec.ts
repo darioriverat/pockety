@@ -25,7 +25,6 @@ test('success messages after create, update, and delete', async ({
         data: {
             date: '2025-01-21',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 40,
             comments: 'Toast flow source',

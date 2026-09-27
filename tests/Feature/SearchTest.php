@@ -62,7 +62,6 @@ class SearchTest extends TestCase
         $matchingTxn = Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $groceries->id,
             'account_id' => $rbc->id,
             'amount_cad' => 42.5,
@@ -72,7 +71,6 @@ class SearchTest extends TestCase
         Transaction::create([
             'date' => '2025-01-16',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $groceries->id,
             'account_id' => $rbc->id,
             'amount_cad' => 10,
@@ -124,7 +122,6 @@ class SearchTest extends TestCase
         $txn = Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $rbc->id,
             'amount_cad' => 12.34,

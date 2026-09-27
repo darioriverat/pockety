@@ -42,7 +42,6 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
         data: {
             date: '2025-01-10',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 100,
             comments: 'Groceries for summary',
@@ -53,7 +52,6 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
         data: {
             date: '2025-01-15',
             period: '202501',
-            quincena: 'Q1',
             category_id: c044!.id,
             amount_cad: 500,
             debt_component: 'principal',
@@ -65,7 +63,6 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
         data: {
             date: '2025-01-15',
             period: '202501',
-            quincena: 'Q1',
             category_id: c044!.id,
             amount_cad: 50,
             debt_component: 'interest',
@@ -77,7 +74,6 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
         data: {
             date: '2025-01-20',
             period: '202501',
-            quincena: 'Q2',
             category_id: c045!.id,
             amount_cad: 75,
             comments: 'Depreciation entry',

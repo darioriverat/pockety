@@ -37,7 +37,6 @@ test('feature 85: user can view list of all periods with data', async ({
         data: {
             date: '2025-01-12',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 88.25,
             comments: 'periods-history-jan',

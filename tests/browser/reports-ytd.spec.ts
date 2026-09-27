@@ -55,7 +55,6 @@ async function seedYtdData(request: APIRequestContext): Promise<void> {
             data: {
                 date: `2025-0${month}-15`,
                 period,
-                quincena: 'Q1',
                 category_id: groceries!.id,
                 account_id: bank.data.id,
                 amount_cad: 1000 + (month * 100),

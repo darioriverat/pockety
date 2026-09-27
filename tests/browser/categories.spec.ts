@@ -82,7 +82,6 @@ test('feature 89: system prevents deletion of category that has associated trans
         data: {
             date: '2025-01-15',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 100.0,
             comments: 'Test transaction for delete verification',

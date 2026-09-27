@@ -49,7 +49,6 @@ test('feature 98: user can view all transactions for a category across periods',
         data: {
             date: '2025-01-05',
             period: '202501',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: accountId,
             amount_cad: 100,
@@ -61,7 +60,6 @@ test('feature 98: user can view all transactions for a category across periods',
         data: {
             date: '2025-02-12',
             period: '202502',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: accountId,
             amount_cad: 250.5,
@@ -134,7 +132,6 @@ test('feature 99: category details show summary statistics', async ({
         data: {
             date: '2025-01-05',
             period: '202501',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: accountId,
             amount_cad: 100,
@@ -146,7 +143,6 @@ test('feature 99: category details show summary statistics', async ({
         data: {
             date: '2025-02-12',
             period: '202502',
-            quincena: 'Q1',
             category_id: categoryId,
             account_id: accountId,
             amount_cad: 250.5,

@@ -37,7 +37,6 @@ test('feature 86: category actuals aggregates by category and period', async ({
         data: {
             date: '2025-01-05',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 100.0,
             comments: 'actuals-first',
@@ -48,7 +47,6 @@ test('feature 86: category actuals aggregates by category and period', async ({
         data: {
             date: '2025-01-12',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             amount_cad: 50.25,
             comments: 'actuals-second',
@@ -86,7 +84,6 @@ test('feature 86: category actuals aggregates by category and period', async ({
         data: {
             date: '2025-01-28',
             period: '202501',
-            quincena: 'Q2',
             category_id: c001!.id,
             amount_cad: 42.5,
             comments: 'actuals-third',

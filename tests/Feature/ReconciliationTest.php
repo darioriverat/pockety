@@ -48,7 +48,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 100,
@@ -120,7 +119,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $account->id,
             'amount_cad' => 50,
@@ -179,7 +177,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $expenseCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 100,
@@ -188,7 +185,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-12',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $incomeCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 500,
@@ -197,7 +193,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $debtCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 200,
@@ -207,7 +202,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $debtCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 50,
@@ -256,7 +250,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $debtCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 50,
@@ -315,7 +308,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $expenseCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 100,
@@ -325,7 +317,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $debtCategory->id,
             'account_id' => $account->id,
             'amount_cad' => 200,
@@ -486,7 +477,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $assetAccount->id,
             'amount_cad' => 100,
@@ -690,7 +680,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-10',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $checking->id,
             'amount_cad' => 100,
@@ -699,7 +688,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-12',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'account_id' => $creditCard->id,
             'amount_cad' => 50,
@@ -838,7 +826,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-05',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $grocery->id,
             'account_id' => $bank->id,
             'amount_cad' => 300,
@@ -847,7 +834,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-08',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $grocery->id,
             'account_id' => $creditCard->id,
             'amount_cad' => 50,
@@ -856,7 +842,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-20',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $debt->id,
             'account_id' => $creditCard->id,
             'amount_cad' => 100,
@@ -866,7 +851,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-21',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $debt->id,
             'account_id' => $creditCard->id,
             'amount_usd' => 150,
@@ -876,7 +860,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-22',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $debt->id,
             'account_id' => $creditCard->id,
             'amount_cad' => 40,
@@ -886,7 +869,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-23',
             'period' => '202502',
-            'quincena' => 'Q2',
             'category_id' => $debt->id,
             'account_id' => $creditCard->id,
             'amount_usd' => 90,
@@ -982,7 +964,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-15',
             'period' => '202501',
-            'quincena' => 'Q1',
             'category_id' => $category->id,
             'amount_cad' => 250,
         ]);
@@ -1042,7 +1023,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-15',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $debt->id,
             'account_id' => $loan->id,
             'amount_cad' => 100,
@@ -1052,7 +1032,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-15',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $debt->id,
             'account_id' => $loan->id,
             'amount_cad' => 10,
@@ -1062,7 +1041,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-15',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $expense->id,
             'account_id' => $bank->id,
             'amount_cad' => 110,
@@ -1129,7 +1107,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-15',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $debt->id,
             'account_id' => $loan->id,
             'amount_cad' => 100,
@@ -1139,7 +1116,6 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-02-15',
             'period' => '202502',
-            'quincena' => 'Q1',
             'category_id' => $debt->id,
             'account_id' => $loan->id,
             'amount_cad' => 10,

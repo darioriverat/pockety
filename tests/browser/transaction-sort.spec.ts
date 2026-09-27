@@ -19,7 +19,6 @@ async function createTransaction(
     data: {
         date: string;
         period: string;
-        quincena: 'Q1' | 'Q2';
         category_id: number;
         amount_cad?: number;
         amount_usd?: number;
@@ -70,7 +69,6 @@ test('feature 120: user can sort transactions table by date', async ({
     await createTransaction(request, {
         date: '2026-09-10',
         period: '202609',
-        quincena: 'Q1',
         category_id: categoryId,
         amount_cad: 10,
         comments: 'sort-date-mid',
@@ -78,7 +76,6 @@ test('feature 120: user can sort transactions table by date', async ({
     await createTransaction(request, {
         date: '2026-09-01',
         period: '202609',
-        quincena: 'Q1',
         category_id: categoryId,
         amount_cad: 20,
         comments: 'sort-date-early',
@@ -86,7 +83,6 @@ test('feature 120: user can sort transactions table by date', async ({
     await createTransaction(request, {
         date: '2026-09-20',
         period: '202609',
-        quincena: 'Q2',
         category_id: categoryId,
         amount_cad: 30,
         comments: 'sort-date-late',
@@ -145,7 +141,6 @@ test('feature 121: user can sort transactions table by amount', async ({
     await createTransaction(request, {
         date: '2026-09-01',
         period: '202609',
-        quincena: 'Q1',
         category_id: categoryId,
         amount_cad: 50,
         comments: 'sort-amount-50',
@@ -153,7 +148,6 @@ test('feature 121: user can sort transactions table by amount', async ({
     await createTransaction(request, {
         date: '2026-09-02',
         period: '202609',
-        quincena: 'Q1',
         category_id: categoryId,
         amount_cad: 10,
         comments: 'sort-amount-10',
@@ -161,7 +155,6 @@ test('feature 121: user can sort transactions table by amount', async ({
     await createTransaction(request, {
         date: '2026-09-03',
         period: '202609',
-        quincena: 'Q1',
         category_id: categoryId,
         amount_cad: 25,
         comments: 'sort-amount-25',
@@ -229,7 +222,6 @@ test('feature 122: user can sort transactions table by category', async ({
     await createTransaction(request, {
         date: '2026-09-01',
         period: '202609',
-        quincena: 'Q1',
         category_id: utilities.id,
         amount_cad: 5,
         comments: 'sort-cat-utilities',
@@ -237,7 +229,6 @@ test('feature 122: user can sort transactions table by category', async ({
     await createTransaction(request, {
         date: '2026-09-02',
         period: '202609',
-        quincena: 'Q1',
         category_id: groceries.id,
         amount_cad: 5,
         comments: 'sort-cat-groceries',
@@ -245,7 +236,6 @@ test('feature 122: user can sort transactions table by category', async ({
     await createTransaction(request, {
         date: '2026-09-03',
         period: '202609',
-        quincena: 'Q1',
         category_id: transport.id,
         amount_cad: 5,
         comments: 'sort-cat-transport',

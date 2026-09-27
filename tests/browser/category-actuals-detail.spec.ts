@@ -41,7 +41,6 @@ test('feature 88: click category in actuals to see detailed transactions', async
         data: {
             date: '2025-01-05',
             period: '202501',
-            quincena: 'Q1',
             category_id: c001!.id,
             account_id: accountId,
             amount_cad: 55.5,
@@ -53,7 +52,6 @@ test('feature 88: click category in actuals to see detailed transactions', async
         data: {
             date: '2025-01-18',
             period: '202501',
-            quincena: 'Q2',
             category_id: c001!.id,
             account_id: accountId,
             amount_cad: 22.25,
@@ -65,7 +63,6 @@ test('feature 88: click category in actuals to see detailed transactions', async
         data: {
             date: '2025-01-20',
             period: '202501',
-            quincena: 'Q2',
             category_id: c004!.id,
             account_id: accountId,
             amount_cad: 99.0,
