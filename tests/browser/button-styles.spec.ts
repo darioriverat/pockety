@@ -77,7 +77,11 @@ for (const theme of ['light', 'dark'] as const) {
         await page.getByTestId('nav-link-transactions').click();
         const bulk = page.getByTestId('bulk-edit-button');
         await expect(bulk).toBeDisabled();
-        expect(await bulk.evaluate((element) => getComputedStyle(element).opacity)).toBe('0.5');
+        await expect
+            .poll(() =>
+                bulk.evaluate((element) => getComputedStyle(element).opacity),
+            )
+            .toBe('0.5');
         await page.screenshot({ path: `${evidence}/${theme}-disabled.png`, animations: 'disabled' });
         await page.emulateMedia({ reducedMotion: 'reduce' });
         expect(await bulk.evaluate((element) => getComputedStyle(element).transitionProperty)).toBe('none');

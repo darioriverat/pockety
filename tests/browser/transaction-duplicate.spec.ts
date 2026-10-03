@@ -66,11 +66,12 @@ test.describe('Duplicate transaction', () => {
             fullPage: true,
         });
 
-        const today = new Date().toISOString().split('T')[0];
-        const todayPeriod = today.slice(0, 7).replace('-', '');
+        // Stay inside the supported window (January 2025–September 2026).
+        const updatedDate = '2026-09-15';
+        const updatedPeriod = '202609';
 
-        await page.getByTestId('transaction-date-input').fill(today);
-        await page.getByTestId('transaction-period-input').fill(todayPeriod);
+        await page.getByTestId('transaction-date-input').fill(updatedDate);
+        await page.getByTestId('transaction-period-input').fill(updatedPeriod);
 
         await page.screenshot({
             path: 'verification/session-60/03-duplicate-form-date-updated.png',
@@ -82,18 +83,16 @@ test.describe('Duplicate transaction', () => {
 
         // Switch to current period to find the new duplicate
         await page.getByTestId('page-period-selector').click();
-        const periodLabel = new Date().toLocaleString('en-US', {
-            month: 'long',
-            year: 'numeric',
-        });
-        await page.getByRole('option', { name: periodLabel, exact: true }).click();
+        await page
+            .getByRole('option', { name: 'September 2026', exact: true })
+            .click();
 
         await expect(
             page.getByText('Duplicate source txn').first(),
         ).toBeVisible({ timeout: 10000 });
 
         const listResponse = await request.get(
-            `/api/transactions?period=${todayPeriod}&search=${encodeURIComponent('Duplicate source txn')}`,
+            `/api/transactions?period=${updatedPeriod}&search=${encodeURIComponent('Duplicate source txn')}`,
         );
         expect(listResponse.ok()).toBeTruthy();
         const listPayload = (await listResponse.json()) as {
@@ -109,7 +108,7 @@ test.describe('Duplicate transaction', () => {
             (item) =>
                 item.comments === 'Duplicate source txn' &&
                 item.id !== sourceId &&
-                item.date === today,
+                item.date === updatedDate,
         );
         expect(duplicates.length).toBeGreaterThanOrEqual(1);
         expect(duplicates[0].amount_cad).toBe(33.25);

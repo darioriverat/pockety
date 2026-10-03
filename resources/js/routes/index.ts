@@ -1111,6 +1111,87 @@ balanceSheet.form = balanceSheetForm
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/period-balances'
+*/
+export const periodBalances = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: periodBalances.url(options),
+    method: 'get',
+})
+
+periodBalances.definition = {
+    methods: ["get","head"],
+    url: '/period-balances',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/period-balances'
+*/
+periodBalances.url = (options?: RouteQueryOptions) => {
+    return periodBalances.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/period-balances'
+*/
+periodBalances.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: periodBalances.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/period-balances'
+*/
+periodBalances.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: periodBalances.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/period-balances'
+*/
+const periodBalancesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodBalances.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/period-balances'
+*/
+periodBalancesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodBalances.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/period-balances'
+*/
+periodBalancesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: periodBalances.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+periodBalances.form = periodBalancesForm
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/balance-sheet/time-series'
 */
 export const balanceSheetTimeSeries = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({

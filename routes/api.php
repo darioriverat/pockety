@@ -13,6 +13,7 @@ use App\Http\Controllers\ExchangeRateImportController;
 use App\Http\Controllers\FinancialSummaryController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\PeriodBalanceController;
 use App\Http\Controllers\PeriodComparisonController;
 use App\Http\Controllers\PeriodHistoryController;
 use App\Http\Controllers\ReconciliationController;
@@ -92,6 +93,10 @@ Route::get('/category-actuals', [CategoryActualsController::class, 'index'])->na
 
 // Reconciliation API
 Route::get('/periods/{period}/reconciliation', [ReconciliationController::class, 'show'])->name('periods.reconciliation');
+
+// Period balances (registered from reconciliation figures; not part of the reconciliation report)
+Route::get('/period-balances', [PeriodBalanceController::class, 'show'])->name('period-balances.show');
+Route::post('/period-balances', [PeriodBalanceController::class, 'store'])->name('period-balances.store');
 
 // Budget vs actual alias (period in path)
 Route::get('/periods/{period}/budget-vs-actual', [BudgetController::class, 'reportForPeriod'])

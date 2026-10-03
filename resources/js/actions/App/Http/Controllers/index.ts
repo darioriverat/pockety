@@ -10,6 +10,7 @@ import PeriodHistoryController from './PeriodHistoryController'
 import PeriodComparisonController from './PeriodComparisonController'
 import CategoryActualsController from './CategoryActualsController'
 import ReconciliationController from './ReconciliationController'
+import PeriodBalanceController from './PeriodBalanceController'
 import BudgetController from './BudgetController'
 import BalanceSheetController from './BalanceSheetController'
 import BalanceSheetImportController from './BalanceSheetImportController'
@@ -35,6 +36,7 @@ const Controllers = {
     PeriodComparisonController: Object.assign(PeriodComparisonController, PeriodComparisonController),
     CategoryActualsController: Object.assign(CategoryActualsController, CategoryActualsController),
     ReconciliationController: Object.assign(ReconciliationController, ReconciliationController),
+    PeriodBalanceController: Object.assign(PeriodBalanceController, PeriodBalanceController),
     BudgetController: Object.assign(BudgetController, BudgetController),
     BalanceSheetController: Object.assign(BalanceSheetController, BalanceSheetController),
     BalanceSheetImportController: Object.assign(BalanceSheetImportController, BalanceSheetImportController),
