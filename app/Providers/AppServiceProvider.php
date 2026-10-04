@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Domain\Requests\Contracts\Category\StoreCategoryRequestInterface;
+use App\Domain\Requests\Contracts\Category\UpdateCategoryRequestInterface;
 use App\Domain\Requests\Contracts\PeriodBalance\ShowPeriodBalanceRequestInterface;
 use App\Domain\Requests\Contracts\PeriodBalance\StorePeriodBalanceRequestInterface;
 use App\Domain\Services\Contracts\AccountServiceInterface;
@@ -15,6 +17,8 @@ use App\Domain\Services\Contracts\PeriodComparisonServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Domain\Services\Contracts\SearchServiceInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Requests\PeriodBalance\ShowPeriodBalanceRequest;
 use App\Http\Requests\PeriodBalance\StorePeriodBalanceRequest;
 use App\Services\AccountService;
@@ -90,6 +94,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             SearchServiceInterface::class,
             SearchService::class
+        );
+
+        // Request bindings
+        $this->app->bind(
+            StoreCategoryRequestInterface::class,
+            StoreCategoryRequest::class
+        );
+
+        $this->app->bind(
+            UpdateCategoryRequestInterface::class,
+            UpdateCategoryRequest::class
         );
 
         $this->app->bind(
