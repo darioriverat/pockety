@@ -1136,4 +1136,117 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(-110.0, $check['result_cad']);
         $this->assertFalse($check['is_balanced']);
     }
+
+    public function test_reconciliation_totals_include_inactive_categories_with_transactions(): void
+    {
+        // Step 1: Create inactive income and expense categories
+        $inactiveIncome = Category::factory()->create([
+            'code' => 'I05',
+            'name' => 'Inactive Income',
+            'is_income_category' => true,
+            'is_debt_category' => false,
+            'is_active' => false,
+        ]);
+
+        $inactiveExpense = Category::factory()->create([
+            'code' => 'C060',
+            'name' => 'Inactive Expense',
+            'is_income_category' => false,
+            'is_debt_category' => false,
+            'is_active' => false,
+        ]);
+
+        // Step 2: Create income transaction for inactive category
+        Income::create([
+            'period' => '202501',
+            'description' => 'Income on inactive',
+            'line_number' => 1,
+            'amount_cad' => 1000,
+        ]);
+
+        // Step 3: Create expense transaction for inactive expense category
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'category_id' => $inactiveExpense->id,
+            'amount_cad' => 200.00,
+            'comments' => 'Expense on inactive category',
+        ]);
+
+        // Also add a regular transaction for comparison
+        Transaction::create([
+            'date' => '2025-01-10',
+            'period' => '202501',
+            'category_id' => $this->groceries->id,
+            'amount_cad' => 100.00,
+            'comments' => 'Regular expense',
+        ]);
+
+        // Step 4: Call ReconciliationService
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        // Step 5-7: Verify totals include inactive categories
+        $response->assertOk();
+
+        // expenses_total_cad should include both active and inactive category transactions
+        // 200 (inactive) + 100 (active) = 300
+        $this->assertEquals(300.0, $response->json('data.financial_summary.total_recorded_disbursements_cad'));
+        $this->assertEquals(300.0, $response->json('data.financial_summary.net_operating_expenses_cad'));
+        
+        // Verify category appears in financial summary
+        $categoryTotals = $response->json('data.financial_summary.category_totals');
+        $codes = collect($categoryTotals)->pluck('category_code')->all();
+        $this->assertContains('C060', $codes);
+    }
+
+    public function test_reconciliation_debt_principal_includes_inactive_debt_categories(): void
+    {
+        // Step 1: Create debt category and inactivate it
+        $inactiveDebt = Category::factory()->create([
+            'code' => 'C070',
+            'name' => 'Inactive Debt',
+            'is_debt_category' => true,
+            'is_income_category' => false,
+            'is_active' => false,
+        ]);
+
+        // Step 2: Create debt payment transaction
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'category_id' => $inactiveDebt->id,
+            'amount_cad' => 500.00,
+            'debt_component' => 'principal',
+            'comments' => 'Debt principal on inactive',
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'category_id' => $inactiveDebt->id,
+            'amount_cad' => 50.00,
+            'debt_component' => 'interest',
+            'comments' => 'Debt interest on inactive',
+        ]);
+
+        // Step 3: Call ReconciliationService
+        $response = $this->getJson('/api/periods/202501/reconciliation');
+
+        // Step 4-5: Verify debt calculations include inactive category
+        $response->assertOk();
+
+        $this->assertEquals(500.0, $response->json('data.financial_summary.debt_principal_excluded_cad'));
+        $this->assertEquals(50.0, $response->json('data.financial_summary.debt_interest_included_cad'));
+        
+        // Net operating should only include interest
+        $this->assertEquals(50.0, $response->json('data.financial_summary.net_operating_expenses_cad'));
+        
+        // Verify category appears in financial summary
+        $categoryTotals = $response->json('data.financial_summary.category_totals');
+        $c070 = collect($categoryTotals)->firstWhere('category_code', 'C070');
+        $this->assertNotNull($c070);
+        $this->assertEquals(550.0, $c070['total_cad']);
+        $this->assertEquals(500.0, $c070['principal_cad']);
+        $this->assertEquals(50.0, $c070['interest_cad']);
+    }
 }
