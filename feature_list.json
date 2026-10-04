@@ -1379,7 +1379,7 @@
       "Step 12: Verify test_delete_blocked_by_budgets passes",
       "Step 13: Verify all assertions pass with user scoping"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1395,7 +1395,7 @@
       "Step 8: Verify test_budget_vs_actual_includes_inactive_with_activity passes",
       "Step 9: Verify test_budget_vs_actual_excludes_inactive_without_activity passes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1414,7 +1414,7 @@
       "Step 11: Verify test_accessing_other_user_category_returns_404 passes",
       "Step 12: Verify test_new_user_receives_template passes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
