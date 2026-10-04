@@ -22,6 +22,11 @@ vi.mock('@inertiajs/react', () => ({
     router: {
         get: (...args: unknown[]) => routerGet(...args),
     },
+    usePage: () => ({
+        props: {
+            availablePeriods: ['202501', '202502'],
+        },
+    }),
 }));
 
 describe('PeriodComparison page', () => {

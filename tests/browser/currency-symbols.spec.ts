@@ -4,7 +4,11 @@ import {
     currencySymbol,
     formatDisplayCurrency,
 } from '../../resources/js/lib/currency';
-import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
+import {
+    ensureTransactionInPeriod,
+    loginAsBrowserTestUser,
+    trackConsoleErrors,
+} from './helpers';
 
 const evidence = 'verification/test-148-currency-symbols';
 
@@ -131,6 +135,7 @@ test.describe('currency symbols', () => {
         await copAmount.screenshot({ path: `${evidence}/cop-symbol.png` });
 
         // Balance sheet also shows all three symbols side by side
+        await ensureTransactionInPeriod(page.request, '202501');
         await page.goto('/balance-sheet');
         await page.getByTestId('page-period-selector').click();
         await page

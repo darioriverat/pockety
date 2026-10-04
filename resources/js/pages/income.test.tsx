@@ -2,6 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { initializePeriod } from '@/hooks/use-period';
+import { generatePeriods } from '@/lib/periods';
 import Income from '@/pages/income';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { User } from '@/types';
@@ -15,6 +16,7 @@ type MockPage = {
             user: User;
         };
         sidebarOpen: boolean;
+        availablePeriods: string[];
     };
 };
 
@@ -33,6 +35,7 @@ const mockPage: MockPage = {
             },
         },
         sidebarOpen: true,
+        availablePeriods: generatePeriods('202501', '202610'),
     },
 };
 

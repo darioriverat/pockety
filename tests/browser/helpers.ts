@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { expect, type Page } from '@playwright/test';
+import { expect, type APIRequestContext, type Page } from '@playwright/test';
 
 export interface ApiCategory {
     id: number;
@@ -41,6 +41,33 @@ export interface TransactionPayload {
     is_credit?: boolean;
     is_debt_payment?: boolean;
     debt_component?: 'principal' | 'interest' | null;
+}
+
+/**
+ * Insert a transaction so the period picker includes this month through the
+ * current month. Call it before the page that renders the picker is loaded.
+ */
+export async function ensureTransactionInPeriod(
+    request: APIRequestContext,
+    period: string,
+): Promise<void> {
+    const categoriesResponse = await request.get('/api/categories');
+    expect(categoriesResponse.ok()).toBeTruthy();
+    const body = (await categoriesResponse.json()) as { data: ApiCategory[] };
+    const category =
+        body.data.find((item) => item.code === 'C001') ?? body.data[0];
+    expect(category).toBeTruthy();
+
+    const response = await request.post('/api/transactions', {
+        data: {
+            date: `${period.slice(0, 4)}-${period.slice(4, 6)}-01`,
+            period,
+            category_id: category.id,
+            amount_cad: 0.01,
+            comments: `period-range-anchor-${period}`,
+        },
+    });
+    expect(response.ok()).toBeTruthy();
 }
 
 export function resetBrowserState(): void {

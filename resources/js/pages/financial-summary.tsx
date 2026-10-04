@@ -23,8 +23,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { formatCurrencyAmount } from '@/lib/currency';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatPeriod } from '@/lib/periods';
 import {
     Calculator,
     Download,
@@ -77,7 +78,7 @@ function formatCad(value: number | null | undefined): string {
 }
 
 export default function FinancialSummary() {
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
     const [summary, setSummary] = useState<FinancialSummaryData | null>(null);

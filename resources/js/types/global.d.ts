@@ -13,6 +13,7 @@ declare module '@inertiajs/core' {
             version: string;
             auth: Auth;
             sidebarOpen: boolean;
+            availablePeriods: string[];
             [key: string]: unknown;
         };
     }

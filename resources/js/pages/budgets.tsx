@@ -21,10 +21,11 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
 import { formatCurrencyAmount } from '@/lib/currency';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatPeriod } from '@/lib/periods';
 import {
     CheckCircle,
     XCircle,
@@ -62,7 +63,7 @@ function formatCad(value: number | null | undefined): string {
 }
 
 export default function Budgets() {
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
     const [categories, setCategories] = useState<CategoryOption[]>([]);

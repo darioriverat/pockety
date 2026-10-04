@@ -30,7 +30,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
+import { formatPeriod } from '@/lib/periods';
 
 interface ExchangeRate {
     id: number;
@@ -89,7 +90,7 @@ export default function ExchangeRates() {
         useState<ExchangeRateStatistics | null>(null);
     const [loadingStats, setLoadingStats] = useState(false);
 
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
 
     useEffect(() => {
         fetchAllRates();

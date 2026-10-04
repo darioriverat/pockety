@@ -5,6 +5,7 @@ import FinancialSummary from './financial-summary';
 
 vi.mock('@inertiajs/react', () => ({
     Head: ({ title }: { title: string }) => <title>{title}</title>,
+    usePage: () => ({ props: {} }),
 }));
 
 vi.mock('@/hooks/use-period', () => ({

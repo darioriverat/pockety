@@ -19,8 +19,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { formatDisplayCurrency } from '@/lib/currency';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatPeriod } from '@/lib/periods';
 import TextLink from '@/components/text-link';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
@@ -49,7 +50,7 @@ function formatCad(value: number): string {
 }
 
 export default function CategoryActuals() {
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
     const [rows, setRows] = useState<CategoryActualRow[]>([]);

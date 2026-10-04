@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+    ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
@@ -65,6 +66,7 @@ test('feature 115: user can generate PDF report of balance sheet for a period', 
     });
 
     // Step 1: Navigate to balance sheet for period 202501
+    await ensureTransactionInPeriod(request, '202501');
     await page.goto('/balance-sheet?period=202501');
     await expect(
         page.getByRole('heading', { name: 'Balance Sheet' }),

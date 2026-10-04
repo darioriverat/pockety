@@ -6,8 +6,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { usePeriod } from '@/hooks/use-period';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatPeriod } from '@/lib/periods';
 import { cn } from '@/lib/utils';
 
 type PeriodSelectorProps = {
@@ -30,7 +31,7 @@ export function PeriodSelector({
     testId = 'period-selector',
 }: PeriodSelectorProps) {
     const { period, setPeriod } = usePeriod();
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
 
     return (
         <div className={cn('w-full max-w-xs space-y-2', className)}>

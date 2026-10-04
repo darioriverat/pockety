@@ -37,10 +37,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
 import { usePeriod } from '@/hooks/use-period';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { formatCurrencyAmount } from '@/lib/currency';
 import {
     formatPeriod,
-    generatePeriods,
     isPeriodFormatValid,
     periodFromDate,
 } from '@/lib/periods';
@@ -168,7 +168,7 @@ interface FilterState {
 
 export default function Transactions() {
     const { period, setPeriod } = usePeriod();
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);

@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
+import {
+    ensureTransactionInPeriod,
+    loginAsBrowserTestUser,
+    trackConsoleErrors,
+} from './helpers';
 
 const evidence = 'verification/test-151-success-messages';
 
@@ -29,6 +33,7 @@ for (const theme of ['light', 'dark'] as const) {
         await page.emulateMedia({ colorScheme: theme });
         await page.setViewportSize({ width: 1440, height: 1000 });
         await loginAsBrowserTestUser(page);
+        await ensureTransactionInPeriod(request, '202412');
 
         const categoriesResponse = await request.get('/api/categories');
         expect(categoriesResponse.ok()).toBeTruthy();

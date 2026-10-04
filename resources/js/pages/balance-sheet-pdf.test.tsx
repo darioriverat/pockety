@@ -5,6 +5,7 @@ import BalanceSheet from './balance-sheet';
 
 vi.mock('@inertiajs/react', () => ({
     Head: ({ title }: { title: string }) => <title>{title}</title>,
+    usePage: () => ({ props: {} }),
     Link: ({
         href,
         children,

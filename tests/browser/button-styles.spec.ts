@@ -1,5 +1,9 @@
 import { expect, test, type Locator } from '@playwright/test';
-import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
+import {
+    ensureTransactionInPeriod,
+    loginAsBrowserTestUser,
+    trackConsoleErrors,
+} from './helpers';
 
 const evidence = 'verification/test-144-button-styles';
 const background = (button: Locator) => button.evaluate((element) => getComputedStyle(element).backgroundColor);
@@ -7,6 +11,7 @@ const background = (button: Locator) => button.evaluate((element) => getComputed
 test('income period stays synchronized with the header and navigation', async ({ page }) => {
     const errors = trackConsoleErrors(page);
     page.on('pageerror', (error) => errors.push(error.message));
+    await ensureTransactionInPeriod(page.request, '202501');
     await loginAsBrowserTestUser(page);
     await page.getByRole('link', { name: 'Income', exact: true }).click();
     await page.getByTestId('period-selector').click();

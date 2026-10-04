@@ -21,11 +21,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { usePeriod } from '@/hooks/use-period';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import {
     formatCurrencyAmount,
     type DisplayCurrency,
 } from '@/lib/currency';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatPeriod } from '@/lib/periods';
 import {
     Download,
     Landmark,
@@ -93,7 +94,7 @@ function typeLabel(type: string): string {
 }
 
 export default function BalanceSheet() {
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
     const [sheet, setSheet] = useState<BalanceSheetData | null>(null);

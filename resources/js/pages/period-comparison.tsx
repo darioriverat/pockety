@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -18,7 +18,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
+import { formatPeriod } from '@/lib/periods';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
@@ -97,7 +98,7 @@ function readQueryParam(key: string): string | null {
 }
 
 export default function PeriodComparison() {
-    const periods = useMemo(() => generatePeriods(), []);
+    const periods = useSelectablePeriods();
     const [periodA, setPeriodA] = useState(
         () => readQueryParam('period_a') ?? '202501',
     );

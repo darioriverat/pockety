@@ -15,15 +15,52 @@ const MONTH_NAMES = [
     'December',
 ] as const;
 
-export function generatePeriods(): string[] {
+export function currentPeriod(date = new Date()): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+    return `${year}${month}`;
+}
+
+/**
+ * Inclusive month range from `from` through `to` (YYYYMM).
+ * Returns the end month alone when the start is missing or later than the end.
+ */
+export function generatePeriods(from: string, to: string): string[] {
+    if (!isCalendarPeriod(to)) {
+        return [];
+    }
+
+    if (!isCalendarPeriod(from) || from > to) {
+        return [to];
+    }
+
     const periods: string[] = [];
-    for (let year = 2025; year <= 2026; year++) {
-        const maxMonth = year === 2026 ? 9 : 12;
-        for (let month = 1; month <= maxMonth; month++) {
-            periods.push(`${year}${month.toString().padStart(2, '0')}`);
+    let year = Number(from.slice(0, 4));
+    let month = Number(from.slice(4, 6));
+    const endYear = Number(to.slice(0, 4));
+    const endMonth = Number(to.slice(4, 6));
+
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+        periods.push(`${year}${month.toString().padStart(2, '0')}`);
+        month += 1;
+        if (month > 12) {
+            month = 1;
+            year += 1;
         }
     }
+
     return periods;
+}
+
+function isCalendarPeriod(period: string): boolean {
+    if (!/^\d{6}$/.test(period)) {
+        return false;
+    }
+
+    const month = Number(period.slice(4, 6));
+
+    return month >= 1 && month <= 12;
 }
 
 export function formatPeriod(period: string): string {
@@ -39,7 +76,7 @@ export function formatPeriod(period: string): string {
 }
 
 export function isValidPeriod(period: string): boolean {
-    return generatePeriods().includes(period);
+    return isCalendarPeriod(period);
 }
 
 /**

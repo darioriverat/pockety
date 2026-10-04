@@ -3,12 +3,14 @@ import {
     type ApiCategory,
     type ApiTransaction,
     type TransactionPayload,
+    ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
 } from './helpers';
 
 async function openTransactionsPage(page: Page): Promise<void> {
+    await ensureTransactionInPeriod(page.request, '202512');
     await page.goto('/transactions');
 
     await expect(page).toHaveURL(/\/transactions$/);

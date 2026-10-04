@@ -31,8 +31,9 @@ import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
 import TextLink from '@/components/text-link';
 import { usePeriod } from '@/hooks/use-period';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { formatDisplayCurrency } from '@/lib/currency';
-import { formatPeriod, generatePeriods } from '@/lib/periods';
+import { formatPeriod } from '@/lib/periods';
 import {
     AlertTriangle,
     BookMarked,
@@ -136,7 +137,7 @@ function FigureGrid({
 }
 
 export default function PeriodBalances() {
-    const periods = generatePeriods();
+    const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
     const [payload, setPayload] = useState<PeriodBalancePayload | null>(null);

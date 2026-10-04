@@ -4,7 +4,11 @@ import {
     formatCurrencyAmount,
     formatDisplayCurrency,
 } from '../../resources/js/lib/currency';
-import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
+import {
+    ensureTransactionInPeriod,
+    loginAsBrowserTestUser,
+    trackConsoleErrors,
+} from './helpers';
 
 const evidence = 'verification/test-147-currency-format';
 
@@ -131,6 +135,7 @@ test.describe('currency amount formatting', () => {
             '/dev/seed-balance-sheet-fixture?period=202501&book_value=25000',
         );
         expect(seedFixed.ok()).toBeTruthy();
+        await ensureTransactionInPeriod(page.request, '202501');
 
         await page.goto('/balance-sheet');
         await page.getByTestId('page-period-selector').click();

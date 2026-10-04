@@ -5,6 +5,7 @@ import Budgets from './budgets';
 // Mock Inertia
 vi.mock('@inertiajs/react', () => ({
     Head: () => null,
+    usePage: () => ({ props: {} }),
 }));
 
 // Mock hooks

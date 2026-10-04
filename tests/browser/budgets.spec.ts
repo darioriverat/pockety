@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+    ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
@@ -108,6 +109,7 @@ test('feature 97: Budget form validates that budget amount is a positive number'
     const consoleErrors = trackConsoleErrors(page);
 
     await loginAsBrowserTestUser(page);
+    await ensureTransactionInPeriod(page.request, '202501');
 
     // Step 1: Navigate to budget form
     await page.goto('/budgets');

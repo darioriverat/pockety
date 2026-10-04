@@ -4,6 +4,7 @@ import PeriodBalances from './period-balances';
 
 vi.mock('@inertiajs/react', () => ({
     Head: ({ title }: { title: string }) => <title>{title}</title>,
+    usePage: () => ({ props: {} }),
     Link: ({
         href,
         children,

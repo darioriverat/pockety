@@ -1,9 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
+import {
+    ensureTransactionInPeriod,
+    loginAsBrowserTestUser,
+    trackConsoleErrors,
+} from './helpers';
 
 test('dashboard period selector matches and updates the displayed summary', async ({ page }) => {
     const errors = trackConsoleErrors(page);
     page.on('pageerror', (error) => errors.push(error.message));
+    await ensureTransactionInPeriod(page.request, '202501');
     await loginAsBrowserTestUser(page);
     const selector = page.getByTestId('period-selector');
     const initialPeriod = await selector.innerText();

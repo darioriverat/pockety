@@ -1,6 +1,7 @@
 import { usePeriod } from '@/hooks/use-period';
+import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { formatCurrencyAmount } from '@/lib/currency';
-import { isValidPeriod } from '@/lib/periods';
+import { formatPeriod } from '@/lib/periods';
 import { cn } from '@/lib/utils';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -73,6 +74,7 @@ const formatPeriodLabel = (period: string): string => {
 
 export default function Income() {
     const { period, setPeriod } = usePeriod();
+    const selectablePeriods = useSelectablePeriods();
     const [periodInput, setPeriodInput] = useState(period);
     const [lines, setLines] = useState<IncomeLine[]>([]);
     const [totalCad, setTotalCad] = useState<number>(0);
@@ -123,8 +125,12 @@ export default function Income() {
 
     const handlePeriodSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isValidPeriod(periodInput)) {
-            setError('Select a supported period from January 2025 through September 2026.');
+        if (!selectablePeriods.includes(periodInput)) {
+            const first = formatPeriod(selectablePeriods[0]);
+            const last = formatPeriod(
+                selectablePeriods[selectablePeriods.length - 1],
+            );
+            setError(`Select a supported period from ${first} through ${last}.`);
             return;
         }
         if (periodInput === period) {

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+    ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
@@ -15,6 +16,7 @@ test('feature 42-45: income entry UI supports multi-currency lines and totals', 
     const consoleErrors = trackConsoleErrors(page);
 
     await loginAsBrowserTestUser(page);
+    await ensureTransactionInPeriod(page.request, '202501');
 
     await page.goto('/income');
     await expect(page.getByRole('heading', { name: 'Income' })).toBeVisible();

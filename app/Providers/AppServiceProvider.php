@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Domain\Requests\Contracts\PeriodBalance\ShowPeriodBalanceRequestInterface;
 use App\Domain\Requests\Contracts\PeriodBalance\StorePeriodBalanceRequestInterface;
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Domain\Services\Contracts\AvailablePeriodServiceInterface;
 use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Domain\Services\Contracts\IncomeServiceInterface;
@@ -16,6 +17,7 @@ use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Http\Requests\PeriodBalance\ShowPeriodBalanceRequest;
 use App\Http\Requests\PeriodBalance\StorePeriodBalanceRequest;
 use App\Services\AccountService;
+use App\Services\AvailablePeriodService;
 use App\Services\CategoryActualsService;
 use App\Services\CategoryService;
 use App\Services\IncomeService;
@@ -41,6 +43,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             AccountServiceInterface::class,
             AccountService::class
+        );
+
+        $this->app->bind(
+            AvailablePeriodServiceInterface::class,
+            AvailablePeriodService::class
         );
 
         $this->app->bind(

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+    ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
@@ -15,6 +16,7 @@ test('feature 96: Exchange rate form validates that rates are positive numbers',
     const consoleErrors = trackConsoleErrors(page);
 
     await loginAsBrowserTestUser(page);
+    await ensureTransactionInPeriod(page.request, '202601');
 
     // Step 1: Navigate to exchange rates form
     await page.goto('/exchange-rates');
