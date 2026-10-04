@@ -16,7 +16,7 @@ test('user can register a period balance from reconciliation figures and overwri
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -73,6 +73,11 @@ test('user can register a period balance from reconciliation figures and overwri
 
     await page.goto('/period-balances');
     await expect(page.getByTestId('period-balances-heading')).toBeVisible();
+    await page.getByTestId('page-period-selector').click();
+    await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+    await expect(page.getByTestId('page-period-selector')).toContainText(
+        'January 2025',
+    );
     await expect(page.getByTestId('proposed-assets-cad')).toHaveText('$900.00');
     await expect(page.getByTestId('proposed-liabilities-cad')).toHaveText(
         '$0.00',

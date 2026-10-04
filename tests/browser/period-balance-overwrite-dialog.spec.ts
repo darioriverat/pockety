@@ -7,7 +7,7 @@ import {
 } from './helpers';
 
 async function seedOverwriteScenario(page: Page, request: APIRequestContext) {
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -60,6 +60,12 @@ async function seedOverwriteScenario(page: Page, request: APIRequestContext) {
 
     await page.goto('/period-balances');
     await expect(page.getByTestId('period-balances-heading')).toBeVisible();
+    await page.getByTestId('page-period-selector').click();
+    await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+    await expect(page.getByTestId('page-period-selector')).toContainText(
+        'January 2025',
+    );
+    await expect(page.getByTestId('proposed-assets-cad')).toHaveText('$900.00');
     await page.getByTestId('register-period-balance').click();
     await expect(page.getByTestId('period-balance-success')).toContainText(
         'registered',
