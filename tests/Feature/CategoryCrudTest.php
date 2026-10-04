@@ -256,6 +256,33 @@ class CategoryCrudTest extends TestCase
         $this->assertFalse($category->is_debt_category);
     }
 
+    public function test_update_rejects_income_flag_change_when_transactions_exist(): void
+    {
+        $category = Category::where('code', 'C001')->first();
+        $this->assertFalse($category->is_income_category);
+        $this->assertFalse($category->is_debt_category);
+
+        Transaction::create([
+            'date' => '2026-01-15',
+            'period' => '202601',
+            'category_id' => $category->id,
+            'account_id' => $this->account->id,
+            'amount_cad' => 55.00,
+            'comments' => 'Locks income flag change',
+        ]);
+
+        $response = $this->putJson('/api/categories/C001', [
+            'is_income_category' => true,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('error', 'Debt and income settings cannot be changed because this category has transactions');
+
+        $category->refresh();
+        $this->assertFalse($category->is_income_category);
+        $this->assertFalse($category->is_debt_category);
+    }
+
     public function test_update_allows_name_change_when_transactions_exist(): void
     {
         $category = Category::where('code', 'C001')->first();

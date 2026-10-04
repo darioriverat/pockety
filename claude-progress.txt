@@ -374,3 +374,38 @@ Next
 - Feature #10: reject income-flag change when transactions exist.
 - Then inactivate/reactivate and remaining category edit flows.
 - Current completion: 9/106 features passing; 97 remaining.
+
+
+===============================================================================
+SESSION 7 - October 4, 2026
+===============================================================================
+Completed feature #10: reject income-flag change when transactions exist.
+
+Changes
+- PHPUnit: test_update_rejects_income_flag_change_when_transactions_exist
+  in CategoryCrudTest (PUT is_income_category true → 422 + flags unchanged).
+- Playwright: tests/browser/category-edit-income-flag-locked.spec.ts
+  (API 422 + locked kind radios + name still editable; no Income badge).
+- Helper: scripts/session7-verify-income-lock.mjs
+- Backend/UI already enforced RuntimeException + edit-kind-locked-message;
+  no service change required.
+
+Verification
+- App at http://dev.pockety.com:8080/ (login 200); stack already up.
+- Pre-work: CategoryCrudTest 25 passed; categories.test.tsx 9 passed;
+  Playwright category-edit-debt-flag-locked.spec.ts passed (regression).
+- PHPUnit focused income-flag test + full CategoryCrudTest: 26 passed.
+- Frontend categories.test.tsx: 9 passed.
+- Playwright category-edit-income-flag-locked.spec.ts: passed.
+- Screenshots: verification/category-edit-income-flag-locked-{before,dialog,after}.png
+  Dialog shows locked message and disabled Expense/Debt/Income radios; no
+  Income badge after rejected change; name update still succeeds.
+- Puppeteer MCP blocked this session (interactive approval); used /dev Playwright.
+
+Issues found
+- None functional. Host Puppeteer MCP still needs interactive approval.
+
+Next
+- Feature #11: inactivate category via update endpoint.
+- Then reactivate, inactivate-with-transactions, and remaining category flows.
+- Current completion: 10/106 features passing; 96 remaining.
