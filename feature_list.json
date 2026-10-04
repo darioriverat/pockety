@@ -148,7 +148,7 @@
       "Step 5: Verify data.is_active is false",
       "Step 6: Verify category still exists in database"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
