@@ -1,0 +1,90 @@
+Claude Agent Session 1 - Progress Report
+========================================
+
+Session Started: 2026-10-04
+Status: IN PROGRESS
+
+## Completed Tasks
+
+### Initial Setup ✓
+- Created comprehensive feature_list.json with 96 detailed test cases
+  * 22 tests for category CRUD operations
+  * 10 tests for report logic changes
+  * 31 tests for user ownership and scoping
+  * 8 tests for two-user isolation
+  * 10 tests for UI/style requirements
+  * 15 tests for end-to-end workflows
+  * 32 tests with 10+ steps for comprehensive coverage
+
+- Reviewed and verified existing init.sh script (already comprehensive)
+- Updated README.md with correct feature count
+- Made initial git commit with feature_list.json and app_spec.txt
+- Analyzed existing codebase structure and patterns
+
+### Current Understanding
+- Laravel + Inertia React stack with Docker development environment
+- Existing Category model has all required fields (code, name, is_debt_category, is_income_category, is_active, status)
+- CategoryService follows domain entity pattern (no Eloquent models exposed)
+- CategoryController has index, show, destroy methods
+- Missing: create, update endpoints and methods
+- Tests use RefreshDatabase and actingAs() for authentication
+
+## Next Steps (Implementation Order from Spec)
+
+### Step 1: Category Create, Update, Delete Guards (IN PROGRESS)
+Need to implement:
+- [ ] Create CategoryServiceInterface methods: create(), update()
+- [ ] Implement CategoryService::create() with code generation logic
+- [ ] Implement CategoryService::update() with transaction guards
+- [ ] Update CategoryService::delete() to check for budgets
+- [ ] Add CategoryController::store() method
+- [ ] Add CategoryController::update() method
+- [ ] Update CategoryController::index() to support include_inactive param
+- [ ] Update CategoryController::destroy() to check budgets
+- [ ] Add routes for POST /api/categories and PUT/PATCH /api/categories/{code}
+- [ ] Create form request classes following domain interface pattern
+- [ ] Write feature tests for all CRUD operations
+- [ ] Update categories.tsx UI page with create/edit dialogs
+
+### Step 2: Report Inclusion Rules
+- [ ] Update FinancialSummaryService::getSummary to include inactive categories with transactions
+- [ ] Update CategoryActualsService to include inactive, exclude active without transactions
+- [ ] Update BudgetService::getBudgetVsActualReport logic
+- [ ] Write tests for all report changes
+
+### Step 3: Period Balance Overwrite Dialog UI
+- [ ] Update period-balances.tsx dialog width to sm:max-w-3xl
+- [ ] Fix FigureGrid to single column layout
+- [ ] Ensure side-by-side on desktop, stacked on mobile
+- [ ] Fix header padding for close button
+- [ ] Verify all test IDs remain
+
+### Step 4: Per-User Ownership
+- [ ] Create migration to add user_id to all financial tables
+- [ ] Add backfill logic for existing data
+- [ ] Update category unique constraint to (user_id, code)
+- [ ] Update period unique constraints to (user_id, period)
+- [ ] Create OwnerResolver service
+- [ ] Add auth middleware to API routes
+- [ ] Update all services to scope queries by user_id
+- [ ] Update CreateNewUser to copy category template
+- [ ] Update CategorySeeder for per-user logic
+- [ ] Update factories with user_id
+
+### Step 5: Tests and Verification
+- [ ] Run task tests for all affected features
+- [ ] Browser verification of categories page
+- [ ] Browser verification of overwrite dialog
+- [ ] Two-user isolation testing
+
+## Files Modified This Session
+- feature_list.json (created)
+- app_spec.txt (created)
+- README.md (updated)
+- claude-progress.txt (created)
+
+## Notes
+- Production-ready quality is the goal
+- Work on ONE feature at a time
+- Test thoroughly before marking passes: true
+- Commit progress frequently

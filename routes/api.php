@@ -63,8 +63,10 @@ Route::post('/fixed-assets/{id}/valuations', [FixedAssetController::class, 'stor
 
 // Categories API
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
 Route::get('/categories/{code}/transactions', [CategoryController::class, 'transactions'])->name('categories.transactions');
 Route::get('/categories/{code}', [CategoryController::class, 'show'])->name('categories.show');
+Route::match(['put', 'patch'], '/categories/{code}', [CategoryController::class, 'update'])->name('categories.update');
 Route::delete('/categories/{code}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
 // Transactions API

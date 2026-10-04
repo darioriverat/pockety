@@ -14,13 +14,18 @@ class CategoryController extends Controller
     ) {}
 
     /**
-     * Get all active categories.
+     * Get all active categories, or all categories if include_inactive=1.
      *
      * GET /api/categories
+     * GET /api/categories?include_inactive=1
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $categories = $this->service->getAllActive();
+        $includeInactive = $request->query('include_inactive') === '1';
+
+        $categories = $includeInactive
+            ? $this->service->getAll()
+            : $this->service->getAllActive();
 
         $data = array_map(fn ($entity) => $entity->toArray(), $categories);
 
@@ -111,6 +116,108 @@ class CategoryController extends Controller
     }
 
     /**
+     * Create a new category.
+     *
+     * POST /api/categories
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'is_debt_category' => 'required|boolean',
+                'is_income_category' => 'required|boolean',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'messages' => $e->errors(),
+            ], 422);
+        }
+
+        try {
+            $category = $this->service->create(
+                name: $validated['name'],
+                isDebtCategory: $validated['is_debt_category'],
+                isIncomeCategory: $validated['is_income_category']
+            );
+
+            return response()->json([
+                'data' => $category->toArray(),
+                'links' => [
+                    'self' => route('categories.show', $category->code),
+                ],
+            ], 201);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Update a category by code.
+     *
+     * PUT/PATCH /api/categories/{code}
+     */
+    public function update(Request $request, string $code): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'is_debt_category' => 'sometimes|boolean',
+                'is_income_category' => 'sometimes|boolean',
+                'is_active' => 'sometimes|boolean',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'messages' => $e->errors(),
+            ], 422);
+        }
+
+        // Require at least one field
+        if (empty($validated)) {
+            return response()->json([
+                'error' => 'At least one field must be provided',
+            ], 422);
+        }
+
+        try {
+            $category = $this->service->update(
+                code: $code,
+                name: $validated['name'] ?? null,
+                isDebtCategory: $validated['is_debt_category'] ?? null,
+                isIncomeCategory: $validated['is_income_category'] ?? null,
+                isActive: $validated['is_active'] ?? null
+            );
+
+            if (! $category) {
+                return response()->json([
+                    'error' => 'Category not found',
+                ], 404);
+            }
+
+            return response()->json([
+                'data' => $category->toArray(),
+                'links' => [
+                    'self' => route('categories.show', $category->code),
+                    'index' => route('categories.index'),
+                ],
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 422);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
      * Delete a category by code.
      *
      * DELETE /api/categories/{code}
@@ -122,13 +229,26 @@ class CategoryController extends Controller
 
             if (! $deleted) {
                 $hasTransactions = $this->service->hasTransactions($code);
+                $hasBudgets = $this->service->hasBudgets($code);
+
+                if ($hasTransactions) {
+                    return response()->json([
+                        'error' => 'Cannot delete category',
+                        'message' => 'This category has associated transactions and cannot be deleted',
+                        'has_transactions' => true,
+                    ], 422);
+                }
+
+                if ($hasBudgets) {
+                    return response()->json([
+                        'error' => 'Cannot delete category',
+                        'message' => 'This category has associated budgets and cannot be deleted',
+                        'has_budgets' => true,
+                    ], 422);
+                }
 
                 return response()->json([
-                    'error' => 'Cannot delete category',
-                    'message' => $hasTransactions
-                        ? 'This category has associated transactions and cannot be deleted'
-                        : 'Category deletion failed',
-                    'has_transactions' => $hasTransactions,
+                    'error' => 'Category deletion failed',
                 ], 422);
             }
 

@@ -67,7 +67,7 @@ class CategoryService implements CategoryServiceInterface
 
     /**
      * Delete a category by its code.
-     * Returns true if deleted successfully, false if category has transactions.
+     * Returns true if deleted successfully, false if category has transactions or budgets.
      *
      * @throws \Exception if category not found
      */
@@ -81,6 +81,11 @@ class CategoryService implements CategoryServiceInterface
 
         // Check if category has associated transactions
         if ($category->transactions()->exists()) {
+            return false;
+        }
+
+        // Check if category has associated budgets
+        if ($category->budgets()->exists()) {
             return false;
         }
 
@@ -218,6 +223,171 @@ class CategoryService implements CategoryServiceInterface
                 ],
             ],
         ];
+    }
+
+    /**
+     * Create a new category.
+     * Server assigns code unique for the user: C### for expense/debt, I## for income.
+     *
+     * @throws \InvalidArgumentException if both flags are true
+     */
+    public function create(
+        string $name,
+        bool $isDebtCategory,
+        bool $isIncomeCategory
+    ): CategoryEntity {
+        // Validate that both flags are not true
+        if ($isDebtCategory && $isIncomeCategory) {
+            throw new \InvalidArgumentException('A category cannot be both debt and income');
+        }
+
+        // Trim name
+        $name = trim($name);
+        if ($name === '') {
+            throw new \InvalidArgumentException('Category name cannot be empty');
+        }
+
+        // Generate appropriate code
+        $code = $this->generateNextCode($isIncomeCategory);
+
+        // Create category
+        $category = Category::create([
+            'code' => $code,
+            'name' => $name,
+            'is_debt_category' => $isDebtCategory,
+            'is_income_category' => $isIncomeCategory,
+            'is_active' => true,
+            'status' => null,
+        ]);
+
+        return $this->toEntity($category);
+    }
+
+    /**
+     * Update an existing category.
+     * Returns null if category not found.
+     *
+     * @throws \InvalidArgumentException if both debt and income flags would be true
+     * @throws \RuntimeException if attempting to change debt/income flags when transactions exist
+     */
+    public function update(
+        string $code,
+        ?string $name = null,
+        ?bool $isDebtCategory = null,
+        ?bool $isIncomeCategory = null,
+        ?bool $isActive = null
+    ): ?CategoryEntity {
+        $category = Category::where('code', $code)->first();
+
+        if (! $category) {
+            return null;
+        }
+
+        // Build update array with only provided values
+        $updates = [];
+
+        if ($name !== null) {
+            $trimmed = trim($name);
+            if ($trimmed === '') {
+                throw new \InvalidArgumentException('Category name cannot be empty');
+            }
+            $updates['name'] = $trimmed;
+        }
+
+        // Determine final flag values
+        $finalIsDebt = $isDebtCategory ?? $category->is_debt_category;
+        $finalIsIncome = $isIncomeCategory ?? $category->is_income_category;
+
+        // Validate that both flags won't be true
+        if ($finalIsDebt && $finalIsIncome) {
+            throw new \InvalidArgumentException('A category cannot be both debt and income');
+        }
+
+        // Check if attempting to change debt/income flags
+        $debtChanging = $isDebtCategory !== null && $isDebtCategory !== $category->is_debt_category;
+        $incomeChanging = $isIncomeCategory !== null && $isIncomeCategory !== $category->is_income_category;
+
+        if (($debtChanging || $incomeChanging) && $category->transactions()->exists()) {
+            throw new \RuntimeException(
+                'Debt and income settings cannot be changed because this category has transactions'
+            );
+        }
+
+        // Apply flag updates if provided
+        if ($isDebtCategory !== null) {
+            $updates['is_debt_category'] = $isDebtCategory;
+        }
+
+        if ($isIncomeCategory !== null) {
+            $updates['is_income_category'] = $isIncomeCategory;
+        }
+
+        if ($isActive !== null) {
+            $updates['is_active'] = $isActive;
+        }
+
+        // Update the category
+        if (! empty($updates)) {
+            $category->update($updates);
+            $category->refresh();
+        }
+
+        return $this->toEntity($category);
+    }
+
+    /**
+     * Check if a category has associated budgets.
+     */
+    public function hasBudgets(string $code): bool
+    {
+        $category = Category::where('code', $code)->first();
+
+        if (! $category) {
+            return false;
+        }
+
+        return $category->budgets()->exists();
+    }
+
+    /**
+     * Generate the next available code for a category.
+     *
+     * @param  bool  $isIncome  Whether this is an income category
+     * @return string The generated code (C### for expense/debt, I## for income)
+     */
+    private function generateNextCode(bool $isIncome): string
+    {
+        if ($isIncome) {
+            // Income: I followed by at least two digits
+            $lastIncomeCode = Category::where('code', 'LIKE', 'I%')
+                ->orderByRaw('CAST(SUBSTRING(code, 2) AS UNSIGNED) DESC')
+                ->value('code');
+
+            if (! $lastIncomeCode) {
+                return 'I01';
+            }
+
+            // Extract number part and increment
+            $number = (int) substr($lastIncomeCode, 1);
+            $nextNumber = $number + 1;
+
+            return 'I'.str_pad((string) $nextNumber, 2, '0', STR_PAD_LEFT);
+        } else {
+            // Expense/Debt: C followed by three digits
+            $lastCCode = Category::where('code', 'LIKE', 'C%')
+                ->orderByRaw('CAST(SUBSTRING(code, 2) AS UNSIGNED) DESC')
+                ->value('code');
+
+            if (! $lastCCode) {
+                return 'C001';
+            }
+
+            // Extract number part and increment
+            $number = (int) substr($lastCCode, 1);
+            $nextNumber = $number + 1;
+
+            return 'C'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+        }
     }
 
     private function toEntity(Category $category): CategoryEntity

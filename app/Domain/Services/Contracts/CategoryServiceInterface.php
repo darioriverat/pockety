@@ -66,4 +66,36 @@ interface CategoryServiceInterface
      * }|null
      */
     public function getTransactionHistory(string $code, ?string $period = null): ?array;
+
+    /**
+     * Create a new category.
+     * Server assigns code unique for the user: C### for expense/debt, I## for income.
+     *
+     * @throws \InvalidArgumentException if both flags are true
+     */
+    public function create(
+        string $name,
+        bool $isDebtCategory,
+        bool $isIncomeCategory
+    ): CategoryEntity;
+
+    /**
+     * Update an existing category.
+     * Returns null if category not found.
+     *
+     * @throws \InvalidArgumentException if both debt and income flags would be true
+     * @throws \RuntimeException if attempting to change debt/income flags when transactions exist
+     */
+    public function update(
+        string $code,
+        ?string $name = null,
+        ?bool $isDebtCategory = null,
+        ?bool $isIncomeCategory = null,
+        ?bool $isActive = null
+    ): ?CategoryEntity;
+
+    /**
+     * Check if a category has associated budgets.
+     */
+    public function hasBudgets(string $code): bool;
 }
