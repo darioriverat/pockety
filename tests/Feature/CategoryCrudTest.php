@@ -469,4 +469,57 @@ class CategoryCrudTest extends TestCase
         sort($sortedCodes);
         $this->assertEquals($sortedCodes, $codes);
     }
+
+    public function test_show_returns_404_for_nonexistent_category(): void
+    {
+        $response = $this->getJson('/api/categories/NONEXISTENT');
+
+        $response->assertNotFound();
+    }
+
+    public function test_create_validates_name_is_required(): void
+    {
+        $response = $this->postJson('/api/categories', [
+            'name' => '',
+            'is_debt_category' => false,
+            'is_income_category' => false,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonStructure(['error', 'messages']);
+    }
+
+    public function test_create_validates_name_max_length(): void
+    {
+        $response = $this->postJson('/api/categories', [
+            'name' => str_repeat('a', 256), // 256 characters, exceeds 255 limit
+            'is_debt_category' => false,
+            'is_income_category' => false,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonStructure(['error', 'messages']);
+    }
+
+    public function test_create_validates_debt_flag_is_required(): void
+    {
+        $response = $this->postJson('/api/categories', [
+            'name' => 'Test Category',
+            'is_income_category' => false,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonStructure(['error', 'messages']);
+    }
+
+    public function test_create_validates_income_flag_is_required(): void
+    {
+        $response = $this->postJson('/api/categories', [
+            'name' => 'Test Category',
+            'is_debt_category' => false,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonStructure(['error', 'messages']);
+    }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('budgets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
             $table->string('period', 6); // YYYYMM format
             $table->decimal('amount_cad', 15, 2); // Budget amount in CAD
             $table->text('notes')->nullable();

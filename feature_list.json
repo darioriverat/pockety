@@ -253,7 +253,7 @@
       "Step 4: Attempt direct database delete",
       "Step 5: Verify foreign key constraint prevents deletion"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -266,7 +266,7 @@
       "Step 5: DELETE /api/categories/NONEXISTENT",
       "Step 6: Verify response 404"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -281,7 +281,7 @@
       "Step 7: POST with missing is_income_category",
       "Step 8: Verify response 422"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
