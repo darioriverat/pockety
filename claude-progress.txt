@@ -794,3 +794,39 @@ Browser verification: Two-user category isolation, duplicate names allowed
 Current status: 78/106 passing (73.6% complete), 28 remaining
 
 Next: Verify UI features, E2E workflows, browser tests
+
+===============================================================================
+SESSION 16 - October 4, 2026 - Retired template category on registration
+===============================================================================
+
+Completed feature #71:
+- Registered a fresh user through the real registration UI.
+- Verified C040 remains inactive with status retired_merged_into_C031.
+- Verified include-inactive catalog has 47 categories and active catalog has 46.
+- Verified C040 is excluded from the default active catalog.
+- Existing implementation satisfied this feature; no production changes needed.
+
+Baseline verification:
+- Puppeteer navigation and screenshots worked in this session.
+- init.sh could not access Docker under the sandbox; the app was already up.
+- Retried task tests with Docker access: successful.
+- Backend: 355 tests passed, Pint and PHPStan passed.
+- Frontend: 233 tests passed across 57 files.
+- One existing browser regression passed: authenticated categories API/page.
+
+Added regression coverage:
+- RegistrationTest verifies owner catalog, retired status, and active exclusion.
+- Categories component test verifies preserved status and include-inactive fetch.
+- registration-category-template.spec.ts registers an isolated unique user.
+- Browser test checks UI, actual API responses, and no console/page errors.
+- No shared browser user or destructive database reset required.
+
+Focused verification:
+- Registration backend tests: 3 passed, 16 assertions; Pint passed.
+- Categories frontend tests: 10 passed.
+- New browser test: 1 passed.
+- Reviewed screenshots in verification/registration-template/.
+- Updated only the passes field for feature #71.
+
+Current status: 79/106 features passing; 27 remaining.
+Next priority: #72, transaction picker includes only the user's active categories.

@@ -36,4 +36,36 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
     }
+
+    public function test_registration_preserves_retired_template_category_in_owner_catalog(): void
+    {
+        $this->post(route('register.store'), [
+            'name' => 'Template User',
+            'email' => 'template@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('categories', [
+            'user_id' => auth()->id(),
+            'code' => 'C040',
+            'is_active' => false,
+            'status' => 'retired_merged_into_C031',
+        ]);
+
+        $this->getJson('/api/categories?include_inactive=1')
+            ->assertOk()
+            ->assertJsonCount(47, 'data')
+            ->assertJsonFragment([
+                'code' => 'C040',
+                'is_active' => false,
+                'status' => 'retired_merged_into_C031',
+            ]);
+
+        $this->getJson('/api/categories')
+            ->assertOk()
+            ->assertJsonCount(46, 'data')
+            ->assertJsonMissing(['code' => 'C040']);
+    }
 }

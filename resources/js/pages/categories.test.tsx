@@ -42,6 +42,30 @@ describe('Categories Page', () => {
         (global.fetch as any).mockReset();
     });
 
+    it('shows the retired template category and its preserved status', async () => {
+        vi.mocked(fetch).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                data: [{
+                    id: 40,
+                    code: 'C040',
+                    name: "Kids' Allowance",
+                    is_debt_category: false,
+                    is_income_category: false,
+                    is_active: false,
+                    status: 'retired_merged_into_C031',
+                }],
+            }),
+        } as Response);
+
+        render(<Categories />);
+
+        const card = await screen.findByTestId('category-card-C040');
+        expect(card).toHaveTextContent('Retired');
+        expect(card).toHaveTextContent('retired_merged_into_C031');
+        expect(fetch).toHaveBeenCalledWith('/api/categories?include_inactive=1');
+    });
+
     it('displays an Income badge for income categories', async () => {
         const mockCategories = {
             data: [
