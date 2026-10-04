@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\CategoryController::index
-* @see app/Http/Controllers/CategoryController.php:21
+* @see app/Http/Controllers/CategoryController.php:22
 * @route '/api/categories'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::index
-* @see app/Http/Controllers/CategoryController.php:21
+* @see app/Http/Controllers/CategoryController.php:22
 * @route '/api/categories'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\CategoryController::index
-* @see app/Http/Controllers/CategoryController.php:21
+* @see app/Http/Controllers/CategoryController.php:22
 * @route '/api/categories'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\CategoryController::index
-* @see app/Http/Controllers/CategoryController.php:21
+* @see app/Http/Controllers/CategoryController.php:22
 * @route '/api/categories'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\CategoryController::index
-* @see app/Http/Controllers/CategoryController.php:21
+* @see app/Http/Controllers/CategoryController.php:22
 * @route '/api/categories'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\CategoryController::index
-* @see app/Http/Controllers/CategoryController.php:21
+* @see app/Http/Controllers/CategoryController.php:22
 * @route '/api/categories'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\CategoryController::index
-* @see app/Http/Controllers/CategoryController.php:21
+* @see app/Http/Controllers/CategoryController.php:22
 * @route '/api/categories'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -81,8 +81,64 @@ indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 index.form = indexForm
 
 /**
+* @see \App\Http\Controllers\CategoryController::store
+* @see app/Http/Controllers/CategoryController.php:123
+* @route '/api/categories'
+*/
+export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: store.url(options),
+    method: 'post',
+})
+
+store.definition = {
+    methods: ["post"],
+    url: '/api/categories',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\CategoryController::store
+* @see app/Http/Controllers/CategoryController.php:123
+* @route '/api/categories'
+*/
+store.url = (options?: RouteQueryOptions) => {
+    return store.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\CategoryController::store
+* @see app/Http/Controllers/CategoryController.php:123
+* @route '/api/categories'
+*/
+store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: store.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::store
+* @see app/Http/Controllers/CategoryController.php:123
+* @route '/api/categories'
+*/
+const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: store.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::store
+* @see app/Http/Controllers/CategoryController.php:123
+* @route '/api/categories'
+*/
+storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: store.url(options),
+    method: 'post',
+})
+
+store.form = storeForm
+
+/**
 * @see \App\Http\Controllers\CategoryController::transactions
-* @see app/Http/Controllers/CategoryController.php:68
+* @see app/Http/Controllers/CategoryController.php:73
 * @route '/api/categories/{code}/transactions'
 */
 export const transactions = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +153,7 @@ transactions.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::transactions
-* @see app/Http/Controllers/CategoryController.php:68
+* @see app/Http/Controllers/CategoryController.php:73
 * @route '/api/categories/{code}/transactions'
 */
 transactions.url = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -124,7 +180,7 @@ transactions.url = (args: { code: string | number } | [code: string | number ] |
 
 /**
 * @see \App\Http\Controllers\CategoryController::transactions
-* @see app/Http/Controllers/CategoryController.php:68
+* @see app/Http/Controllers/CategoryController.php:73
 * @route '/api/categories/{code}/transactions'
 */
 transactions.get = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -134,7 +190,7 @@ transactions.get = (args: { code: string | number } | [code: string | number ] |
 
 /**
 * @see \App\Http\Controllers\CategoryController::transactions
-* @see app/Http/Controllers/CategoryController.php:68
+* @see app/Http/Controllers/CategoryController.php:73
 * @route '/api/categories/{code}/transactions'
 */
 transactions.head = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -144,7 +200,7 @@ transactions.head = (args: { code: string | number } | [code: string | number ] 
 
 /**
 * @see \App\Http\Controllers\CategoryController::transactions
-* @see app/Http/Controllers/CategoryController.php:68
+* @see app/Http/Controllers/CategoryController.php:73
 * @route '/api/categories/{code}/transactions'
 */
 const transactionsForm = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -154,7 +210,7 @@ const transactionsForm = (args: { code: string | number } | [code: string | numb
 
 /**
 * @see \App\Http\Controllers\CategoryController::transactions
-* @see app/Http/Controllers/CategoryController.php:68
+* @see app/Http/Controllers/CategoryController.php:73
 * @route '/api/categories/{code}/transactions'
 */
 transactionsForm.get = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -164,7 +220,7 @@ transactionsForm.get = (args: { code: string | number } | [code: string | number
 
 /**
 * @see \App\Http\Controllers\CategoryController::transactions
-* @see app/Http/Controllers/CategoryController.php:68
+* @see app/Http/Controllers/CategoryController.php:73
 * @route '/api/categories/{code}/transactions'
 */
 transactionsForm.head = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -181,7 +237,7 @@ transactions.form = transactionsForm
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
-* @see app/Http/Controllers/CategoryController.php:43
+* @see app/Http/Controllers/CategoryController.php:48
 * @route '/api/categories/{code}'
 */
 export const show = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -196,7 +252,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
-* @see app/Http/Controllers/CategoryController.php:43
+* @see app/Http/Controllers/CategoryController.php:48
 * @route '/api/categories/{code}'
 */
 show.url = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -223,7 +279,7 @@ show.url = (args: { code: string | number } | [code: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
-* @see app/Http/Controllers/CategoryController.php:43
+* @see app/Http/Controllers/CategoryController.php:48
 * @route '/api/categories/{code}'
 */
 show.get = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -233,7 +289,7 @@ show.get = (args: { code: string | number } | [code: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
-* @see app/Http/Controllers/CategoryController.php:43
+* @see app/Http/Controllers/CategoryController.php:48
 * @route '/api/categories/{code}'
 */
 show.head = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -243,7 +299,7 @@ show.head = (args: { code: string | number } | [code: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
-* @see app/Http/Controllers/CategoryController.php:43
+* @see app/Http/Controllers/CategoryController.php:48
 * @route '/api/categories/{code}'
 */
 const showForm = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -253,7 +309,7 @@ const showForm = (args: { code: string | number } | [code: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
-* @see app/Http/Controllers/CategoryController.php:43
+* @see app/Http/Controllers/CategoryController.php:48
 * @route '/api/categories/{code}'
 */
 showForm.get = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -263,7 +319,7 @@ showForm.get = (args: { code: string | number } | [code: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
-* @see app/Http/Controllers/CategoryController.php:43
+* @see app/Http/Controllers/CategoryController.php:48
 * @route '/api/categories/{code}'
 */
 showForm.head = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -279,8 +335,117 @@ showForm.head = (args: { code: string | number } | [code: string | number ] | st
 show.form = showForm
 
 /**
+* @see \App\Http\Controllers\CategoryController::update
+* @see app/Http/Controllers/CategoryController.php:163
+* @route '/api/categories/{code}'
+*/
+export const update = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
+    method: 'put',
+})
+
+update.definition = {
+    methods: ["put","patch"],
+    url: '/api/categories/{code}',
+} satisfies RouteDefinition<["put","patch"]>
+
+/**
+* @see \App\Http\Controllers\CategoryController::update
+* @see app/Http/Controllers/CategoryController.php:163
+* @route '/api/categories/{code}'
+*/
+update.url = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { code: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            code: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        code: args.code,
+    }
+
+    return update.definition.url
+            .replace('{code}', parsedArgs.code.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\CategoryController::update
+* @see app/Http/Controllers/CategoryController.php:163
+* @route '/api/categories/{code}'
+*/
+update.put = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
+    method: 'put',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::update
+* @see app/Http/Controllers/CategoryController.php:163
+* @route '/api/categories/{code}'
+*/
+update.patch = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: update.url(args, options),
+    method: 'patch',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::update
+* @see app/Http/Controllers/CategoryController.php:163
+* @route '/api/categories/{code}'
+*/
+const updateForm = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PUT',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::update
+* @see app/Http/Controllers/CategoryController.php:163
+* @route '/api/categories/{code}'
+*/
+updateForm.put = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PUT',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\CategoryController::update
+* @see app/Http/Controllers/CategoryController.php:163
+* @route '/api/categories/{code}'
+*/
+updateForm.patch = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PATCH',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+update.form = updateForm
+
+/**
 * @see \App\Http\Controllers\CategoryController::destroy
-* @see app/Http/Controllers/CategoryController.php:118
+* @see app/Http/Controllers/CategoryController.php:225
 * @route '/api/categories/{code}'
 */
 export const destroy = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -295,7 +460,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::destroy
-* @see app/Http/Controllers/CategoryController.php:118
+* @see app/Http/Controllers/CategoryController.php:225
 * @route '/api/categories/{code}'
 */
 destroy.url = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -322,7 +487,7 @@ destroy.url = (args: { code: string | number } | [code: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\CategoryController::destroy
-* @see app/Http/Controllers/CategoryController.php:118
+* @see app/Http/Controllers/CategoryController.php:225
 * @route '/api/categories/{code}'
 */
 destroy.delete = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -332,7 +497,7 @@ destroy.delete = (args: { code: string | number } | [code: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\CategoryController::destroy
-* @see app/Http/Controllers/CategoryController.php:118
+* @see app/Http/Controllers/CategoryController.php:225
 * @route '/api/categories/{code}'
 */
 const destroyForm = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -347,7 +512,7 @@ const destroyForm = (args: { code: string | number } | [code: string | number ] 
 
 /**
 * @see \App\Http\Controllers\CategoryController::destroy
-* @see app/Http/Controllers/CategoryController.php:118
+* @see app/Http/Controllers/CategoryController.php:225
 * @route '/api/categories/{code}'
 */
 destroyForm.delete = (args: { code: string | number } | [code: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -362,6 +527,6 @@ destroyForm.delete = (args: { code: string | number } | [code: string | number ]
 
 destroy.form = destroyForm
 
-const CategoryController = { index, transactions, show, destroy }
+const CategoryController = { index, store, transactions, show, update, destroy }
 
 export default CategoryController
