@@ -1682,3 +1682,133 @@ CODE QUALITY
 - Application fully functional and stable
 - Ready for continued development or deployment
 
+
+
+================================================================================
+SESSION 28 - E2E Browser Test Implementation
+Date: October 4, 2026
+================================================================================
+
+SUMMARY
+-------
+Created 6 comprehensive end-to-end (E2E) browser tests to cover the remaining
+features in feature_list.json. Tests are written and ready for execution, but
+cannot be verified in this session due to sandbox restrictions preventing
+browser automation and test execution.
+
+WORK COMPLETED
+--------------
+✅ Created e2e-category-workflow.spec.ts (23 steps)
+   - Complete workflow: create → use → edit → inactivate → delete prevention
+   - Validates category codes, transaction creation, name updates
+   - Verifies retired badge, picker exclusion, report inclusion
+   - Tests delete rejection with appropriate error messages
+
+✅ Created e2e-two-user-isolation.spec.ts (25 steps)
+   - Complete two-user isolation verification
+   - Alice and Bob each get template categories
+   - Same category codes (C047) but isolated per user
+   - Validates transactions, budgets, and API isolation
+   - Verifies 404 or own-data responses for cross-user access
+
+✅ Created e2e-category-create-workflow.spec.ts (10 steps)
+   - Browser test for category creation
+   - Validates reactive UI updates without page reload
+   - Tracks console errors
+
+✅ Created e2e-category-edit-workflow.spec.ts (7 steps)
+   - Browser test for category editing
+   - Validates name updates and UI reactivity
+
+✅ Created e2e-category-inactivate-picker.spec.ts (8 steps)
+   - Browser test for inactivation and picker exclusion
+   - Validates retired badge and picker filtering
+
+✅ Created e2e-delete-rejection.spec.ts (7 steps)
+   - Browser test for delete rejection with transactions
+   - Validates error dialog and category persistence
+
+✅ Created E2E_TESTS_VERIFICATION_GUIDE.md
+   - Comprehensive guide for running and verifying tests
+   - Feature mapping table
+   - Test coverage documentation
+   - Troubleshooting section
+
+TECHNICAL DETAILS
+-----------------
+- All tests use Playwright testing framework (v1.63.0)
+- Tests follow existing patterns from helpers.ts
+- Each test includes screenshot captures for manual verification
+- Tests use resetBrowserState() for clean state
+- Console error tracking included in all tests
+- Total lines added: 927 (test files) + 180 (guide) = 1,107 lines
+
+FILES CREATED
+-------------
+1. tests/browser/e2e-category-workflow.spec.ts (269 lines)
+2. tests/browser/e2e-two-user-isolation.spec.ts (275 lines)
+3. tests/browser/e2e-category-create-workflow.spec.ts (80 lines)
+4. tests/browser/e2e-category-edit-workflow.spec.ts (88 lines)
+5. tests/browser/e2e-category-inactivate-picker.spec.ts (113 lines)
+6. tests/browser/e2e-delete-rejection.spec.ts (102 lines)
+7. E2E_TESTS_VERIFICATION_GUIDE.md (180 lines)
+
+SANDBOX RESTRICTIONS ENCOUNTERED
+--------------------------------
+❌ Cannot execute `task tests` - Docker permission denied
+❌ Cannot run Puppeteer tools - MCP requires interactive approval
+❌ Cannot run `npx playwright test` - npx not in allowed commands list
+
+These restrictions prevented test verification in this session, but tests are
+implemented correctly based on:
+- Existing test patterns in tests/browser/
+- helpers.ts utility functions
+- Playwright best practices
+- Feature requirements from feature_list.json
+
+CURRENT STATUS
+--------------
+Features passing: 100/106 (94.3%)
+Remaining features: 6 (all need test execution to verify)
+
+The 6 remaining features all require browser test execution:
+1. Feature ~101: End-to-end category workflow
+2. Feature ~102: End-to-end two-user isolation workflow
+3. Feature ~103: Browser test for category create workflow
+4. Feature ~104: Browser test for category edit workflow
+5. Feature ~105: Browser test for category inactivate and picker exclusion
+6. Feature ~106: Browser test for delete rejection with transactions
+
+NEXT STEPS
+----------
+1. Execute browser tests to verify they pass:
+   - From Docker: `task browser-tests`
+   - Or: `npx playwright test tests/browser/e2e-*.spec.ts`
+
+2. Review test results and screenshots in verification/ directories
+
+3. Fix any test failures discovered
+
+4. Once all 6 E2E tests pass:
+   - Update feature_list.json: mark features 101-106 as "passes": true
+   - Commit the updated feature list
+   - Take final verification screenshots
+
+5. Verify backend (374) and frontend (237) tests still pass
+
+VERIFICATION NEEDED
+-------------------
+The tests are written but need execution to verify they pass. The tests follow
+the exact steps described in feature_list.json and use established patterns from
+existing browser tests. Review E2E_TESTS_VERIFICATION_GUIDE.md for detailed
+instructions on running and verifying these tests.
+
+CODE QUALITY
+------------
+- Clean git state before work
+- All new files follow project conventions
+- Tests use proper TypeScript types
+- Console error tracking included
+- Screenshots for visual verification
+- Ready for commit
+
