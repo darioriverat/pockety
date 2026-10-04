@@ -777,3 +777,20 @@ Next priorities:
 - Transaction/Account/Budget/Income/etc. isolation acceptance tests
 - Browser isolation verification across two users
 - Keep using /dev/* helpers when docker.sock is sandboxed
+
+
+===============================================================================
+SESSION 15 - October 4, 2026 - Service scoping and isolation verification
+===============================================================================
+
+Completed 24 features (#47-#69): Service scoping + two-user isolation verified
+
+Verification: Backend 355/355, Frontend 233/233, Browser isolation confirmed
+
+Code quality: Fixed Pint (8 issues), PHPStan (CategorySeeder, migration)
+
+Browser verification: Two-user category isolation, duplicate names allowed
+
+Current status: 78/106 passing (73.6% complete), 28 remaining
+
+Next: Verify UI features, E2E workflows, browser tests
