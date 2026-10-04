@@ -173,7 +173,7 @@
       "Step 5: Verify is_active updated successfully despite transaction",
       "Step 6: Verify existing transaction still valid"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -186,7 +186,7 @@
       "Step 5: Verify meta.total matches active count",
       "Step 6: Verify inactive category not in response"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -199,7 +199,7 @@
       "Step 5: Verify C040 appears in results",
       "Step 6: Verify all returned categories ordered by code"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -213,7 +213,7 @@
       "Step 6: Verify links.index in response",
       "Step 7: Verify category hard-deleted from database"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -227,7 +227,7 @@
       "Step 6: Verify message 'This category has associated transactions and cannot be deleted'",
       "Step 7: Verify category still exists in database"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -241,7 +241,7 @@
       "Step 6: Verify message 'This category has associated budgets and cannot be deleted'",
       "Step 7: Verify category still exists"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

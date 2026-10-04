@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './helpers';
+import { loginAsBrowserTestUser as login } from './helpers';
 
 test.describe('Category Inactivate and Reactivate', () => {
     test('inactivate category via update endpoint (Feature #11)', async ({ page }) => {
@@ -99,5 +99,77 @@ test.describe('Category Inactivate and Reactivate', () => {
         // Step 5: Verify data.is_active is true (no Retired badge, full opacity restored)
         await expect(categoryCard.getByText('Retired')).not.toBeVisible();
         await expect(categoryCard).not.toHaveClass(/opacity-50/);
+    });
+
+    test('inactivate category even when transactions exist (Feature #13)', async ({ page, request }) => {
+        await login(page);
+
+        // Step 1: Create category
+        await page.goto('/categories');
+        await page.getByTestId('create-category-button').click();
+        await page.getByTestId('category-name-input').fill('Category with Transactions');
+        await page.getByTestId('kind-expense').check();
+        await page.getByTestId('create-category-submit').click();
+        await expect(page.getByTestId('create-category-dialog')).toBeHidden();
+
+        const categoryCard = page.getByTestId('category-card-C047');
+        await expect(categoryCard).toBeVisible();
+
+        // Get the category ID from the API to create a transaction
+        const categoriesResponse = await request.get('/api/categories');
+        expect(categoriesResponse.ok()).toBeTruthy();
+        const categoriesBody = await categoriesResponse.json();
+        const category = categoriesBody.data.find((c: any) => c.code === 'C047');
+        expect(category).toBeTruthy();
+
+        // Get an account ID for the transaction
+        const accountsResponse = await request.get('/api/accounts');
+        expect(accountsResponse.ok()).toBeTruthy();
+        const accountsBody = await accountsResponse.json();
+        const account = accountsBody.data[0];
+        expect(account).toBeTruthy();
+
+        // Step 2: Create transaction using this category
+        const transactionResponse = await request.post('/api/transactions', {
+            data: {
+                date: '2026-10-01',
+                period: '202610',
+                category_id: category.id,
+                account_id: account.id,
+                amount_cad: 100.00,
+                comments: 'Test transaction for category inactivation',
+            },
+        });
+        expect(transactionResponse.ok()).toBeTruthy();
+
+        // Refresh to ensure UI state is consistent
+        await page.reload();
+        await expect(categoryCard).toBeVisible();
+
+        // Step 3: PUT /api/categories/{code} with is_active false
+        await page.getByTestId('edit-category-C047').click();
+        await expect(page.getByTestId('edit-category-dialog')).toBeVisible();
+
+        const activeCheckbox = page.getByTestId('edit-category-active');
+        await expect(activeCheckbox).toBeChecked();
+
+        // Uncheck Active
+        await activeCheckbox.click();
+        await expect(activeCheckbox).not.toBeChecked();
+
+        // Submit
+        await page.getByTestId('edit-category-submit').click();
+
+        // Step 4: Verify response 200 (dialog closes without error)
+        await expect(page.getByTestId('edit-category-dialog')).toBeHidden();
+
+        // Step 5: Verify is_active updated successfully despite transaction
+        await expect(categoryCard.getByText('Retired')).toBeVisible();
+        await expect(categoryCard).toHaveClass(/opacity-50/);
+
+        // Step 6: Verify existing transaction still valid
+        // Navigate to transactions page and verify the transaction exists
+        await page.goto('/transactions');
+        await expect(page.getByText('Test transaction for category inactivation')).toBeVisible();
     });
 });
