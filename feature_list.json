@@ -1113,7 +1113,7 @@
       "Step 5: Verify C040 appears with reduced opacity",
       "Step 6: Take screenshot and verify visual hierarchy clear"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
