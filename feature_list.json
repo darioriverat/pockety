@@ -1154,7 +1154,7 @@
       "Step 6: Verify active/inactive status clear",
       "Step 7: Verify edit and delete actions accessible"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
