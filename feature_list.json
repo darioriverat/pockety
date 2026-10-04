@@ -323,7 +323,7 @@
       "Step 7: Verify net_operating_expenses_cad calculation is correct",
       "Step 8: Verify inactivating categories doesn't change reconciliation totals"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -336,7 +336,7 @@
       "Step 5: Verify debt interest calculation correct",
       "Step 6: Confirm hardcoded debt payment codes still work"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -426,7 +426,7 @@
       "Step 5: Verify depreciation amount calculated correctly",
       "Step 6: Verify inactive C045 transaction included in calculation"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

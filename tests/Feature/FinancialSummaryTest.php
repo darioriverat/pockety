@@ -431,4 +431,36 @@ class FinancialSummaryTest extends TestCase
         // Step 6: Verify C001 (with transaction) is included
         $this->assertContains('C001', $codes);
     }
+
+    public function test_depreciation_calculation_includes_inactive_c045_transactions(): void
+    {
+        // Step 1-2: C045 exists from setUp; create a depreciation transaction in period.
+        Transaction::create([
+            'date' => '2025-01-20',
+            'period' => '202501',
+            'category_id' => $this->depreciation->id,
+            'amount_cad' => 75.00,
+            'comments' => 'Depreciation on inactive C045',
+        ]);
+
+        // Step 3: Inactivate C045 after the transaction exists.
+        $this->depreciation->update(['is_active' => false]);
+        $this->assertFalse((bool) $this->depreciation->fresh()->is_active);
+
+        // Step 4-6: Summary still includes C045 and depreciation math is unchanged.
+        $response = $this->getJson('/api/financial-summary?period=202501');
+        $response->assertOk()
+            ->assertJsonPath('data.depreciation_excluded_cad', 75)
+            ->assertJsonPath('data.total_recorded_disbursements_cad', 75)
+            ->assertJsonPath('data.net_operating_expenses_cad', 0);
+
+        $categoryTotals = $response->json('data.category_totals');
+        $codes = collect($categoryTotals)->pluck('category_code')->all();
+        $this->assertContains('C045', $codes);
+
+        $c045 = collect($categoryTotals)->firstWhere('category_code', 'C045');
+        $this->assertNotNull($c045);
+        $this->assertTrue($c045['is_depreciation']);
+        $this->assertEquals(75.0, $c045['total_cad']);
+    }
 }

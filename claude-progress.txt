@@ -658,3 +658,41 @@ Notes:
 - Clean session with no issues or regressions
 - Implementation is straightforward and follows existing patterns
 - Budget service now correctly handles inactive category inclusion per spec
+
+===============================================================================
+SESSION 12 - October 4, 2026 - Reconciliation + depreciation inactive inclusion
+===============================================================================
+
+Completed features #24, #25, #32 (3 features):
+- #24: Reconciliation totals include inactive categories with transactions ✓
+- #25: Reconciliation debt principal includes inactive debt categories ✓
+- #32: Depreciation calculation C045 includes inactive category transactions ✓
+
+Baseline verification before new work
+- App already serving at http://dev.pockety.com:8080/
+- ReconciliationTest: 17/17 green via /dev/run-tests
+- Frontend unit tests: 232/232 green via /dev/frontend-tests
+- Random browser regression categories.spec.ts: 4/4 green
+- Docker exec unavailable from this sandbox; used HTTP /dev/* helpers instead
+- Puppeteer MCP required interactive approval and was unavailable; used Playwright
+
+Implementation / verification
+- Backend logic already correct (FinancialSummaryService builds from transactions,
+  independent of is_active). No service code changes required for these features.
+- Added browser test reconciliation-inactive-inclusion.spec.ts:
+  create expense+debt categories, post expense/principal/interest, add income for
+  202601, verify reconciliation totals, inactivate categories, re-check unchanged.
+- Added FinancialSummaryTest::test_depreciation_calculation_includes_inactive_c045_transactions
+- Added browser test depreciation-inactive-inclusion.spec.ts for C045 UI path
+- Screenshots in verification/reconciliation-inactive-inclusion/ and
+  verification/depreciation-inactive-inclusion/
+- Confirmed UI figures: income $1,000; disbursements $750; net op $250;
+  interest $50; debt payments $550; after inactivation identical.
+- Confirmed inactive C045 still shows depreciation excluded $75.00
+
+Current status: 32/106 tests passing, 74 remaining
+
+Next priorities:
+- Begin per-user ownership (section 4): user_id migrations (#33 onward)
+- Or period-balance overwrite dialog UI (#90-96) if ownership is deferred
+- Keep using /dev/* helpers when docker.sock is sandboxed
