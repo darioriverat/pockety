@@ -1100,7 +1100,7 @@
       "Step 4: Check category create/update/delete routes available",
       "Step 5: Verify TypeScript types generated"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
