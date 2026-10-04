@@ -621,4 +621,83 @@ class CategoryCrudTest extends TestCase
             ->assertJsonPath('data.name', 'HATEOAS Create Link')
             ->assertJsonPath('data.id', $response->json('data.id'));
     }
+
+    public function test_update_response_includes_hateoas_links(): void
+    {
+        // Create a category first
+        $createResponse = $this->postJson('/api/categories', [
+            'name' => 'HATEOAS Update Test',
+            'is_debt_category' => false,
+            'is_income_category' => false,
+        ]);
+
+        $createResponse->assertStatus(201);
+        $code = $createResponse->json('data.code');
+
+        // Update the category
+        $updateResponse = $this->putJson('/api/categories/'.$code, [
+            'name' => 'HATEOAS Updated Name',
+        ]);
+
+        // Verify response structure
+        $updateResponse->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => ['id', 'code', 'name', 'is_debt_category', 'is_income_category', 'is_active'],
+                'links' => ['self', 'index'],
+            ]);
+
+        // Verify links.self
+        $self = $updateResponse->json('links.self');
+        $this->assertIsString($self);
+        $this->assertNotEmpty($self);
+        $this->assertStringContainsString($code, $self);
+        $this->assertEquals(
+            route('categories.show', $code),
+            $self
+        );
+
+        // Verify links.index
+        $index = $updateResponse->json('links.index');
+        $this->assertIsString($index);
+        $this->assertNotEmpty($index);
+        $this->assertEquals(
+            route('categories.index'),
+            $index
+        );
+
+        // Follow links.self and verify it returns the same category
+        $followSelfPath = parse_url($self, PHP_URL_PATH);
+        $this->assertIsString($followSelfPath);
+
+        $followSelf = $this->getJson($followSelfPath);
+        $followSelf->assertOk()
+            ->assertJsonPath('data.code', $code)
+            ->assertJsonPath('data.name', 'HATEOAS Updated Name')
+            ->assertJsonPath('data.id', $updateResponse->json('data.id'));
+
+        // Follow links.index and verify it returns the category list
+        $followIndexPath = parse_url($index, PHP_URL_PATH);
+        $this->assertIsString($followIndexPath);
+
+        $followIndex = $this->getJson($followIndexPath);
+        $followIndex->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'code', 'name'],
+                ],
+                'meta' => ['total'],
+            ]);
+
+        // Verify the updated category is in the list
+        $categories = $followIndex->json('data');
+        $found = false;
+        foreach ($categories as $category) {
+            if ($category['code'] === $code) {
+                $found = true;
+                $this->assertEquals('HATEOAS Updated Name', $category['name']);
+                break;
+            }
+        }
+        $this->assertTrue($found, "Updated category {$code} should be present in the index response");
+    }
 }
