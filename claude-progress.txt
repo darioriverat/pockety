@@ -1257,3 +1257,61 @@ Next Session Priorities:
 - Feature #86-88: Error states (delete confirmation, empty, loading)
 - Remaining end-to-end workflows
 - Backend and browser test suite execution
+
+========================================
+Session 24 (2026-10-04)
+========================================
+
+Session Goals:
+- Verify backend tests and UI working correctly
+- Complete Feature #83: Edit dialog shows locked kind when category has transactions
+
+Verification Tests Completed:
+1. Backend Tests: ✅ All 374 tests passing
+2. Browser Verification: ✅ Categories page working correctly
+   - Logged in as test@example.com
+   - Verified all 48 categories display (including inactive C040)
+   - Confirmed C040 shows "Retired" badge with reduced opacity
+   - UI is clean and professional
+
+Feature #83 Implementation: ✅ COMPLETED
+Description: "Category edit dialog shows locked debt/income when transactions exist"
+
+Implementation verified:
+1. Created test category C048 "Test Category for Locking"
+2. Created transaction referencing category C048
+3. Opened edit dialog for C048
+4. Confirmed implementation:
+   ✅ Explanation message displays: "Debt and income settings are locked because this category has transactions."
+   ✅ All three kind radio buttons (Expense, Debt, Income) are disabled
+   ✅ Radio buttons show reduced opacity and cursor-not-allowed
+   ✅ Name field remains editable
+   ✅ Active checkbox remains editable
+5. Screenshot captured: edit-dialog-kind-locked.png
+
+Code Review:
+- Feature was already fully implemented in resources/js/pages/categories.tsx
+- Lines 122-149: openEditDialog() checks for transactions via API
+- Lines 482-488: Displays lock message when kindLocked is true
+- Lines 491-553: Disables radio buttons when kindLocked is true
+- API endpoint /api/categories/{code}/transactions exists and working
+
+Session Results:
+- Started: 92/106 passing (14 remaining)
+- Completed: 93/106 passing (13 remaining)
+- Feature completed: #83
+- Backend tests: All 374 tests passing ✅
+- App status: Working perfectly in browser ✅
+
+Next Session Priorities:
+- Feature #85: Delete confirmation shows server error messages
+- Feature #86: Categories page empty state is clear
+- Feature #87: Categories page loading state is clear
+- Feature #88: Categories page error state is clear
+- Remaining end-to-end workflows
+- Browser automation tests
+
+Notes:
+- All category CRUD functionality working correctly
+- Edit dialog transaction checking works as expected
+- Clean codebase, all tests passing
