@@ -2146,3 +2146,29 @@ Next session:
 - Prefer node scripts/session-helpers.mjs browser <spec> when docker.sock is sandboxed.
 - Keep scenario registrations isolated; do not reset the shared development database.
 - App remains running with isolated verification users and their records.
+Session 34b — 2026-10-04 — Category delete rejection browser workflow verified
+----------------------------------------------------
+Completed feature #105: Browser test for delete rejection with transactions.
+Current completion: 106/106 passing; 0 remain unverified.
+
+Environment and baseline:
+- App already serving at http://dev.pockety.com:8080 (HTTP 200).
+- Verified via Playwright in-container (/dev/browser-tests).
+- Prior session-34 baseline still green (backend 374, frontend 238).
+
+Implementation and issues resolved:
+- Reworked e2e-delete-rejection.spec.ts to register a unique user (no migrate:fresh).
+- Create category + transaction through real UI, then delete via confirm dialogs.
+- Assert DELETE returns 422 with has_transactions and the exact server message.
+- Assert category card remains; filter expected 422 console noise.
+
+Final verification:
+- Delete-rejection Playwright test passed (~3.7s).
+- Screenshots reviewed: C047 Delete Test Category still on grid after rejection.
+- Evidence: verification/e2e-delete-rejection/ (force-added).
+- Only feature #105's passes field changed; descriptions/steps/order preserved.
+
+Next session:
+- Feature list is fully green (106/106).
+- Prefer regression runs over new feature work unless app_spec expands.
+- Keep scenario registrations isolated; do not reset the shared development database.
