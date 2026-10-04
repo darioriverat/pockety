@@ -7,6 +7,7 @@ use App\Domain\Entities\PeriodBalanceEntity;
 use App\Domain\Entities\PeriodBalanceHistoryEntity;
 use App\Domain\Entities\PeriodBalanceSnapshotEntity;
 use App\Domain\Exceptions\PeriodBalanceAlreadyExistsException;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Domain\Services\Contracts\PeriodBalanceServiceInterface;
 use App\Models\AccountBalance;
 use App\Models\PeriodBalance;
@@ -17,6 +18,7 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
 {
     public function __construct(
         private readonly ReconciliationService $reconciliationService,
+        private readonly OwnerResolverInterface $owner,
     ) {}
 
     public function preview(string $period): PeriodBalanceSnapshotEntity
@@ -29,7 +31,10 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
 
     public function findRegistered(string $period): ?PeriodBalanceEntity
     {
-        $balance = PeriodBalance::query()->forPeriod($period)->first();
+        $balance = PeriodBalance::query()
+            ->forUser($this->owner->id())
+            ->forPeriod($period)
+            ->first();
 
         return $balance ? $this->toEntity($balance) : null;
     }
@@ -39,6 +44,7 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
         $collection = new PeriodBalanceHistoryCollection;
 
         $rows = PeriodBalanceHistory::query()
+            ->forUser($this->owner->id())
             ->forPeriod($period)
             ->orderByDesc('replaced_at')
             ->orderByDesc('id')
@@ -55,7 +61,10 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
     {
         $report = $this->reconciliationService->reconcileForPeriod($period);
         $proposed = $this->snapshotFromReport($period, $report);
-        $existing = PeriodBalance::query()->forPeriod($period)->first();
+        $existing = PeriodBalance::query()
+            ->forUser($this->owner->id())
+            ->forPeriod($period)
+            ->first();
 
         if ($existing && ! $overwrite) {
             throw new PeriodBalanceAlreadyExistsException(
@@ -122,12 +131,15 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
      */
     private function syncAccountBalances(string $period, array $accounts): void
     {
+        $userId = $this->owner->id();
+
         foreach ($accounts as $account) {
             /** @var array{cad?: float|int, usd?: float|int, cop?: float|int} $computed */
             $computed = $account['computed'];
 
             AccountBalance::query()->updateOrCreate(
                 [
+                    'user_id' => $userId,
                     'account_id' => (int) $account['account_id'],
                     'period' => $period,
                 ],
@@ -142,6 +154,7 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
 
     /**
      * @return array{
+     *     user_id: int,
      *     period: string,
      *     assets_cad: float,
      *     liabilities_cad: float,
@@ -155,6 +168,7 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
     private function attributesFromSnapshot(PeriodBalanceSnapshotEntity $snapshot): array
     {
         return [
+            'user_id' => $this->owner->id(),
             'period' => $snapshot->period,
             'assets_cad' => $snapshot->assetsCad,
             'liabilities_cad' => $snapshot->liabilitiesCad,
@@ -169,6 +183,7 @@ class PeriodBalanceService implements PeriodBalanceServiceInterface
     private function archive(PeriodBalance $existing): void
     {
         PeriodBalanceHistory::query()->create([
+            'user_id' => $this->owner->id(),
             'period' => $existing->period,
             'assets_cad' => $existing->assets_cad,
             'liabilities_cad' => $existing->liabilities_cad,

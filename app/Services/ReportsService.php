@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\Transaction;
@@ -9,6 +10,9 @@ use Carbon\Carbon;
 
 class ReportsService
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
     /**
      * Get year-to-date totals for income and expenses.
      *
@@ -89,7 +93,8 @@ class ReportsService
 
     private function calculateTotalIncome(string $period, ExchangeRate $exchangeRate): float
     {
-        $incomeLines = Income::forPeriod($period)->get();
+        $userId = $this->owner->id();
+        $incomeLines = Income::query()->forUser($userId)->forPeriod($period)->get();
 
         $total = 0.0;
 
@@ -106,6 +111,7 @@ class ReportsService
         }
 
         $incomeTransactions = Transaction::query()
+            ->forUser($userId)
             ->income()
             ->where('period', $period)
             ->get();
@@ -120,6 +126,7 @@ class ReportsService
     private function calculateTotalExpenses(string $period, ExchangeRate $exchangeRate): float
     {
         $transactions = Transaction::query()
+            ->forUser($this->owner->id())
             ->expenses()
             ->where('period', $period)
             ->get();

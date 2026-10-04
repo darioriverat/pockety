@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Domain\Collections\SearchHitCollection;
 use App\Domain\Entities\SearchHitEntity;
 use App\Domain\Entities\SearchResultsEntity;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Domain\Services\Contracts\SearchServiceInterface;
 use App\Models\Account;
 use App\Models\Category;
@@ -12,6 +13,10 @@ use App\Models\Transaction;
 
 class SearchService implements SearchServiceInterface
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     public function search(string $query, int $limit = 10): SearchResultsEntity
     {
         $term = trim($query);
@@ -40,6 +45,7 @@ class SearchService implements SearchServiceInterface
         $like = '%'.$term.'%';
 
         $accounts = Account::query()
+            ->forUser($this->owner->id())
             ->active()
             ->where(function ($query) use ($like) {
                 $query
@@ -69,6 +75,7 @@ class SearchService implements SearchServiceInterface
         $like = '%'.$term.'%';
 
         $transactions = Transaction::query()
+            ->forUser($this->owner->id())
             ->with(['category', 'account'])
             ->where(function ($query) use ($like) {
                 $query
@@ -113,6 +120,7 @@ class SearchService implements SearchServiceInterface
         $like = '%'.$term.'%';
 
         $categories = Category::query()
+            ->forUser($this->owner->id())
             ->active()
             ->where(function ($query) use ($like) {
                 $query

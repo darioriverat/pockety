@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\Category;
@@ -11,6 +12,9 @@ use Illuminate\Support\Facades\Log;
 
 class AccountImportService
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
     /**
      * Labels that are section totals / placeholders, not real accounts.
      *
@@ -102,7 +106,11 @@ class AccountImportService
                 $primaryCurrency = $this->resolvePrimaryCurrency($meta['currencies']);
                 $notes = $meta['notes'] ?? (self::ACCOUNT_NOTES[$name] ?? null);
 
-                $account = Account::query()->where('name', $name)->first();
+                $userId = $this->owner->id();
+                $account = Account::query()
+                    ->forUser($userId)
+                    ->where('name', $name)
+                    ->first();
 
                 if ($account) {
                     $account->update([
@@ -114,6 +122,7 @@ class AccountImportService
                     $updated++;
                 } else {
                     $account = Account::create([
+                        'user_id' => $userId,
                         'name' => $name,
                         'type' => $meta['type'],
                         'primary_currency' => $primaryCurrency,
@@ -132,6 +141,7 @@ class AccountImportService
 
                     AccountBalance::query()->updateOrCreate(
                         [
+                            'user_id' => $userId,
                             'account_id' => $account->id,
                             'period' => $period,
                         ],
@@ -347,12 +357,17 @@ class AccountImportService
      */
     public function linkFordEscapeTransactions(): int
     {
-        $account = Account::query()->where('name', 'Personal LOAN CIBC')->first();
+        $userId = $this->owner->id();
+        $account = Account::query()
+            ->forUser($userId)
+            ->where('name', 'Personal LOAN CIBC')
+            ->first();
         if (! $account) {
             return 0;
         }
 
         $categoryIds = Category::query()
+            ->forUser($userId)
             ->where('code', 'C044')
             ->pluck('id');
 
@@ -361,6 +376,7 @@ class AccountImportService
         }
 
         return Transaction::query()
+            ->forUser($userId)
             ->whereIn('category_id', $categoryIds)
             ->where(function ($query) {
                 $query->where('comments', 'like', '%FORD ESC%')
@@ -379,9 +395,9 @@ class AccountImportService
      */
     public function getImportStatistics(): array
     {
-        $total = Account::query()->active()->count();
-        $byType = Account::query()
-            ->active()
+        $owned = Account::query()->forUser($this->owner->id())->active();
+        $total = (clone $owned)->count();
+        $byType = (clone $owned)
             ->select('type', DB::raw('count(*) as count'))
             ->groupBy('type')
             ->pluck('count', 'type')

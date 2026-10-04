@@ -9,8 +9,8 @@ test.beforeAll(() => {
     resetBrowserState();
 });
 
-test.beforeEach(async ({ page }) => {
-    await loginAsBrowserTestUser(page);
+test.beforeEach(async ({ page, request }) => {
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 2: categories page shows active and retired categories', async ({
@@ -65,12 +65,11 @@ test('feature 4: debt categories display a debt indicator', async ({
 
 test('feature 89: system prevents deletion of category that has associated transactions', async ({
     page,
-    request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
     // Step 1: Create a transaction with category C001 via API (stable setup)
-    const categoriesResponse = await request.get('/api/categories');
+    const categoriesResponse = await page.request.get('/api/categories');
     expect(categoriesResponse.ok()).toBeTruthy();
     const categoriesPayload = (await categoriesResponse.json()) as {
         data: Array<{ id: number; code: string }>;
@@ -78,7 +77,7 @@ test('feature 89: system prevents deletion of category that has associated trans
     const c001 = categoriesPayload.data.find((item) => item.code === 'C001');
     expect(c001).toBeTruthy();
 
-    const createResponse = await request.post('/api/transactions', {
+    const createResponse = await page.request.post('/api/transactions', {
         data: {
             date: '2025-01-15',
             period: '202501',

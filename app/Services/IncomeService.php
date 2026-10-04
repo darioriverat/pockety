@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Domain\Collections\IncomeCollection;
 use App\Domain\Entities\IncomeEntity;
 use App\Domain\Services\Contracts\IncomeServiceInterface;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,12 +15,17 @@ class IncomeService implements IncomeServiceInterface
 {
     public const MAX_LINES_PER_PERIOD = 6;
 
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     public function getForPeriod(string $period): IncomeCollection
     {
         $exchangeRate = $this->resolveExchangeRate($period);
         $collection = new IncomeCollection;
 
-        $lines = Income::forPeriod($period)
+        $lines = $this->ownedIncome()
+            ->forPeriod($period)
             ->orderBy('line_number')
             ->orderBy('id')
             ->get();
@@ -33,7 +39,7 @@ class IncomeService implements IncomeServiceInterface
 
     public function getById(int $id): ?IncomeEntity
     {
-        $income = Income::find($id);
+        $income = $this->ownedIncome()->find($id);
 
         if (! $income) {
             return null;
@@ -48,7 +54,8 @@ class IncomeService implements IncomeServiceInterface
     public function create(array $data): IncomeEntity
     {
         $period = $data['period'];
-        $existingCount = Income::forPeriod($period)->count();
+        $userId = $this->owner->id();
+        $existingCount = $this->ownedIncome()->forPeriod($period)->count();
 
         if ($existingCount >= self::MAX_LINES_PER_PERIOD) {
             throw ValidationException::withMessages([
@@ -61,13 +68,14 @@ class IncomeService implements IncomeServiceInterface
         $this->assertHasAmount($data);
 
         $lineNumber = $data['line_number']
-            ?? ((int) Income::forPeriod($period)->max('line_number') + 1);
+            ?? ((int) $this->ownedIncome()->forPeriod($period)->max('line_number') + 1);
 
         if ($lineNumber < 1) {
             $lineNumber = 1;
         }
 
         $income = Income::create([
+            'user_id' => $userId,
             'period' => $period,
             'description' => $data['description'],
             'line_number' => $lineNumber,
@@ -85,7 +93,7 @@ class IncomeService implements IncomeServiceInterface
 
     public function update(int $id, array $data): IncomeEntity
     {
-        $income = Income::find($id);
+        $income = $this->ownedIncome()->find($id);
 
         if (! $income) {
             throw (new ModelNotFoundException)->setModel(Income::class, [$id]);
@@ -131,7 +139,7 @@ class IncomeService implements IncomeServiceInterface
 
     public function delete(int $id): bool
     {
-        $income = Income::find($id);
+        $income = $this->ownedIncome()->find($id);
 
         if (! $income) {
             throw (new ModelNotFoundException)->setModel(Income::class, [$id]);
@@ -145,11 +153,16 @@ class IncomeService implements IncomeServiceInterface
         $exchangeRate = $this->resolveExchangeRate($period);
         $total = 0.0;
 
-        foreach (Income::forPeriod($period)->get() as $income) {
+        foreach ($this->ownedIncome()->forPeriod($period)->get() as $income) {
             $total += $income->getTotalCadEquivalent($exchangeRate);
         }
 
         return round($total, 2);
+    }
+
+    private function ownedIncome()
+    {
+        return Income::query()->forUser($this->owner->id());
     }
 
     /**

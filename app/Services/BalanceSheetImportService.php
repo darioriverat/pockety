@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\HistoricalBalanceSheet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -9,6 +10,10 @@ use Illuminate\Support\Facades\Log;
 class BalanceSheetImportService
 {
     private const FLOAT_NOISE_THRESHOLD = 1e-6;
+
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
 
     /**
      * Import historical balance sheet snapshots from estado_financiero JSON.
@@ -82,7 +87,10 @@ class BalanceSheetImportService
                 $equity = $this->normalizeAmount($row['patrimonio_value']);
 
                 HistoricalBalanceSheet::updateOrCreate(
-                    ['period' => $period],
+                    [
+                        'user_id' => $this->owner->id(),
+                        'period' => $period,
+                    ],
                     [
                         'assets_cad' => $assets,
                         'liabilities_cad' => $liabilities,
@@ -155,7 +163,10 @@ class BalanceSheetImportService
      */
     public function getImportStatistics(): array
     {
-        $rows = HistoricalBalanceSheet::query()->orderBy('period')->get();
+        $rows = HistoricalBalanceSheet::query()
+            ->forUser($this->owner->id())
+            ->orderBy('period')
+            ->get();
 
         $snapshots = $rows->map(fn (HistoricalBalanceSheet $row): array => [
             'period' => $row->period,

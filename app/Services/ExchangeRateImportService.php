@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ExchangeRateImportService
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
     /**
      * Import exchange rates from month_sheets JSON files.
      *
@@ -70,7 +74,10 @@ class ExchangeRateImportService
 
                     // Create or update exchange rate
                     ExchangeRate::updateOrCreate(
-                        ['period' => $period],
+                        [
+                            'user_id' => $this->owner->id(),
+                            'period' => $period,
+                        ],
                         [
                             'usd_cop' => $usdCop,
                             'usd_cad' => $usdCad,
@@ -113,7 +120,10 @@ class ExchangeRateImportService
      */
     public function getImportStatistics(): array
     {
-        $rates = ExchangeRate::orderBy('period')->get();
+        $rates = ExchangeRate::query()
+            ->forUser($this->owner->id())
+            ->orderBy('period')
+            ->get();
 
         $ratesByMonth = [];
         foreach ($rates as $rate) {

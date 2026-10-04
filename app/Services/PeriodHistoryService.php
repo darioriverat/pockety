@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Domain\Collections\PeriodSummaryCollection;
 use App\Domain\Entities\PeriodSummaryEntity;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
 use App\Models\Transaction;
 
@@ -11,6 +12,7 @@ class PeriodHistoryService implements PeriodHistoryServiceInterface
 {
     public function __construct(
         private readonly FinancialSummaryService $financialSummaryService,
+        private readonly OwnerResolverInterface $owner,
     ) {}
 
     public function getHistory(string $from = '202501', string $to = '202609'): PeriodSummaryCollection
@@ -20,6 +22,7 @@ class PeriodHistoryService implements PeriodHistoryServiceInterface
 
         /** @var array<string, int> $counts */
         $counts = Transaction::query()
+            ->forUser($this->owner->id())
             ->whereIn('period', $periods)
             ->selectRaw('period, COUNT(*) as transaction_count')
             ->groupBy('period')

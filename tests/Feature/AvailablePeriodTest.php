@@ -13,6 +13,15 @@ class AvailablePeriodTest extends TestCase
 {
     use RefreshDatabase;
 
+    private User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+    }
+
     protected function tearDown(): void
     {
         $this->travelBack();
@@ -67,7 +76,7 @@ class AvailablePeriodTest extends TestCase
         $category = Category::factory()->create();
         $this->createTransaction($category, '2025-09-04', '202509');
 
-        $response = $this->actingAs(User::factory()->create())->get(route('dashboard'));
+        $response = $this->get(route('dashboard'));
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
@@ -80,6 +89,7 @@ class AvailablePeriodTest extends TestCase
     private function createTransaction(Category $category, string $date, string $period): void
     {
         Transaction::query()->create([
+            'user_id' => $this->user->id,
             'date' => $date,
             'period' => $period,
             'category_id' => $category->id,

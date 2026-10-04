@@ -9,6 +9,7 @@ use App\Domain\Services\Contracts\AvailablePeriodServiceInterface;
 use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Domain\Services\Contracts\IncomeServiceInterface;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Domain\Services\Contracts\PeriodBalanceServiceInterface;
 use App\Domain\Services\Contracts\PeriodComparisonServiceInterface;
 use App\Domain\Services\Contracts\PeriodHistoryServiceInterface;
@@ -21,6 +22,7 @@ use App\Services\AvailablePeriodService;
 use App\Services\CategoryActualsService;
 use App\Services\CategoryService;
 use App\Services\IncomeService;
+use App\Services\OwnerResolver;
 use App\Services\PeriodBalanceService;
 use App\Services\PeriodComparisonService;
 use App\Services\PeriodHistoryService;
@@ -39,6 +41,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(
+            OwnerResolverInterface::class,
+            OwnerResolver::class
+        );
+
         // Service bindings
         $this->app->bind(
             AccountServiceInterface::class,

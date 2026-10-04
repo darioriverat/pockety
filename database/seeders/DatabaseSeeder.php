@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Support\CategoryTemplate;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,16 +16,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed categories first (required for transactions)
-        $this->call([
-            CategorySeeder::class,
-        ]);
-
-        // User::factory(10)->create();
-
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        CategoryTemplate::seedForUser((int) $user->id);
     }
 }

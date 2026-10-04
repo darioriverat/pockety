@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOwner;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FixedAssetValuation extends Model
 {
+    use BelongsToOwner;
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'fixed_asset_id',
         'period',
         'book_value_cad',

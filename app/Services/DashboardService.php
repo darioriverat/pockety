@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\Category;
@@ -14,7 +15,8 @@ use Illuminate\Support\Facades\Log;
 class DashboardService
 {
     public function __construct(
-        private ReconciliationService $reconciliationService
+        private ReconciliationService $reconciliationService,
+        private readonly OwnerResolverInterface $owner,
     ) {}
 
     /**
@@ -211,7 +213,8 @@ class DashboardService
      */
     private function calculateTotalIncome(string $period, ExchangeRate $exchangeRate): float
     {
-        $incomeLines = Income::forPeriod($period)->get();
+        $userId = $this->owner->id();
+        $incomeLines = Income::query()->forUser($userId)->forPeriod($period)->get();
 
         $total = 0.0;
 
@@ -228,6 +231,7 @@ class DashboardService
         }
 
         $incomeTransactions = Transaction::query()
+            ->forUser($userId)
             ->income()
             ->where('period', $period)
             ->get();
@@ -245,6 +249,7 @@ class DashboardService
     private function calculateTotalExpenses(string $period, ExchangeRate $exchangeRate): float
     {
         $transactions = Transaction::query()
+            ->forUser($this->owner->id())
             ->expenses()
             ->where('period', $period)
             ->get();
@@ -278,10 +283,13 @@ class DashboardService
         $totalAssets = 0.0;
         $totalLiabilities = 0.0;
 
-        $accounts = Account::active()->get();
+        $userId = $this->owner->id();
+        $accounts = Account::query()->forUser($userId)->active()->get();
 
         foreach ($accounts as $account) {
-            $balance = AccountBalance::where('account_id', $account->id)
+            $balance = AccountBalance::query()
+                ->forUser($userId)
+                ->where('account_id', $account->id)
                 ->where('period', $period)
                 ->first();
 
@@ -338,7 +346,12 @@ class DashboardService
         /** @var array<int, array{amount: float, count: int}> $aggregates */
         $aggregates = [];
 
-        $transactions = Transaction::forPeriod($period)->with('category')->get();
+        $userId = $this->owner->id();
+        $transactions = Transaction::query()
+            ->forUser($userId)
+            ->forPeriod($period)
+            ->with('category')
+            ->get();
 
         foreach ($transactions as $transaction) {
             if ($transaction->isIncome()) {
@@ -365,6 +378,7 @@ class DashboardService
         $topIds = array_slice(array_keys($aggregates), 0, $limit, true);
 
         $categoriesById = Category::query()
+            ->forUser($userId)
             ->whereIn('id', $topIds)
             ->get()
             ->keyBy('id');
@@ -430,8 +444,10 @@ class DashboardService
     public function getRecentActivity(int $limit = 15): array
     {
         $limit = max(10, min(20, $limit));
+        $userId = $this->owner->id();
 
         $transactions = Transaction::query()
+            ->forUser($userId)
             ->with(['category', 'account'])
             ->orderByDesc('date')
             ->orderByDesc('id')
@@ -439,6 +455,7 @@ class DashboardService
             ->get();
 
         $incomeLines = Income::query()
+            ->forUser($userId)
             ->orderByDesc('updated_at')
             ->orderByDesc('id')
             ->limit($limit)

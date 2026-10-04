@@ -20,6 +20,7 @@ use App\Services\BalanceSheetImportService;
 use App\Services\BalanceSheetService;
 use App\Services\BudgetService;
 use App\Services\FinancialSummaryService;
+use App\Support\CategoryTemplate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +89,23 @@ if (app()->environment('local')) {
         }
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
+    Route::get('/dev/migrate-fresh', function () {
+        try {
+            Artisan::call('migrate:fresh', ['--force' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Database refreshed',
+                'output' => Artisan::output(),
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
     Route::get('/dev/seed-categories', function () {
         try {
             Artisan::call('db:seed', ['--class' => 'CategorySeeder', '--force' => true]);
@@ -119,6 +137,7 @@ if (app()->environment('local')) {
 
         // Ensure password is always the known browser-test value (cast hashes it).
         $user->forceFill(['password' => 'password'])->save();
+        CategoryTemplate::seedForUser((int) $user->id);
 
         auth()->login($user);
 
@@ -137,6 +156,7 @@ if (app()->environment('local')) {
             ]
         );
         $user->forceFill(['password' => 'password'])->save();
+        CategoryTemplate::seedForUser((int) $user->id);
 
         return response()->json([
             'success' => true,
@@ -182,8 +202,8 @@ if (app()->environment('local')) {
         $cwd = base_path();
         $phpunit = $cwd.'/vendor/bin/phpunit';
         $args = $filter ? ' --filter='.escapeshellarg($filter) : '';
-        // Force testing env so CSRF is disabled in feature tests (web process has APP_ENV=local)
-        $command = 'export HOME=/tmp APP_ENV=testing && cd '.escapeshellarg($cwd).' && '.$phpunit.$args.' 2>&1';
+        // Force testing env + in-memory sqlite/array cache so tests never touch the live DB or shared rate limits.
+        $command = 'export HOME=/tmp APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= CACHE_STORE=array SESSION_DRIVER=array && cd '.escapeshellarg($cwd).' && '.$phpunit.$args.' 2>&1';
         $output = [];
         $exitCode = 0;
         exec($command, $output, $exitCode);

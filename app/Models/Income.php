@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOwner;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Income extends Model
 {
+    use BelongsToOwner;
     use HasFactory;
 
     protected $table = 'income';
 
     protected $fillable = [
+        'user_id',
         'period',
         'description',
         'line_number',

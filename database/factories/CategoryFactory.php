@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +18,7 @@ class CategoryFactory extends Factory
         $code = 'C'.str_pad((string) fake()->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT);
 
         return [
+            'user_id' => fn () => auth()->id() ?? User::factory(),
             'code' => $code,
             'name' => fake()->words(2, true),
             'is_debt_category' => false,

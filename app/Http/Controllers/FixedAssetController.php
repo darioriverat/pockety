@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\FixedAsset;
 use App\Models\FixedAssetValuation;
 use Illuminate\Http\JsonResponse;
@@ -9,6 +10,10 @@ use Illuminate\Http\Request;
 
 class FixedAssetController extends Controller
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     /**
      * Get all fixed assets.
      *
@@ -16,7 +21,9 @@ class FixedAssetController extends Controller
      */
     public function index(): JsonResponse
     {
-        $assets = FixedAsset::active()
+        $assets = FixedAsset::query()
+            ->forUser($this->owner->id())
+            ->active()
             ->orderBy('name')
             ->get();
 
@@ -49,7 +56,7 @@ class FixedAssetController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $asset = FixedAsset::find($id);
+        $asset = $this->findOwned($id);
 
         if (! $asset) {
             return response()->json([
@@ -89,7 +96,10 @@ class FixedAssetController extends Controller
             'initial_value_cad' => 'nullable|numeric|min:0',
         ]);
 
-        $asset = FixedAsset::create($validated);
+        $asset = FixedAsset::create([
+            ...$validated,
+            'user_id' => $this->owner->id(),
+        ]);
 
         return response()->json([
             'data' => [
@@ -116,7 +126,7 @@ class FixedAssetController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $asset = FixedAsset::find($id);
+        $asset = $this->findOwned($id);
 
         if (! $asset) {
             return response()->json([
@@ -159,7 +169,7 @@ class FixedAssetController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $asset = FixedAsset::find($id);
+        $asset = $this->findOwned($id);
 
         if (! $asset) {
             return response()->json([
@@ -181,7 +191,7 @@ class FixedAssetController extends Controller
      */
     public function valuations(Request $request, int $id): JsonResponse
     {
-        $asset = FixedAsset::find($id);
+        $asset = $this->findOwned($id);
 
         if (! $asset) {
             return response()->json([
@@ -227,7 +237,7 @@ class FixedAssetController extends Controller
      */
     public function storeValuation(Request $request, int $id): JsonResponse
     {
-        $asset = FixedAsset::find($id);
+        $asset = $this->findOwned($id);
 
         if (! $asset) {
             return response()->json([
@@ -243,6 +253,7 @@ class FixedAssetController extends Controller
 
         $valuation = FixedAssetValuation::updateOrCreate(
             [
+                'user_id' => $this->owner->id(),
                 'fixed_asset_id' => $asset->id,
                 'period' => $validated['period'],
             ],
@@ -267,5 +278,12 @@ class FixedAssetController extends Controller
                 'asset' => route('fixed-assets.show', $asset->id),
             ],
         ], $valuation->wasRecentlyCreated ? 201 : 200);
+    }
+
+    private function findOwned(int $id): ?FixedAsset
+    {
+        return FixedAsset::query()
+            ->forUser($this->owner->id())
+            ->find($id);
     }
 }

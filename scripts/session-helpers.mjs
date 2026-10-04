@@ -67,6 +67,8 @@ const routes = {
     build: () => `/dev/build-assets`,
     reset: () => `/dev/reset-test-user`,
     seed: () => `/dev/seed-browser`,
+    migrate: () => `/dev/migrate`,
+    'migrate-fresh': () => `/dev/migrate-fresh`,
 };
 
 if (!routes[cmd]) {

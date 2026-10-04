@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExchangeRate;
@@ -10,6 +11,10 @@ use Illuminate\Support\Collection;
 
 class BudgetService
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     /**
      * List budgets for a period, optionally filtered by category.
      *
@@ -17,7 +22,8 @@ class BudgetService
      */
     public function listForPeriod(string $period, ?int $categoryId = null): Collection
     {
-        $query = Budget::with('category')
+        $query = $this->ownedBudgets()
+            ->with('category')
             ->forPeriod($period)
             ->orderBy('category_id');
 
@@ -33,8 +39,11 @@ class BudgetService
      */
     public function upsert(int $categoryId, string $period, float $amountCad, ?string $notes = null): Budget
     {
+        $userId = $this->owner->id();
+
         $budget = Budget::updateOrCreate(
             [
+                'user_id' => $userId,
                 'category_id' => $categoryId,
                 'period' => $period,
             ],
@@ -75,12 +84,19 @@ class BudgetService
     public function getBudgetVsActualReport(string $period): array
     {
         $exchangeRate = $this->resolveExchangeRate($period);
+        $userId = $this->owner->id();
 
         // Start with all active categories
-        $activeCategories = Category::active()->orderBy('code')->get();
+        $activeCategories = Category::query()
+            ->forUser($userId)
+            ->active()
+            ->orderBy('code')
+            ->get();
 
         // Find inactive categories with transactions in this period
-        $inactiveCategoryIdsWithTransactions = Transaction::forPeriod($period)
+        $inactiveCategoryIdsWithTransactions = Transaction::query()
+            ->forUser($userId)
+            ->forPeriod($period)
             ->whereHas('category', function ($query) {
                 $query->where('is_active', false);
             })
@@ -88,8 +104,9 @@ class BudgetService
             ->unique();
 
         // Find inactive categories with budgets in this period
-        $budgetsByCategory = Budget::forPeriod($period)->get()->keyBy('category_id');
+        $budgetsByCategory = $this->ownedBudgets()->forPeriod($period)->get()->keyBy('category_id');
         $inactiveCategoryIdsWithBudgets = Category::query()
+            ->forUser($userId)
             ->where('is_active', false)
             ->whereIn('id', $budgetsByCategory->keys())
             ->pluck('id');
@@ -101,6 +118,7 @@ class BudgetService
 
         // Load inactive categories that have transactions or budgets
         $inactiveCategories = Category::query()
+            ->forUser($userId)
             ->whereIn('id', $inactiveCategoryIds)
             ->orderBy('code')
             ->get();
@@ -164,7 +182,10 @@ class BudgetService
      */
     private function calculateActualsByCategory(string $period, ExchangeRate $exchangeRate): array
     {
-        $transactions = Transaction::forPeriod($period)->get();
+        $transactions = Transaction::query()
+            ->forUser($this->owner->id())
+            ->forPeriod($period)
+            ->get();
         $actuals = [];
 
         foreach ($transactions as $transaction) {
@@ -187,6 +208,11 @@ class BudgetService
         }
 
         return $actuals;
+    }
+
+    private function ownedBudgets()
+    {
+        return Budget::query()->forUser($this->owner->id());
     }
 
     private function resolveExchangeRate(string $period): ExchangeRate

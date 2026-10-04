@@ -3,7 +3,7 @@ import { loginAsBrowserTestUser } from './helpers';
 
 test.describe('Category Deletion', () => {
     test('delete category succeeds when no transactions or budgets exist (Feature #16)', async ({ page, request }) => {
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         // Step 1: Create new category
         await page.goto('/categories');
@@ -44,7 +44,7 @@ test.describe('Category Deletion', () => {
     });
 
     test('delete blocked when transactions exist (Feature #17)', async ({ page, request }) => {
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         // Step 1: Create category
         await page.goto('/categories');
@@ -117,7 +117,7 @@ test.describe('Category Deletion', () => {
     });
 
     test('delete blocked when budgets exist (Feature #18)', async ({ page, request }) => {
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         // Step 1: Create category
         await page.goto('/categories');

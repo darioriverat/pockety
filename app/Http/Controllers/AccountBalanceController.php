@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class AccountBalanceController extends Controller
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     /**
      * Get all balances for an account.
      *
@@ -18,7 +23,7 @@ class AccountBalanceController extends Controller
      */
     public function index(Request $request, int $accountId): JsonResponse
     {
-        $account = Account::find($accountId);
+        $account = $this->findOwnedAccount($accountId);
 
         if (! $account) {
             return response()->json([
@@ -64,7 +69,7 @@ class AccountBalanceController extends Controller
      */
     public function store(Request $request, int $accountId): JsonResponse
     {
-        $account = Account::find($accountId);
+        $account = $this->findOwnedAccount($accountId);
 
         if (! $account) {
             return response()->json([
@@ -84,6 +89,7 @@ class AccountBalanceController extends Controller
             // Update or create balance for this period
             $balance = AccountBalance::updateOrCreate(
                 [
+                    'user_id' => $this->owner->id(),
                     'account_id' => $accountId,
                     'period' => $validated['period'],
                 ],
@@ -130,7 +136,16 @@ class AccountBalanceController extends Controller
      */
     public function show(int $accountId, int $id): JsonResponse
     {
-        $balance = AccountBalance::where('account_id', $accountId)->find($id);
+        if (! $this->findOwnedAccount($accountId)) {
+            return response()->json([
+                'error' => 'Account not found',
+            ], 404);
+        }
+
+        $balance = AccountBalance::query()
+            ->forUser($this->owner->id())
+            ->where('account_id', $accountId)
+            ->find($id);
 
         if (! $balance) {
             return response()->json([
@@ -164,7 +179,16 @@ class AccountBalanceController extends Controller
      */
     public function destroy(int $accountId, int $id): JsonResponse
     {
-        $balance = AccountBalance::where('account_id', $accountId)->find($id);
+        if (! $this->findOwnedAccount($accountId)) {
+            return response()->json([
+                'error' => 'Account not found',
+            ], 404);
+        }
+
+        $balance = AccountBalance::query()
+            ->forUser($this->owner->id())
+            ->where('account_id', $accountId)
+            ->find($id);
 
         if (! $balance) {
             return response()->json([
@@ -182,5 +206,12 @@ class AccountBalanceController extends Controller
                 'account' => route('accounts.show', $accountId),
             ],
         ]);
+    }
+
+    private function findOwnedAccount(int $accountId): ?Account
+    {
+        return Account::query()
+            ->forUser($this->owner->id())
+            ->find($accountId);
     }
 }

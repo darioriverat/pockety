@@ -3,14 +3,21 @@
 namespace App\Services;
 
 use App\Domain\Services\Contracts\AvailablePeriodServiceInterface;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Transaction;
 
 class AvailablePeriodService implements AvailablePeriodServiceInterface
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     public function selectable(): array
     {
         $current = now()->format('Ym');
-        $earliest = Transaction::query()->min('period');
+        $earliest = Transaction::query()
+            ->forUser($this->owner->id())
+            ->min('period');
 
         if (! is_string($earliest) || ! $this->isPeriod($earliest) || $earliest > $current) {
             return [$current];

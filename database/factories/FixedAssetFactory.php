@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\FixedAsset;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,6 +21,7 @@ class FixedAssetFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => fn () => auth()->id() ?? User::factory(),
             'name' => fake()->randomElement(['Ford Escape', 'Honda Civic', 'Toyota Camry', 'Office Equipment', 'Computer']),
             'description' => fake()->optional()->sentence(),
             'acquisition_date' => fake()->optional()->dateTimeBetween('-5 years', 'now'),

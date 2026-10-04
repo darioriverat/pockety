@@ -18,6 +18,7 @@ class ExchangeRateTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create();
+        $this->actingAs($this->user);
     }
 
     public function test_can_create_exchange_rate_for_period(): void

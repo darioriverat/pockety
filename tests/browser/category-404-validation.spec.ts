@@ -3,7 +3,7 @@ import { loginAsBrowserTestUser } from './helpers';
 
 test.describe('Category 404 and Validation', () => {
     test('category not found returns 404 (Feature #20)', async ({ page, request }) => {
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         // Step 1: GET /api/categories/NONEXISTENT
         const getResponse = await request.get('/api/categories/NONEXISTENT');
@@ -27,7 +27,7 @@ test.describe('Category 404 and Validation', () => {
     });
 
     test('validation errors for category creation (Feature #21)', async ({ page, request }) => {
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         // Step 1: POST /api/categories with empty name
         const emptyNameResponse = await request.post('/api/categories', {

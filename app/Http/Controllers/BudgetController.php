@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Category;
 use App\Services\BudgetService;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class BudgetController extends Controller
 {
     public function __construct(
-        private readonly BudgetService $budgetService
+        private readonly BudgetService $budgetService,
+        private readonly OwnerResolverInterface $owner,
     ) {}
 
     /**
@@ -66,15 +68,17 @@ class BudgetController extends Controller
             ], 422);
         }
 
-        $categoryId = $validated['category_id'] ?? null;
-
-        if ($categoryId === null) {
-            $category = Category::where('code', $validated['category_code'])->firstOrFail();
-            $categoryId = $category->id;
-        }
+        $category = Category::query()
+            ->forUser($this->owner->id())
+            ->when(
+                isset($validated['category_id']),
+                fn ($query) => $query->whereKey($validated['category_id']),
+                fn ($query) => $query->where('code', $validated['category_code'])
+            )
+            ->firstOrFail();
 
         $budget = $this->budgetService->upsert(
-            categoryId: (int) $categoryId,
+            categoryId: (int) $category->id,
             period: $validated['period'],
             amountCad: (float) $validated['amount_cad'],
             notes: $validated['notes'] ?? null

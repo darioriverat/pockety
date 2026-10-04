@@ -4,11 +4,16 @@ namespace App\Services;
 
 use App\Domain\Entities\AccountEntity;
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Account;
 use Illuminate\Database\Eloquent\Collection;
 
 class AccountService implements AccountServiceInterface
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     /**
      * Get all active accounts.
      *
@@ -16,7 +21,8 @@ class AccountService implements AccountServiceInterface
      */
     public function getAllActive(): array
     {
-        $accounts = Account::active()
+        $accounts = $this->ownedAccounts()
+            ->active()
             ->with('balances')
             ->orderBy('type')
             ->orderBy('name')
@@ -32,7 +38,8 @@ class AccountService implements AccountServiceInterface
      */
     public function getAll(): array
     {
-        $accounts = Account::orderBy('type')
+        $accounts = $this->ownedAccounts()
+            ->orderBy('type')
             ->orderBy('name')
             ->get();
 
@@ -46,7 +53,8 @@ class AccountService implements AccountServiceInterface
      */
     public function getAssets(): array
     {
-        $accounts = Account::assets()
+        $accounts = $this->ownedAccounts()
+            ->assets()
             ->active()
             ->with('balances')
             ->orderBy('name')
@@ -62,7 +70,8 @@ class AccountService implements AccountServiceInterface
      */
     public function getLiabilities(): array
     {
-        $accounts = Account::liabilities()
+        $accounts = $this->ownedAccounts()
+            ->liabilities()
             ->active()
             ->with('balances')
             ->orderBy('name')
@@ -76,7 +85,7 @@ class AccountService implements AccountServiceInterface
      */
     public function getById(int $id): ?AccountEntity
     {
-        $account = Account::find($id);
+        $account = $this->ownedAccounts()->find($id);
 
         if (! $account) {
             return null;
@@ -93,6 +102,7 @@ class AccountService implements AccountServiceInterface
     public function create(array $data): AccountEntity
     {
         $account = Account::create([
+            'user_id' => $this->owner->id(),
             'name' => $data['name'],
             'type' => $data['type'],
             'primary_currency' => $data['primary_currency'] ?? null,
@@ -110,7 +120,7 @@ class AccountService implements AccountServiceInterface
      */
     public function update(int $id, array $data): AccountEntity
     {
-        $account = Account::findOrFail($id);
+        $account = $this->ownedAccounts()->findOrFail($id);
         $account->update($data);
 
         return $this->mapToEntity($account->fresh());
@@ -121,11 +131,16 @@ class AccountService implements AccountServiceInterface
      */
     public function delete(int $id): bool
     {
-        $account = Account::findOrFail($id);
+        $account = $this->ownedAccounts()->findOrFail($id);
         $account->is_active = false;
         $account->save();
 
         return true;
+    }
+
+    private function ownedAccounts()
+    {
+        return Account::query()->forUser($this->owner->id());
     }
 
     /**

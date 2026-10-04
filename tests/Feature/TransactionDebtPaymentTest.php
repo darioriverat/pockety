@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\CategoryTemplate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -29,20 +30,22 @@ class TransactionDebtPaymentTest extends TestCase
 
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
+        CategoryTemplate::seedForUser((int) $this->user->id);
 
-        $this->groceries = Category::factory()->create([
-            'code' => 'C001',
-            'name' => 'Groceries',
-            'is_debt_category' => false,
-            'is_active' => true,
-        ]);
+        $this->groceries = Category::query()
+            ->forUser((int) $this->user->id)
+            ->where('code', 'C001')
+            ->firstOrFail();
 
-        $this->debt = Category::factory()->debt()->create([
-            'code' => 'C044',
-            'name' => 'Ford Escape Auto Loan Payment',
-        ]);
+        $this->debt = Category::query()
+            ->forUser((int) $this->user->id)
+            ->where('code', 'C044')
+            ->firstOrFail();
 
-        $this->income = Category::query()->where('code', 'I01')->firstOrFail();
+        $this->income = Category::query()
+            ->forUser((int) $this->user->id)
+            ->where('code', 'I01')
+            ->firstOrFail();
 
         $this->bank = Account::create([
             'name' => 'RBC Checking',

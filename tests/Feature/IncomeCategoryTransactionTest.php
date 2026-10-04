@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\CategoryTemplate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -29,14 +30,17 @@ class IncomeCategoryTransactionTest extends TestCase
 
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
+        CategoryTemplate::seedForUser((int) $this->user->id);
 
-        $this->incomeCategory = Category::query()->where('code', 'I01')->firstOrFail();
+        $this->incomeCategory = Category::query()
+            ->forUser((int) $this->user->id)
+            ->where('code', 'I01')
+            ->firstOrFail();
 
-        $this->expenseCategory = Category::factory()->create([
-            'code' => 'C001',
-            'name' => 'Groceries',
-            'is_active' => true,
-        ]);
+        $this->expenseCategory = Category::query()
+            ->forUser((int) $this->user->id)
+            ->where('code', 'C001')
+            ->firstOrFail();
 
         $this->account = Account::factory()->create([
             'name' => 'RBC Checking',

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Services\Contracts\AccountServiceInterface;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\AccountBalance;
-use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -14,7 +14,8 @@ use Illuminate\Validation\ValidationException;
 class AccountController extends Controller
 {
     public function __construct(
-        private readonly AccountServiceInterface $service
+        private readonly AccountServiceInterface $service,
+        private readonly OwnerResolverInterface $owner,
     ) {}
 
     /**
@@ -233,8 +234,11 @@ class AccountController extends Controller
             default => 'recorded_balance_cad',
         };
 
+        $userId = $this->owner->id();
+
         /** @var AccountBalance|null $latestBalance */
         $latestBalance = AccountBalance::query()
+            ->forUser($userId)
             ->where('account_id', $id)
             ->orderByDesc('period')
             ->first();
@@ -245,7 +249,9 @@ class AccountController extends Controller
             : null;
 
         // Oldest → newest for running balance calculation (full ledger)
-        $transactions = Transaction::forAccount($id)
+        $transactions = Transaction::query()
+            ->forUser($userId)
+            ->forAccount($id)
             ->with('category')
             ->orderBy('date')
             ->orderBy('id')

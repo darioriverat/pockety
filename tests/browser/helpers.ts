@@ -103,7 +103,10 @@ export function trackConsoleErrors(page: Page): string[] {
     return consoleErrors;
 }
 
-export async function loginAsBrowserTestUser(page: Page): Promise<void> {
+export async function loginAsBrowserTestUser(
+    page: Page,
+    request?: APIRequestContext,
+): Promise<void> {
     await page.goto('/login');
 
     await expect(page).toHaveURL(/\/login$/);
@@ -113,4 +116,11 @@ export async function loginAsBrowserTestUser(page: Page): Promise<void> {
     await page.getByRole('button', { name: 'Log in' }).click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
+
+    // Playwright's request fixture does not share the page cookie jar. Financial
+    // APIs require session auth, so mirror login into the API context when given.
+    if (request) {
+        const response = await request.get('/dev/login-as-test-user?redirect=/dashboard');
+        expect(response.status()).toBeLessThan(400);
+    }
 }

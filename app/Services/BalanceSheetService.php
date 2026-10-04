@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
@@ -11,6 +12,9 @@ use Illuminate\Support\Facades\Log;
 
 class BalanceSheetService
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
     /**
      * Build the balance sheet for a period.
      *
@@ -49,10 +53,18 @@ class BalanceSheetService
         $accountsAssetsCad = 0.0;
         $liabilitiesCad = 0.0;
 
-        $accounts = Account::active()->orderBy('type')->orderBy('name')->get();
+        $userId = $this->owner->id();
+        $accounts = Account::query()
+            ->forUser($userId)
+            ->active()
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get();
 
         foreach ($accounts as $account) {
-            $balance = AccountBalance::where('account_id', $account->id)
+            $balance = AccountBalance::query()
+                ->forUser($userId)
+                ->where('account_id', $account->id)
                 ->where('period', $period)
                 ->first();
 
@@ -91,7 +103,11 @@ class BalanceSheetService
         }
 
         $fixedAssetsCad = 0.0;
-        $fixedAssets = FixedAsset::active()->orderBy('name')->get();
+        $fixedAssets = FixedAsset::query()
+            ->forUser($userId)
+            ->active()
+            ->orderBy('name')
+            ->get();
 
         foreach ($fixedAssets as $fixedAsset) {
             $bookValueCad = $this->fixedAssetBookValueCad($fixedAsset, $period);

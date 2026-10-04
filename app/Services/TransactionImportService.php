@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -10,6 +11,9 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionImportService
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
     /**
      * Import transactions from the historical JSON file.
      *
@@ -125,6 +129,7 @@ class TransactionImportService
 
         // Create transaction
         Transaction::create([
+            'user_id' => $this->owner->id(),
             'date' => $date->format('Y-m-d'),
             'period' => (string) $data['periodo'],
             'category_id' => $categoryId,
@@ -152,6 +157,7 @@ class TransactionImportService
         }
 
         return Account::query()
+            ->forUser($this->owner->id())
             ->where('name', 'Personal LOAN CIBC')
             ->value('id');
     }
@@ -163,7 +169,10 @@ class TransactionImportService
      */
     private function getCategoryMapping(): array
     {
-        return Category::pluck('id', 'code')->toArray();
+        return Category::query()
+            ->forUser($this->owner->id())
+            ->pluck('id', 'code')
+            ->toArray();
     }
 
     /**
@@ -178,7 +187,10 @@ class TransactionImportService
         $comments = strtolower($comments);
 
         // Check if this is a debt category
-        $category = Category::where('code', $categoryCode)->first();
+        $category = Category::query()
+            ->forUser($this->owner->id())
+            ->where('code', $categoryCode)
+            ->first();
         if (! $category || ! $category->is_debt_category) {
             return null;
         }
@@ -205,7 +217,7 @@ class TransactionImportService
      */
     public function clearAllTransactions(): void
     {
-        Transaction::truncate();
+        Transaction::query()->forUser($this->owner->id())->delete();
     }
 
     /**
@@ -215,18 +227,20 @@ class TransactionImportService
      */
     public function getImportStatistics(): array
     {
-        $total = Transaction::count();
+        $owned = Transaction::query()->forUser($this->owner->id());
+        $total = (clone $owned)->count();
 
-        $byPeriod = Transaction::select('period', DB::raw('count(*) as count'))
+        $byPeriod = (clone $owned)
+            ->select('period', DB::raw('count(*) as count'))
             ->groupBy('period')
             ->orderBy('period')
             ->pluck('count', 'period')
             ->toArray();
 
         $byCurrency = [
-            'cad' => Transaction::whereNotNull('amount_cad')->where('amount_cad', '!=', 0)->count(),
-            'usd' => Transaction::whereNotNull('amount_usd')->where('amount_usd', '!=', 0)->count(),
-            'cop' => Transaction::whereNotNull('amount_cop')->where('amount_cop', '!=', 0)->count(),
+            'cad' => (clone $owned)->whereNotNull('amount_cad')->where('amount_cad', '!=', 0)->count(),
+            'usd' => (clone $owned)->whereNotNull('amount_usd')->where('amount_usd', '!=', 0)->count(),
+            'cop' => (clone $owned)->whereNotNull('amount_cop')->where('amount_cop', '!=', 0)->count(),
         ];
 
         return [

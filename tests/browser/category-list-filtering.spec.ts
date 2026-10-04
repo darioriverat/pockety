@@ -3,7 +3,7 @@ import { loginAsBrowserTestUser } from './helpers';
 
 test.describe('Category List Filtering', () => {
     test('GET /api/categories returns only active categories by default (Feature #14)', async ({ page, request }) => {
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         // Step 1: Create two categories
         await page.goto('/categories');
@@ -52,7 +52,7 @@ test.describe('Category List Filtering', () => {
     });
 
     test('GET /api/categories?include_inactive=1 returns all categories (Feature #15)', async ({ page, request }) => {
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         // Step 1: Seed database with active and inactive categories (template already has this)
         // Step 2: Note C040 is inactive in template

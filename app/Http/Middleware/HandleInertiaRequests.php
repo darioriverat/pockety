@@ -36,6 +36,10 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $availablePeriods = $request->user()
+            ? app(AvailablePeriodServiceInterface::class)->selectable()
+            : [now()->format('Ym')];
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -44,7 +48,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'availablePeriods' => app(AvailablePeriodServiceInterface::class)->selectable(),
+            'availablePeriods' => $availablePeriods,
         ];
     }
 }

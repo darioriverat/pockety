@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
@@ -19,6 +20,7 @@ class ReconciliationService
     public function __construct(
         private readonly FinancialSummaryService $financialSummaryService,
         private readonly TransactionService $transactionService,
+        private readonly OwnerResolverInterface $owner,
     ) {}
 
     /**
@@ -60,7 +62,9 @@ class ReconciliationService
      */
     public function reconcileForPeriod(string $period): array
     {
-        $accounts = Account::active()
+        $accounts = Account::query()
+            ->forUser($this->owner->id())
+            ->active()
             ->orderBy('type')
             ->orderBy('name')
             ->get();
@@ -196,7 +200,13 @@ class ReconciliationService
     {
         $total = 0.0;
 
-        foreach (FixedAsset::active()->orderBy('name')->get() as $fixedAsset) {
+        foreach (
+            FixedAsset::query()
+                ->forUser($this->owner->id())
+                ->active()
+                ->orderBy('name')
+                ->get() as $fixedAsset
+        ) {
             $valuation = $fixedAsset->valuationForPeriod($period);
 
             if ($valuation !== null) {
@@ -370,7 +380,13 @@ class ReconciliationService
     {
         $total = 0.0;
 
-        foreach (Transaction::forPeriod($period)->where('debt_component', $component)->get() as $transaction) {
+        foreach (
+            Transaction::query()
+                ->forUser($this->owner->id())
+                ->forPeriod($period)
+                ->where('debt_component', $component)
+                ->get() as $transaction
+        ) {
             $total += $this->amountsCadEquivalent([
                 'cad' => (float) ($transaction->amount_cad ?? 0),
                 'usd' => (float) ($transaction->amount_usd ?? 0),
@@ -388,7 +404,14 @@ class ReconciliationService
     {
         $total = 0.0;
 
-        foreach (Transaction::forPeriod($period)->where('is_credit', true)->whereNull('account_id')->get() as $transaction) {
+        foreach (
+            Transaction::query()
+                ->forUser($this->owner->id())
+                ->forPeriod($period)
+                ->where('is_credit', true)
+                ->whereNull('account_id')
+                ->get() as $transaction
+        ) {
             $total += $this->amountsCadEquivalent([
                 'cad' => (float) ($transaction->amount_cad ?? 0),
                 'usd' => (float) ($transaction->amount_usd ?? 0),

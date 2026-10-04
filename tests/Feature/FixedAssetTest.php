@@ -18,10 +18,13 @@ class FixedAssetTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create();
+        $this->actingAs($this->user);
     }
 
     public function test_guests_are_redirected_from_fixed_assets_page(): void
     {
+        auth()->logout();
+
         $response = $this->get('/fixed-assets');
         $response->assertRedirect('/login');
     }

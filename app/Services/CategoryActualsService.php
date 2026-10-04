@@ -5,21 +5,30 @@ namespace App\Services;
 use App\Domain\Collections\CategoryActualCollection;
 use App\Domain\Entities\CategoryActualEntity;
 use App\Domain\Services\Contracts\CategoryActualsServiceInterface;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Transaction;
 
 class CategoryActualsService implements CategoryActualsServiceInterface
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     public function getReport(string $period): CategoryActualCollection
     {
         $exchangeRate = $this->resolveExchangeRate($period);
+        $userId = $this->owner->id();
 
         /** @var array<int, array{actual: float, count: int}> $aggregates */
         $aggregates = [];
 
         // Query ledger by period — never hardcoded row references
-        $transactions = Transaction::forPeriod($period)->get();
+        $transactions = Transaction::query()
+            ->forUser($userId)
+            ->forPeriod($period)
+            ->get();
 
         foreach ($transactions as $transaction) {
             $categoryId = (int) $transaction->category_id;
@@ -34,7 +43,11 @@ class CategoryActualsService implements CategoryActualsServiceInterface
         }
 
         // Activity in this month determines inclusion, regardless of active status.
-        $categories = Category::whereIn('id', array_keys($aggregates))->orderBy('code')->get();
+        $categories = Category::query()
+            ->forUser($userId)
+            ->whereIn('id', array_keys($aggregates))
+            ->orderBy('code')
+            ->get();
         $collection = new CategoryActualCollection;
 
         foreach ($categories as $category) {

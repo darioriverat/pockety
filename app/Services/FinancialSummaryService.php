@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Income;
@@ -20,6 +21,10 @@ class FinancialSummaryService
         'C044',
         'C046',
     ];
+
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
 
     /**
      * Build financial summary for a period.
@@ -75,8 +80,23 @@ class FinancialSummaryService
         }
         $totalIncome = round($totalIncome, 2);
 
+        $userId = $this->owner->id();
+        // Resolve hardcoded C045 / debt codes within the authenticated owner's categories.
+        $specialCategoryIdsByCode = Category::query()
+            ->forUser($userId)
+            ->whereIn('code', array_merge(
+                [self::DEPRECIATION_CATEGORY_CODE],
+                self::DEBT_PAYMENT_CATEGORY_CODES
+            ))
+            ->pluck('id', 'code');
+        $depreciationCategoryId = $specialCategoryIdsByCode->get(self::DEPRECIATION_CATEGORY_CODE);
+
         // Do not pre-seed categories. Build category_totals only from transactions.
-        $transactions = Transaction::forPeriod($period)->with('category')->get();
+        $transactions = Transaction::query()
+            ->forUser($userId)
+            ->forPeriod($period)
+            ->with('category')
+            ->get();
 
         $totalsByCategory = [];
         $debtPaymentsExcluded = 0.0;
@@ -96,7 +116,8 @@ class FinancialSummaryService
                     'category_name' => $category->name,
                     'is_debt_category' => (bool) $category->is_debt_category,
                     'is_income_category' => (bool) $category->is_income_category,
-                    'is_depreciation' => $category->code === self::DEPRECIATION_CATEGORY_CODE,
+                    'is_depreciation' => $depreciationCategoryId !== null
+                        && $category->id === (int) $depreciationCategoryId,
                     'total_cad' => 0.0,
                     'principal_cad' => 0.0,
                     'interest_cad' => 0.0,
@@ -202,9 +223,12 @@ class FinancialSummaryService
     private function buildIncomeLines(string $period, ExchangeRate $exchangeRate): array
     {
         $lines = [];
+        $userId = $this->owner->id();
 
         foreach (
-            Income::forPeriod($period)
+            Income::query()
+                ->forUser($userId)
+                ->forPeriod($period)
                 ->orderBy('line_number')
                 ->orderBy('id')
                 ->get() as $income
@@ -227,6 +251,7 @@ class FinancialSummaryService
         $nextLineNumber = count($lines) + 1;
 
         $incomeTransactions = Transaction::query()
+            ->forUser($userId)
             ->income()
             ->with(['category', 'account'])
             ->where('period', $period)

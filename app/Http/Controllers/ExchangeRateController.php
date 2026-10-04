@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ExchangeRateController extends Controller
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     /**
      * Get exchange rates for a specific period (query param).
      */
@@ -63,7 +68,10 @@ class ExchangeRateController extends Controller
      */
     public function index(): JsonResponse
     {
-        $rates = ExchangeRate::orderBy('period')->get();
+        $rates = ExchangeRate::query()
+            ->forUser($this->owner->id())
+            ->orderBy('period')
+            ->get();
 
         return response()->json([
             'data' => $rates,
@@ -87,7 +95,10 @@ class ExchangeRateController extends Controller
         ]);
 
         $rate = ExchangeRate::updateOrCreate(
-            ['period' => $validated['period']],
+            [
+                'user_id' => $this->owner->id(),
+                'period' => $validated['period'],
+            ],
             [
                 'usd_cop' => $validated['usd_cop'],
                 'usd_cad' => $validated['usd_cad'],

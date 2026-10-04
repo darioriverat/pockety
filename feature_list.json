@@ -438,7 +438,7 @@
       "Step 4: Verify restrictOnDelete constraint",
       "Step 5: Verify column not nullable after backfill"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -452,7 +452,7 @@
       "Step 6: Verify all are indexed",
       "Step 7: Verify all are not nullable"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -465,7 +465,7 @@
       "Step 5: Verify same for all other financial tables",
       "Step 6: Verify no rows orphaned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -479,7 +479,7 @@
       "Step 6: Verify C040 is inactive in template",
       "Step 7: Verify second user has no transactions or budgets"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -491,7 +491,7 @@
       "Step 4: Verify one user cannot have duplicate code",
       "Step 5: Test with C001 for user A and C001 for user B"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -503,7 +503,7 @@
       "Step 4: Verify two users can have same period",
       "Step 5: Verify one user cannot have duplicate period"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -518,7 +518,7 @@
       "Step 7: Verify new ids generated, not copied from another user",
       "Step 8: Verify no transactions or budgets on template"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -532,7 +532,7 @@
       "Step 6: Verify seeder doesn't steal rows from other users",
       "Step 7: Verify both users have 46 active categories"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -546,7 +546,7 @@
       "Step 6: Logout user",
       "Step 7: Call ownerResolver->id() and verify it fails"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -561,7 +561,7 @@
       "Step 7: GET /api/categories with session",
       "Step 8: Verify response 200"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -576,7 +576,7 @@
       "Step 7: Verify only user B's categories returned",
       "Step 8: Verify no overlap between results"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -589,7 +589,7 @@
       "Step 5: Verify both users have C047 with different category_id",
       "Step 6: Verify isolation between users"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -604,7 +604,7 @@
       "Step 7: GET /api/categories/C047",
       "Step 8: Verify returns user B's C047"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -619,7 +619,7 @@
       "Step 7: DELETE /api/categories/C047",
       "Step 8: Verify response 404"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

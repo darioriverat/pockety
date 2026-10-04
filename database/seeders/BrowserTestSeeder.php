@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Support\CategoryTemplate;
 use Illuminate\Database\Seeder;
 
 class BrowserTestSeeder extends Seeder
@@ -12,12 +13,8 @@ class BrowserTestSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            CategorySeeder::class,
-        ]);
-
         // Plain password — User model casts password as hashed.
-        User::query()->updateOrCreate(
+        $user = User::query()->updateOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Browser Test User',
@@ -26,5 +23,7 @@ class BrowserTestSeeder extends Seeder
                 'default_currency' => 'CAD',
             ],
         );
+
+        CategoryTemplate::seedForUser((int) $user->id);
     }
 }

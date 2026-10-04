@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\FixedAsset;
 use App\Models\FixedAssetValuation;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class FixedAssetValuationFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => fn () => auth()->id() ?? User::factory(),
             'fixed_asset_id' => FixedAsset::factory(),
             'period' => now()->format('Ym'),
             'book_value_cad' => fake()->randomFloat(2, 1000, 50000),

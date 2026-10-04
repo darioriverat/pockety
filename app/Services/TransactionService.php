@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Domain\Collections\TransactionCollection;
 use App\Domain\Entities\TransactionEntity;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Domain\Services\Contracts\TransactionServiceInterface;
 use App\Models\Account;
 use App\Models\Category;
@@ -22,6 +23,10 @@ class TransactionService implements TransactionServiceInterface
     public const DEFAULT_SORT_BY = 'date';
 
     public const DEFAULT_SORT_DIR = 'desc';
+
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
 
     /**
      * Get all transactions with optional filtering.
@@ -138,7 +143,10 @@ class TransactionService implements TransactionServiceInterface
      */
     private function buildFilteredQuery(array $filters): ?Builder
     {
-        $query = Transaction::with(['category', 'account']);
+        $userId = $this->owner->id();
+        $query = Transaction::query()
+            ->with(['category', 'account'])
+            ->forUser($userId);
 
         if (isset($filters['period']) && $filters['period'] !== '') {
             $query->forPeriod($filters['period']);
@@ -147,7 +155,8 @@ class TransactionService implements TransactionServiceInterface
         if (isset($filters['category_id']) && $filters['category_id'] !== '') {
             $query->forCategory((int) $filters['category_id']);
         } elseif (isset($filters['category']) && $filters['category'] !== '') {
-            $categoryId = DB::table('categories')
+            $categoryId = Category::query()
+                ->forUser($userId)
                 ->where('code', $filters['category'])
                 ->value('id');
 
@@ -191,7 +200,10 @@ class TransactionService implements TransactionServiceInterface
      */
     public function getById(int $id): ?TransactionEntity
     {
-        $transaction = Transaction::with(['category', 'account'])->find($id);
+        $transaction = Transaction::query()
+            ->with(['category', 'account'])
+            ->forUser($this->owner->id())
+            ->find($id);
 
         if (! $transaction) {
             return null;
@@ -217,6 +229,7 @@ class TransactionService implements TransactionServiceInterface
 
         $data['is_credit'] = (bool) ($data['is_credit'] ?? false);
         $data['is_debt_payment'] = (bool) ($data['is_debt_payment'] ?? false);
+        $data['user_id'] = $this->owner->id();
 
         $transaction = Transaction::create($data);
         $transaction->load(['category', 'account']);
@@ -231,7 +244,9 @@ class TransactionService implements TransactionServiceInterface
      */
     public function update(int $id, array $data): TransactionEntity
     {
-        $transaction = Transaction::findOrFail($id);
+        $transaction = Transaction::query()
+            ->forUser($this->owner->id())
+            ->findOrFail($id);
 
         // Validate that only one currency is set
         $this->validateSingleCurrency($data);
@@ -263,7 +278,9 @@ class TransactionService implements TransactionServiceInterface
      */
     public function delete(int $id): bool
     {
-        $transaction = Transaction::findOrFail($id);
+        $transaction = Transaction::query()
+            ->forUser($this->owner->id())
+            ->findOrFail($id);
 
         return $transaction->delete();
     }
@@ -298,14 +315,18 @@ class TransactionService implements TransactionServiceInterface
             $this->validateBulkIncomeRequiresAccount($ids, $allowed);
         }
 
-        DB::transaction(function () use ($ids, $allowed) {
+        $userId = $this->owner->id();
+
+        DB::transaction(function () use ($ids, $allowed, $userId) {
             Transaction::query()
+                ->forUser($userId)
                 ->whereIn('id', $ids)
                 ->update($allowed);
         });
 
         $transactions = Transaction::query()
             ->with(['category', 'account'])
+            ->forUser($userId)
             ->whereIn('id', $ids)
             ->orderBy('id')
             ->get();
@@ -324,7 +345,9 @@ class TransactionService implements TransactionServiceInterface
      */
     public function duplicate(int $id, array $overrides = []): TransactionEntity
     {
-        $source = Transaction::query()->findOrFail($id);
+        $source = Transaction::query()
+            ->forUser($this->owner->id())
+            ->findOrFail($id);
 
         $data = [
             'date' => $overrides['date'] ?? $source->date,
@@ -359,7 +382,9 @@ class TransactionService implements TransactionServiceInterface
      */
     public function getRollForwardTransactionsForAccount(Account $account, string $period): array
     {
-        $transactions = Transaction::where('account_id', $account->id)
+        $transactions = Transaction::query()
+            ->forUser($this->owner->id())
+            ->where('account_id', $account->id)
             ->where('period', $period)
             ->with('category')
             ->get();
@@ -515,7 +540,10 @@ class TransactionService implements TransactionServiceInterface
      */
     private function validateCategory(int $categoryId): void
     {
-        $exists = DB::table('categories')->where('id', $categoryId)->exists();
+        $exists = Category::query()
+            ->forUser($this->owner->id())
+            ->whereKey($categoryId)
+            ->exists();
 
         if (! $exists) {
             throw new \InvalidArgumentException("Category with ID {$categoryId} does not exist");
@@ -536,7 +564,9 @@ class TransactionService implements TransactionServiceInterface
             return;
         }
 
-        $category = Category::find($categoryId);
+        $category = Category::query()
+            ->forUser($this->owner->id())
+            ->find($categoryId);
         if (! $category?->is_income_category) {
             return;
         }
@@ -569,7 +599,7 @@ class TransactionService implements TransactionServiceInterface
 
         $categoryId = $data['category_id'] ?? $existing?->category_id;
         $category = $categoryId
-            ? Category::query()->whereKey($categoryId)->first()
+            ? Category::query()->forUser($this->owner->id())->whereKey($categoryId)->first()
             : null;
 
         if ($category?->is_income_category) {
@@ -613,12 +643,17 @@ class TransactionService implements TransactionServiceInterface
      */
     private function validateBulkIncomeRequiresAccount(array $ids, array $allowed): void
     {
-        $category = Category::find($allowed['category_id'] ?? null);
+        $category = Category::query()
+            ->forUser($this->owner->id())
+            ->find($allowed['category_id'] ?? null);
         if (! $category?->is_income_category) {
             return;
         }
 
-        $transactions = Transaction::query()->whereIn('id', $ids)->get();
+        $transactions = Transaction::query()
+            ->forUser($this->owner->id())
+            ->whereIn('id', $ids)
+            ->get();
         foreach ($transactions as $transaction) {
             $accountId = array_key_exists('account_id', $allowed)
                 ? $allowed['account_id']

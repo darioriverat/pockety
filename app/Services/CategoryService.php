@@ -5,11 +5,16 @@ namespace App\Services;
 use App\Domain\Entities\CategoryEntity;
 use App\Domain\Entities\TransactionEntity;
 use App\Domain\Services\Contracts\CategoryServiceInterface;
+use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Category;
 use App\Models\Transaction;
 
 class CategoryService implements CategoryServiceInterface
 {
+    public function __construct(
+        private readonly OwnerResolverInterface $owner,
+    ) {}
+
     /**
      * Get all active categories.
      *
@@ -17,7 +22,8 @@ class CategoryService implements CategoryServiceInterface
      */
     public function getAllActive(): array
     {
-        $categories = Category::active()
+        $categories = $this->ownedCategories()
+            ->active()
             ->orderBy('code')
             ->get();
 
@@ -31,7 +37,9 @@ class CategoryService implements CategoryServiceInterface
      */
     public function getAll(): array
     {
-        $categories = Category::orderBy('code')->get();
+        $categories = $this->ownedCategories()
+            ->orderBy('code')
+            ->get();
 
         return $categories->map(fn (Category $category) => $this->toEntity($category))->all();
     }
@@ -41,7 +49,7 @@ class CategoryService implements CategoryServiceInterface
      */
     public function getByCode(string $code): ?CategoryEntity
     {
-        $category = Category::where('code', $code)->first();
+        $category = $this->findOwnedByCode($code);
 
         if (! $category) {
             return null;
@@ -57,7 +65,8 @@ class CategoryService implements CategoryServiceInterface
      */
     public function getDebtCategories(): array
     {
-        $categories = Category::debtCategories()
+        $categories = $this->ownedCategories()
+            ->debtCategories()
             ->active()
             ->orderBy('code')
             ->get();
@@ -73,23 +82,20 @@ class CategoryService implements CategoryServiceInterface
      */
     public function delete(string $code): bool
     {
-        $category = Category::where('code', $code)->first();
+        $category = $this->findOwnedByCode($code);
 
         if (! $category) {
             throw new \Exception("Category with code {$code} not found");
         }
 
-        // Check if category has associated transactions
         if ($category->transactions()->exists()) {
             return false;
         }
 
-        // Check if category has associated budgets
         if ($category->budgets()->exists()) {
             return false;
         }
 
-        // Safe to delete
         $category->delete();
 
         return true;
@@ -100,7 +106,7 @@ class CategoryService implements CategoryServiceInterface
      */
     public function hasTransactions(string $code): bool
     {
-        $category = Category::where('code', $code)->first();
+        $category = $this->findOwnedByCode($code);
 
         if (! $category) {
             return false;
@@ -130,16 +136,18 @@ class CategoryService implements CategoryServiceInterface
      */
     public function getTransactionHistory(string $code, ?string $period = null): ?array
     {
-        $category = Category::where('code', $code)->first();
+        $category = $this->findOwnedByCode($code);
 
         if (! $category) {
             return null;
         }
 
         $categoryEntity = $this->toEntity($category);
+        $userId = $this->owner->id();
 
         /** @var list<string> $availablePeriods */
         $availablePeriods = Transaction::query()
+            ->forUser($userId)
             ->where('category_id', $category->id)
             ->distinct()
             ->orderByDesc('period')
@@ -150,6 +158,7 @@ class CategoryService implements CategoryServiceInterface
 
         $query = Transaction::query()
             ->with('account')
+            ->forUser($userId)
             ->where('category_id', $category->id)
             ->orderByDesc('date')
             ->orderByDesc('id');
@@ -236,22 +245,20 @@ class CategoryService implements CategoryServiceInterface
         bool $isDebtCategory,
         bool $isIncomeCategory
     ): CategoryEntity {
-        // Validate that both flags are not true
         if ($isDebtCategory && $isIncomeCategory) {
             throw new \InvalidArgumentException('A category cannot be both debt and income');
         }
 
-        // Trim name
         $name = trim($name);
         if ($name === '') {
             throw new \InvalidArgumentException('Category name cannot be empty');
         }
 
-        // Generate appropriate code
-        $code = $this->generateNextCode($isIncomeCategory);
+        $userId = $this->owner->id();
+        $code = $this->generateNextCode($isIncomeCategory, $userId);
 
-        // Create category
         $category = Category::create([
+            'user_id' => $userId,
             'code' => $code,
             'name' => $name,
             'is_debt_category' => $isDebtCategory,
@@ -277,13 +284,12 @@ class CategoryService implements CategoryServiceInterface
         ?bool $isIncomeCategory = null,
         ?bool $isActive = null
     ): ?CategoryEntity {
-        $category = Category::where('code', $code)->first();
+        $category = $this->findOwnedByCode($code);
 
         if (! $category) {
             return null;
         }
 
-        // Build update array with only provided values
         $updates = [];
 
         if ($name !== null) {
@@ -294,16 +300,13 @@ class CategoryService implements CategoryServiceInterface
             $updates['name'] = $trimmed;
         }
 
-        // Determine final flag values
         $finalIsDebt = $isDebtCategory ?? $category->is_debt_category;
         $finalIsIncome = $isIncomeCategory ?? $category->is_income_category;
 
-        // Validate that both flags won't be true
         if ($finalIsDebt && $finalIsIncome) {
             throw new \InvalidArgumentException('A category cannot be both debt and income');
         }
 
-        // Check if attempting to change debt/income flags
         $debtChanging = $isDebtCategory !== null && $isDebtCategory !== $category->is_debt_category;
         $incomeChanging = $isIncomeCategory !== null && $isIncomeCategory !== $category->is_income_category;
 
@@ -313,7 +316,6 @@ class CategoryService implements CategoryServiceInterface
             );
         }
 
-        // Apply flag updates if provided
         if ($isDebtCategory !== null) {
             $updates['is_debt_category'] = $isDebtCategory;
         }
@@ -326,7 +328,6 @@ class CategoryService implements CategoryServiceInterface
             $updates['is_active'] = $isActive;
         }
 
-        // Update the category
         if (! empty($updates)) {
             $category->update($updates);
             $category->refresh();
@@ -340,7 +341,7 @@ class CategoryService implements CategoryServiceInterface
      */
     public function hasBudgets(string $code): bool
     {
-        $category = Category::where('code', $code)->first();
+        $category = $this->findOwnedByCode($code);
 
         if (! $category) {
             return false;
@@ -350,16 +351,14 @@ class CategoryService implements CategoryServiceInterface
     }
 
     /**
-     * Generate the next available code for a category.
-     *
-     * @param  bool  $isIncome  Whether this is an income category
-     * @return string The generated code (C### for expense/debt, I## for income)
+     * Generate the next available code for a category for one user.
      */
-    private function generateNextCode(bool $isIncome): string
+    private function generateNextCode(bool $isIncome, int $userId): string
     {
         if ($isIncome) {
-            // Income: I followed by at least two digits
-            $lastIncomeCode = Category::where('code', 'LIKE', 'I%')
+            $lastIncomeCode = Category::query()
+                ->forUser($userId)
+                ->where('code', 'LIKE', 'I%')
                 ->orderByRaw('CAST(SUBSTRING(code, 2) AS UNSIGNED) DESC')
                 ->value('code');
 
@@ -367,27 +366,34 @@ class CategoryService implements CategoryServiceInterface
                 return 'I01';
             }
 
-            // Extract number part and increment
             $number = (int) substr($lastIncomeCode, 1);
-            $nextNumber = $number + 1;
 
-            return 'I'.str_pad((string) $nextNumber, 2, '0', STR_PAD_LEFT);
-        } else {
-            // Expense/Debt: C followed by three digits
-            $lastCCode = Category::where('code', 'LIKE', 'C%')
-                ->orderByRaw('CAST(SUBSTRING(code, 2) AS UNSIGNED) DESC')
-                ->value('code');
-
-            if (! $lastCCode) {
-                return 'C001';
-            }
-
-            // Extract number part and increment
-            $number = (int) substr($lastCCode, 1);
-            $nextNumber = $number + 1;
-
-            return 'C'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+            return 'I'.str_pad((string) ($number + 1), 2, '0', STR_PAD_LEFT);
         }
+
+        $lastCCode = Category::query()
+            ->forUser($userId)
+            ->where('code', 'LIKE', 'C%')
+            ->orderByRaw('CAST(SUBSTRING(code, 2) AS UNSIGNED) DESC')
+            ->value('code');
+
+        if (! $lastCCode) {
+            return 'C001';
+        }
+
+        $number = (int) substr($lastCCode, 1);
+
+        return 'C'.str_pad((string) ($number + 1), 3, '0', STR_PAD_LEFT);
+    }
+
+    private function ownedCategories()
+    {
+        return Category::query()->forUser($this->owner->id());
+    }
+
+    private function findOwnedByCode(string $code): ?Category
+    {
+        return $this->ownedCategories()->where('code', $code)->first();
     }
 
     private function toEntity(Category $category): CategoryEntity
