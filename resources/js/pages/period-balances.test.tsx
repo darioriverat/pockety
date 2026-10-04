@@ -198,6 +198,18 @@ describe('PeriodBalances page', () => {
         expect(screen.getByTestId('overwrite-proposed-assets-cad')).toHaveTextContent(
             '$850.00',
         );
+        expect(screen.getByTestId('overwrite-balance-dialog')).toHaveClass(
+            'sm:max-w-3xl',
+        );
+        expect(
+            screen.getByTestId('overwrite-existing-assets-cad').closest('dl'),
+        ).toHaveClass('grid-cols-1');
+        expect(
+            screen.getByTestId('overwrite-proposed-assets-cad').closest('dl'),
+        ).toHaveClass('grid-cols-1');
+        expect(
+            screen.getByTestId('overwrite-balance-comparison'),
+        ).toHaveClass('sm:grid-cols-2');
 
         const postsBeforeConfirm = fetchMock.mock.calls.filter(
             (call) => (call[1] as RequestInit | undefined)?.method === 'POST',
@@ -219,5 +231,53 @@ describe('PeriodBalances page', () => {
         expect(screen.getByTestId('balance-history-assets-3')).toHaveTextContent(
             '$900.00',
         );
+    });
+
+    it('cancels overwrite without changing the registered balance', async () => {
+        const fetchMock = vi.fn(async () => ({
+            ok: true,
+            status: 200,
+            json: async () => ({
+                data: {
+                    period: '202501',
+                    proposed: {
+                        ...proposed,
+                        assets_cad: 850,
+                        equity_cad: 850,
+                    },
+                    registered,
+                    history: [],
+                },
+            }),
+        }));
+
+        vi.stubGlobal('fetch', fetchMock);
+
+        render(<PeriodBalances />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('registered-assets-cad')).toHaveTextContent(
+                '$900.00',
+            );
+        });
+
+        fireEvent.click(screen.getByTestId('register-period-balance'));
+        expect(screen.getByTestId('overwrite-balance-dialog')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('overwrite-balance-cancel'));
+
+        await waitFor(() => {
+            expect(
+                screen.queryByTestId('overwrite-balance-dialog'),
+            ).not.toBeInTheDocument();
+        });
+
+        expect(screen.getByTestId('registered-assets-cad')).toHaveTextContent(
+            '$900.00',
+        );
+        const posts = fetchMock.mock.calls.filter(
+            (call) => (call[1] as RequestInit | undefined)?.method === 'POST',
+        );
+        expect(posts).toHaveLength(0);
     });
 });

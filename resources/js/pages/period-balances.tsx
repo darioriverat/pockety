@@ -94,9 +94,12 @@ function statusLabel(status: string): string {
 function FigureGrid({
     figures,
     testIdPrefix,
+    columns = 'responsive',
 }: {
     figures: BalanceFigures;
     testIdPrefix: string;
+    /** Single-column avoids nested-grid overlap inside the overwrite dialog. */
+    columns?: 'responsive' | 'single';
 }) {
     const rows: Array<{ label: string; key: string; value: number }> = [
         { label: 'Assets', key: 'assets-cad', value: figures.assets_cad },
@@ -120,7 +123,13 @@ function FigureGrid({
     ];
 
     return (
-        <dl className="grid gap-3 sm:grid-cols-2">
+        <dl
+            className={
+                columns === 'single'
+                    ? 'grid grid-cols-1 gap-3'
+                    : 'grid gap-3 sm:grid-cols-2'
+            }
+        >
             {rows.map((row) => (
                 <div key={row.key} className="flex items-baseline justify-between gap-4">
                     <dt className="text-sm text-muted-foreground">{row.label}</dt>
@@ -501,8 +510,11 @@ export default function PeriodBalances() {
             </PageContainer>
 
             <Dialog open={overwriteOpen} onOpenChange={setOverwriteOpen}>
-                <DialogContent data-testid="overwrite-balance-dialog">
-                    <DialogHeader>
+                <DialogContent
+                    data-testid="overwrite-balance-dialog"
+                    className="sm:max-w-3xl"
+                >
+                    <DialogHeader className="pr-10">
                         <DialogTitle data-testid="overwrite-balance-title">
                             Overwrite existing balance?
                         </DialogTitle>
@@ -515,23 +527,28 @@ export default function PeriodBalances() {
                         </DialogDescription>
                     </DialogHeader>
                     {registered && proposed && (
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <div>
+                        <div
+                            className="grid gap-6 sm:grid-cols-2"
+                            data-testid="overwrite-balance-comparison"
+                        >
+                            <div data-testid="overwrite-existing-column">
                                 <p className="mb-2 text-sm font-medium">
                                     Current balance
                                 </p>
                                 <FigureGrid
                                     figures={registered}
                                     testIdPrefix="overwrite-existing"
+                                    columns="single"
                                 />
                             </div>
-                            <div>
+                            <div data-testid="overwrite-proposed-column">
                                 <p className="mb-2 text-sm font-medium">
                                     New figures
                                 </p>
                                 <FigureGrid
                                     figures={proposed}
                                     testIdPrefix="overwrite-proposed"
+                                    columns="single"
                                 />
                             </div>
                         </div>

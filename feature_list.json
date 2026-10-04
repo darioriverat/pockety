@@ -1216,7 +1216,7 @@
       "Step 5: Verify wider than other dialogs in app",
       "Step 6: Take screenshot at desktop resolution"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1229,7 +1229,7 @@
       "Step 5: Verify no overlapping labels or amounts",
       "Step 6: Take screenshot showing layout"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1241,7 +1241,7 @@
       "Step 4: Verify all labels and amounts readable",
       "Step 5: Take screenshot at mobile resolution"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1254,7 +1254,7 @@
       "Step 5: Verify same single-column layout",
       "Step 6: Verify no nested grid causing overlap"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1267,7 +1267,7 @@
       "Step 5: Test at different viewport sizes",
       "Step 6: Take screenshot showing header clearly"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1282,7 +1282,7 @@
       "Step 7: Verify overwrite-balance-confirm present",
       "Step 8: Verify Playwright tests can select these elements"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1297,7 +1297,7 @@
       "Step 7: Verify stored balance unchanged",
       "Step 8: Verify UI shows original balance"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1494,6 +1494,6 @@
       "Step 12: Verify balance unchanged",
       "Step 13: Verify test passes"
     ],
-    "passes": false
+    "passes": true
   }
 ]

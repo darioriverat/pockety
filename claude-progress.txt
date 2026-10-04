@@ -696,3 +696,44 @@ Next priorities:
 - Begin per-user ownership (section 4): user_id migrations (#33 onward)
 - Or period-balance overwrite dialog UI (#90-96) if ownership is deferred
 - Keep using /dev/* helpers when docker.sock is sandboxed
+
+===============================================================================
+SESSION 13 - October 4, 2026 - Period balance overwrite dialog layout
+===============================================================================
+
+Completed features #90-96 and #106 (8 features):
+- #90: Overwrite dialog wider than default (sm:max-w-3xl)
+- #91: Current vs proposed side-by-side on desktop
+- #92: Columns stack on mobile
+- #93: FigureGrid single column per section (no nested overlap)
+- #94: Close control does not cover title (header pr-10)
+- #95: Test IDs remain functional
+- #96: Cancel preserves stored balance
+- #106: Browser test for overwrite dialog layout
+
+Baseline verification before new work
+- App serving at http://dev.pockety.com:8080/
+- CategoryTest filter green via /dev/run-tests
+- Frontend unit tests: 232/232 green
+- Browser regression categories.spec.ts: 4/4 green
+- Puppeteer MCP blocked (interactive approval); used Playwright for UI
+
+Implementation
+- period-balances.tsx: DialogContent className sm:max-w-3xl
+- FigureGrid columns="single" inside overwrite dialog
+- DialogHeader pr-10 so X does not cover title
+- comparison wrapper test ids for layout assertions
+- Frontend unit tests: layout classes + cancel path
+- Browser: period-balance-overwrite-dialog.spec.ts (desktop + mobile)
+- Screenshots: verification/period-balance-overwrite-dialog/
+
+Verification
+- Desktop screenshot: wide dialog, side-by-side readable figures
+- Mobile stacked layout assertion; cancel keeps registered $900
+- Existing period-balances.spec.ts still green
+
+Current status: 40/106 tests passing, 66 remaining
+
+Next priorities:
+- Begin per-user ownership (section 4): user_id migrations (#33 onward)
+- Spec implementation order step 4 is next after overwrite dialog
