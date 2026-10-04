@@ -75,27 +75,11 @@ class FinancialSummaryService
         }
         $totalIncome = round($totalIncome, 2);
 
-        $categories = Category::active()->orderBy('code')->get()->keyBy('id');
+        // Do not pre-seed categories. Build category_totals only from transactions.
         $transactions = Transaction::forPeriod($period)->with('category')->get();
 
         $totalsByCategory = [];
         $debtPaymentsExcluded = 0.0;
-
-        foreach ($categories as $category) {
-            $totalsByCategory[$category->id] = [
-                'category_id' => $category->id,
-                'category_code' => $category->code,
-                'category_name' => $category->name,
-                'is_debt_category' => (bool) $category->is_debt_category,
-                'is_income_category' => (bool) $category->is_income_category,
-                'is_depreciation' => $category->code === self::DEPRECIATION_CATEGORY_CODE,
-                'total_cad' => 0.0,
-                'principal_cad' => 0.0,
-                'interest_cad' => 0.0,
-                'no_account_credit_cad' => 0.0,
-                'other_cad' => 0.0,
-            ];
-        }
 
         foreach ($transactions as $transaction) {
             $categoryId = (int) $transaction->category_id;

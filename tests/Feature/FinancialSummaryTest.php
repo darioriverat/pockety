@@ -351,4 +351,84 @@ class FinancialSummaryTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['period']);
     }
+
+    public function test_financial_summary_includes_inactive_categories_with_transactions_in_period(): void
+    {
+        // Step 1: Create category and inactivate it
+        $inactiveCategory = Category::factory()->create([
+            'code' => 'C050',
+            'name' => 'Inactive with Transactions',
+            'is_debt_category' => false,
+            'is_income_category' => false,
+            'is_active' => false,
+        ]);
+
+        // Step 2: Create transaction for this category in period 202501
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'category_id' => $inactiveCategory->id,
+            'amount_cad' => 150.00,
+            'comments' => 'Transaction on inactive category',
+        ]);
+
+        // Step 3: Call FinancialSummaryService::getSummary for 202501
+        $response = $this->getJson('/api/financial-summary?period=202501');
+
+        // Step 4: Verify inactive category appears in category_totals
+        $response->assertOk();
+        
+        $categoryTotals = $response->json('data.category_totals');
+        $codes = collect($categoryTotals)->pluck('category_code')->all();
+        
+        // Step 5: Verify inactive category C050 is included
+        $this->assertContains('C050', $codes);
+        
+        $c050 = collect($categoryTotals)->firstWhere('category_code', 'C050');
+        $this->assertNotNull($c050);
+        $this->assertEquals(150.0, $c050['total_cad']);
+        $this->assertEquals('Inactive with Transactions', $c050['category_name']);
+    }
+
+    public function test_financial_summary_excludes_active_categories_with_no_transactions_in_period(): void
+    {
+        // Step 1: Create active category
+        $activeCategory = Category::factory()->create([
+            'code' => 'C051',
+            'name' => 'Active No Transactions',
+            'is_debt_category' => false,
+            'is_income_category' => false,
+            'is_active' => true,
+        ]);
+
+        // Create another category with a transaction to ensure the service works
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'category_id' => $this->groceries->id,
+            'amount_cad' => 100.00,
+            'comments' => 'Transaction on different category',
+        ]);
+
+        // Step 2: Ensure no transactions for active category C051 in period 202501
+        $this->assertDatabaseMissing('transactions', [
+            'category_id' => $activeCategory->id,
+            'period' => '202501',
+        ]);
+
+        // Step 3: Call FinancialSummaryService::getSummary for 202501
+        $response = $this->getJson('/api/financial-summary?period=202501');
+
+        // Step 4: Verify active category without transactions is NOT in category_totals
+        $response->assertOk();
+        
+        $categoryTotals = $response->json('data.category_totals');
+        $codes = collect($categoryTotals)->pluck('category_code')->all();
+        
+        // Step 5: Verify C051 is excluded
+        $this->assertNotContains('C051', $codes);
+        
+        // Step 6: Verify C001 (with transaction) is included
+        $this->assertContains('C001', $codes);
+    }
 }

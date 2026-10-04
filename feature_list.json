@@ -295,7 +295,7 @@
       "Step 6: Verify total_recorded_disbursements_cad includes this transaction",
       "Step 7: Verify net_operating_expenses_cad calculation correct"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -308,7 +308,7 @@
       "Step 5: Verify category_totals only contains categories with actual transactions",
       "Step 6: Confirm this is change from old behavior that pre-seeded active categories"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
