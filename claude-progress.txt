@@ -179,3 +179,40 @@ The category CRUD backend is production-ready and fully tested. Session 2 should
 3. Then proceed with dialog UI fixes (Step 3) and user ownership (Step 4)
 
 Follow the spec's implementation order to avoid reopening completed work.
+
+===============================================================================
+SESSION 2 - October 4, 2026
+===============================================================================
+
+ACCOMPLISHED THIS SESSION
+-------------------------
+✅ Implemented Create Category UI functionality
+  - Added Create Category button to categories page header
+  - Built create category dialog with name input and kind radio buttons
+  - Form submits to POST /api/categories with correct payload
+  - New categories appear in list without page reload
+  - Dialog closes and form resets after successful creation
+
+✅ Updated categories page to show inactive categories
+  - Changed API call from /api/categories to /api/categories?include_inactive=1
+  - Inactive category C040 now displays with Retired badge
+  - Total count increased from 46 to 47 (now includes inactive)
+
+✅ Fixed test compatibility
+  - Updated categories.test.tsx to select delete buttons by aria-label
+  - Tests now pass with new Create button in the DOM
+
+✅ Browser verification completed
+  - Created C047 Groceries Test (expense) - verified code assignment
+  - Created C048 Credit Card Debt (debt) - verified Debt badge
+  - Created I02 Freelance Income (income) - verified Income badge
+  - All three kinds working correctly with proper code sequences
+
+✅ Updated feature_list.json  
+  - Marked 5 features as passing (tests #1-5)
+  - Features: expense create, debt create, income create, C### sequence, I## sequence
+
+CURRENT STATUS: 5 of 106 features passing, 101 remaining
+
+NEXT SESSION: Implement Edit Category dialog or move to report inclusion rules
+
