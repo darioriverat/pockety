@@ -1315,3 +1315,62 @@ Notes:
 - All category CRUD functionality working correctly
 - Edit dialog transaction checking works as expected
 - Clean codebase, all tests passing
+
+========================================
+Session 25 (2026-10-04)
+========================================
+
+Session Goals:
+- Run Step 1-3: Get bearings, verify tests, choose feature
+- Complete Feature #84: Delete confirmation shows server error messages
+
+Step 1-3: Verification ✅
+- Backend tests: All 374 tests passing
+- Browser verification: Categories page working correctly
+- Logged in as test@example.com
+- Categories displaying properly with all functionality intact
+
+Feature #84 Implementation: ✅ COMPLETED
+Description: "Delete confirmation shows server error messages"
+
+Verification:
+1. Backend Implementation:
+   - CategoryController.php lines 218-223: Returns has_budgets: true with error message
+   - Proper 422 response with message: "This category has associated budgets and cannot be deleted"
+   
+2. Frontend Implementation:
+   - categories.tsx lines 259-266: Handles both has_transactions and has_budgets errors
+   - Displays appropriate alert() messages for each case
+   
+3. Backend Test:
+   - Test: test_delete_blocked_when_budgets_exist in CategoryCrudTest.php
+   - Status: ✅ PASSING (1 passed, 4 assertions)
+   
+4. Test Data Created:
+   - Category C049 "Test Category Budget Delete" created
+   - Budget added for C049 via API (period 202601, amount $100)
+   - Verified delete attempt is properly blocked
+   
+5. Both Error Cases Verified:
+   - ✅ Transaction blocking: has_transactions = true
+   - ✅ Budget blocking: has_budgets = true
+   - ✅ Both show proper error messages in UI via alert()
+
+Session Results:
+- Started: 93/106 passing (13 remaining)
+- Completed: 94/106 passing (12 remaining)  
+- Feature completed: #84
+- Backend tests: All 374 tests passing ✅
+- App status: Working perfectly ✅
+
+Next Session Priorities:
+- Feature #86: Categories page empty state
+- Feature #87: Categories page loading state
+- Feature #88: Categories page error state
+- Remaining end-to-end workflows and browser tests
+
+Notes:
+- Delete error handling fully implemented for both transactions and budgets
+- Error messages display correctly via browser alerts
+- Backend validation working as specified
+- Clean codebase, all tests passing
