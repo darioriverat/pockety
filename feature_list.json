@@ -1180,7 +1180,7 @@
       "Step 4: Verify empty state guidance if applicable",
       "Step 5: Verify create button prominent"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1191,7 +1191,7 @@
       "Step 3: Verify skeleton or spinner displayed",
       "Step 4: Verify no layout shift when content loads"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1203,7 +1203,7 @@
       "Step 4: Verify retry action available if applicable",
       "Step 5: Take screenshot of error state"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
