@@ -177,9 +177,9 @@ describe('Categories Page', () => {
             expect(screen.getByText('C001')).toBeInTheDocument();
         });
 
-        // Find and click delete button
-        const deleteButtons = screen.getAllByRole('button');
-        fireEvent.click(deleteButtons[0]);
+        // Find and click delete button by aria-label
+        const deleteButton = screen.getByRole('button', { name: /Delete C001/i });
+        fireEvent.click(deleteButton);
 
         await waitFor(() => {
             expect(window.confirm).toHaveBeenCalledWith(
@@ -246,9 +246,9 @@ describe('Categories Page', () => {
             expect(screen.getByText('C004')).toBeInTheDocument();
         });
 
-        // Find and click the first delete button
-        const deleteButtons = screen.getAllByRole('button');
-        fireEvent.click(deleteButtons[0]);
+        // Find and click the first delete button by aria-label
+        const deleteButton = screen.getByRole('button', { name: /Delete C001/i });
+        fireEvent.click(deleteButton);
 
         await waitFor(() => {
             expect(window.confirm).toHaveBeenCalled();
@@ -305,9 +305,9 @@ describe('Categories Page', () => {
             expect(screen.getByText('C001')).toBeInTheDocument();
         });
 
-        // Find and click delete button
-        const deleteButtons = screen.getAllByRole('button');
-        fireEvent.click(deleteButtons[0]);
+        // Find and click delete button by aria-label
+        const deleteButton = screen.getByRole('button', { name: /Delete C001/i });
+        fireEvent.click(deleteButton);
 
         await waitFor(() => {
             expect(window.confirm).toHaveBeenCalled();

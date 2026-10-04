@@ -10,10 +10,20 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Plus } from 'lucide-react';
 import TextLink from '@/components/text-link';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Category {
     id: number;
@@ -40,6 +50,12 @@ export default function Categories() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const [createFormData, setCreateFormData] = useState({
+        name: '',
+        kind: 'expense' as 'expense' | 'debt' | 'income',
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         fetchCategories();
@@ -48,7 +64,7 @@ export default function Categories() {
     const fetchCategories = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/categories');
+            const response = await fetch('/api/categories?include_inactive=1');
 
             if (!response.ok) {
                 throw new Error('Failed to fetch categories');
@@ -61,6 +77,44 @@ export default function Categories() {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCreate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch('/api/categories', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: createFormData.name,
+                    is_debt_category: createFormData.kind === 'debt',
+                    is_income_category: createFormData.kind === 'income',
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create category');
+            }
+
+            const result = await response.json();
+
+            // Add new category to the list
+            setCategories([...categories, result.data]);
+
+            // Reset form and close dialog
+            setCreateFormData({ name: '', kind: 'expense' });
+            setCreateDialogOpen(false);
+            setError(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -84,6 +138,8 @@ export default function Categories() {
                 const errorData = await response.json();
                 if (errorData.has_transactions) {
                     alert(errorData.message || 'This category has associated transactions and cannot be deleted');
+                } else if (errorData.has_budgets) {
+                    alert(errorData.message || 'This category has associated budgets and cannot be deleted');
                 } else {
                     throw new Error(errorData.message || 'Failed to delete category');
                 }
@@ -109,6 +165,13 @@ export default function Categories() {
                         title="Categories"
                         description="View all active expense and income categories for your finance tracking"
                     />
+                    <Button
+                        onClick={() => setCreateDialogOpen(true)}
+                        data-testid="create-category-button"
+                    >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Category
+                    </Button>
                 </div>
 
                 {error && (
@@ -125,6 +188,116 @@ export default function Categories() {
                         </CardContent>
                     </Card>
                 )}
+
+                <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                    <DialogContent data-testid="create-category-dialog">
+                        <DialogHeader>
+                            <DialogTitle data-testid="create-category-title">
+                                Create Category
+                            </DialogTitle>
+                            <DialogDescription>
+                                Create a new expense, debt, or income category for tracking your finances.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleCreate}>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="category-name">
+                                        Name
+                                    </Label>
+                                    <Input
+                                        id="category-name"
+                                        data-testid="category-name-input"
+                                        value={createFormData.name}
+                                        onChange={(e) =>
+                                            setCreateFormData({
+                                                ...createFormData,
+                                                name: e.target.value,
+                                            })
+                                        }
+                                        placeholder="e.g., Groceries"
+                                        required
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Kind</Label>
+                                    <div className="grid gap-2">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="kind"
+                                                value="expense"
+                                                checked={createFormData.kind === 'expense'}
+                                                onChange={(e) =>
+                                                    setCreateFormData({
+                                                        ...createFormData,
+                                                        kind: 'expense',
+                                                    })
+                                                }
+                                                disabled={isSubmitting}
+                                                data-testid="kind-expense"
+                                            />
+                                            <span>Expense</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="kind"
+                                                value="debt"
+                                                checked={createFormData.kind === 'debt'}
+                                                onChange={(e) =>
+                                                    setCreateFormData({
+                                                        ...createFormData,
+                                                        kind: 'debt',
+                                                    })
+                                                }
+                                                disabled={isSubmitting}
+                                                data-testid="kind-debt"
+                                            />
+                                            <span>Debt</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="kind"
+                                                value="income"
+                                                checked={createFormData.kind === 'income'}
+                                                onChange={(e) =>
+                                                    setCreateFormData({
+                                                        ...createFormData,
+                                                        kind: 'income',
+                                                    })
+                                                }
+                                                disabled={isSubmitting}
+                                                data-testid="kind-income"
+                                            />
+                                            <span>Income</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setCreateDialogOpen(false)}
+                                    disabled={isSubmitting}
+                                    data-testid="create-category-cancel"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    data-testid="create-category-submit"
+                                >
+                                    {isSubmitting ? 'Creating...' : 'Create'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
 
                 {loading ? (
                     <LoadingState

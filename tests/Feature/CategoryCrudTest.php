@@ -163,7 +163,7 @@ class CategoryCrudTest extends TestCase
     {
         $category = Category::where('code', 'C001')->first();
 
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'name' => 'Updated Name',
         ]);
 
@@ -183,7 +183,7 @@ class CategoryCrudTest extends TestCase
 
     public function test_update_inactivate_category(): void
     {
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'is_active' => false,
         ]);
 
@@ -202,7 +202,7 @@ class CategoryCrudTest extends TestCase
         Category::where('code', 'C001')->update(['is_active' => false]);
 
         // Then reactivate
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'is_active' => true,
         ]);
 
@@ -215,7 +215,7 @@ class CategoryCrudTest extends TestCase
         $category = Category::where('code', 'C001')->first();
         $this->assertFalse($category->is_debt_category);
 
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'is_debt_category' => true,
         ]);
 
@@ -242,7 +242,7 @@ class CategoryCrudTest extends TestCase
             'comments' => 'Test transaction',
         ]);
 
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'is_debt_category' => true,
         ]);
 
@@ -268,7 +268,7 @@ class CategoryCrudTest extends TestCase
             'comments' => 'Test transaction',
         ]);
 
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'name' => 'New Name With Transactions',
         ]);
 
@@ -290,7 +290,7 @@ class CategoryCrudTest extends TestCase
             'comments' => 'Test transaction',
         ]);
 
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'is_active' => false,
         ]);
 
@@ -300,7 +300,7 @@ class CategoryCrudTest extends TestCase
 
     public function test_update_rejects_both_flags_true(): void
     {
-        $response = $this->putJson("/api/categories/C001", [
+        $response = $this->putJson('/api/categories/C001', [
             'is_debt_category' => true,
             'is_income_category' => true,
         ]);
@@ -311,7 +311,7 @@ class CategoryCrudTest extends TestCase
 
     public function test_update_requires_at_least_one_field(): void
     {
-        $response = $this->putJson("/api/categories/C001", []);
+        $response = $this->putJson('/api/categories/C001', []);
 
         $response->assertStatus(422)
             ->assertJsonPath('error', 'At least one field must be provided');
@@ -319,7 +319,7 @@ class CategoryCrudTest extends TestCase
 
     public function test_update_returns_404_for_nonexistent_category(): void
     {
-        $response = $this->putJson("/api/categories/NONEXISTENT", [
+        $response = $this->putJson('/api/categories/NONEXISTENT', [
             'name' => 'Test',
         ]);
 
@@ -361,7 +361,7 @@ class CategoryCrudTest extends TestCase
             'comments' => 'Test transaction',
         ]);
 
-        $response = $this->deleteJson("/api/categories/C001");
+        $response = $this->deleteJson('/api/categories/C001');
 
         $response->assertStatus(422)
             ->assertJsonPath('message', 'This category has associated transactions and cannot be deleted')
@@ -381,7 +381,7 @@ class CategoryCrudTest extends TestCase
             'amount_cad' => 500.00,
         ]);
 
-        $response = $this->deleteJson("/api/categories/C001");
+        $response = $this->deleteJson('/api/categories/C001');
 
         $response->assertStatus(422)
             ->assertJsonPath('message', 'This category has associated budgets and cannot be deleted')
@@ -392,7 +392,7 @@ class CategoryCrudTest extends TestCase
 
     public function test_delete_returns_404_for_nonexistent_category(): void
     {
-        $response = $this->deleteJson("/api/categories/NONEXISTENT");
+        $response = $this->deleteJson('/api/categories/NONEXISTENT');
 
         $response->assertNotFound();
     }

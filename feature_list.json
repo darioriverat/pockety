@@ -14,7 +14,7 @@
       "Step 9: Verify data.is_income_category is false",
       "Step 10: Verify new category appears on page without reload"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -29,7 +29,7 @@
       "Step 7: Verify data.is_debt_category is true",
       "Step 8: Verify data.is_income_category is false"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -45,7 +45,7 @@
       "Step 8: Verify data.is_income_category is true",
       "Step 9: Verify data.is_debt_category is false"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -58,7 +58,7 @@
       "Step 5: Verify assigned code is C048",
       "Step 6: Confirm codes are unique for user"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -70,7 +70,7 @@
       "Step 4: Create second custom income category",
       "Step 5: Verify assigned code is I03"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
