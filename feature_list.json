@@ -1,0 +1,1499 @@
+[
+  {
+    "category": "functional",
+    "description": "Create expense category - server assigns C### code, category is active by default",
+    "steps": [
+      "Step 1: Navigate to categories page at /categories",
+      "Step 2: Click create category button",
+      "Step 3: Enter name 'Groceries Test'",
+      "Step 4: Select 'expense' kind",
+      "Step 5: Submit form via POST /api/categories",
+      "Step 6: Verify response 201 with data.code matching C### pattern",
+      "Step 7: Verify data.is_active is true",
+      "Step 8: Verify data.is_debt_category is false",
+      "Step 9: Verify data.is_income_category is false",
+      "Step 10: Verify new category appears on page without reload"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Create debt category - server assigns C### code with proper flags",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Click create category button",
+      "Step 3: Enter name 'Credit Card Debt'",
+      "Step 4: Select 'debt' kind",
+      "Step 5: Submit form",
+      "Step 6: Verify response 201",
+      "Step 7: Verify data.is_debt_category is true",
+      "Step 8: Verify data.is_income_category is false"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Create income category - server assigns I## code",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Click create category button",
+      "Step 3: Enter name 'Freelance Income'",
+      "Step 4: Select 'income' kind",
+      "Step 5: Submit form via POST /api/categories",
+      "Step 6: Verify response 201",
+      "Step 7: Verify data.code matches I\\d{2,} pattern",
+      "Step 8: Verify data.is_income_category is true",
+      "Step 9: Verify data.is_debt_category is false"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category code assignment follows C### sequence for expenses after template",
+    "steps": [
+      "Step 1: Verify template has codes C001-C046",
+      "Step 2: Create first custom expense category",
+      "Step 3: Verify assigned code is C047",
+      "Step 4: Create second custom expense category",
+      "Step 5: Verify assigned code is C048",
+      "Step 6: Confirm codes are unique for user"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category code assignment follows I## sequence for income after template",
+    "steps": [
+      "Step 1: Verify template has code I01",
+      "Step 2: Create first custom income category",
+      "Step 3: Verify assigned code is I02",
+      "Step 4: Create second custom income category",
+      "Step 5: Verify assigned code is I03"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reject category creation when both debt and income flags are true",
+    "steps": [
+      "Step 1: POST /api/categories with name 'Invalid'",
+      "Step 2: Set is_debt_category to true",
+      "Step 3: Set is_income_category to true",
+      "Step 4: Verify response 422",
+      "Step 5: Verify validation error message"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Update category name successfully",
+    "steps": [
+      "Step 1: Create test category via POST /api/categories",
+      "Step 2: Note the category code from response",
+      "Step 3: PUT /api/categories/{code} with new name 'Updated Name'",
+      "Step 4: Verify response 200",
+      "Step 5: Verify data.name is 'Updated Name'",
+      "Step 6: Verify other fields unchanged",
+      "Step 7: Verify links.self and links.index in response"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Update category flags when no transactions exist",
+    "steps": [
+      "Step 1: Create expense category",
+      "Step 2: Verify is_debt_category is false",
+      "Step 3: PUT /api/categories/{code} with is_debt_category true",
+      "Step 4: Verify response 200",
+      "Step 5: Verify flag updated successfully",
+      "Step 6: Confirm no transactions exist for category"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reject flag change when transactions exist - debt flag",
+    "steps": [
+      "Step 1: Create expense category",
+      "Step 2: Create transaction with this category_id",
+      "Step 3: Attempt PUT /api/categories/{code} changing is_debt_category",
+      "Step 4: Verify response 422",
+      "Step 5: Verify message 'Debt and income settings cannot be changed because this category has transactions'",
+      "Step 6: Verify category unchanged in database"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reject flag change when transactions exist - income flag",
+    "steps": [
+      "Step 1: Create expense category",
+      "Step 2: Create transaction with this category_id",
+      "Step 3: Attempt PUT /api/categories/{code} changing is_income_category",
+      "Step 4: Verify response 422",
+      "Step 5: Verify appropriate error message",
+      "Step 6: Verify category flags remain unchanged"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Inactivate category via update endpoint",
+    "steps": [
+      "Step 1: Create active category",
+      "Step 2: Verify is_active is true",
+      "Step 3: PUT /api/categories/{code} with is_active false",
+      "Step 4: Verify response 200",
+      "Step 5: Verify data.is_active is false",
+      "Step 6: Verify category still exists in database"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reactivate category via update endpoint",
+    "steps": [
+      "Step 1: Create category and inactivate it",
+      "Step 2: Verify is_active is false",
+      "Step 3: PUT /api/categories/{code} with is_active true",
+      "Step 4: Verify response 200",
+      "Step 5: Verify data.is_active is true"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Inactivate category even when transactions exist",
+    "steps": [
+      "Step 1: Create category",
+      "Step 2: Create transaction using this category",
+      "Step 3: PUT /api/categories/{code} with is_active false",
+      "Step 4: Verify response 200",
+      "Step 5: Verify is_active updated successfully despite transaction",
+      "Step 6: Verify existing transaction still valid"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "GET /api/categories returns only active categories by default",
+    "steps": [
+      "Step 1: Create two categories",
+      "Step 2: Inactivate one category",
+      "Step 3: GET /api/categories without parameters",
+      "Step 4: Verify response includes only active categories",
+      "Step 5: Verify meta.total matches active count",
+      "Step 6: Verify inactive category not in response"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "GET /api/categories?include_inactive=1 returns all categories",
+    "steps": [
+      "Step 1: Seed database with active and inactive categories",
+      "Step 2: Note C040 is inactive in template",
+      "Step 3: GET /api/categories?include_inactive=1",
+      "Step 4: Verify response includes both active and inactive",
+      "Step 5: Verify C040 appears in results",
+      "Step 6: Verify all returned categories ordered by code"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Delete category succeeds when no transactions or budgets exist",
+    "steps": [
+      "Step 1: Create new category",
+      "Step 2: Verify no transactions reference it",
+      "Step 3: Verify no budgets reference it",
+      "Step 4: DELETE /api/categories/{code}",
+      "Step 5: Verify response 200",
+      "Step 6: Verify links.index in response",
+      "Step 7: Verify category hard-deleted from database"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Delete blocked when transactions exist",
+    "steps": [
+      "Step 1: Create category",
+      "Step 2: Create transaction with this category_id",
+      "Step 3: DELETE /api/categories/{code}",
+      "Step 4: Verify response 422",
+      "Step 5: Verify has_transactions is true",
+      "Step 6: Verify message 'This category has associated transactions and cannot be deleted'",
+      "Step 7: Verify category still exists in database"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Delete blocked when budgets exist",
+    "steps": [
+      "Step 1: Create category",
+      "Step 2: Create budget with this category_id",
+      "Step 3: DELETE /api/categories/{code}",
+      "Step 4: Verify response 422",
+      "Step 5: Verify has_budgets is true",
+      "Step 6: Verify message 'This category has associated budgets and cannot be deleted'",
+      "Step 7: Verify category still exists"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Budget cascade prevention - migration changes cascadeOnDelete to restrictOnDelete",
+    "steps": [
+      "Step 1: Verify budgets table migration file",
+      "Step 2: Confirm category_id foreign key uses restrictOnDelete",
+      "Step 3: Create category with budget",
+      "Step 4: Attempt direct database delete",
+      "Step 5: Verify foreign key constraint prevents deletion"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category not found returns 404",
+    "steps": [
+      "Step 1: GET /api/categories/NONEXISTENT",
+      "Step 2: Verify response 404",
+      "Step 3: PUT /api/categories/NONEXISTENT",
+      "Step 4: Verify response 404",
+      "Step 5: DELETE /api/categories/NONEXISTENT",
+      "Step 6: Verify response 404"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Validation errors for category creation",
+    "steps": [
+      "Step 1: POST /api/categories with empty name",
+      "Step 2: Verify response 422 with name required error",
+      "Step 3: POST with name over 255 characters",
+      "Step 4: Verify response 422",
+      "Step 5: POST with missing is_debt_category",
+      "Step 6: Verify response 422",
+      "Step 7: POST with missing is_income_category",
+      "Step 8: Verify response 422"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Financial summary includes inactive categories with transactions in period",
+    "steps": [
+      "Step 1: Create category and inactivate it",
+      "Step 2: Create transaction for this category in period 202601",
+      "Step 3: Call FinancialSummaryService::getSummary for 202601",
+      "Step 4: Verify category_totals includes the inactive category",
+      "Step 5: Verify transaction amount reflected in totals",
+      "Step 6: Verify total_recorded_disbursements_cad includes this transaction",
+      "Step 7: Verify net_operating_expenses_cad calculation correct"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Financial summary excludes active categories with no transactions in period",
+    "steps": [
+      "Step 1: Create active category",
+      "Step 2: Ensure no transactions for this category in period 202601",
+      "Step 3: Call FinancialSummaryService::getSummary for 202601",
+      "Step 4: Verify category_totals does NOT include the active category",
+      "Step 5: Verify category_totals only contains categories with actual transactions",
+      "Step 6: Confirm this is change from old behavior that pre-seeded active categories"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reconciliation totals include inactive categories with transactions",
+    "steps": [
+      "Step 1: Create inactive category",
+      "Step 2: Create income transaction for inactive category in period",
+      "Step 3: Create expense transaction for another inactive category in same period",
+      "Step 4: Call ReconciliationService::reconcileForPeriod",
+      "Step 5: Verify income_total_cad includes the inactive income category transaction",
+      "Step 6: Verify expenses_total_cad includes the inactive expense category transaction",
+      "Step 7: Verify net_operating_expenses_cad calculation is correct",
+      "Step 8: Verify inactivating categories doesn't change reconciliation totals"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reconciliation debt principal includes inactive debt categories",
+    "steps": [
+      "Step 1: Create debt category and inactivate it",
+      "Step 2: Create debt payment transaction in period",
+      "Step 3: Call ReconciliationService for period",
+      "Step 4: Verify debt principal calculation includes inactive category",
+      "Step 5: Verify debt interest calculation correct",
+      "Step 6: Confirm hardcoded debt payment codes still work"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category actuals report includes only categories with transactions in period",
+    "steps": [
+      "Step 1: Create two active categories",
+      "Step 2: Create transaction for first category in period 202601",
+      "Step 3: Leave second category with no transactions in period",
+      "Step 4: Call CategoryActualsService::getReport for 202601",
+      "Step 5: Verify report includes first category with actual_cad and transaction_count",
+      "Step 6: Verify report does NOT include second category",
+      "Step 7: Verify results ordered by code"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category actuals report includes inactive categories with transactions",
+    "steps": [
+      "Step 1: Create category and create transaction",
+      "Step 2: Inactivate the category",
+      "Step 3: Call CategoryActualsService::getReport for period",
+      "Step 4: Verify inactive category appears in report",
+      "Step 5: Verify actual_cad reflects transaction amount",
+      "Step 6: Verify transaction_count is correct"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Budget vs actual grid includes all active categories even with no activity",
+    "steps": [
+      "Step 1: Create active category with no transactions or budgets",
+      "Step 2: Call BudgetService::getBudgetVsActualReport",
+      "Step 3: Verify active category appears in grid",
+      "Step 4: Verify user can enter budget for this category",
+      "Step 5: Verify actual_cad is zero for category"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Budget vs actual grid includes inactive categories with transactions in period",
+    "steps": [
+      "Step 1: Create category and inactivate it",
+      "Step 2: Create transaction for this category in period",
+      "Step 3: Call BudgetService::getBudgetVsActualReport",
+      "Step 4: Verify inactive category appears in grid",
+      "Step 5: Verify actual_cad reflects transaction",
+      "Step 6: Verify actuals counted toward report total"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Budget vs actual grid includes inactive categories with budgets in period",
+    "steps": [
+      "Step 1: Create category and create budget for period",
+      "Step 2: Inactivate the category",
+      "Step 3: Call BudgetService::getBudgetVsActualReport",
+      "Step 4: Verify inactive category appears in grid",
+      "Step 5: Verify budget amount displayed",
+      "Step 6: Verify category can be budgeted even though inactive"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Budget vs actual grid excludes inactive categories with neither transaction nor budget",
+    "steps": [
+      "Step 1: Create category and inactivate it",
+      "Step 2: Ensure no transactions in period",
+      "Step 3: Ensure no budget in period",
+      "Step 4: Call BudgetService::getBudgetVsActualReport",
+      "Step 5: Verify inactive category does NOT appear in grid"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Depreciation calculation C045 includes inactive category transactions",
+    "steps": [
+      "Step 1: Verify C045 is depreciation code in FinancialSummaryService",
+      "Step 2: Create transaction with code C045 in period",
+      "Step 3: Inactivate C045 category",
+      "Step 4: Call FinancialSummaryService::getSummary",
+      "Step 5: Verify depreciation amount calculated correctly",
+      "Step 6: Verify inactive C045 transaction included in calculation"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Add user_id column to categories table",
+    "steps": [
+      "Step 1: Run migration to add user_id to categories",
+      "Step 2: Verify column is foreign key to users.id",
+      "Step 3: Verify column is indexed",
+      "Step 4: Verify restrictOnDelete constraint",
+      "Step 5: Verify column not nullable after backfill"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Add user_id column to all financial tables",
+    "steps": [
+      "Step 1: Run migrations for user_id on accounts, account_balances, transactions",
+      "Step 2: Run migrations for budgets, income, exchange_rates",
+      "Step 3: Run migrations for fixed_assets, fixed_asset_valuations",
+      "Step 4: Run migrations for historical_balance_sheets, period_balances, period_balance_histories",
+      "Step 5: Verify all columns are foreign keys with restrictOnDelete",
+      "Step 6: Verify all are indexed",
+      "Step 7: Verify all are not nullable"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Backfill user_id to smallest user id for existing data",
+    "steps": [
+      "Step 1: Create test user with known id",
+      "Step 2: Insert test data in categories",
+      "Step 3: Run migration backfill",
+      "Step 4: Verify all existing categories have user_id set to smallest user id",
+      "Step 5: Verify same for all other financial tables",
+      "Step 6: Verify no rows orphaned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Copy category template to existing users during backfill",
+    "steps": [
+      "Step 1: Create two users",
+      "Step 2: Run seeder/backfill",
+      "Step 3: Verify first user gets existing categories assigned",
+      "Step 4: Verify second user gets fresh copy of template",
+      "Step 5: Verify template includes C001-C046 and I01",
+      "Step 6: Verify C040 is inactive in template",
+      "Step 7: Verify second user has no transactions or budgets"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Change categories.code unique constraint to (user_id, code)",
+    "steps": [
+      "Step 1: Run migration to drop global unique on code",
+      "Step 2: Add unique constraint on (user_id, code)",
+      "Step 3: Verify two users can have same code",
+      "Step 4: Verify one user cannot have duplicate code",
+      "Step 5: Test with C001 for user A and C001 for user B"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Change period unique constraints to (user_id, period)",
+    "steps": [
+      "Step 1: Migrate exchange_rates.period to (user_id, period)",
+      "Step 2: Migrate historical_balance_sheets.period to (user_id, period)",
+      "Step 3: Migrate period_balances.period to (user_id, period)",
+      "Step 4: Verify two users can have same period",
+      "Step 5: Verify one user cannot have duplicate period"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "CreateNewUser copies category template to new user",
+    "steps": [
+      "Step 1: Register new user via CreateNewUser action",
+      "Step 2: Verify user created successfully",
+      "Step 3: Query categories for new user_id",
+      "Step 4: Verify 46 active categories exist",
+      "Step 5: Verify C040 is inactive",
+      "Step 6: Verify codes C001-C046 and I01 present",
+      "Step 7: Verify new ids generated, not copied from another user",
+      "Step 8: Verify no transactions or budgets on template"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "CategorySeeder applies template to all existing users",
+    "steps": [
+      "Step 1: Create two users",
+      "Step 2: Run CategorySeeder::run",
+      "Step 3: Verify first user has template categories",
+      "Step 4: Verify second user has template categories",
+      "Step 5: Verify seeder matches by (user_id, code)",
+      "Step 6: Verify seeder doesn't steal rows from other users",
+      "Step 7: Verify both users have 46 active categories"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Owner resolver returns authenticated user id",
+    "steps": [
+      "Step 1: Create owner resolver service",
+      "Step 2: Bind in AppServiceProvider",
+      "Step 3: Authenticate a user",
+      "Step 4: Call ownerResolver->id()",
+      "Step 5: Verify returns authenticated user's id",
+      "Step 6: Logout user",
+      "Step 7: Call ownerResolver->id() and verify it fails"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Financial API routes require authentication",
+    "steps": [
+      "Step 1: Verify routes/api.php has auth middleware on financial routes",
+      "Step 2: GET /api/categories without authentication",
+      "Step 3: Verify response 401",
+      "Step 4: POST /api/categories without authentication",
+      "Step 5: Verify response 401",
+      "Step 6: Authenticate user",
+      "Step 7: GET /api/categories with session",
+      "Step 8: Verify response 200"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "CategoryService scopes all queries to authenticated user",
+    "steps": [
+      "Step 1: Create two users with categories",
+      "Step 2: Authenticate as user A",
+      "Step 3: Call CategoryService::getAll()",
+      "Step 4: Verify only user A's categories returned",
+      "Step 5: Authenticate as user B",
+      "Step 6: Call CategoryService::getAll()",
+      "Step 7: Verify only user B's categories returned",
+      "Step 8: Verify no overlap between results"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category creation assigns code unique per user",
+    "steps": [
+      "Step 1: Authenticate as user A",
+      "Step 2: Create expense category, verify code C047",
+      "Step 3: Authenticate as user B",
+      "Step 4: Create expense category, verify code C047",
+      "Step 5: Verify both users have C047 with different category_id",
+      "Step 6: Verify isolation between users"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Category lookup by code scopes to (user_id, code)",
+    "steps": [
+      "Step 1: Create user A with category C047",
+      "Step 2: Create user B with category C047",
+      "Step 3: Authenticate as user A",
+      "Step 4: GET /api/categories/C047",
+      "Step 5: Verify returns user A's C047",
+      "Step 6: Authenticate as user B",
+      "Step 7: GET /api/categories/C047",
+      "Step 8: Verify returns user B's C047"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Accessing another user's category returns 404",
+    "steps": [
+      "Step 1: Create user A with custom category code C047",
+      "Step 2: Authenticate as user B",
+      "Step 3: GET /api/categories/C047",
+      "Step 4: Verify response 404, not 403",
+      "Step 5: PUT /api/categories/C047",
+      "Step 6: Verify response 404",
+      "Step 7: DELETE /api/categories/C047",
+      "Step 8: Verify response 404"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "TransactionService scopes queries to authenticated user",
+    "steps": [
+      "Step 1: Create transactions for user A",
+      "Step 2: Create transactions for user B",
+      "Step 3: Authenticate as user A",
+      "Step 4: Query transactions via service",
+      "Step 5: Verify only user A's transactions returned",
+      "Step 6: Authenticate as user B",
+      "Step 7: Verify only user B's transactions returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "AccountService scopes accounts and balances to authenticated user",
+    "steps": [
+      "Step 1: Create accounts for user A and B",
+      "Step 2: Create account_balances for both",
+      "Step 3: Authenticate as user A",
+      "Step 4: Query accounts",
+      "Step 5: Verify only user A's accounts returned",
+      "Step 6: Query account_balances",
+      "Step 7: Verify only user A's balances returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "BudgetService scopes budgets to authenticated user",
+    "steps": [
+      "Step 1: Create budgets for user A and B",
+      "Step 2: Authenticate as user A",
+      "Step 3: Call BudgetService methods",
+      "Step 4: Verify only user A's budgets returned",
+      "Step 5: Authenticate as user B",
+      "Step 6: Verify only user B's budgets returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "IncomeService scopes income records to authenticated user with MAX_LINES_PER_PERIOD per user",
+    "steps": [
+      "Step 1: Authenticate as user A",
+      "Step 2: Create 6 income records for period 202601",
+      "Step 3: Attempt to create 7th income record for same period",
+      "Step 4: Verify rejected due to MAX_LINES_PER_PERIOD",
+      "Step 5: Authenticate as user B",
+      "Step 6: Create 6 income records for period 202601",
+      "Step 7: Verify allowed because count is per (user_id, period)",
+      "Step 8: Verify users don't interfere with each other"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "ExchangeRateService scopes rates to authenticated user",
+    "steps": [
+      "Step 1: Create exchange rate for period 202601 for user A",
+      "Step 2: Create exchange rate for period 202601 for user B",
+      "Step 3: Authenticate as user A",
+      "Step 4: Query exchange rates",
+      "Step 5: Verify only user A's rates returned",
+      "Step 6: Verify period 202601 uniqueness per user"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "FixedAssetService scopes assets and valuations to authenticated user",
+    "steps": [
+      "Step 1: Create fixed assets for user A and B",
+      "Step 2: Create valuations for both",
+      "Step 3: Authenticate as user A",
+      "Step 4: Query fixed assets",
+      "Step 5: Verify only user A's assets returned",
+      "Step 6: Query valuations",
+      "Step 7: Verify only user A's valuations returned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "PeriodBalanceService scopes balances and histories to authenticated user",
+    "steps": [
+      "Step 1: Create period_balances for user A and B for same period",
+      "Step 2: Create period_balance_histories for both",
+      "Step 3: Authenticate as user A",
+      "Step 4: Query period balances",
+      "Step 5: Verify only user A's balances returned",
+      "Step 6: Verify period uniqueness per user"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "HistoricalBalanceSheetService scopes to authenticated user",
+    "steps": [
+      "Step 1: Create historical balance sheets for user A and B for same period",
+      "Step 2: Authenticate as user A",
+      "Step 3: Query historical balance sheets",
+      "Step 4: Verify only user A's sheets returned",
+      "Step 5: Verify period uniqueness per user"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "AvailablePeriodService returns periods only for authenticated user",
+    "steps": [
+      "Step 1: Create transactions in period 202601 for user A",
+      "Step 2: Create transactions in period 202602 for user B",
+      "Step 3: Authenticate as user A",
+      "Step 4: Call AvailablePeriodService",
+      "Step 5: Verify only period 202601 returned",
+      "Step 6: Authenticate as user B",
+      "Step 7: Verify only period 202602 returned",
+      "Step 8: Verify availablePeriods Inertia prop correct for each user"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "FinancialSummaryService scopes to authenticated user with hardcoded category codes",
+    "steps": [
+      "Step 1: Authenticate as user A",
+      "Step 2: Create transaction with C045 (depreciation) for user A",
+      "Step 3: Call FinancialSummaryService::getSummary",
+      "Step 4: Verify C045 lookup scoped to user A's categories",
+      "Step 5: Verify depreciation calculation uses user A's C045",
+      "Step 6: Verify debt payment codes lookup scoped to user A",
+      "Step 7: Authenticate as user B",
+      "Step 8: Verify summary doesn't see user A's data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Dashboard scopes all data to authenticated user",
+    "steps": [
+      "Step 1: Create comprehensive data for user A",
+      "Step 2: Create different data for user B",
+      "Step 3: Authenticate as user A",
+      "Step 4: Load dashboard",
+      "Step 5: Verify all displayed data belongs to user A",
+      "Step 6: Authenticate as user B",
+      "Step 7: Verify dashboard shows only user B's data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Import functionality scopes to authenticated user",
+    "steps": [
+      "Step 1: Authenticate as user A",
+      "Step 2: Import transactions CSV",
+      "Step 3: Verify imported transactions have user_id for user A",
+      "Step 4: Verify transactions invisible to other users",
+      "Step 5: Verify category lookups during import scoped to user A"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Search functionality scopes results to authenticated user",
+    "steps": [
+      "Step 1: Create searchable data for user A and B",
+      "Step 2: Authenticate as user A",
+      "Step 3: Perform search",
+      "Step 4: Verify results only from user A's data",
+      "Step 5: Authenticate as user B",
+      "Step 6: Verify results only from user B's data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reports scope to authenticated user data only",
+    "steps": [
+      "Step 1: Create report data for user A and B",
+      "Step 2: Authenticate as user A",
+      "Step 3: Generate balance sheet report",
+      "Step 4: Verify only user A's data in report",
+      "Step 5: Generate category actuals report",
+      "Step 6: Verify only user A's categories",
+      "Step 7: Generate budget vs actual report",
+      "Step 8: Verify only user A's budgets"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Factories set user_id on all financial models",
+    "steps": [
+      "Step 1: Review all factory files for financial models",
+      "Step 2: Verify CategoryFactory includes user_id",
+      "Step 3: Verify TransactionFactory includes user_id",
+      "Step 4: Verify AccountFactory includes user_id",
+      "Step 5: Verify BudgetFactory includes user_id",
+      "Step 6: Verify all other financial factories include user_id",
+      "Step 7: Test factories create valid records with user_id"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "BrowserTestSeeder assigns user_id to authenticated user",
+    "steps": [
+      "Step 1: Review BrowserTestSeeder",
+      "Step 2: Verify seeder gets authenticated user",
+      "Step 3: Verify all seeded data assigned to that user_id",
+      "Step 4: Run browser test",
+      "Step 5: Verify test sees only its own seeded data",
+      "Step 6: Verify test isolation maintained"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - categories",
+    "steps": [
+      "Step 1: Create user A and user B",
+      "Step 2: Authenticate as user A, create category 'A Category'",
+      "Step 3: Authenticate as user B, create category 'B Category'",
+      "Step 4: Authenticate as user A",
+      "Step 5: GET /api/categories",
+      "Step 6: Verify 'A Category' present, 'B Category' absent",
+      "Step 7: Authenticate as user B",
+      "Step 8: GET /api/categories",
+      "Step 9: Verify 'B Category' present, 'A Category' absent"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - transactions",
+    "steps": [
+      "Step 1: Create user A and B",
+      "Step 2: User A creates transaction",
+      "Step 3: User B creates transaction",
+      "Step 4: Authenticate as user A",
+      "Step 5: Query transactions",
+      "Step 6: Verify only user A's transaction visible",
+      "Step 7: Authenticate as user B",
+      "Step 8: Verify only user B's transaction visible"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - accounts and balances",
+    "steps": [
+      "Step 1: User A creates account and balances",
+      "Step 2: User B creates account and balances",
+      "Step 3: Authenticate as user A",
+      "Step 4: Query accounts API",
+      "Step 5: Verify only user A's account visible",
+      "Step 6: Navigate to accounts page",
+      "Step 7: Verify only user A's data displayed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - budgets",
+    "steps": [
+      "Step 1: User A creates budget for period 202601",
+      "Step 2: User B creates budget for period 202601",
+      "Step 3: Authenticate as user A",
+      "Step 4: Navigate to budgets page",
+      "Step 5: Verify only user A's budget visible",
+      "Step 6: Authenticate as user B",
+      "Step 7: Verify only user B's budget visible"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - period balances and exchange rates",
+    "steps": [
+      "Step 1: User A creates period balance for 202601",
+      "Step 2: User B creates period balance for 202601",
+      "Step 3: User A creates exchange rate for 202601",
+      "Step 4: User B creates exchange rate for 202601",
+      "Step 5: Authenticate as user A",
+      "Step 6: Verify only user A's balances and rates visible",
+      "Step 7: Authenticate as user B",
+      "Step 8: Verify only user B's balances and rates visible"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - duplicate category names allowed",
+    "steps": [
+      "Step 1: Authenticate as user A",
+      "Step 2: Create category named 'Groceries'",
+      "Step 3: Authenticate as user B",
+      "Step 4: Create category named 'Groceries'",
+      "Step 5: Verify both categories exist with different user_ids",
+      "Step 6: Verify no conflict or uniqueness violation"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - template received on registration",
+    "steps": [
+      "Step 1: Create and seed user A with template",
+      "Step 2: User A creates custom category C047",
+      "Step 3: Register new user B",
+      "Step 4: Authenticate as user B",
+      "Step 5: GET /api/categories?include_inactive=1",
+      "Step 6: Verify user B has template C001-C046 and I01",
+      "Step 7: Verify user B has C040 inactive",
+      "Step 8: Verify user B does NOT have user A's C047",
+      "Step 9: Verify 46 active categories for user B"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Two-user isolation - availablePeriods scoped per user",
+    "steps": [
+      "Step 1: User A creates data in period 202601",
+      "Step 2: User B creates data in period 202602",
+      "Step 3: Authenticate as user A",
+      "Step 4: Load any Inertia page",
+      "Step 5: Check availablePeriods shared prop",
+      "Step 6: Verify includes 202601, excludes 202602",
+      "Step 7: Authenticate as user B",
+      "Step 8: Verify includes 202602, excludes 202601"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Inactive category C040 in template remains inactive after user registration",
+    "steps": [
+      "Step 1: Register new user",
+      "Step 2: Authenticate as new user",
+      "Step 3: GET /api/categories?include_inactive=1",
+      "Step 4: Find category C040",
+      "Step 5: Verify is_active is false",
+      "Step 6: Verify status is 'retired_merged_into_C031'",
+      "Step 7: Verify C040 not in default active categories list"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Transaction category picker shows only active categories for user",
+    "steps": [
+      "Step 1: Authenticate as user",
+      "Step 2: User has active category C047 and inactive C040",
+      "Step 3: Navigate to transaction creation page",
+      "Step 4: Open category picker/dropdown",
+      "Step 5: Verify C047 appears in picker",
+      "Step 6: Verify C040 does not appear in picker",
+      "Step 7: Verify picker calls GET /api/categories without include_inactive"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Budget category picker shows only active categories for user",
+    "steps": [
+      "Step 1: Authenticate as user",
+      "Step 2: Navigate to budget creation/edit page",
+      "Step 3: Open category picker",
+      "Step 4: Verify only active categories appear",
+      "Step 5: Verify inactive categories excluded from picker",
+      "Step 6: Create budget with active category successfully"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Existing transaction remains valid after category inactivation",
+    "steps": [
+      "Step 1: Create category C047",
+      "Step 2: Create transaction with category_id for C047",
+      "Step 3: Inactivate C047",
+      "Step 4: Query transaction",
+      "Step 5: Verify transaction still exists",
+      "Step 6: Verify category_id still points to C047",
+      "Step 7: Verify transaction displays correctly in UI",
+      "Step 8: Verify reports include this transaction"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "HATEOAS links on category create response",
+    "steps": [
+      "Step 1: POST /api/categories with valid data",
+      "Step 2: Verify response 201",
+      "Step 3: Verify response has data object with category",
+      "Step 4: Verify response has links.self with route to categories.show",
+      "Step 5: Verify links.self includes the assigned code",
+      "Step 6: Follow links.self and verify returns same category"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "HATEOAS links on category update response",
+    "steps": [
+      "Step 1: Create category",
+      "Step 2: PUT /api/categories/{code}",
+      "Step 3: Verify response 200",
+      "Step 4: Verify links.self present",
+      "Step 5: Verify links.index present",
+      "Step 6: Follow links.index to list endpoint"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "HATEOAS links on category delete response",
+    "steps": [
+      "Step 1: Create category without transactions or budgets",
+      "Step 2: DELETE /api/categories/{code}",
+      "Step 3: Verify response 200",
+      "Step 4: Verify links.index present in response",
+      "Step 5: Follow links.index"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Domain interfaces don't return Eloquent models",
+    "steps": [
+      "Step 1: Review CategoryServiceInterface",
+      "Step 2: Verify return types are entities, not Eloquent models",
+      "Step 3: Review implementation in CategoryService",
+      "Step 4: Verify service transforms models to entities",
+      "Step 5: Verify HTTP layer receives entities, not models",
+      "Step 6: Check other domain service interfaces follow same pattern"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Form requests implement domain request interfaces",
+    "steps": [
+      "Step 1: Review CreateCategoryRequest form request",
+      "Step 2: Verify implements domain request interface",
+      "Step 3: Review UpdateCategoryRequest",
+      "Step 4: Verify implements domain request interface",
+      "Step 5: Verify form requests handle HTTP validation",
+      "Step 6: Verify service methods accept domain interfaces, not form requests"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Service bindings in AppServiceProvider",
+    "steps": [
+      "Step 1: Open AppServiceProvider",
+      "Step 2: Verify CategoryServiceInterface bound to CategoryService",
+      "Step 3: Verify owner resolver bound",
+      "Step 4: Verify all new service interfaces have bindings",
+      "Step 5: Test dependency injection works in controllers"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Wayfinder routes regenerated for new endpoints",
+    "steps": [
+      "Step 1: Run php artisan wayfinder:generate --with-form --no-interaction",
+      "Step 2: Verify resources/js/routes updated",
+      "Step 3: Verify resources/js/actions updated if present",
+      "Step 4: Check category create/update/delete routes available",
+      "Step 5: Verify TypeScript types generated"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Categories page displays all categories including inactive with Retired badge",
+    "steps": [
+      "Step 1: Navigate to http://dev.pockety.com:8080/categories",
+      "Step 2: Verify page loads successfully",
+      "Step 3: Verify all active categories displayed",
+      "Step 4: Verify inactive categories displayed with Retired badge",
+      "Step 5: Verify C040 appears with reduced opacity",
+      "Step 6: Take screenshot and verify visual hierarchy clear"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Category create dialog follows existing dialog style",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Click create category button",
+      "Step 3: Verify dialog opens with consistent styling",
+      "Step 4: Verify dialog has name input field",
+      "Step 5: Verify dialog has kind selector (expense/debt/income)",
+      "Step 6: Verify submit and cancel buttons present",
+      "Step 7: Take screenshot and compare to other dialogs in app"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Category edit dialog shows locked debt/income when transactions exist",
+    "steps": [
+      "Step 1: Create category and transaction",
+      "Step 2: Open edit dialog for category",
+      "Step 3: Verify kind control is disabled",
+      "Step 4: Verify explanation text explains debt/income settings locked",
+      "Step 5: Verify name and active status still editable",
+      "Step 6: Take screenshot showing locked state"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Category card displays all category information clearly",
+    "steps": [
+      "Step 1: Navigate to categories page",
+      "Step 2: Verify each category displays as card",
+      "Step 3: Verify code visible on card",
+      "Step 4: Verify name visible on card",
+      "Step 5: Verify kind (expense/debt/income) indicated",
+      "Step 6: Verify active/inactive status clear",
+      "Step 7: Verify edit and delete actions accessible"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Delete confirmation shows server error messages",
+    "steps": [
+      "Step 1: Create category with transactions",
+      "Step 2: Attempt to delete category",
+      "Step 3: Verify server message displayed: 'This category has associated transactions and cannot be deleted'",
+      "Step 4: Create category with budgets",
+      "Step 5: Attempt to delete",
+      "Step 6: Verify budget message displayed",
+      "Step 7: Take screenshot of error state"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Categories page empty state is clear",
+    "steps": [
+      "Step 1: Create new user with no custom categories",
+      "Step 2: Navigate to categories page",
+      "Step 3: Verify template categories displayed",
+      "Step 4: Verify empty state guidance if applicable",
+      "Step 5: Verify create button prominent"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Categories page loading state is clear",
+    "steps": [
+      "Step 1: Open categories page with network throttling",
+      "Step 2: Observe loading state",
+      "Step 3: Verify skeleton or spinner displayed",
+      "Step 4: Verify no layout shift when content loads"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Categories page error state is clear",
+    "steps": [
+      "Step 1: Simulate API error for GET /api/categories",
+      "Step 2: Navigate to categories page",
+      "Step 3: Verify error message displayed",
+      "Step 4: Verify retry action available if applicable",
+      "Step 5: Take screenshot of error state"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Period balance overwrite dialog is wider than default",
+    "steps": [
+      "Step 1: Navigate to Period Balances page",
+      "Step 2: Click overwrite for existing period balance",
+      "Step 3: Verify dialog opens",
+      "Step 4: Verify dialog width at least sm:max-w-3xl",
+      "Step 5: Verify wider than other dialogs in app",
+      "Step 6: Take screenshot at desktop resolution"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Period balance overwrite dialog shows current and proposed figures side-by-side on desktop",
+    "steps": [
+      "Step 1: Open overwrite dialog at sm breakpoint or wider",
+      "Step 2: Verify current-balance column on left",
+      "Step 3: Verify new-figures column on right",
+      "Step 4: Verify columns side-by-side",
+      "Step 5: Verify no overlapping labels or amounts",
+      "Step 6: Take screenshot showing layout"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Period balance overwrite dialog stacks columns on mobile",
+    "steps": [
+      "Step 1: Open overwrite dialog at mobile viewport",
+      "Step 2: Verify current-balance column stacked above",
+      "Step 3: Verify new-figures column stacked below",
+      "Step 4: Verify all labels and amounts readable",
+      "Step 5: Take screenshot at mobile resolution"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Period balance overwrite dialog FigureGrid is single column per section",
+    "steps": [
+      "Step 1: Open overwrite dialog",
+      "Step 2: Inspect current-balance FigureGrid",
+      "Step 3: Verify each item is label and amount in single column",
+      "Step 4: Inspect new-figures FigureGrid",
+      "Step 5: Verify same single-column layout",
+      "Step 6: Verify no nested grid causing overlap"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Period balance overwrite dialog close control doesn't cover title",
+    "steps": [
+      "Step 1: Open overwrite dialog",
+      "Step 2: Verify close X button visible",
+      "Step 3: Verify title 'Overwrite Balance' fully visible",
+      "Step 4: Verify padding on header prevents overlap",
+      "Step 5: Test at different viewport sizes",
+      "Step 6: Take screenshot showing header clearly"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Period balance overwrite dialog test IDs remain functional",
+    "steps": [
+      "Step 1: Open overwrite dialog",
+      "Step 2: Verify data-testid='overwrite-balance-dialog' present",
+      "Step 3: Verify overwrite-balance-title present",
+      "Step 4: Verify overwrite-existing-* test IDs present",
+      "Step 5: Verify overwrite-proposed-* test IDs present",
+      "Step 6: Verify overwrite-balance-cancel present",
+      "Step 7: Verify overwrite-balance-confirm present",
+      "Step 8: Verify Playwright tests can select these elements"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Period balance overwrite dialog cancel preserves stored balance",
+    "steps": [
+      "Step 1: Navigate to Period Balances",
+      "Step 2: Note existing balance for period",
+      "Step 3: Click overwrite",
+      "Step 4: Verify current balance shown in dialog",
+      "Step 5: Click cancel",
+      "Step 6: Verify dialog closes",
+      "Step 7: Verify stored balance unchanged",
+      "Step 8: Verify UI shows original balance"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "End-to-end category workflow - create, use, edit, inactivate",
+    "steps": [
+      "Step 1: Navigate to categories page at http://dev.pockety.com:8080/categories",
+      "Step 2: Click create category button",
+      "Step 3: Enter name 'Test Category E2E'",
+      "Step 4: Select 'expense' kind",
+      "Step 5: Submit and verify category appears with code C047",
+      "Step 6: Navigate to transactions page",
+      "Step 7: Create transaction using Test Category E2E",
+      "Step 8: Verify transaction saved successfully",
+      "Step 9: Return to categories page",
+      "Step 10: Edit Test Category E2E name to 'Renamed Category'",
+      "Step 11: Verify edit dialog shows debt/income locked",
+      "Step 12: Submit edit and verify name updated",
+      "Step 13: Inactivate Renamed Category",
+      "Step 14: Verify category shows as inactive with badge",
+      "Step 15: Navigate to transactions page",
+      "Step 16: Open category picker",
+      "Step 17: Verify Renamed Category NOT in picker",
+      "Step 18: View existing transaction",
+      "Step 19: Verify still shows Renamed Category correctly",
+      "Step 20: View financial reports",
+      "Step 21: Verify Renamed Category included due to transaction",
+      "Step 22: Attempt to delete Renamed Category",
+      "Step 23: Verify delete rejected with message about transactions"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "End-to-end two-user isolation workflow",
+    "steps": [
+      "Step 1: Register user Alice",
+      "Step 2: Login as Alice",
+      "Step 3: Navigate to categories page",
+      "Step 4: Verify Alice has template categories C001-C046, I01",
+      "Step 5: Create category 'Alice Groceries'",
+      "Step 6: Note code assigned (should be C047)",
+      "Step 7: Create transaction with Alice Groceries category",
+      "Step 8: Create budget for period 202601",
+      "Step 9: View dashboard and note available periods",
+      "Step 10: Logout",
+      "Step 11: Register user Bob",
+      "Step 12: Login as Bob",
+      "Step 13: Navigate to categories page",
+      "Step 14: Verify Bob has template categories C001-C046, I01",
+      "Step 15: Verify Bob does NOT see 'Alice Groceries'",
+      "Step 16: Create category 'Bob Groceries' - should get code C047",
+      "Step 17: Create transaction with Bob Groceries",
+      "Step 18: View dashboard",
+      "Step 19: Verify Bob sees only his own data",
+      "Step 20: Verify available periods are Bob's only",
+      "Step 21: Attempt to access Alice's category by code via API",
+      "Step 22: Verify returns 404",
+      "Step 23: Logout Bob, login Alice",
+      "Step 24: Verify all Alice's data intact",
+      "Step 25: Verify Alice cannot see Bob's data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Backend test suite passes for category CRUD",
+    "steps": [
+      "Step 1: Run task tests for category feature tests",
+      "Step 2: Verify test_create_expense_category passes",
+      "Step 3: Verify test_create_debt_category passes",
+      "Step 4: Verify test_create_income_category passes",
+      "Step 5: Verify test_reject_both_flags_true passes",
+      "Step 6: Verify test_update_category_name passes",
+      "Step 7: Verify test_update_flags_when_no_transactions passes",
+      "Step 8: Verify test_reject_flag_change_with_transactions passes",
+      "Step 9: Verify test_inactivate_category passes",
+      "Step 10: Verify test_delete_allowed_when_no_dependencies passes",
+      "Step 11: Verify test_delete_blocked_by_transactions passes",
+      "Step 12: Verify test_delete_blocked_by_budgets passes",
+      "Step 13: Verify all assertions pass with user scoping"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Backend test suite passes for report logic",
+    "steps": [
+      "Step 1: Run task tests for financial summary tests",
+      "Step 2: Verify test_financial_summary_includes_inactive_with_transactions passes",
+      "Step 3: Verify test_financial_summary_excludes_active_without_transactions passes",
+      "Step 4: Verify test_reconciliation_includes_inactive_categories passes",
+      "Step 5: Verify test_category_actuals_includes_inactive passes",
+      "Step 6: Verify test_category_actuals_excludes_active_without_transactions passes",
+      "Step 7: Verify test_budget_vs_actual_includes_all_active passes",
+      "Step 8: Verify test_budget_vs_actual_includes_inactive_with_activity passes",
+      "Step 9: Verify test_budget_vs_actual_excludes_inactive_without_activity passes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Backend test suite passes for user scoping",
+    "steps": [
+      "Step 1: Run task tests for user isolation tests",
+      "Step 2: Verify test_categories_scoped_to_user passes",
+      "Step 3: Verify test_transactions_scoped_to_user passes",
+      "Step 4: Verify test_accounts_scoped_to_user passes",
+      "Step 5: Verify test_budgets_scoped_to_user passes",
+      "Step 6: Verify test_income_scoped_to_user passes",
+      "Step 7: Verify test_period_balances_scoped_to_user passes",
+      "Step 8: Verify test_available_periods_scoped_to_user passes",
+      "Step 9: Verify test_category_code_unique_per_user passes",
+      "Step 10: Verify test_period_unique_per_user passes",
+      "Step 11: Verify test_accessing_other_user_category_returns_404 passes",
+      "Step 12: Verify test_new_user_receives_template passes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browser test for category create workflow",
+    "steps": [
+      "Step 1: Launch browser test with BrowserTestSeeder",
+      "Step 2: Login test user",
+      "Step 3: Navigate to categories page",
+      "Step 4: Click create category button",
+      "Step 5: Fill form with test data",
+      "Step 6: Submit form",
+      "Step 7: Wait for new category card to appear",
+      "Step 8: Verify category visible on page",
+      "Step 9: Verify no page reload occurred",
+      "Step 10: Close browser and verify test passes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browser test for category edit workflow",
+    "steps": [
+      "Step 1: Setup test with seeded category",
+      "Step 2: Login and navigate to categories",
+      "Step 3: Click edit on test category",
+      "Step 4: Modify name in dialog",
+      "Step 5: Submit changes",
+      "Step 6: Verify category name updated on page",
+      "Step 7: Verify test passes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browser test for category inactivate and picker exclusion",
+    "steps": [
+      "Step 1: Setup test with seeded category",
+      "Step 2: Login and navigate to categories",
+      "Step 3: Inactivate test category",
+      "Step 4: Verify Retired badge appears",
+      "Step 5: Navigate to transactions page",
+      "Step 6: Open category picker",
+      "Step 7: Verify inactivated category not in picker options",
+      "Step 8: Verify test passes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browser test for delete rejection with transactions",
+    "steps": [
+      "Step 1: Setup test with category and transaction",
+      "Step 2: Login and navigate to categories",
+      "Step 3: Click delete on test category",
+      "Step 4: Confirm deletion",
+      "Step 5: Verify error message appears with transaction text",
+      "Step 6: Verify category still present on page",
+      "Step 7: Verify test passes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browser test for period balance overwrite dialog layout",
+    "steps": [
+      "Step 1: Setup test with existing period balance",
+      "Step 2: Login and navigate to period balances page",
+      "Step 3: Click overwrite button for test period",
+      "Step 4: Verify dialog opens",
+      "Step 5: Verify dialog test ID present: overwrite-balance-dialog",
+      "Step 6: Verify title test ID present",
+      "Step 7: Verify existing figures visible and readable",
+      "Step 8: Verify proposed figures visible and readable",
+      "Step 9: Verify no overlapping text",
+      "Step 10: Click cancel",
+      "Step 11: Verify dialog closes",
+      "Step 12: Verify balance unchanged",
+      "Step 13: Verify test passes"
+    ],
+    "passes": false
+  }
+]

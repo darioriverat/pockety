@@ -83,7 +83,7 @@ task dev
 ├── tests/                # PHPUnit tests
 ├── plan/                 # Project planning documents
 │   └── extracted/        # Historical data (JSON/CSV)
-├── feature_list.json     # 200+ test cases (implementation roadmap)
+├── feature_list.json     # 96 test cases (implementation roadmap)
 ├── app_spec.txt          # Complete project specification
 ├── init.sh               # Development environment setup script
 └── Taskfile.yml          # Task runner configuration
@@ -132,7 +132,7 @@ task dev
 
 ## Feature Implementation
 
-Implementation is guided by `feature_list.json` containing 200+ detailed test cases.
+Implementation is guided by `feature_list.json` containing 96 detailed test cases covering all requirements.
 
 **CRITICAL RULE**: Features can ONLY be marked as passing (`"passes": true`). Never remove, edit descriptions, or modify testing steps. This ensures complete coverage.
 

@@ -1,0 +1,391 @@
+Pockety application specification
+================================
+
+Status
+------
+This file is the authoritative specification for the work described below.
+Implement exactly these requirements. Where this file is silent, preserve
+current behavior. Do not add an admin role, an "act as user" screen, a
+created_by column, or SoftDeletes on categories.
+
+Product intent
+--------------
+1. A user can create categories and edit existing ones.
+2. A category that already has transactions cannot be deleted.
+3. A category that already has transactions cannot change its debt or income
+   classification, because that would rewrite historical meaning.
+4. A category can be inactivated so it cannot be used on new entries, while
+   remaining available to reports that cover periods where it has records.
+5. Reconciliation figures, category actuals, and budget actuals must include
+   every category that has at least one transaction in the selected month,
+   including inactive categories.
+6. The period-balance overwrite dialog must show the current and proposed
+   figures without overlapping fields.
+7. Each user owns their own financial records. Ownership is a user_id column.
+   The logged-in user reads and writes only their own rows.
+
+Out of scope
+------------
+- No admin role, impersonation, or user picker. A later admin feature may set
+  user_id to another user; this work only stores and scopes that column.
+- Do not add created_by, updated_by, or owner columns with any other name.
+- Do not replace is_active with deleted_at. Inactive categories must remain
+  queryable for history.
+- Do not change depreciation or debt-payment math, exchange-rate formulas, or
+  the records-check formula, except to stop dropping inactive categories that
+  have transactions in the period.
+- Do not add a category list to the reconciliation page. Reconciliation keeps
+  its current layout. Its income and expense totals come from
+  FinancialSummaryService and must follow the category rule in this spec.
+
+Current baseline the agent must know
+-------------------------------------
+- Stack: Laravel, Inertia React, Fortify session auth. Pages under
+  routes/web.php use middleware auth and verified. routes/api.php currently
+  has no auth middleware. The UI calls those APIs with same-origin fetch.
+- Categories: table columns id, code (globally unique), name, is_debt_category,
+  is_income_category, is_active, status, timestamps. No user_id. No
+  store or update endpoint. GET /api/categories returns active categories
+  only via CategoryService::getAllActive. DELETE /api/categories/{code}
+  hard-deletes and returns 422 when the category has transactions, with
+  has_transactions true and message
+  "This category has associated transactions and cannot be deleted".
+- CategoryServiceInterface already has getAll() for every category. The
+  categories page does not use it, so inactive categories never appear there.
+- Budgets.category_id cascades on category delete
+  (database/migrations/2026_09_13_000006_create_budgets_table.php).
+  Transactions.category_id restricts.
+- CategorySeeder inserts the household template (C001–C046 and I01). C040 is
+  inactive with status retired_merged_into_C031. I01 is the income category.
+  Tests expect GET /api/categories to return 46 active rows and to omit C040.
+- FinancialSummaryService::getSummary seeds every active category, then adds
+  an inactive category only when a transaction in the period references it.
+  ReconciliationService::reconcileForPeriod uses that summary for
+  income_total_cad, expenses_total_cad, and net_operating_expenses_cad.
+- CategoryActualsService totals every transaction in the period, then emits
+  rows only for Category::active(), so inactive categories with transactions
+  disappear from the report.
+- BudgetService::getBudgetVsActualReport walks Category::active() only, so
+  actuals on inactive categories are omitted from rows and from the total.
+- Period-balance overwrite UI is the dialog in
+  resources/js/pages/period-balances.tsx (overwriteOpen). DialogContent
+  defaults to sm:max-w-lg (resources/js/components/ui/dialog.tsx). Inside the
+  dialog, a sm:grid-cols-2 comparison renders two FigureGrid lists, and
+  FigureGrid is itself sm:grid-cols-2. That nesting overlaps labels and
+  amounts. Test ids that must keep working: overwrite-balance-dialog,
+  overwrite-balance-title, overwrite-existing-*, overwrite-proposed-*,
+  overwrite-balance-cancel, overwrite-balance-confirm.
+- No financial table has user_id. Users have no role column. There is no
+  global owner scope. Services query these tables for the whole database.
+- IncomeService::MAX_LINES_PER_PERIOD is 6, counted globally per period.
+- Unique constraints that are global today and must become per user:
+  categories.code; exchange_rates.period; historical_balance_sheets.period;
+  period_balances.period.
+- Child uniques that stay as they are, because the parent is already per user:
+  account_balances (account_id, period); budgets (category_id, period);
+  fixed_asset_valuations (fixed_asset_id, period).
+- New users are created in app/Actions/Fortify/CreateNewUser.php.
+- Shared Inertia prop availablePeriods comes from AvailablePeriodService via
+  app/Http/Middleware/HandleInertiaRequests.php and is currently global.
+- API style for new endpoints: follow .claude/skills/create-api-endpoint.
+  Domain request interfaces, HTTP form requests that implement them, service
+  methods that take scalars and return entities, bindings in
+  AppServiceProvider, HATEOAS links on JSON responses. Domain interfaces must
+  not return Eloquent models.
+- Tests: RefreshDatabase, no shared mutable state between tests
+  (.claude/skills/test-isolation). Browser tests use BrowserTestSeeder and
+  tests/browser/helpers.ts. Run backend tests with `task tests` from this
+  repo (devbox). The app is served at http://dev.pockety.com:8080/ when the
+  stack is up.
+
+1. Category create, update, inactivate, delete
+----------------------------------------------
+
+1.1 Classification
+A category has exactly one kind:
+- expense: is_debt_category false and is_income_category false
+- debt: is_debt_category true and is_income_category false
+- income: is_income_category true and is_debt_category false
+Both flags true is invalid on create and on update.
+
+1.2 Codes
+The client does not send a code. The server assigns one, unique for that
+user:
+- debt and expense: next code C### with three digits, after the highest
+  existing C code for that user. After the template, the next code is C047.
+- income: next code I followed by at least two digits, after the highest
+  existing I code for that user. After I01, the next code is I02.
+Codes are immutable. Update requests that include code are ignored, or
+rejected if the value differs. Detail URLs stay /categories/{code} and
+/api/categories/{code}, scoped to the owner (see section 4).
+
+1.3 Create
+POST /api/categories
+Body:
+- name: required string, max 255, trimmed, not empty
+- is_debt_category: required boolean
+- is_income_category: required boolean
+Creates an active category (is_active true, status null) owned by the
+authenticated user. Response 201:
+- data: category object (id, code, name, is_debt_category,
+  is_income_category, is_active, status)
+- links.self: route categories.show for that code
+Validation failure: 422.
+
+1.4 Update
+PUT or PATCH /api/categories/{code}
+Body fields, all optional but at least one required:
+- name: string, max 255, trimmed, not empty
+- is_debt_category: boolean
+- is_income_category: boolean
+- is_active: boolean
+Rules:
+- Name and is_active may change whether or not transactions exist.
+- If the category has any transaction and the request changes
+  is_debt_category or is_income_category from the stored value, respond 422
+  and do not save. Message:
+  "Debt and income settings cannot be changed because this category has transactions"
+- Both flags true is 422 even when there are no transactions.
+- Missing category, or a code owned by someone else: 404.
+Success: 200 with data and links.self, links.index.
+
+1.5 Inactivate and reactivate
+Inactivation is is_active false via the update endpoint. Reactivation is
+is_active true. Do not delete the row. Do not require a status note. Existing
+status values, including C040's retired_merged_into_C031, stay unless a
+future requirement says otherwise. This spec does not add a status editor.
+
+Pickers for new transactions and new budgets must keep using active
+categories only. An inactive category cannot be selected for a new record.
+Existing transactions that already point at it stay valid.
+
+1.6 List
+GET /api/categories
+Default: the caller's active categories only, ordered by code. This default
+keeps transaction and budget pickers unchanged.
+GET /api/categories?include_inactive=1
+The caller's categories, active and inactive, ordered by code.
+The Categories page must call the include-inactive form.
+meta.total is the count of rows returned.
+Another user's categories are never included.
+
+1.7 Delete
+Keep hard delete when it is allowed.
+- Transactions exist: do not delete. 422, has_transactions true, message
+  "This category has associated transactions and cannot be deleted".
+- No transactions, but budgets exist: do not delete. 422, has_budgets true,
+  message "This category has associated budgets and cannot be deleted".
+  Change budgets.category_id from cascadeOnDelete to restrictOnDelete so a
+  direct delete cannot wipe budgets.
+- No transactions and no budgets: delete and return 200 with links.index.
+- Unknown code or another user's code: 404.
+
+1.8 Categories page UI
+File: resources/js/pages/categories.tsx, plus a small dialog consistent with
+existing dialog components.
+- Show every category for the user, including inactive. Keep the Retired
+  badge and reduced opacity for inactive rows.
+- A create action opens a dialog: name, and a kind control for expense,
+  debt, or income. Submit calls POST. On success, the new card appears
+  without a full page reload.
+- Each card can be edited. The edit dialog edits name, kind, and active
+  state. When the category has transactions, the kind control is disabled
+  and the dialog explains that debt and income settings are locked. The
+  client must still handle a 422 if it submits a locked change.
+- Keep delete. Show the server message when delete is rejected.
+- Empty, loading, and error states stay as clear as the current page.
+- Verify in the browser at http://dev.pockety.com:8080/categories : create
+  an expense category, edit its name, inactivate it, confirm it disappears
+  from the transaction category picker, reactivate it, and confirm delete
+  is rejected after a transaction is posted to it.
+
+2. Reports must follow records, not the active flag
+----------------------------------------------------
+
+"A record in the month" means at least one row in transactions for that
+category_id and that period (YYYYMM). Budgets alone do not put a category
+on the reconciliation or category-actuals lists. is_active is irrelevant
+to inclusion once a transaction exists.
+
+2.1 Financial summary and reconciliation totals
+In FinancialSummaryService::getSummary, build category_totals only from
+categories that have at least one transaction in the period. Include
+inactive categories. Do not pre-seed active categories that have no
+transactions in that period.
+Those transactions still flow into total_recorded_disbursements_cad,
+net_operating_expenses_cad, debt principal, interest, depreciation (code
+C045), and debt-payment exclusions exactly as they do today. Income
+category rows still do not add to total recorded disbursements.
+ReconciliationService must keep calling this summary. After the change,
+inactivating a category that has transactions in the month must not change
+reconciliation income, expense, or net operating expense totals for that
+month.
+
+2.2 Category actuals
+CategoryActualsService::getReport returns one row per category that has at
+least one transaction in the period, including inactive categories, ordered
+by code. Omit active categories with zero transactions in that period.
+actual_cad and transaction_count reflect those transactions.
+
+2.3 Budget vs actual
+Keep every active category on the budget grid, including those with no
+activity, so a budget can still be entered.
+Also include an inactive category when, for that period, it has at least
+one transaction or an existing budget. Its actual_cad counts toward the
+report total. Inactive categories with neither a transaction nor a budget
+in the period stay off the grid.
+
+3. Period-balance overwrite dialog
+----------------------------------
+Only the overwrite dialog in resources/js/pages/period-balances.tsx.
+Do not change the default width of every dialog in the app.
+- Pass a wider max width on this DialogContent (at least sm:max-w-3xl).
+- In this dialog, each FigureGrid is a single column of label and amount.
+  The current-balance column and the new-figures column may sit side by
+  side from the sm breakpoint up. Below that, stack them.
+- The close control must not cover the title. Pad the header.
+- Do not remove or rename the test ids listed in the baseline.
+Verify in the browser: open Period Balances for a period that already has
+a registered balance, start overwrite, and confirm every label and amount
+in both lists is fully readable and not overlapping. Cancel leaves the
+stored balance unchanged.
+
+4. Per-user ownership
+---------------------
+
+4.1 Column
+Add user_id to each of these tables. It is a required foreign key to
+users.id, indexed, restrictOnDelete:
+- categories
+- accounts
+- account_balances
+- transactions
+- budgets
+- income
+- exchange_rates
+- fixed_assets
+- fixed_asset_valuations
+- historical_balance_sheets
+- period_balances
+- period_balance_histories
+Do not add user_id to users, passkeys, sessions, cache, or jobs.
+The client never sends user_id. The server sets it from the authenticated
+user on create. Update must not move a row to another user.
+
+4.2 Uniqueness
+- categories: drop the global unique on code. Unique (user_id, code).
+- exchange_rates, historical_balance_sheets, period_balances: drop the
+  global unique on period. Unique (user_id, period).
+- Leave the child uniques in the baseline unchanged.
+- IncomeService::MAX_LINES_PER_PERIOD stays 6, counted for
+  (user_id, period), not for the period across all users.
+
+4.3 Backfill
+The current database is one household.
+- Add user_id nullable, backfill, then set it not null.
+- Owner of existing rows: the user with the smallest id. If the users
+  table is empty, skip the backfill; seeders assign user_id when they
+  create users.
+- Point every existing row in the tables in section 4.1 at that owner,
+  including the existing category rows. Do not duplicate those rows and
+  do not re-point existing transactions at copies.
+- For every other user that already exists, insert a fresh copy of the
+  category template only (new ids, that user_id, no transactions and no
+  budgets).
+
+4.4 Template for new users
+Extract the category definitions from CategorySeeder into one place used
+by the seeder and by registration. CreateNewUser, after it creates the
+user, copies that template onto the new user. The copy is the seeder
+definition, not another user's edited categories. C040 stays inactive.
+CategorySeeder::run applies the template to every user that exists when
+it runs, matched by (user_id, code), and does not steal rows from a user
+who already has categories. Tests that create a user and then seed must
+still see 46 active categories for that user.
+
+4.5 Owner resolver
+Add an owner resolver, bound in AppServiceProvider, whose id() returns
+the authenticated user's id. If no user is authenticated, id() fails.
+HTTP requests that read or write financial data must run as an
+authenticated user. Put the financial API routes behind the same session
+guard the Inertia pages use, so existing same-origin fetch keeps working.
+Unauthenticated API calls get 401. Do not add token auth.
+Services apply the owner id on every query and insert. Use an explicit
+for-user scope or an equivalent where user_id = owner. Do not add a
+global Eloquent scope that turns the filter off when nobody is logged in.
+Seeders and factories set user_id themselves.
+A category, account, transaction, or other financial row that belongs to
+someone else is 404, the same as missing. Do not return 403 for that case.
+
+4.6 What must be scoped
+Every read and write in app/ that touches the tables in section 4.1,
+including imports, search, dashboard, balance sheet, financial summary,
+reconciliation, category actuals, budgets, income, exchange rates, fixed
+assets, period balances, period history, period comparison, reports, and
+AvailablePeriodService. The availablePeriods Inertia prop lists only
+periods present in the authenticated user's data.
+Looking up a category by code is (user_id, code).
+Hardcoded category codes in FinancialSummaryService (C045 and the debt
+payment codes) still match the template codes inside the current user's
+catalog. Do not look those codes up across all users.
+
+4.7 Isolation acceptance
+Given two users, A and B:
+- A category, transaction, account, budget, income line, exchange rate,
+  fixed asset, and period balance created by A is invisible to B, on the
+  API and on Inertia pages.
+- B can create a category with a name A already uses, and can have the
+  same period on exchange rates and period balances.
+- B's registration receives the template, including inactive C040, and
+  does not see A's later custom categories.
+- availablePeriods for A does not include a period that only B has used.
+
+5. Tests and verification
+-------------------------
+Add or update feature tests:
+- Create each kind of category; codes follow section 1.2; both flags true
+  is 422.
+- Update name; update is_active; reject a debt or income flag change when
+  a transaction exists; allow that flag change when no transaction exists.
+- Delete blocked by transactions; delete blocked by budgets; delete
+  succeeds when neither exists.
+- GET /api/categories omits inactive categories. With include_inactive=1
+  it returns them.
+- Financial summary, category actuals, and reconciliation: a transaction
+  on an inactive category in the period is included in totals and, where
+  that report lists categories, in the category rows. An active category
+  with no transaction in the period is absent from financial-summary
+  category_totals and from category actuals. The budget grid still lists
+  active categories with no activity, and also lists an inactive category
+  that has a transaction in the period.
+- Two-user isolation from section 4.7.
+Update factories so new financial rows set user_id. Update
+BrowserTestSeeder and browser helpers so scenario data belongs to the
+signed-in user. A browser test must not depend on another spec's rows.
+Update assertions that assume a global unique period, a global category
+code, or "46 categories in the whole database" so they assert 46 active
+categories for the acting user.
+After adding routes, regenerate Wayfinder
+(`php artisan wayfinder:generate --with-form --no-interaction`) if the
+generated files under resources/js/routes or resources/js/actions are
+part of the repo.
+Run `task tests` for the affected feature tests. For the categories page
+and the overwrite dialog, verify the flows in the browser as specified in
+sections 1.8 and 3. Do not finish the UI work on screenshots alone.
+
+6. Implementation order
+-----------------------
+Do the work in this order so later steps do not reopen earlier APIs:
+1. Category create, update, list flag, delete guards, and the categories
+   page, still on the current single-owner database if that is simpler,
+   but shape the service so user_id can be set in step 3.
+2. Report inclusion rules in section 2.
+3. Overwrite dialog in section 3.
+4. user_id migration, backfill, template copy, owner resolver, and
+   scoping of every financial query, including the category endpoints
+   from step 1.
+5. Isolation tests and browser verification.
+
+Done means every acceptance rule in sections 1 through 5 holds, existing
+behavior outside this spec still holds, and the test run for the touched
+areas is green.
