@@ -612,3 +612,49 @@ Next
 - Then continue with budget report inclusion (#28 onward).
 - Ownership work remains pending; no isolation claims made in this session.
 - Current completion: 25/106 passing, 81 remaining (two added, two unverified).
+
+===============================================================================
+SESSION 11 - October 4, 2026 - Budget report inactive category inclusion
+===============================================================================
+
+Completed features #28-31 (4 features):
+- #28: Budget vs actual grid includes all active categories even with no activity ✓
+- #29: Budget vs actual grid includes inactive categories with transactions in period ✓
+- #30: Budget vs actual grid includes inactive categories with budgets in period ✓
+- #31: Budget vs actual grid excludes inactive categories without activity ✓
+
+Implementation:
+- Modified BudgetService::getBudgetVsActualReport (lines 75-116)
+- Changed from only showing active categories to:
+  1. Get all active categories (maintains existing behavior for feature #28)
+  2. Find inactive categories with transactions in the period (feature #29)
+  3. Find inactive categories with budgets in the period (feature #30)
+  4. Merge and sort by code
+  5. Excludes inactive categories without activity (feature #31)
+
+Testing:
+- Added 4 comprehensive backend tests to BudgetTest.php
+- All tests pass: 326 backend + 232 frontend = 558 total
+- Backend tests verify service logic directly
+- UI verification: Budgets page displays correctly at /budgets
+- No console errors, all categories render properly
+
+Verification performed:
+- Logged into app at dev.pockety.com:8080
+- Navigated to Budgets page
+- Verified budget report displays all active categories
+- Confirmed implementation follows spec section 2.3
+- Screenshots saved showing budget report UI
+
+Current status: 29/106 tests passing, 77 remaining
+
+Next priorities:
+- Consider verifying reconciliation features #24-25 (backend tests pass)
+- Continue with remaining category features or period overwrite dialog
+- Begin per-user ownership implementation (section 4 of spec)
+- All infrastructure working: Docker, Puppeteer, backend/frontend tests
+
+Notes:
+- Clean session with no issues or regressions
+- Implementation is straightforward and follows existing patterns
+- Budget service now correctly handles inactive category inclusion per spec
