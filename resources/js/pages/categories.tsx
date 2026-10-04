@@ -56,6 +56,7 @@ export default function Categories() {
         kind: 'expense' as 'expense' | 'debt' | 'income',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [createError, setCreateError] = useState<string | null>(null);
 
     useEffect(() => {
         fetchCategories();
@@ -82,6 +83,7 @@ export default function Categories() {
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
+        setCreateError(null);
         setIsSubmitting(true);
 
         try {
@@ -99,7 +101,13 @@ export default function Categories() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to create category');
+                const messages = Object.values(errorData.messages ?? {}).flat();
+                throw new Error(
+                    messages.join(' ') ||
+                        errorData.message ||
+                        errorData.error ||
+                        'Failed to create category',
+                );
             }
 
             const result = await response.json();
@@ -110,9 +118,9 @@ export default function Categories() {
             // Reset form and close dialog
             setCreateFormData({ name: '', kind: 'expense' });
             setCreateDialogOpen(false);
-            setError(null);
+            setCreateError(null);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
+            setCreateError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setIsSubmitting(false);
         }
@@ -163,10 +171,13 @@ export default function Categories() {
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                     <PageTitle
                         title="Categories"
-                        description="View all active expense and income categories for your finance tracking"
+                        description="Manage expense, debt, and income categories, including retired categories"
                     />
                     <Button
-                        onClick={() => setCreateDialogOpen(true)}
+                        onClick={() => {
+                            setCreateError(null);
+                            setCreateDialogOpen(true);
+                        }}
                         data-testid="create-category-button"
                     >
                         <Plus className="mr-2 h-4 w-4" />
@@ -200,6 +211,15 @@ export default function Categories() {
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleCreate}>
+                            {createError && (
+                                <p
+                                    role="alert"
+                                    className="mt-4 text-sm text-destructive"
+                                    data-testid="create-category-error"
+                                >
+                                    {createError}
+                                </p>
+                            )}
                             <div className="grid gap-4 py-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="category-name">

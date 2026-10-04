@@ -318,4 +318,25 @@ describe('Categories Page', () => {
             expect(screen.getByText(/error/i)).toBeInTheDocument();
         });
     });
+    it('shows server validation inside the create dialog and preserves input', async () => {
+        vi.mocked(fetch).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: [] }),
+        } as Response).mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({ error: 'A category cannot be both debt and income' }),
+        } as Response);
+        render(<Categories />);
+        await screen.findByText('Total categories: 0');
+        fireEvent.click(screen.getByTestId('create-category-button'));
+        fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Invalid' } });
+        fireEvent.click(screen.getByTestId('create-category-submit'));
+        expect(await screen.findByRole('alert')).toHaveTextContent('A category cannot be both debt and income');
+        expect(screen.getByTestId('create-category-dialog')).toContainElement(screen.getByRole('alert'));
+        expect(screen.getByLabelText('Name')).toHaveValue('Invalid');
+        fireEvent.click(screen.getByTestId('create-category-cancel'));
+        fireEvent.click(screen.getByTestId('create-category-button'));
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
 });

@@ -216,3 +216,48 @@ CURRENT STATUS: 5 of 106 features passing, 101 remaining
 
 NEXT SESSION: Implement Edit Category dialog or move to report inclusion rules
 
+
+===============================================================================
+SESSION 3 - October 4, 2026
+===============================================================================
+Completed feature #6: reject category creation with both classification flags.
+
+Changes
+- Preserved the existing backend guard returning 422 for debt + income.
+- Fixed create-dialog errors being hidden behind the modal.
+- Display server error and field-validation messages inside an accessible alert.
+- Keep form input on rejection; clear stale errors on retry or reopening.
+- Updated Categories description to reflect inactive categories.
+- Strengthened backend test to assert rejected categories are never persisted.
+- Added component coverage for visible errors, preserved input, and reopening.
+- Added isolated Playwright coverage for rejection and successful recovery.
+- Browser interception corrupts only the outgoing UI request flags; the real
+  backend returns the validation response. Normal radio controls stay exclusive.
+
+Verification
+- Ran ./init.sh in Docker; dependencies, migrations, and build succeeded.
+- Initial Docker failure was sandbox socket access; escalation resolved it.
+- Puppeteer navigation, screenshots, login, and form interactions worked.
+- Baseline task tests: 311 backend tests and 227 frontend tests passed.
+- Backend Pint and PHPStan checks passed as part of task tests.
+- Sampled existing Playwright English-category test passed before new work.
+- Focused CategoryCrudTest: 25 passed, including persistence assertion.
+- Focused category component tests: 6 passed.
+- Production frontend build and TypeScript check passed.
+- Two new browser tests passed, including mobile field validation and recovery.
+- Four existing category browser cases passed after updating stale assertions.
+- No unexpected browser console or page errors in the new validation flow.
+- Screenshots reviewed: verification/category-validation-{input,rejected,
+  recovered,mobile}.png.
+
+Issues found and resolved
+- Server uses error/messages fields; create UI previously read message only.
+- Form error was rendered behind the modal, making it inaccessible.
+- Existing browser test expected 46 rows and no inactive C040.
+- Its C031 substring selector also matched C040's retirement status.
+
+Next
+- Feature #7: update category name, including an Edit Category dialog.
+- Continue category editing before reports, overwrite layout, and ownership.
+- Only feature #6 passes field changed; descriptions and steps preserved.
+- Current completion: 6/106 features passing; 100 remaining.

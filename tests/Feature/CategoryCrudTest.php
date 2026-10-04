@@ -135,6 +135,8 @@ class CategoryCrudTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonPath('error', 'A category cannot be both debt and income');
+
+        $this->assertDatabaseMissing('categories', ['name' => 'Invalid Category']);
     }
 
     public function test_create_validates_required_fields(): void
