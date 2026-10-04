@@ -160,7 +160,7 @@
       "Step 4: Verify response 200",
       "Step 5: Verify data.is_active is true"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

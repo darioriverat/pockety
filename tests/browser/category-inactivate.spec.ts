@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers';
 
-test.describe('Category Inactivate', () => {
-    test('inactivate category via update endpoint', async ({ page }) => {
+test.describe('Category Inactivate and Reactivate', () => {
+    test('inactivate category via update endpoint (Feature #11)', async ({ page }) => {
         await login(page);
         await page.goto('/categories');
 
@@ -54,5 +54,50 @@ test.describe('Category Inactivate', () => {
 
         // Verify name is still visible
         await expect(page.getByTestId('category-name-C047')).toContainText('Category to Inactivate');
+    });
+
+    test('reactivate category via update endpoint (Feature #12)', async ({ page }) => {
+        await login(page);
+        await page.goto('/categories');
+
+        // Step 1: Create category and inactivate it
+        await page.getByTestId('create-category-button').click();
+        await page.getByTestId('category-name-input').fill('Category to Reactivate');
+        await page.getByTestId('kind-expense').check();
+        await page.getByTestId('create-category-submit').click();
+        await expect(page.getByTestId('create-category-dialog')).toBeHidden();
+
+        const categoryCard = page.getByTestId('category-card-C047');
+        
+        // Inactivate it first
+        await page.getByTestId('edit-category-C047').click();
+        await page.getByTestId('edit-category-active').click();
+        await page.getByTestId('edit-category-submit').click();
+        await expect(page.getByTestId('edit-category-dialog')).toBeHidden();
+
+        // Step 2: Verify is_active is false
+        await expect(categoryCard.getByText('Retired')).toBeVisible();
+        await expect(categoryCard).toHaveClass(/opacity-50/);
+
+        // Step 3: PUT /api/categories/{code} with is_active true
+        await page.getByTestId('edit-category-C047').click();
+        await expect(page.getByTestId('edit-category-dialog')).toBeVisible();
+
+        const activeCheckbox = page.getByTestId('edit-category-active');
+        await expect(activeCheckbox).not.toBeChecked();
+
+        // Check the Active checkbox
+        await activeCheckbox.click();
+        await expect(activeCheckbox).toBeChecked();
+
+        // Submit
+        await page.getByTestId('edit-category-submit').click();
+
+        // Step 4: Verify response 200 (dialog closes without error)
+        await expect(page.getByTestId('edit-category-dialog')).toBeHidden();
+
+        // Step 5: Verify data.is_active is true (no Retired badge, full opacity restored)
+        await expect(categoryCard.getByText('Retired')).not.toBeVisible();
+        await expect(categoryCard).not.toHaveClass(/opacity-50/);
     });
 });
