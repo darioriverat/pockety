@@ -463,4 +463,86 @@ describe('Categories Page', () => {
         });
     });
 
+    it('updates debt flag when the category has no transactions', async () => {
+        const mockCategories = {
+            data: [
+                {
+                    id: 48,
+                    code: 'C048',
+                    name: 'Flag Target',
+                    is_debt_category: false,
+                    is_income_category: false,
+                    is_active: true,
+                    status: null,
+                },
+            ],
+            links: { self: '/api/categories' },
+            meta: { total: 1 },
+        };
+
+        vi.mocked(fetch)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockCategories,
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ data: [] }),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    data: {
+                        id: 48,
+                        code: 'C048',
+                        name: 'Flag Target',
+                        is_debt_category: true,
+                        is_income_category: false,
+                        is_active: true,
+                        status: null,
+                    },
+                    links: {
+                        self: '/api/categories/C048',
+                        index: '/api/categories',
+                    },
+                }),
+            } as Response);
+
+        render(<Categories />);
+
+        await screen.findByTestId('category-name-C048');
+        fireEvent.click(screen.getByRole('button', { name: /Edit C048/i }));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('edit-category-dialog')).toBeInTheDocument();
+            expect(screen.getByTestId('edit-kind-debt')).not.toBeDisabled();
+            expect(
+                screen.queryByTestId('edit-kind-locked-message'),
+            ).not.toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('edit-kind-debt'));
+        fireEvent.click(screen.getByTestId('edit-category-submit'));
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/categories/C048',
+                expect.objectContaining({
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        name: 'Flag Target',
+                        is_debt_category: true,
+                        is_income_category: false,
+                        is_active: true,
+                    }),
+                }),
+            );
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('edit-category-dialog')).not.toBeInTheDocument();
+            expect(screen.getByTestId('debt-badge-C048')).toHaveTextContent('Debt');
+        });
+    });
+
 });

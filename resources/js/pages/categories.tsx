@@ -634,7 +634,10 @@ export default function Categories() {
                                             </CardTitle>
                                             <div className="flex gap-2 items-center">
                                                 {category.is_debt_category && (
-                                                    <Badge variant="secondary">
+                                                    <Badge
+                                                        variant="secondary"
+                                                        data-testid={`debt-badge-${category.code}`}
+                                                    >
                                                         Debt
                                                     </Badge>
                                                 )}

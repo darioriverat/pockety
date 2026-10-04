@@ -305,3 +305,40 @@ Next
   change path already wired).
 - Continue category edit flows before report inclusion and ownership work.
 - Current completion: 7/106 features passing; 99 remaining.
+
+
+===============================================================================
+SESSION 5 - October 4, 2026
+===============================================================================
+Completed feature #8: update category flags when no transactions exist.
+
+Also closed Session 4 gap: ran Playwright category-edit-name.spec.ts after
+installing Chromium via /dev/playwright-install; screenshots written under
+verification/category-edit-name-*.png.
+
+Changes
+- Added debt-badge-{code} test id on category cards.
+- Component test: unlocked kind radios + PUT is_debt_category true when
+  /transactions is empty; Debt badge appears after save.
+- Playwright: tests/browser/category-edit-flags.spec.ts
+- Helpers: scripts/session5-verify-flags.mjs, session5-dev-get.mjs,
+  session5-mark-feature.mjs
+
+Verification
+- App at http://dev.pockety.com:8080/ (login 200); stack already up.
+- PHPUnit CategoryCrudTest: 25 passed; focused flag-update test passed.
+- Frontend categories.test.tsx: 9 passed.
+- Playwright category-edit-name + category-edit-flags + categories.spec:
+  all passed after chromium install in container.
+- Screenshots reviewed: verification/category-edit-flags-{before,dialog,after}.png
+  and category-edit-name-*.png. Dialog shows Debt selected; after save UI
+  updates without console errors.
+- Host Docker socket and Puppeteer MCP still blocked by sandbox approval;
+  used /dev HTTP runners (session-helpers) instead. Do not treat those as
+  permanently broken.
+
+Next
+- Feature #9: reject debt-flag change when transactions exist (API + UI
+  locked radios / 422 path).
+- Then income-flag rejection, inactivate, and remaining category edit flows.
+- Current completion: 8/106 features passing; 98 remaining.

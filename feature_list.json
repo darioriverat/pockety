@@ -109,7 +109,7 @@
       "Step 5: Verify flag updated successfully",
       "Step 6: Confirm no transactions exist for category"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
