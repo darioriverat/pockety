@@ -42,14 +42,6 @@ describe('CategoryActuals page', () => {
                 actual_cad: 150.25,
                 transaction_count: 2,
             },
-            {
-                category_id: 2,
-                category_code: 'C004',
-                category_name: 'Transportation',
-                is_debt_category: false,
-                actual_cad: 0,
-                transaction_count: 0,
-            },
         ];
 
         const fetchMock = vi
@@ -60,7 +52,7 @@ describe('CategoryActuals page', () => {
                     data: { period: '202501', categories },
                     meta: {
                         period: '202501',
-                        category_count: 2,
+                        category_count: 1,
                         total_actual_cad: 150.25,
                         total_transactions: 2,
                         currency: 'CAD',
@@ -78,12 +70,11 @@ describe('CategoryActuals page', () => {
                                 actual_cad: 192.75,
                                 transaction_count: 3,
                             },
-                            categories[1],
                         ],
                     },
                     meta: {
                         period: '202501',
-                        category_count: 2,
+                        category_count: 1,
                         total_actual_cad: 192.75,
                         total_transactions: 3,
                         currency: 'CAD',
@@ -105,14 +96,13 @@ describe('CategoryActuals page', () => {
             screen.getByTestId('category-actuals-heading'),
         ).toBeInTheDocument();
         expect(screen.getByTestId('category-actuals-count')).toHaveTextContent(
-            '2',
+            '1',
         );
         expect(
             screen.getByTestId('category-actual-tx-C001'),
         ).toHaveTextContent('2');
-        expect(
-            screen.getByTestId('category-actual-amount-C004'),
-        ).toHaveTextContent(/0\.00/);
+        expect(screen.queryByTestId('category-actual-row-C004')).not.toBeInTheDocument();
+        expect(screen.getByText('Categories with transactions this period')).toBeInTheDocument();
 
         screen.getByTestId('category-actuals-refresh').click();
 
@@ -127,4 +117,19 @@ describe('CategoryActuals page', () => {
         ).toHaveTextContent('3');
         expect(fetchMock).toHaveBeenCalledTimes(2);
     });
+
+    it('shows an empty month and keeps the selected period readable', async () => {
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                data: { period: '202501', categories: [] },
+                meta: { category_count: 0, total_actual_cad: 0, total_transactions: 0 },
+            }),
+        }));
+        render(<CategoryActuals />);
+        expect(await screen.findByText('No transactions in this period.')).toBeInTheDocument();
+        expect(screen.getByTestId('page-period-selector')).toHaveTextContent('January 2025');
+        expect(screen.getByTestId('category-actuals-count')).toHaveTextContent('0');
+    });
+
 });

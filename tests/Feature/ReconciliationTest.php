@@ -1139,6 +1139,8 @@ class ReconciliationTest extends TestCase
 
     public function test_reconciliation_totals_include_inactive_categories_with_transactions(): void
     {
+        $this->actingAs(User::factory()->create());
+
         // Step 1: Create inactive income and expense categories
         $inactiveIncome = Category::factory()->create([
             'code' => 'I05',
@@ -1177,7 +1179,7 @@ class ReconciliationTest extends TestCase
         Transaction::create([
             'date' => '2025-01-10',
             'period' => '202501',
-            'category_id' => $this->groceries->id,
+            'category_id' => Category::factory()->create(['is_debt_category' => false, 'is_income_category' => false])->id,
             'amount_cad' => 100.00,
             'comments' => 'Regular expense',
         ]);
@@ -1190,17 +1192,20 @@ class ReconciliationTest extends TestCase
 
         // expenses_total_cad should include both active and inactive category transactions
         // 200 (inactive) + 100 (active) = 300
-        $this->assertEquals(300.0, $response->json('data.financial_summary.total_recorded_disbursements_cad'));
-        $this->assertEquals(300.0, $response->json('data.financial_summary.net_operating_expenses_cad'));
-        
+        $this->assertEquals(300.0, $response->json('data.expenses_total_cad'));
+        $this->assertEquals(300.0, $response->json('data.net_operating_expenses_cad'));
+
         // Verify category appears in financial summary
-        $categoryTotals = $response->json('data.financial_summary.category_totals');
+        $summary = $this->getJson('/api/financial-summary?period=202501')->assertOk();
+        $categoryTotals = $summary->json('data.category_totals');
         $codes = collect($categoryTotals)->pluck('category_code')->all();
         $this->assertContains('C060', $codes);
     }
 
     public function test_reconciliation_debt_principal_includes_inactive_debt_categories(): void
     {
+        $this->actingAs(User::factory()->create());
+
         // Step 1: Create debt category and inactivate it
         $inactiveDebt = Category::factory()->create([
             'code' => 'C070',
@@ -1235,14 +1240,15 @@ class ReconciliationTest extends TestCase
         // Step 4-5: Verify debt calculations include inactive category
         $response->assertOk();
 
-        $this->assertEquals(500.0, $response->json('data.financial_summary.debt_principal_excluded_cad'));
-        $this->assertEquals(50.0, $response->json('data.financial_summary.debt_interest_included_cad'));
-        
+        $this->assertEquals(550.0, $response->json('data.expenses_total_cad'));
+        $this->assertEquals(50.0, $response->json('data.records_check.interest_cad'));
+
         // Net operating should only include interest
-        $this->assertEquals(50.0, $response->json('data.financial_summary.net_operating_expenses_cad'));
-        
+        $this->assertEquals(50.0, $response->json('data.net_operating_expenses_cad'));
+
         // Verify category appears in financial summary
-        $categoryTotals = $response->json('data.financial_summary.category_totals');
+        $summary = $this->getJson('/api/financial-summary?period=202501')->assertOk();
+        $categoryTotals = $summary->json('data.category_totals');
         $c070 = collect($categoryTotals)->firstWhere('category_code', 'C070');
         $this->assertNotNull($c070);
         $this->assertEquals(550.0, $c070['total_cad']);

@@ -53,6 +53,7 @@ export default function CategoryActuals() {
     const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
+    const reportPeriods = [...new Set([selectedPeriod, ...periods])].filter(Boolean).sort();
     const [rows, setRows] = useState<CategoryActualRow[]>([]);
     const [meta, setMeta] = useState<CategoryActualsMeta | null>(null);
     const [loading, setLoading] = useState(true);
@@ -118,7 +119,7 @@ export default function CategoryActuals() {
                                         <SelectValue placeholder="Select period" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {periods.map((period) => (
+                                        {reportPeriods.map((period) => (
                                             <SelectItem
                                                 key={period}
                                                 value={period}
@@ -168,7 +169,7 @@ export default function CategoryActuals() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="text-sm text-gray-600 dark:text-gray-400">
-                                Active categories (excludes retired)
+                                Categories with transactions this period
                             </CardContent>
                         </Card>
                         <Card>
@@ -218,9 +219,7 @@ export default function CategoryActuals() {
                             <CardHeader>
                                 <CardTitle>Actuals by category</CardTitle>
                                 <CardDescription>
-                                    Totals are computed by querying transactions
-                                    for category + period — not hardcoded row
-                                    references
+                                    Includes active and retired categories with transactions in this period
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="overflow-x-auto">
@@ -245,6 +244,13 @@ export default function CategoryActuals() {
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {rows.length === 0 && (
+                                            <tr>
+                                                <td colSpan={4} className="py-8 text-center text-muted-foreground">
+                                                    No transactions in this period.
+                                                </td>
+                                            </tr>
+                                        )}
                                         {rows.map((row) => (
                                             <tr
                                                 key={row.category_code}

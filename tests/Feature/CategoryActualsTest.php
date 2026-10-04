@@ -156,24 +156,54 @@ class CategoryActualsTest extends TestCase
         $this->assertEquals(2, $c001Second['transaction_count']);
     }
 
-    public function test_category_actuals_lists_all_active_categories_including_zeros(): void
+    public function test_category_actuals_omits_categories_without_transactions_in_selected_period(): void
     {
-        $response = $this->getJson('/api/category-actuals?period=202501');
+        Transaction::create([
+            'date' => '2026-01-15',
+            'period' => '202601',
+            'category_id' => $this->groceries->id,
+            'amount_cad' => 125.50,
+        ]);
+        Transaction::create([
+            'date' => '2025-12-15',
+            'period' => '202512',
+            'category_id' => $this->transport->id,
+            'amount_cad' => 999,
+        ]);
 
-        $response->assertOk();
+        $this->getJson('/api/category-actuals?period=202601')->assertOk()
+            ->assertJsonCount(1, 'data.categories')
+            ->assertJsonPath('data.categories.0.category_code', 'C001')
+            ->assertJsonPath('data.categories.0.actual_cad', 125.5)
+            ->assertJsonPath('data.categories.0.transaction_count', 1)
+            ->assertJsonPath('meta.category_count', 1);
 
-        $categories = collect($response->json('data.categories'));
-        $codes = $categories->pluck('category_code')->all();
+        $this->getJson('/api/category-actuals?period=202602')->assertOk()
+            ->assertJsonCount(0, 'data.categories')
+            ->assertJsonPath('meta.total_transactions', 0);
+    }
 
-        $this->assertContains('C001', $codes);
-        $this->assertContains('C004', $codes);
-        $this->assertContains('I01', $codes);
-        $this->assertNotContains('C040', $codes);
-        $this->assertEquals(3, $response->json('meta.category_count'));
+    public function test_category_actuals_keeps_inactive_and_zero_net_categories_ordered_by_code(): void
+    {
+        $this->transport->update(['is_active' => false]);
+        foreach ([[$this->transport, 25], [$this->groceries, 10], [$this->groceries, -10]] as [$category, $amount]) {
+            Transaction::create([
+                'date' => '2026-01-15',
+                'period' => '202601',
+                'category_id' => $category->id,
+                'amount_cad' => $amount,
+            ]);
+        }
 
-        $c001 = $categories->firstWhere('category_code', 'C001');
-        $this->assertEquals(0.0, $c001['actual_cad']);
-        $this->assertEquals(0, $c001['transaction_count']);
+        $this->getJson('/api/category-actuals?period=202601')->assertOk()
+            ->assertJsonCount(2, 'data.categories')
+            ->assertJsonPath('data.categories.0.category_code', 'C001')
+            ->assertJsonPath('data.categories.0.transaction_count', 2)
+            ->assertJsonPath('data.categories.1.category_code', 'C004')
+            ->assertJsonPath('data.categories.1.transaction_count', 1);
+        $response = $this->getJson('/api/category-actuals?period=202601');
+        $this->assertEquals(0, $response->json('data.categories.0.actual_cad'));
+        $this->assertEquals(25, $response->json('meta.total_actual_cad'));
     }
 
     public function test_category_actuals_converts_multi_currency_to_cad(): void

@@ -14,7 +14,6 @@ class CategoryActualsService implements CategoryActualsServiceInterface
     public function getReport(string $period): CategoryActualCollection
     {
         $exchangeRate = $this->resolveExchangeRate($period);
-        $categories = Category::active()->orderBy('code')->get();
 
         /** @var array<int, array{actual: float, count: int}> $aggregates */
         $aggregates = [];
@@ -34,10 +33,12 @@ class CategoryActualsService implements CategoryActualsServiceInterface
             $aggregates[$categoryId]['count']++;
         }
 
+        // Activity in this month determines inclusion, regardless of active status.
+        $categories = Category::whereIn('id', array_keys($aggregates))->orderBy('code')->get();
         $collection = new CategoryActualCollection;
 
         foreach ($categories as $category) {
-            $stats = $aggregates[$category->id] ?? ['actual' => 0.0, 'count' => 0];
+            $stats = $aggregates[$category->id];
 
             $collection->add(new CategoryActualEntity(
                 categoryId: (int) $category->id,

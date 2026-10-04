@@ -69,10 +69,10 @@ test('feature 86: category actuals aggregates by category and period', async ({
     );
     await expect(page.getByTestId('category-actual-tx-C001')).toHaveText('2');
 
-    await expect(page.getByTestId('category-actuals-count')).toHaveText('46');
+    await expect(page.getByTestId('category-actuals-count')).toHaveText('1');
 
     const rows = page.locator('[data-testid^="category-actual-row-"]');
-    await expect(rows).toHaveCount(46);
+    await expect(rows).toHaveCount(1);
     await expect(page.getByTestId('category-actual-row-C040')).toHaveCount(0);
 
     await page.screenshot({

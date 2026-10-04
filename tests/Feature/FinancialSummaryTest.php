@@ -114,7 +114,7 @@ class FinancialSummaryTest extends TestCase
             ->all();
 
         $this->assertContains('C044', $codes);
-        $this->assertContains('C009', $codes);
+        $this->assertNotContains('C009', $codes);
     }
 
     public function test_net_operating_expenses_excludes_principal_and_depreciation_keeps_interest(): void
@@ -377,13 +377,13 @@ class FinancialSummaryTest extends TestCase
 
         // Step 4: Verify inactive category appears in category_totals
         $response->assertOk();
-        
+
         $categoryTotals = $response->json('data.category_totals');
         $codes = collect($categoryTotals)->pluck('category_code')->all();
-        
+
         // Step 5: Verify inactive category C050 is included
         $this->assertContains('C050', $codes);
-        
+
         $c050 = collect($categoryTotals)->firstWhere('category_code', 'C050');
         $this->assertNotNull($c050);
         $this->assertEquals(150.0, $c050['total_cad']);
@@ -421,13 +421,13 @@ class FinancialSummaryTest extends TestCase
 
         // Step 4: Verify active category without transactions is NOT in category_totals
         $response->assertOk();
-        
+
         $categoryTotals = $response->json('data.category_totals');
         $codes = collect($categoryTotals)->pluck('category_code')->all();
-        
+
         // Step 5: Verify C051 is excluded
         $this->assertNotContains('C051', $codes);
-        
+
         // Step 6: Verify C001 (with transaction) is included
         $this->assertContains('C001', $codes);
     }

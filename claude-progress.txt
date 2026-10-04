@@ -573,3 +573,42 @@ Next session:
 - Continue with remaining category features (#26+)
 - Or move to report features (category actuals, budget vs actual)
 - Or begin per-user ownership implementation (section 4 of spec)
+
+===============================================================================
+SESSION 10 - October 4, 2026 - Category actuals inclusion
+===============================================================================
+Completed
+- Implemented #26: category actuals lists only categories with monthly transactions.
+- Verified #27 in the same flow: retiring a category preserves its monthly actuals.
+- Rows remain ordered by code; zero-net categories with transactions remain present.
+- Conversion formulas are unchanged.
+- Updated report descriptions and added an explicit empty-month message.
+- Kept the selected report period visible even when outside availablePeriods.
+
+Baseline issues repaired before implementation
+- Fixed Pint whitespace failures in FinancialSummaryTest and ReconciliationTest.
+- Corrected obsolete summary assertion expecting C009 without transactions.
+- Repaired reconciliation tests' missing fixture and nonexistent response paths.
+- Marked #24 and #25 false immediately after their baseline tests failed.
+- Their backend tests now pass, but they remain false pending dedicated UI evidence.
+
+Verification performed this session
+- Puppeteer navigation and screenshots worked at dev.pockety.com:8080.
+- ./init.sh completed in Docker after sandbox escalation; app built successfully.
+- task tests: 322 backend tests and 232 frontend tests passed.
+- task tests also passed Pint and PHPStan.
+- Existing category-name browser regression passed.
+- Category-actuals aggregation and detail browser regressions passed.
+- New browser flow creates two categories and two transactions via UI controls.
+- Verified January 2026 totals, code order, omitted empty category, and retirement.
+- Verified February 2026 empty state; no unexpected console or page errors.
+- Final targeted unit run: 2 category-actuals tests passed.
+- Final UI screenshots reviewed and saved in verification/category-actuals-inclusion/.
+- Docker browser URL: PLAYWRIGHT_BASE_URL=http://host.docker.internal:8080.
+- Browser tests reset the local browser-test database using BrowserTestSeeder.
+
+Next
+- Re-verify reconciliation #24/#25 through UI before restoring their passes flags.
+- Then continue with budget report inclusion (#28 onward).
+- Ownership work remains pending; no isolation claims made in this session.
+- Current completion: 25/106 passing, 81 remaining (two added, two unverified).

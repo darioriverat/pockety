@@ -323,7 +323,7 @@
       "Step 7: Verify net_operating_expenses_cad calculation is correct",
       "Step 8: Verify inactivating categories doesn't change reconciliation totals"
     ],
-    "passes": true
+    "passes": false
   },
   {
     "category": "functional",
@@ -336,7 +336,7 @@
       "Step 5: Verify debt interest calculation correct",
       "Step 6: Confirm hardcoded debt payment codes still work"
     ],
-    "passes": true
+    "passes": false
   },
   {
     "category": "functional",
@@ -350,7 +350,7 @@
       "Step 6: Verify report does NOT include second category",
       "Step 7: Verify results ordered by code"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -363,7 +363,7 @@
       "Step 5: Verify actual_cad reflects transaction amount",
       "Step 6: Verify transaction_count is correct"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
