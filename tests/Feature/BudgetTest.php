@@ -324,4 +324,105 @@ class BudgetTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['period']);
     }
+
+    public function test_budget_report_includes_all_active_categories_even_with_no_activity(): void
+    {
+        // Feature #28: Active categories appear even without transactions or budgets
+        $activeCategory = Category::factory()->create([
+            'code' => 'C002',
+            'name' => 'Active No Activity',
+            'is_active' => true,
+        ]);
+
+        $response = $this->getJson('/api/budgets/report?period=202501');
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('category_code', 'C002');
+
+        $this->assertNotNull($row, 'Active category should appear in report even with no activity');
+        $this->assertEquals('Active No Activity', $row['category_name']);
+        $this->assertNull($row['budget_cad']);
+        $this->assertEquals(0.0, $row['actual_cad']);
+    }
+
+    public function test_budget_report_includes_inactive_categories_with_transactions_in_period(): void
+    {
+        // Feature #29: Inactive categories with transactions appear in report
+        $inactiveCategory = Category::factory()->create([
+            'code' => 'C003',
+            'name' => 'Inactive With Transactions',
+            'is_active' => false,
+        ]);
+
+        Transaction::create([
+            'date' => '2025-01-15',
+            'period' => '202501',
+            'category_id' => $inactiveCategory->id,
+            'amount_cad' => 250.00,
+            'amount_usd' => 0,
+            'amount_cop' => 0,
+            'comments' => 'Transaction on inactive category',
+            'is_recurring' => false,
+        ]);
+
+        $response = $this->getJson('/api/budgets/report?period=202501');
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('category_code', 'C003');
+
+        $this->assertNotNull($row, 'Inactive category with transactions should appear in report');
+        $this->assertEquals('Inactive With Transactions', $row['category_name']);
+        $this->assertEquals(250.0, $row['actual_cad']);
+
+        // Verify actual is counted toward report total
+        $totals = $response->json('meta.totals');
+        $this->assertGreaterThanOrEqual(250.0, $totals['actual_cad']);
+    }
+
+    public function test_budget_report_includes_inactive_categories_with_budgets_in_period(): void
+    {
+        // Feature #30: Inactive categories with budgets appear in report
+        $inactiveCategory = Category::factory()->create([
+            'code' => 'C004',
+            'name' => 'Inactive With Budget',
+            'is_active' => false,
+        ]);
+
+        Budget::create([
+            'category_id' => $inactiveCategory->id,
+            'period' => '202501',
+            'amount_cad' => 500.00,
+        ]);
+
+        $response = $this->getJson('/api/budgets/report?period=202501');
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('category_code', 'C004');
+
+        $this->assertNotNull($row, 'Inactive category with budget should appear in report');
+        $this->assertEquals('Inactive With Budget', $row['category_name']);
+        $this->assertEquals(500.0, $row['budget_cad']);
+        $this->assertEquals(0.0, $row['actual_cad']);
+    }
+
+    public function test_budget_report_omits_inactive_categories_without_activity_in_period(): void
+    {
+        // Inactive categories without transactions or budgets should not appear
+        $inactiveCategory = Category::factory()->create([
+            'code' => 'C005',
+            'name' => 'Inactive No Activity',
+            'is_active' => false,
+        ]);
+
+        $response = $this->getJson('/api/budgets/report?period=202501');
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('category_code', 'C005');
+
+        $this->assertNull($row, 'Inactive category without activity should not appear in report');
+    }
 }

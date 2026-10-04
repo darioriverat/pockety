@@ -375,7 +375,7 @@
       "Step 4: Verify user can enter budget for this category",
       "Step 5: Verify actual_cad is zero for category"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -388,7 +388,7 @@
       "Step 5: Verify actual_cad reflects transaction",
       "Step 6: Verify actuals counted toward report total"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -401,7 +401,7 @@
       "Step 5: Verify budget amount displayed",
       "Step 6: Verify category can be budgeted even though inactive"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -413,7 +413,7 @@
       "Step 4: Call BudgetService::getBudgetVsActualReport",
       "Step 5: Verify inactive category does NOT appear in grid"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

@@ -75,8 +75,39 @@ class BudgetService
     public function getBudgetVsActualReport(string $period): array
     {
         $exchangeRate = $this->resolveExchangeRate($period);
-        $categories = Category::active()->orderBy('code')->get();
+
+        // Start with all active categories
+        $activeCategories = Category::active()->orderBy('code')->get();
+
+        // Find inactive categories with transactions in this period
+        $inactiveCategoryIdsWithTransactions = Transaction::forPeriod($period)
+            ->whereHas('category', function ($query) {
+                $query->where('is_active', false);
+            })
+            ->pluck('category_id')
+            ->unique();
+
+        // Find inactive categories with budgets in this period
         $budgetsByCategory = Budget::forPeriod($period)->get()->keyBy('category_id');
+        $inactiveCategoryIdsWithBudgets = Category::query()
+            ->where('is_active', false)
+            ->whereIn('id', $budgetsByCategory->keys())
+            ->pluck('id');
+
+        // Merge inactive category IDs
+        $inactiveCategoryIds = $inactiveCategoryIdsWithTransactions
+            ->merge($inactiveCategoryIdsWithBudgets)
+            ->unique();
+
+        // Load inactive categories that have transactions or budgets
+        $inactiveCategories = Category::query()
+            ->whereIn('id', $inactiveCategoryIds)
+            ->orderBy('code')
+            ->get();
+
+        // Merge active and inactive categories, maintaining code order
+        $categories = $activeCategories->merge($inactiveCategories)->sortBy('code')->values();
+
         $actualsByCategory = $this->calculateActualsByCategory($period, $exchangeRate);
 
         $rows = [];
