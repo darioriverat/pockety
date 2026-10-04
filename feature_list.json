@@ -1460,7 +1460,7 @@
       "Step 7: Verify inactivated category not in picker options",
       "Step 8: Verify test passes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

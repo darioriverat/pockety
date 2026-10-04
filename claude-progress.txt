@@ -2115,3 +2115,34 @@ Next session:
 - Prefer node scripts/session-helpers.mjs browser <spec> when docker.sock is sandboxed.
 - Keep scenario registrations isolated; do not reset the shared development database.
 - App remains running with isolated verification users and their records.
+Session 34 — 2026-10-04 — Category inactivate + picker exclusion verified
+----------------------------------------------------
+Completed feature #104: Browser test for category inactivate and picker exclusion.
+Current completion: 105/106 passing; 1 remain unverified.
+
+Environment and baseline:
+- App already serving at http://dev.pockety.com:8080 (HTTP 200).
+- Docker CLI blocked in this sandbox; used /dev/* HTTP helpers instead.
+- Puppeteer MCP blocked (interactive approval unavailable); verified via Playwright in-container.
+- Backend: 374 tests / 2,520 assertions via /dev/run-tests.
+- Frontend: 238 tests via /dev/frontend-tests.
+- Random browser regression passed: registration-category-template.
+
+Implementation and issues resolved:
+- Reworked e2e-category-inactivate-picker.spec.ts to register a unique user (no migrate:fresh / shared seeder).
+- Create C047 through the real create dialog, uncheck Active in edit dialog, assert Retired badge + opacity-50.
+- Open transaction category picker and assert inactivated C047 / name are absent from options.
+- Capture screenshots with animations disabled for readable evidence.
+
+Final verification:
+- Inactivate-picker Playwright test passed (~3.4s).
+- Screenshots reviewed: Active unchecked; Retired badge on C047; picker lists active categories only.
+- Evidence: verification/e2e-inactivate-picker/ (force-added).
+- Only feature #104's passes field changed; descriptions/steps/order preserved.
+
+Next session:
+- Highest-priority remaining feature: #105, browser delete rejection with transactions.
+- Remaining features: #105.
+- Prefer node scripts/session-helpers.mjs browser <spec> when docker.sock is sandboxed.
+- Keep scenario registrations isolated; do not reset the shared development database.
+- App remains running with isolated verification users and their records.
