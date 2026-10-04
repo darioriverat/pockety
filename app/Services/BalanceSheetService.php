@@ -15,6 +15,7 @@ class BalanceSheetService
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
+
     /**
      * Build the balance sheet for a period.
      *

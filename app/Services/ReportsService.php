@@ -13,6 +13,7 @@ class ReportsService
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
+
     /**
      * Get year-to-date totals for income and expenses.
      *

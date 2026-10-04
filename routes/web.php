@@ -146,6 +146,26 @@ if (app()->environment('local')) {
         return redirect($redirect);
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
+    Route::get('/dev/login-as-second-user', function () {
+        $user = User::query()->updateOrCreate(
+            ['email' => 'test2@example.com'],
+            [
+                'name' => 'Browser Test User Two',
+                'password' => 'password',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $user->forceFill(['password' => 'password'])->save();
+        CategoryTemplate::seedForUser((int) $user->id);
+
+        auth()->login($user);
+
+        $redirect = request()->query('redirect', '/dashboard');
+
+        return redirect($redirect);
+    })->withoutMiddleware([VerifyCsrfToken::class]);
+
     Route::get('/dev/reset-test-user', function () {
         $user = User::query()->updateOrCreate(
             ['email' => 'test@example.com'],

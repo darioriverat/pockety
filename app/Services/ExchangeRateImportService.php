@@ -12,6 +12,7 @@ class ExchangeRateImportService
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
+
     /**
      * Import exchange rates from month_sheets JSON files.
      *

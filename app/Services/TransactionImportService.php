@@ -14,6 +14,7 @@ class TransactionImportService
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
+
     /**
      * Import transactions from the historical JSON file.
      *

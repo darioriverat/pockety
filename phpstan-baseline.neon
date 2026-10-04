@@ -91,6 +91,24 @@ parameters:
 			path: app/Http/Controllers/AccountBalanceController.php
 
 		-
+			message: '#^Access to property \$code on an unknown class App\\Http\\Controllers\\Category\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/AccountController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Http\\Controllers\\Category\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/AccountController.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$category contains unknown class App\\Http\\Controllers\\Category\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/AccountController.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$book_value_cad\.$#'
 			identifier: property.notFound
 			count: 1
@@ -211,6 +229,12 @@ parameters:
 			path: app/Models/Account.php
 
 		-
+			message: '#^Method App\\Models\\Account\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Account.php
+
+		-
 			message: '#^Class App\\Models\\AccountBalance uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
 			count: 1
@@ -235,6 +259,12 @@ parameters:
 			path: app/Models/AccountBalance.php
 
 		-
+			message: '#^Method App\\Models\\AccountBalance\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AccountBalance.php
+
+		-
 			message: '#^Class App\\Models\\Budget uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
 			count: 1
@@ -255,6 +285,12 @@ parameters:
 		-
 			message: '#^Method App\\Models\\Budget\:\:scopeForPeriod\(\) has parameter \$query with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Budget.php
+
+		-
+			message: '#^Method App\\Models\\Budget\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Models/Budget.php
 
@@ -313,7 +349,19 @@ parameters:
 			path: app/Models/Category.php
 
 		-
+			message: '#^Method App\\Models\\Category\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Category.php
+
+		-
 			message: '#^Class App\\Models\\ExchangeRate uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ExchangeRate.php
+
+		-
+			message: '#^Method App\\Models\\ExchangeRate\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
 			identifier: missingType.generics
 			count: 1
 			path: app/Models/ExchangeRate.php
@@ -333,6 +381,12 @@ parameters:
 		-
 			message: '#^Method App\\Models\\FixedAsset\:\:scopeActive\(\) has parameter \$query with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: app/Models/FixedAsset.php
+
+		-
+			message: '#^Method App\\Models\\FixedAsset\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Models/FixedAsset.php
 
@@ -373,7 +427,19 @@ parameters:
 			path: app/Models/FixedAssetValuation.php
 
 		-
+			message: '#^Method App\\Models\\FixedAssetValuation\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FixedAssetValuation.php
+
+		-
 			message: '#^Class App\\Models\\HistoricalBalanceSheet uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/HistoricalBalanceSheet.php
+
+		-
+			message: '#^Method App\\Models\\HistoricalBalanceSheet\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
 			identifier: missingType.generics
 			count: 1
 			path: app/Models/HistoricalBalanceSheet.php
@@ -397,6 +463,42 @@ parameters:
 			path: app/Models/Income.php
 
 		-
+			message: '#^Method App\\Models\\Income\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Income.php
+
+		-
+			message: '#^Class App\\Models\\PeriodBalance uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PeriodBalance.php
+
+		-
+			message: '#^Method App\\Models\\PeriodBalance\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PeriodBalance.php
+
+		-
+			message: '#^Class App\\Models\\PeriodBalanceHistory uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PeriodBalanceHistory.php
+
+		-
+			message: '#^Method App\\Models\\PeriodBalanceHistory\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PeriodBalanceHistory.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_income_category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
 			message: '#^Class App\\Models\\Transaction uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
 			count: 1
@@ -411,6 +513,18 @@ parameters:
 		-
 			message: '#^Method App\\Models\\Transaction\:\:category\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
+			message: '#^Method App\\Models\\Transaction\:\:scopeExpenses\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
+			message: '#^Method App\\Models\\Transaction\:\:scopeExpenses\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
 			count: 1
 			path: app/Models/Transaction.php
 
@@ -463,30 +577,6 @@ parameters:
 			path: app/Models/Transaction.php
 
 		-
-			message: '#^Method App\\Models\\Transaction\:\:scopeInterest\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/Transaction.php
-
-		-
-			message: '#^Method App\\Models\\Transaction\:\:scopeInterest\(\) has parameter \$query with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Models/Transaction.php
-
-		-
-			message: '#^Method App\\Models\\Transaction\:\:scopeExpenses\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/Transaction.php
-
-		-
-			message: '#^Method App\\Models\\Transaction\:\:scopeExpenses\(\) has parameter \$query with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Models/Transaction.php
-
-		-
 			message: '#^Method App\\Models\\Transaction\:\:scopeIncome\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -499,8 +589,14 @@ parameters:
 			path: app/Models/Transaction.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_income_category\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Models\\Transaction\:\:scopeInterest\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
+			message: '#^Method App\\Models\\Transaction\:\:scopeInterest\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
 			count: 1
 			path: app/Models/Transaction.php
 
@@ -529,6 +625,12 @@ parameters:
 			path: app/Models/Transaction.php
 
 		-
+			message: '#^Method App\\Models\\Transaction\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transaction.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$recorded_balance_cad\.$#'
 			identifier: property.notFound
 			count: 1
@@ -547,10 +649,22 @@ parameters:
 			path: app/Services/AccountService.php
 
 		-
+			message: '#^Method App\\Services\\AccountService\:\:ownedAccounts\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Services/AccountService.php
+
+		-
 			message: '#^Method App\\Services\\BalanceSheetImportService\:\:getImportStatistics\(\) should return array\{total\: int, periods_covered\: array\{min\: string\|null, max\: string\|null\}, snapshots\: list\<array\{period\: string, assets_cad\: float, liabilities_cad\: float, equity_cad\: float\}\>\} but returns array\{total\: int\<0, max\>, periods_covered\: array\{min\: string\|null, max\: string\|null\}, snapshots\: array\<int, array\{period\: string, assets_cad\: float, liabilities_cad\: float, equity_cad\: float\}\>\}\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/BalanceSheetImportService.php
+
+		-
+			message: '#^Method App\\Services\\BudgetService\:\:ownedBudgets\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Services/BudgetService.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
@@ -567,6 +681,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Services/CategoryService.php
+
+		-
+			message: '#^Method App\\Services\\CategoryService\:\:ownedCategories\(\) has no return type specified\.$#'
+			identifier: missingType.return
 			count: 1
 			path: app/Services/CategoryService.php
 
@@ -627,13 +747,13 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 1
 			path: app/Services/FinancialSummaryService.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: app/Services/FinancialSummaryService.php
 
 		-
@@ -655,12 +775,6 @@ parameters:
 			path: app/Services/FinancialSummaryService.php
 
 		-
-			message: '#^Using nullsafe property access "\?-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: app/Services/FinancialSummaryService.php
-
-		-
 			message: '#^Parameter \#1 \$array of function usort contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
 			count: 1
@@ -671,6 +785,18 @@ parameters:
 			identifier: argument.unresolvableType
 			count: 1
 			path: app/Services/FinancialSummaryService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/FinancialSummaryService.php
+
+		-
+			message: '#^Method App\\Services\\IncomeService\:\:ownedIncome\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Services/IncomeService.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
@@ -709,9 +835,51 @@ parameters:
 			path: app/Services/TransactionService.php
 
 		-
+			message: '#^Strict comparison using \!\=\= between int\<0, max\> and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: database/factories/AccountBalanceFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: database/factories/AccountBalanceFactory.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between int\<0, max\> and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: database/factories/BudgetFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: database/factories/BudgetFactory.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between int\<0, max\> and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: database/factories/TransactionFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: database/factories/TransactionFactory.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 2
+			path: database/seeders/CategorySeeder.php
+
+		-
 			message: '#^Class App\\Http\\Middleware\\VerifyCsrfToken not found\.$#'
 			identifier: class.notFound
-			count: 24
+			count: 26
 			path: routes/web.php
 
 		-

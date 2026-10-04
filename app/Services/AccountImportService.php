@@ -15,6 +15,7 @@ class AccountImportService
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
+
     /**
      * Labels that are section totals / placeholders, not real accounts.
      *

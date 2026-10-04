@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\PeriodBalance;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Support\CategoryTemplate;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -73,7 +76,7 @@ class UserOwnershipMigrationTest extends TestCase
             'code' => 'C001',
         ]);
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
 
         Category::query()->create([
             'user_id' => $userA->id,
@@ -155,11 +158,11 @@ class UserOwnershipMigrationTest extends TestCase
         ]);
         $this->assertEquals(
             0,
-            \App\Models\Transaction::query()->forUser((int) $other->id)->count()
+            Transaction::query()->forUser((int) $other->id)->count()
         );
         $this->assertEquals(
             0,
-            \App\Models\Budget::query()->forUser((int) $other->id)->count()
+            Budget::query()->forUser((int) $other->id)->count()
         );
     }
 }

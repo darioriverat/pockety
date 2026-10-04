@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToOwner;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PeriodBalanceHistory extends Model
 {
     use BelongsToOwner;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',

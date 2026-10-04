@@ -17,7 +17,9 @@ class CategorySeeder extends Seeder
         $users = User::query()->orderBy('id')->get();
 
         if ($users->isEmpty()) {
-            $this->command?->warn('No users found; skipping category template seed.');
+            if ($this->command) {
+                $this->command->warn('No users found; skipping category template seed.');
+            }
 
             return;
         }
@@ -26,6 +28,8 @@ class CategorySeeder extends Seeder
             CategoryTemplate::seedForUser((int) $user->id);
         }
 
-        $this->command?->info('Successfully seeded 47 categories (46 active + 1 retired) per user');
+        if ($this->command) {
+            $this->command->info('Successfully seeded 47 categories (46 active + 1 retired) per user');
+        }
     }
 }

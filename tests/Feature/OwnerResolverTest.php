@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Fortify\CreateNewUser;
+use App\Domain\Services\Contracts\CategoryServiceInterface;
 use App\Domain\Services\Contracts\OwnerResolverInterface;
+use App\Models\Category;
 use App\Models\User;
 use App\Support\CategoryTemplate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -47,7 +50,7 @@ class OwnerResolverTest extends TestCase
 
     public function test_create_new_user_copies_template(): void
     {
-        $action = app(\App\Actions\Fortify\CreateNewUser::class);
+        $action = app(CreateNewUser::class);
         $user = $action->create([
             'name' => 'New Owner',
             'email' => 'owner-'.uniqid().'@example.com',
@@ -57,7 +60,7 @@ class OwnerResolverTest extends TestCase
 
         $this->assertEquals(
             46,
-            \App\Models\Category::query()->forUser((int) $user->id)->where('is_active', true)->count()
+            Category::query()->forUser((int) $user->id)->where('is_active', true)->count()
         );
         $this->assertDatabaseHas('categories', [
             'user_id' => $user->id,
@@ -78,20 +81,20 @@ class OwnerResolverTest extends TestCase
         CategoryTemplate::seedForUser((int) $userB->id);
 
         $this->actingAs($userA);
-        $codeA = app(\App\Domain\Services\Contracts\CategoryServiceInterface::class)
+        $codeA = app(CategoryServiceInterface::class)
             ->create('A Custom', false, false)
             ->code;
 
         $this->actingAs($userB);
-        $codeB = app(\App\Domain\Services\Contracts\CategoryServiceInterface::class)
+        $codeB = app(CategoryServiceInterface::class)
             ->create('B Custom', false, false)
             ->code;
 
         $this->assertSame('C047', $codeA);
         $this->assertSame('C047', $codeB);
         $this->assertNotSame(
-            \App\Models\Category::query()->forUser((int) $userA->id)->where('code', 'C047')->value('id'),
-            \App\Models\Category::query()->forUser((int) $userB->id)->where('code', 'C047')->value('id'),
+            Category::query()->forUser((int) $userA->id)->where('code', 'C047')->value('id'),
+            Category::query()->forUser((int) $userB->id)->where('code', 'C047')->value('id'),
         );
     }
 
@@ -103,7 +106,7 @@ class OwnerResolverTest extends TestCase
         CategoryTemplate::seedForUser((int) $userB->id);
 
         $this->actingAs($userA);
-        app(\App\Domain\Services\Contracts\CategoryServiceInterface::class)
+        app(CategoryServiceInterface::class)
             ->create('Only A', false, false);
 
         $this->actingAs($userB);

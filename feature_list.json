@@ -633,7 +633,7 @@
       "Step 6: Authenticate as user B",
       "Step 7: Verify only user B's transactions returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -647,7 +647,7 @@
       "Step 6: Query account_balances",
       "Step 7: Verify only user A's balances returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -660,7 +660,7 @@
       "Step 5: Authenticate as user B",
       "Step 6: Verify only user B's budgets returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -675,7 +675,7 @@
       "Step 7: Verify allowed because count is per (user_id, period)",
       "Step 8: Verify users don't interfere with each other"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -688,7 +688,7 @@
       "Step 5: Verify only user A's rates returned",
       "Step 6: Verify period 202601 uniqueness per user"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -702,7 +702,7 @@
       "Step 6: Query valuations",
       "Step 7: Verify only user A's valuations returned"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -715,7 +715,7 @@
       "Step 5: Verify only user A's balances returned",
       "Step 6: Verify period uniqueness per user"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -727,7 +727,7 @@
       "Step 4: Verify only user A's sheets returned",
       "Step 5: Verify period uniqueness per user"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -742,7 +742,7 @@
       "Step 7: Verify only period 202602 returned",
       "Step 8: Verify availablePeriods Inertia prop correct for each user"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -757,7 +757,7 @@
       "Step 7: Authenticate as user B",
       "Step 8: Verify summary doesn't see user A's data"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -771,7 +771,7 @@
       "Step 6: Authenticate as user B",
       "Step 7: Verify dashboard shows only user B's data"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -783,7 +783,7 @@
       "Step 4: Verify transactions invisible to other users",
       "Step 5: Verify category lookups during import scoped to user A"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -796,7 +796,7 @@
       "Step 5: Authenticate as user B",
       "Step 6: Verify results only from user B's data"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -811,7 +811,7 @@
       "Step 7: Generate budget vs actual report",
       "Step 8: Verify only user A's budgets"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -825,7 +825,7 @@
       "Step 6: Verify all other financial factories include user_id",
       "Step 7: Test factories create valid records with user_id"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -838,7 +838,7 @@
       "Step 5: Verify test sees only its own seeded data",
       "Step 6: Verify test isolation maintained"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -854,7 +854,7 @@
       "Step 8: GET /api/categories",
       "Step 9: Verify 'B Category' present, 'A Category' absent"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -869,7 +869,7 @@
       "Step 7: Authenticate as user B",
       "Step 8: Verify only user B's transaction visible"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -883,7 +883,7 @@
       "Step 6: Navigate to accounts page",
       "Step 7: Verify only user A's data displayed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -897,7 +897,7 @@
       "Step 6: Authenticate as user B",
       "Step 7: Verify only user B's budget visible"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -912,7 +912,7 @@
       "Step 7: Authenticate as user B",
       "Step 8: Verify only user B's balances and rates visible"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -925,7 +925,7 @@
       "Step 5: Verify both categories exist with different user_ids",
       "Step 6: Verify no conflict or uniqueness violation"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -941,7 +941,7 @@
       "Step 8: Verify user B does NOT have user A's C047",
       "Step 9: Verify 46 active categories for user B"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -956,7 +956,7 @@
       "Step 7: Authenticate as user B",
       "Step 8: Verify includes 202602, excludes 202601"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

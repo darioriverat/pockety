@@ -98,7 +98,7 @@ return new class extends Migration
             } else {
                 // SQLite may name composites differently; try dropping by columns when present.
                 foreach ($indexes as $index) {
-                    if (($index['unique'] ?? false) && ($index['columns'] ?? []) === $oldColumns) {
+                    if ($index['unique'] && $index['columns'] === $oldColumns) {
                         $blueprint->dropUnique($oldColumns);
                         break;
                     }
