@@ -86,12 +86,13 @@ describe('PeriodBalances page', () => {
         expect(
             screen.getByTestId('proposed-reconciliation-status'),
         ).toHaveTextContent('Unbalanced');
-        expect(screen.getByTestId('registered-balance-empty')).toBeInTheDocument();
+        expect(
+            screen.getByTestId('registered-balance-empty'),
+        ).toBeInTheDocument();
         expect(screen.getByTestId('balance-history-empty')).toBeInTheDocument();
-        expect(screen.getByTestId('reconciliation-verify-link')).toHaveAttribute(
-            'href',
-            '/reconciliation',
-        );
+        expect(
+            screen.getByTestId('reconciliation-verify-link'),
+        ).toHaveAttribute('href', '/reconciliation');
         expect(
             screen.queryByTestId('overwrite-balance-dialog'),
         ).not.toBeInTheDocument();
@@ -105,7 +106,10 @@ describe('PeriodBalances page', () => {
                 const method = init?.method ?? 'GET';
 
                 if (method === 'POST') {
-                    const body = JSON.parse(String(init?.body));
+                    if (typeof init?.body !== 'string') {
+                        throw new Error('Expected a JSON request body');
+                    }
+                    const body = JSON.parse(init.body);
                     expect(body).toEqual({
                         period: '202501',
                         overwrite: true,
@@ -181,23 +185,25 @@ describe('PeriodBalances page', () => {
         render(<PeriodBalances />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('registered-assets-cad')).toHaveTextContent(
-                '$900.00',
-            );
+            expect(
+                screen.getByTestId('registered-assets-cad'),
+            ).toHaveTextContent('$900.00');
         });
 
         fireEvent.click(screen.getByTestId('register-period-balance'));
 
-        expect(screen.getByTestId('overwrite-balance-dialog')).toBeInTheDocument();
+        expect(
+            screen.getByTestId('overwrite-balance-dialog'),
+        ).toBeInTheDocument();
         expect(screen.getByTestId('overwrite-balance-title')).toHaveTextContent(
             'Overwrite existing balance?',
         );
-        expect(screen.getByTestId('overwrite-existing-assets-cad')).toHaveTextContent(
-            '$900.00',
-        );
-        expect(screen.getByTestId('overwrite-proposed-assets-cad')).toHaveTextContent(
-            '$850.00',
-        );
+        expect(
+            screen.getByTestId('overwrite-existing-assets-cad'),
+        ).toHaveTextContent('$900.00');
+        expect(
+            screen.getByTestId('overwrite-proposed-assets-cad'),
+        ).toHaveTextContent('$850.00');
         expect(screen.getByTestId('overwrite-balance-dialog')).toHaveClass(
             'sm:max-w-3xl',
         );
@@ -207,9 +213,9 @@ describe('PeriodBalances page', () => {
         expect(
             screen.getByTestId('overwrite-proposed-assets-cad').closest('dl'),
         ).toHaveClass('grid-cols-1');
-        expect(
-            screen.getByTestId('overwrite-balance-comparison'),
-        ).toHaveClass('sm:grid-cols-2');
+        expect(screen.getByTestId('overwrite-balance-comparison')).toHaveClass(
+            'sm:grid-cols-2',
+        );
 
         const postsBeforeConfirm = fetchMock.mock.calls.filter(
             (call) => (call[1] as RequestInit | undefined)?.method === 'POST',
@@ -219,50 +225,54 @@ describe('PeriodBalances page', () => {
         fireEvent.click(screen.getByTestId('overwrite-balance-confirm'));
 
         await waitFor(() => {
-            expect(screen.getByTestId('period-balance-success')).toHaveTextContent(
-                /overwritten/i,
-            );
+            expect(
+                screen.getByTestId('period-balance-success'),
+            ).toHaveTextContent(/overwritten/i);
         });
 
         expect(screen.getByTestId('registered-assets-cad')).toHaveTextContent(
             '$850.00',
         );
         expect(screen.getByTestId('balance-history-row-3')).toBeInTheDocument();
-        expect(screen.getByTestId('balance-history-assets-3')).toHaveTextContent(
-            '$900.00',
-        );
+        expect(
+            screen.getByTestId('balance-history-assets-3'),
+        ).toHaveTextContent('$900.00');
     });
 
     it('cancels overwrite without changing the registered balance', async () => {
-        const fetchMock = vi.fn(async () => ({
-            ok: true,
-            status: 200,
-            json: async () => ({
-                data: {
-                    period: '202501',
-                    proposed: {
-                        ...proposed,
-                        assets_cad: 850,
-                        equity_cad: 850,
+        const fetchMock = vi.fn(
+            async (_input: RequestInfo | URL, _init?: RequestInit) => ({
+                ok: true,
+                status: 200,
+                json: async () => ({
+                    data: {
+                        period: '202501',
+                        proposed: {
+                            ...proposed,
+                            assets_cad: 850,
+                            equity_cad: 850,
+                        },
+                        registered,
+                        history: [],
                     },
-                    registered,
-                    history: [],
-                },
+                }),
             }),
-        }));
+        );
 
         vi.stubGlobal('fetch', fetchMock);
 
         render(<PeriodBalances />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('registered-assets-cad')).toHaveTextContent(
-                '$900.00',
-            );
+            expect(
+                screen.getByTestId('registered-assets-cad'),
+            ).toHaveTextContent('$900.00');
         });
 
         fireEvent.click(screen.getByTestId('register-period-balance'));
-        expect(screen.getByTestId('overwrite-balance-dialog')).toBeInTheDocument();
+        expect(
+            screen.getByTestId('overwrite-balance-dialog'),
+        ).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('overwrite-balance-cancel'));
 

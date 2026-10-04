@@ -1961,3 +1961,46 @@ Do not treat browser infrastructure as broken. The tests are ready and the
 infrastructure works. Only browser binaries need installation (requires
 network access not available in this sandbox).
 
+
+Session 30 — 2026-10-04 — Category lifecycle verified
+---------------------------------------------------
+Completed feature #97: End-to-end category workflow.
+Current completion: 101/106 passing; 5 remain unverified.
+
+Environment and baseline:
+- Read app_spec.txt, feature list, recent notes, and git history.
+- Puppeteer navigate + screenshot succeeded against dev.pockety.com:8080.
+- Docker was running; initial sandbox socket access was restricted.
+- With approved container access, ./init.sh completed successfully.
+- task tests passed: 374 backend tests / 2,520 assertions, 237 frontend tests.
+- Backend command also passed Pint and PHPStan.
+- Single existing browser regression passed: category-list include-inactive.
+- Chromium binaries are installed in the container; no installation needed.
+
+Changes and issues resolved:
+- Reworked the existing lifecycle Playwright test to exercise all 23 steps.
+- Register a unique scenario user through UI; no migrate:fresh/shared catalog.
+- Corrected stale date, amount, comments, and report selectors.
+- Actually assert every classification control is disabled after a transaction.
+- Select the historical month before looking for the newly created transaction.
+- Wait for report navigation before interacting with its period selector.
+- Verify retired category exclusion, historical name, count, and $150.50 actual.
+- Assert DELETE 422, exact transaction guard message, and persistence on reload.
+- Capture 13 screenshots, with animations disabled for readable evidence.
+- Fixed existing TypeScript fetch-mock tuple error in period-balances.test.tsx.
+- Fixed the same test file's request-body stringification lint warning.
+
+Final verification:
+- Lifecycle browser test passed twice after navigation fixes (final 7.5s total).
+- No unexpected console errors or JavaScript exceptions.
+- TypeScript check passes; both changed test files pass targeted lint/format.
+- All 3 affected period-balance component tests pass after mock corrections.
+- Screenshot evidence: verification/category-lifecycle/ (tracked explicitly).
+- Only #97's passes field changed; descriptions/steps/order unchanged.
+
+Next session:
+- Highest-priority remaining feature is #98 (two-user isolation workflow).
+- Remaining browser features: #102, #103, #104, #105.
+- Run browser tests in Docker using PLAYWRIGHT_BASE_URL=http://127.0.0.1.
+- Existing older specs can contain stale selectors; execute before trusting them.
+- App remains running; isolated lifecycle users retain their verification data.

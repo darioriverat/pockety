@@ -1327,7 +1327,7 @@
       "Step 22: Attempt to delete Renamed Category",
       "Step 23: Verify delete rejected with message about transactions"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
