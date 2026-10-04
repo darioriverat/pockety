@@ -327,6 +327,68 @@ class CategoryCrudTest extends TestCase
             ->assertJsonPath('data.is_active', false);
     }
 
+    public function test_existing_transaction_remains_valid_after_category_inactivation(): void
+    {
+        // Step 1: Create category C047
+        $create = $this->postJson('/api/categories', [
+            'name' => 'Keep Transaction Category',
+            'is_debt_category' => false,
+            'is_income_category' => false,
+        ]);
+        $create->assertCreated()->assertJsonPath('data.code', 'C047');
+        $categoryId = (int) $create->json('data.id');
+
+        // Step 2: Create transaction with category_id for C047
+        $txnCreate = $this->postJson('/api/transactions', [
+            'date' => '2026-01-15',
+            'period' => '202601',
+            'category_id' => $categoryId,
+            'account_id' => $this->account->id,
+            'amount_cad' => 87.25,
+            'comments' => 'survives-inactivation',
+        ]);
+        $txnCreate->assertCreated();
+        $transactionId = (int) $txnCreate->json('data.id');
+
+        // Step 3: Inactivate C047
+        $this->putJson('/api/categories/C047', ['is_active' => false])
+            ->assertOk()
+            ->assertJsonPath('data.is_active', false);
+
+        // Steps 4-6: Query transaction — still exists and points to C047
+        $show = $this->getJson('/api/transactions/'.$transactionId);
+        $show->assertOk()
+            ->assertJsonPath('data.id', $transactionId)
+            ->assertJsonPath('data.category_id', $categoryId)
+            ->assertJsonPath('data.category.code', 'C047')
+            ->assertJsonPath('data.category.name', 'Keep Transaction Category')
+            ->assertJsonPath('data.category.is_active', false)
+            ->assertJsonPath('data.comments', 'survives-inactivation');
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $transactionId,
+            'category_id' => $categoryId,
+            'comments' => 'survives-inactivation',
+        ]);
+
+        // Step 8: Reports include this transaction
+        $this->getJson('/api/financial-summary?period=202601')
+            ->assertOk()
+            ->assertJsonFragment([
+                'category_code' => 'C047',
+                'category_name' => 'Keep Transaction Category',
+                'total_cad' => 87.25,
+            ]);
+
+        $this->getJson('/api/category-actuals?period=202601')
+            ->assertOk()
+            ->assertJsonFragment([
+                'category_code' => 'C047',
+                'actual_cad' => 87.25,
+                'transaction_count' => 1,
+            ]);
+    }
+
     public function test_update_rejects_both_flags_true(): void
     {
         $response = $this->putJson('/api/categories/C001', [

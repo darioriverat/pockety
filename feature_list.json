@@ -1012,7 +1012,7 @@
       "Step 7: Verify transaction displays correctly in UI",
       "Step 8: Verify reports include this transaction"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
