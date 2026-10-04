@@ -2004,3 +2004,48 @@ Next session:
 - Run browser tests in Docker using PLAYWRIGHT_BASE_URL=http://127.0.0.1.
 - Existing older specs can contain stale selectors; execute before trusting them.
 - App remains running; isolated lifecycle users retain their verification data.
+
+Session 31 — 2026-10-04 — Two-user isolation verified
+----------------------------------------------------
+Completed feature #98: End-to-end two-user isolation workflow.
+Current completion: 102/106 passing; 4 remain unverified.
+
+Environment and baseline:
+- Read the full specification, feature list, recent progress, and git history.
+- Puppeteer navigation and screenshots worked against dev.pockety.com:8080.
+- ./init.sh completed using approved access to the running Docker stack.
+- task tests passed: 374 backend tests / 2,520 assertions; 237 frontend tests.
+- Pint and PHPStan passed as part of the backend command.
+- One existing browser regression passed: registration-category-template.
+
+Implementation and issues resolved:
+- Replaced shared seeded users in the isolation spec with unique UI registrations.
+- Exercise real registration, login, logout, category, transaction, and budget forms.
+- Assert both users receive all 47 template codes, including inactive C040.
+- Verify both users can independently create C047 with different record IDs.
+- Alice records January spending/budget; Bob records March spending.
+- Assert dashboard totals, period options, and transaction lists belong to each user.
+- Create Alice-only C048 to assert Bob gets an actual API 404.
+- Assert foreign transaction IDs return 404 in both directions.
+- Verify Alice's category, transaction, and budget survive account switching.
+- Correct stale budget picker selector and HTTP status expectations in old spec.
+- Screenshot review found a blank period picker after account switching.
+- Period store had a fixed January 2025 default and retained the prior user's selection.
+- Use the current month for initialization and reset persisted selection on logout.
+- Add a hook regression covering reset, all subscribers, storage, and reload.
+- Add browser assertion that the next user's period picker is populated.
+
+Final verification:
+- All 238 frontend tests pass after the shared period-store change.
+- TypeScript and targeted lint/format pass; production build succeeds.
+- Full isolation browser workflow passes after the fix (16.6 seconds).
+- No browser console errors or page exceptions; screenshots visually reviewed.
+- 22 screenshots saved in verification/e2e-two-user-isolation/.
+- Only feature #98's passes field changed; descriptions/steps/order preserved.
+
+Next session:
+- Highest-priority remaining feature: #102, browser category create workflow.
+- Remaining features: #102, #103, #104, #105.
+- Run browser tests in Docker with PLAYWRIGHT_BASE_URL=http://127.0.0.1.
+- Keep scenario registrations isolated; do not reset the shared development database.
+- App remains running with isolated verification users and their records.

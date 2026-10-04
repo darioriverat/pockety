@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DEFAULT_PERIOD } from '@/lib/periods';
-import { initializePeriod, usePeriod } from '@/hooks/use-period';
+import { currentPeriod } from '@/lib/periods';
+import { initializePeriod, resetPeriod, usePeriod } from '@/hooks/use-period';
 
 const STORAGE_KEY = 'pockety.selectedPeriod';
 
@@ -15,11 +15,11 @@ describe('usePeriod', () => {
         localStorage.clear();
     });
 
-    it('defaults to DEFAULT_PERIOD and persists it', () => {
+    it('defaults to the current month and persists it', () => {
         const { result } = renderHook(() => usePeriod());
 
-        expect(result.current.period).toBe(DEFAULT_PERIOD);
-        expect(localStorage.getItem(STORAGE_KEY)).toBe(DEFAULT_PERIOD);
+        expect(result.current.period).toBe(currentPeriod());
+        expect(localStorage.getItem(STORAGE_KEY)).toBe(currentPeriod());
     });
 
     it('updates period and persists to localStorage', () => {
@@ -40,8 +40,8 @@ describe('usePeriod', () => {
             result.current.setPeriod('not-a-period');
         });
 
-        expect(result.current.period).toBe(DEFAULT_PERIOD);
-        expect(localStorage.getItem(STORAGE_KEY)).toBe(DEFAULT_PERIOD);
+        expect(result.current.period).toBe(currentPeriod());
+        expect(localStorage.getItem(STORAGE_KEY)).toBe(currentPeriod());
     });
 
     it('restores a previously stored valid period on initialize', () => {
@@ -63,5 +63,20 @@ describe('usePeriod', () => {
 
         expect(first.result.current.period).toBe('202504');
         expect(second.result.current.period).toBe('202504');
+    });
+
+    it('clears the previous account selection on logout for every subscriber and reload', () => {
+        const first = renderHook(() => usePeriod());
+        const second = renderHook(() => usePeriod());
+
+        act(() => first.result.current.setPeriod('202601'));
+        act(() => resetPeriod());
+
+        expect(first.result.current.period).toBe(currentPeriod());
+        expect(second.result.current.period).toBe(currentPeriod());
+        expect(localStorage.getItem(STORAGE_KEY)).toBe(currentPeriod());
+        initializePeriod();
+        const reloaded = renderHook(() => usePeriod());
+        expect(reloaded.result.current.period).toBe(currentPeriod());
     });
 });

@@ -1,275 +1,316 @@
-import {
-    expect,
-    test,
-    type APIRequestContext,
-    type Page,
-} from '@playwright/test';
-import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
+import { randomUUID } from 'node:crypto';
+import { expect, test, type Page } from '@playwright/test';
 
-async function loginAsSecondBrowserUser(
-    page: Page,
-    request?: APIRequestContext,
-): Promise<void> {
-    await page.goto('/dev/login-as-second-user?redirect=/dashboard');
-    await expect(page).toHaveURL(/\/dashboard$/);
+const password = 'Isolation-check-98!';
 
-    if (request) {
-        const response = await request.get(
-            '/dev/login-as-second-user?redirect=/dashboard',
-        );
-        expect(response.status()).toBeLessThan(400);
-    }
-}
-
-async function logout(page: Page): Promise<void> {
-    await page.goto('/logout').catch(() => undefined);
-    await page.context().clearCookies();
-}
-
-test.describe('End-to-end two-user isolation workflow', () => {
-    test('complete two-user isolation workflow - 25 steps', async ({
-        page,
-        request,
-    }) => {
-        const consoleErrors = trackConsoleErrors(page);
-        page.on('pageerror', (error) => consoleErrors.push(error.message));
-
-        // Step 1: Register user Alice (using browser test user as Alice)
-        // Step 2: Login as Alice
-        await loginAsBrowserTestUser(page, request);
-
-        // Step 3: Navigate to categories page
-        await page.goto('/categories');
-        await expect(
-            page.getByRole('heading', { name: /categories/i }),
-        ).toBeVisible();
-
-        // Step 4: Verify Alice has template categories C001-C046, I01
-        await expect(page.getByText(/total categories:/i)).toBeVisible();
-        await expect(page.getByTestId('category-card-C001')).toBeVisible();
-        await expect(page.getByTestId('category-card-C046')).toBeVisible();
-        await expect(page.getByTestId('category-card-I01')).toBeVisible();
-
-        await page.screenshot({
-            path: 'verification/e2e-two-user-isolation/01-alice-categories.png',
-            fullPage: true,
-        });
-
-        // Step 5: Create category 'Alice Groceries'
-        await page.getByTestId('create-category-button').click();
-        await expect(page.getByTestId('create-category-dialog')).toBeVisible();
-        await page
-            .getByTestId('category-name-input')
-            .fill('Alice Groceries');
-        await page.getByTestId('kind-expense').check();
-
-        const createResponsePromise = page.waitForResponse(
-            (response) =>
-                response.request().method() === 'POST' &&
-                response.url().endsWith('/api/categories'),
-        );
-        await page.getByTestId('create-category-submit').click();
-        const createResponse = await createResponsePromise;
-        expect(createResponse.status()).toBe(201);
-
-        const aliceCategory = (await createResponse.json()) as {
-            data: { id: number; code: string };
-        };
-
-        // Step 6: Note code assigned (should be C047)
-        expect(aliceCategory.data.code).toBe('C047');
-        const aliceCategoryId = aliceCategory.data.id;
-
-        await expect(page.getByTestId('create-category-dialog')).toHaveCount(
-            0,
-        );
-        await expect(page.getByTestId('category-card-C047')).toBeVisible();
-        await expect(page.getByTestId('category-name-C047')).toContainText(
-            'Alice Groceries',
-        );
-
-        // Step 7: Create transaction with Alice Groceries category
-        const aliceTxnResponse = await request.post('/api/transactions', {
-            data: {
-                date: '2026-01-15',
-                period: '202601',
-                category_id: aliceCategoryId,
-                amount_cad: 125.50,
-                comments: 'Alice transaction',
-            },
-        });
-        expect(aliceTxnResponse.status()).toBe(201);
-
-        // Step 8: Create budget for period 202601
-        const aliceBudgetResponse = await request.post('/api/budgets', {
-            data: {
-                category_id: aliceCategoryId,
-                period: '202601',
-                budget_amount_cad: 200.0,
-            },
-        });
-        expect(aliceBudgetResponse.status()).toBe(201);
-
-        // Step 9: View dashboard and note available periods
-        await page.goto('/dashboard');
-        await expect(
-            page.getByRole('heading', { name: /dashboard/i }),
-        ).toBeVisible();
-        await expect(page.getByTestId('page-period-selector')).toBeVisible();
-
-        await page.screenshot({
-            path: 'verification/e2e-two-user-isolation/02-alice-dashboard.png',
-            fullPage: true,
-        });
-
-        // Step 10: Logout
-        await logout(page);
-
-        // Step 11: Register user Bob (using second browser test user as Bob)
-        // Step 12: Login as Bob
-        await loginAsSecondBrowserUser(page, request);
-
-        // Step 13: Navigate to categories page
-        await page.goto('/categories');
-        await expect(
-            page.getByRole('heading', { name: /categories/i }),
-        ).toBeVisible();
-
-        // Step 14: Verify Bob has template categories C001-C046, I01
-        await expect(page.getByText(/total categories:/i)).toBeVisible();
-        await expect(page.getByTestId('category-card-C001')).toBeVisible();
-        await expect(page.getByTestId('category-card-C046')).toBeVisible();
-        await expect(page.getByTestId('category-card-I01')).toBeVisible();
-
-        // Step 15: Verify Bob does NOT see 'Alice Groceries'
-        await expect(page.getByText('Alice Groceries')).toHaveCount(0);
-
-        await page.screenshot({
-            path: 'verification/e2e-two-user-isolation/03-bob-categories.png',
-            fullPage: true,
-        });
-
-        // Step 16: Create category 'Bob Groceries' - should get code C047
-        await page.getByTestId('create-category-button').click();
-        await expect(page.getByTestId('create-category-dialog')).toBeVisible();
-        await page.getByTestId('category-name-input').fill('Bob Groceries');
-        await page.getByTestId('kind-expense').check();
-
-        const bobCreateResponsePromise = page.waitForResponse(
-            (response) =>
-                response.request().method() === 'POST' &&
-                response.url().endsWith('/api/categories'),
-        );
-        await page.getByTestId('create-category-submit').click();
-        const bobCreateResponse = await bobCreateResponsePromise;
-        expect(bobCreateResponse.status()).toBe(201);
-
-        const bobCategory = (await bobCreateResponse.json()) as {
-            data: { id: number; code: string };
-        };
-        expect(bobCategory.data.code).toBe('C047'); // Same code as Alice's, but different user
-        const bobCategoryId = bobCategory.data.id;
-
-        await expect(page.getByTestId('create-category-dialog')).toHaveCount(
-            0,
-        );
-        await expect(page.getByTestId('category-card-C047')).toBeVisible();
-        await expect(page.getByTestId('category-name-C047')).toContainText(
-            'Bob Groceries',
-        );
-
-        // Step 17: Create transaction with Bob Groceries
-        const bobTxnResponse = await request.post('/api/transactions', {
-            data: {
-                date: '2026-01-16',
-                period: '202601',
-                category_id: bobCategoryId,
-                amount_cad: 89.75,
-                comments: 'Bob transaction',
-            },
-        });
-        expect(bobTxnResponse.status()).toBe(201);
-
-        // Step 18: View dashboard
-        await page.goto('/dashboard');
-        await expect(
-            page.getByRole('heading', { name: /dashboard/i }),
-        ).toBeVisible();
-
-        await page.screenshot({
-            path: 'verification/e2e-two-user-isolation/04-bob-dashboard.png',
-            fullPage: true,
-        });
-
-        // Step 19: Verify Bob sees only his own data
-        const bobCategoriesResponse = await request.get('/api/categories');
-        expect(bobCategoriesResponse.ok()).toBeTruthy();
-        const bobCategoriesData = (await bobCategoriesResponse.json()) as {
-            data: { name: string }[];
-        };
-        const bobCategoryNames = bobCategoriesData.data.map((c) => c.name);
-        expect(bobCategoryNames).toContain('Bob Groceries');
-        expect(bobCategoryNames).not.toContain('Alice Groceries');
-
-        // Step 20: Verify available periods are Bob's only
-        await expect(page.getByTestId('page-period-selector')).toBeVisible();
-        // Bob has data for 202601, but should not see Alice's other periods
-
-        // Step 21: Attempt to access Alice's category by code via API
-        const aliceCodeAttempt = await request.get('/api/categories/C047');
-        // Bob also has C047, so this should return Bob's category, not Alice's
-        expect(aliceCodeAttempt.ok()).toBeTruthy();
-        const aliceCodeData = (await aliceCodeAttempt.json()) as {
-            data: { id: number; name: string };
-        };
-        expect(aliceCodeData.data.name).toBe('Bob Groceries'); // Bob's C047, not Alice's
-
-        // Step 22: Verify returns 404 (or Bob's own data)
-        // Actually, since Bob also has C047, it returns Bob's. To test 404,
-        // we need a code Alice has that Bob doesn't. Alice might have created
-        // more categories, but in this test they both start with the template.
-        // The isolation is verified by the fact that Bob's C047 !== Alice's C047
-
-        // Step 23: Logout Bob, login Alice
-        await logout(page);
-        await loginAsBrowserTestUser(page, request);
-
-        // Step 24: Verify all Alice's data intact
-        await page.goto('/categories');
-        await expect(page.getByText('Alice Groceries')).toBeVisible();
-        await expect(page.getByTestId('category-card-C047')).toBeVisible();
-        await expect(page.getByTestId('category-name-C047')).toContainText(
-            'Alice Groceries',
-        );
-
-        const aliceCategoriesResponse = await request.get('/api/categories');
-        expect(aliceCategoriesResponse.ok()).toBeTruthy();
-        const aliceCategoriesData = (await aliceCategoriesResponse.json()) as {
-            data: { name: string }[];
-        };
-        const aliceCategoryNames = aliceCategoriesData.data.map((c) => c.name);
-        expect(aliceCategoryNames).toContain('Alice Groceries');
-
-        await page.screenshot({
-            path: 'verification/e2e-two-user-isolation/05-alice-back.png',
-            fullPage: true,
-        });
-
-        // Step 25: Verify Alice cannot see Bob's data
-        expect(aliceCategoryNames).not.toContain('Bob Groceries');
-        await expect(page.getByText('Bob Groceries')).toHaveCount(0);
-
-        const aliceTxnsResponse = await request.get(
-            '/api/transactions?period=202601',
-        );
-        expect(aliceTxnsResponse.ok()).toBeTruthy();
-        const aliceTxnsData = (await aliceTxnsResponse.json()) as {
-            data: { comments: string | null }[];
-        };
-        const aliceComments = aliceTxnsData.data.map((t) => t.comments);
-        expect(aliceComments).toContain('Alice transaction');
-        expect(aliceComments).not.toContain('Bob transaction');
-
-        expect(consoleErrors).toEqual([]);
+async function screenshot(page: Page, name: string) {
+    await page.screenshot({
+        path: `verification/e2e-two-user-isolation/${name}.png`,
+        animations: 'disabled',
     });
+}
+
+async function register(page: Page, name: string, email: string) {
+    await page.goto('/register');
+    await page.getByLabel('Name', { exact: true }).fill(name);
+    await page.getByLabel('Email address').fill(email);
+    await page.getByLabel('Password', { exact: true }).fill(password);
+    await page.getByLabel('Confirm password').fill(password);
+    await screenshot(page, `${name}-register`);
+    await page
+        .getByRole('button', { name: 'Create account', exact: true })
+        .click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+}
+
+async function logout(page: Page) {
+    await page.locator('[data-test="sidebar-menu-button"]').click();
+    await page.locator('[data-test="logout-button"]').click();
+    await expect(page).toHaveURL(/\/$/);
+}
+
+async function login(page: Page, email: string) {
+    await page.getByRole('link', { name: 'Log in', exact: true }).click();
+    await page.getByLabel('Email address').fill(email);
+    await page.getByLabel('Password', { exact: true }).fill(password);
+    await page.getByRole('button', { name: 'Log in', exact: true }).click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+}
+
+async function navigate(page: Page, name: string, path: string) {
+    await page.getByRole('link', { name, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+}
+
+async function verifyTemplate(page: Page, name: string) {
+    const response = page.waitForResponse((r) =>
+        r.url().endsWith('/api/categories?include_inactive=1'),
+    );
+    await navigate(page, 'Categories', '/categories');
+    const { data } = await (await response).json();
+    expect(data.map((category: { code: string }) => category.code)).toEqual([
+        ...Array.from(
+            { length: 46 },
+            (_, index) => `C${String(index + 1).padStart(3, '0')}`,
+        ),
+        'I01',
+    ]);
+    expect(
+        data.filter((category: { is_active: boolean }) => category.is_active),
+    ).toHaveLength(46);
+    await expect(page.getByTestId('category-card-C040')).toContainText(
+        'Retired',
+    );
+    await expect(page.getByTestId('category-card-C040')).toContainText(
+        'retired_merged_into_C031',
+    );
+    await expect(page.locator('[data-testid^="category-card-"]')).toHaveCount(
+        47,
+    );
+    // A preceding user's selected month must not leave this picker blank.
+    await expect(page.getByTestId('period-selector')).toHaveText(/\w+ \d{4}/);
+    await screenshot(page, `${name}-template`);
+}
+
+async function createCategory(page: Page, name: string, code: string) {
+    await page.getByTestId('create-category-button').click();
+    await page.getByTestId('category-name-input').fill(name);
+    await page.getByTestId('kind-expense').check();
+    await screenshot(page, `${code}-${name}-form`);
+    const response = page.waitForResponse(
+        (r) =>
+            r.request().method() === 'POST' &&
+            r.url().endsWith('/api/categories'),
+    );
+    await page.getByTestId('create-category-submit').click();
+    const saved = await response;
+    expect(saved.status()).toBe(201);
+    const { data } = await saved.json();
+    expect(data).toMatchObject({ code, name, is_active: true });
+    await expect(page.getByTestId('create-category-dialog')).toHaveCount(0);
+    const card = page.getByTestId(`category-card-${code}`);
+    await expect(card).toContainText(name);
+    await card.scrollIntoViewIfNeeded();
+    await screenshot(page, `${code}-${name}-saved`);
+    return data.id as number;
+}
+
+async function createTransaction(
+    page: Page,
+    name: string,
+    date: string,
+    amount: string,
+) {
+    await navigate(page, 'Transactions', '/transactions');
+    await page
+        .getByRole('button', { name: 'Add Transaction', exact: true })
+        .click();
+    await page.getByTestId('transaction-date-input').fill(date);
+    await page.getByTestId('transaction-category-field').click();
+    await page
+        .getByRole('option', { name: `C047 - ${name} Groceries`, exact: true })
+        .click();
+    await page.getByTestId('transaction-amount-input').fill(amount);
+    await page.getByLabel('Comments').fill(`${name} transaction`);
+    await screenshot(page, `${name}-transaction-form`);
+    const response = page.waitForResponse(
+        (r) =>
+            r.request().method() === 'POST' &&
+            r.url().endsWith('/api/transactions'),
+    );
+    await page.getByTestId('transaction-form-submit').click();
+    const saved = await response;
+    expect(saved.status()).toBe(201);
+    const { data } = await saved.json();
+    await expect(page.getByTestId('transaction-form-dialog')).toHaveCount(0);
+    return data.id as number;
+}
+
+async function selectPeriod(
+    page: Page,
+    month: string,
+    testId = 'period-selector',
+) {
+    await page.getByTestId(testId).click();
+    await page.getByRole('option', { name: month, exact: true }).click();
+    await expect(page.getByTestId(testId)).toContainText(month);
+}
+
+test('complete two-user isolation workflow - 25 steps', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.on('console', (message) => {
+        if (message.type() === 'error') errors.push(message.text());
+    });
+    // Fresh UI registrations own all scenario data; never reset a shared database.
+    const aliceEmail = `alice-${randomUUID()}@example.com`;
+    const bobEmail = `bob-${randomUUID()}@example.com`;
+    await register(page, 'Alice', aliceEmail);
+    await logout(page);
+    await login(page, aliceEmail);
+    await verifyTemplate(page, 'Alice');
+    const aliceCategoryId = await createCategory(
+        page,
+        'Alice Groceries',
+        'C047',
+    );
+    // C047 belongs to both users. A second Alice-only code makes the 404 meaningful.
+    await createCategory(page, 'Alice Private Category', 'C048');
+    const aliceTransactionId = await createTransaction(
+        page,
+        'Alice',
+        '2026-01-15',
+        '125.50',
+    );
+
+    await navigate(page, 'Budgets', '/budgets');
+    await selectPeriod(page, 'January 2026', 'page-period-selector');
+    await page.getByTestId('budget-category-field').click();
+    await page.getByTestId('budget-category-option-C047').click();
+    await page.getByLabel('Budget Amount (CAD)').fill('200');
+    await screenshot(page, 'Alice-budget-form');
+    const budgetResponse = page.waitForResponse(
+        (r) =>
+            r.request().method() === 'POST' && r.url().endsWith('/api/budgets'),
+    );
+    await page.getByTestId('save-budget').click();
+    expect((await budgetResponse).status()).toBe(200);
+    await expect(page.getByTestId('budget-save-success')).toBeVisible();
+    await expect(page.getByTestId('budget-total')).toHaveText('$200.00');
+    await expect(page.getByTestId('actual-total')).toHaveText('$125.50');
+    await screenshot(page, 'Alice-budget-saved');
+
+    await navigate(page, 'Dashboard', '/dashboard');
+    await selectPeriod(page, 'January 2026');
+    await expect(page.getByTestId('dashboard-total-expenses')).toHaveText(
+        '$125.50',
+    );
+    await expect(page.getByTestId('top-spending-row-C047')).toContainText(
+        'Alice Groceries',
+    );
+    await expect(page.getByTestId('top-spending-amount-C047')).toContainText(
+        '125.50',
+    );
+    await page.getByTestId('period-selector').click();
+    await expect(
+        page.getByRole('option', { name: 'January 2026', exact: true }),
+    ).toBeVisible();
+    await screenshot(page, 'Alice-dashboard-periods');
+    await page.keyboard.press('Escape');
+    await logout(page);
+
+    await register(page, 'Bob', bobEmail);
+    await logout(page);
+    await login(page, bobEmail);
+    await verifyTemplate(page, 'Bob');
+    await expect(page.getByText('Alice Groceries')).toHaveCount(0);
+    const bobCategoryId = await createCategory(page, 'Bob Groceries', 'C047');
+    expect(bobCategoryId).not.toBe(aliceCategoryId);
+    const bobTransactionId = await createTransaction(
+        page,
+        'Bob',
+        '2026-03-16',
+        '89.75',
+    );
+    await navigate(page, 'Dashboard', '/dashboard');
+    await selectPeriod(page, 'March 2026');
+    await expect(page.getByTestId('dashboard-total-expenses')).toHaveText(
+        '$89.75',
+    );
+    await expect(page.getByTestId('top-spending-row-C047')).toContainText(
+        'Bob Groceries',
+    );
+    await expect(page.getByTestId('top-spending-amount-C047')).toContainText(
+        '89.75',
+    );
+    await expect(page.getByText('Alice Groceries')).toHaveCount(0);
+    await expect(
+        page.getByTestId(
+            `recent-activity-item-transaction-${aliceTransactionId}`,
+        ),
+    ).toHaveCount(0);
+    await page.getByTestId('period-selector').click();
+    const options = page.getByRole('option');
+    await expect(options.first()).toHaveText('March 2026');
+    await expect(
+        page.getByRole('option', { name: /January 2026|February 2026/ }),
+    ).toHaveCount(0);
+    await screenshot(page, 'Bob-dashboard-periods');
+    await page.keyboard.press('Escape');
+
+    // Read-only API checks share the actual UI session, never a second login context.
+    const ownCategory = await page.request.get('/api/categories/C047');
+    expect(ownCategory.status()).toBe(200);
+    expect((await ownCategory.json()).data).toMatchObject({
+        id: bobCategoryId,
+        name: 'Bob Groceries',
+    });
+    expect((await page.request.get('/api/categories/C048')).status()).toBe(404);
+    expect(
+        (
+            await page.request.get(`/api/transactions/${aliceTransactionId}`)
+        ).status(),
+    ).toBe(404);
+    await navigate(page, 'Budgets', '/budgets');
+    await expect(page.getByTestId('budget-total')).toHaveText('$0.00');
+    await expect(page.getByTestId('budget-row-C047')).toContainText(
+        'No budget',
+    );
+    // Check Alice's month explicitly even though Bob cannot select it in the UI.
+    const januaryBudgets = await page.request.get(
+        '/api/budgets/report?period=202601',
+    );
+    expect(januaryBudgets.status()).toBe(200);
+    expect((await januaryBudgets.json()).meta.totals.budget_cad).toBe(0);
+    await screenshot(page, 'Bob-budget-isolation');
+    await navigate(page, 'Transactions', '/transactions');
+    await selectPeriod(page, 'March 2026', 'page-period-selector');
+    await expect(
+        page.getByTestId(`transaction-row-${bobTransactionId}`),
+    ).toContainText('Bob transaction');
+    await expect(page.locator('[data-testid^="transaction-row-"]')).toHaveCount(
+        1,
+    );
+    await screenshot(page, 'Bob-transaction-saved');
+    await logout(page);
+
+    await login(page, aliceEmail);
+    await navigate(page, 'Categories', '/categories');
+    await expect(page.getByTestId('category-card-C047')).toContainText(
+        'Alice Groceries',
+    );
+    await expect(page.getByTestId('category-card-C048')).toContainText(
+        'Alice Private Category',
+    );
+    await expect(page.getByText('Bob Groceries')).toHaveCount(0);
+    await page.getByTestId('category-card-C047').scrollIntoViewIfNeeded();
+    await screenshot(page, 'Alice-catalog-preserved');
+    await navigate(page, 'Transactions', '/transactions');
+    await selectPeriod(page, 'January 2026', 'page-period-selector');
+    await expect(
+        page.getByTestId(`transaction-row-${aliceTransactionId}`),
+    ).toContainText('Alice transaction');
+    await expect(
+        page.getByTestId(`transaction-row-${bobTransactionId}`),
+    ).toHaveCount(0);
+    await screenshot(page, 'Alice-transaction-preserved');
+    await selectPeriod(page, 'March 2026', 'page-period-selector');
+    await expect(page.locator('[data-testid^="transaction-row-"]')).toHaveCount(
+        0,
+    );
+    expect(
+        (
+            await page.request.get(`/api/transactions/${bobTransactionId}`)
+        ).status(),
+    ).toBe(404);
+    await screenshot(page, 'Alice-cannot-see-Bob-transaction');
+    await navigate(page, 'Budgets', '/budgets');
+    await selectPeriod(page, 'January 2026', 'page-period-selector');
+    await expect(page.getByTestId('budget-total')).toHaveText('$200.00');
+    await expect(page.getByTestId('actual-total')).toHaveText('$125.50');
+    await expect(page.getByTestId('budget-row-C047')).toContainText(
+        'Alice Groceries',
+    );
+    await screenshot(page, 'Alice-budget-preserved');
+    expect(errors).toEqual([]);
 });

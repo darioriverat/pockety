@@ -1,8 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import {
-    DEFAULT_PERIOD,
-    isValidPeriod,
-} from '@/lib/periods';
+import { currentPeriod as calendarPeriod, isValidPeriod } from '@/lib/periods';
 
 export type UsePeriodReturn = {
     readonly period: string;
@@ -11,11 +8,11 @@ export type UsePeriodReturn = {
 
 const STORAGE_KEY = 'pockety.selectedPeriod';
 const listeners = new Set<() => void>();
-let currentPeriod: string = DEFAULT_PERIOD;
+let currentPeriod: string = calendarPeriod();
 
 const getStoredPeriod = (): string => {
     if (typeof window === 'undefined') {
-        return DEFAULT_PERIOD;
+        return calendarPeriod();
     }
 
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -23,7 +20,7 @@ const getStoredPeriod = (): string => {
         return stored;
     }
 
-    return DEFAULT_PERIOD;
+    return calendarPeriod();
 };
 
 const subscribe = (callback: () => void) => {
@@ -37,6 +34,12 @@ const subscribe = (callback: () => void) => {
 const notify = (): void => {
     listeners.forEach((listener) => listener());
 };
+
+export function resetPeriod(): void {
+    currentPeriod = calendarPeriod();
+    localStorage.setItem(STORAGE_KEY, currentPeriod);
+    notify();
+}
 
 export function initializePeriod(): void {
     if (typeof window === 'undefined') {
@@ -54,7 +57,7 @@ export function usePeriod(): UsePeriodReturn {
     const period = useSyncExternalStore(
         subscribe,
         () => currentPeriod,
-        () => DEFAULT_PERIOD,
+        () => calendarPeriod(),
     );
 
     const setPeriod = (next: string): void => {

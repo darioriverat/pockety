@@ -1359,7 +1359,7 @@
       "Step 24: Verify all Alice's data intact",
       "Step 25: Verify Alice cannot see Bob's data"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
