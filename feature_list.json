@@ -1025,7 +1025,7 @@
       "Step 5: Verify links.self includes the assigned code",
       "Step 6: Follow links.self and verify returns same category"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

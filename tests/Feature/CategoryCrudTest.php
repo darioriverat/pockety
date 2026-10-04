@@ -584,4 +584,41 @@ class CategoryCrudTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonStructure(['error', 'messages']);
     }
+
+    public function test_create_response_includes_hateoas_self_link(): void
+    {
+        $response = $this->postJson('/api/categories', [
+            'name' => 'HATEOAS Create Link',
+            'is_debt_category' => false,
+            'is_income_category' => false,
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonStructure([
+                'data' => ['id', 'code', 'name', 'is_debt_category', 'is_income_category', 'is_active'],
+                'links' => ['self'],
+            ]);
+
+        $code = $response->json('data.code');
+        $self = $response->json('links.self');
+
+        $this->assertIsString($code);
+        $this->assertIsString($self);
+        $this->assertNotEmpty($self);
+        $this->assertStringContainsString($code, $self);
+        $this->assertStringContainsString('/api/categories/'.$code, $self);
+        $this->assertEquals(
+            route('categories.show', $code),
+            $self
+        );
+
+        $followPath = parse_url($self, PHP_URL_PATH);
+        $this->assertIsString($followPath);
+
+        $follow = $this->getJson($followPath);
+        $follow->assertOk()
+            ->assertJsonPath('data.code', $code)
+            ->assertJsonPath('data.name', 'HATEOAS Create Link')
+            ->assertJsonPath('data.id', $response->json('data.id'));
+    }
 }
