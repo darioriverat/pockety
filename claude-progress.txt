@@ -1208,3 +1208,22 @@ Remaining Features:
 All tests passing. App verified working in browser.
 
 Next Session: Continue with remaining UI/style features or end-to-end workflows.
+
+Additional Work in Session 23:
+
+4. Feature #82: Categories Page Display ✓ (VERIFIED)
+   - Verified all 48 categories display (active + inactive)
+   - C040 shows "Retired" badge with reduced opacity (opacity-50)
+   - Status text "retired_merged_into_C031" displayed correctly
+   - Visual hierarchy clear and professional
+   - Screenshot: category-c040-retired-badge.png
+
+5. Feature #83: Category Create Dialog Style ✓ (VERIFIED)
+   - Dialog follows consistent app styling
+   - Standard dialog component with backdrop
+   - Name input with placeholder
+   - Kind selector (radio buttons: expense/debt/income)
+   - Cancel and Create buttons
+   - Screenshot: create-category-dialog-open.png
+
+Updated Status: 91/106 features passing (15 remaining)
