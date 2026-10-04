@@ -342,3 +342,35 @@ Next
   locked radios / 422 path).
 - Then income-flag rejection, inactivate, and remaining category edit flows.
 - Current completion: 8/106 features passing; 98 remaining.
+
+
+===============================================================================
+SESSION 6 - October 4, 2026
+===============================================================================
+Completed feature #9: reject debt-flag change when transactions exist.
+
+Changes
+- Added Playwright: tests/browser/category-edit-debt-flag-locked.spec.ts
+  (API 422 + locked kind radios + name still editable).
+- Helper: scripts/session6-verify-debt-lock.mjs
+- Backend/UI already enforced RuntimeException + edit-kind-locked-message;
+  no service change required.
+
+Verification
+- App at http://dev.pockety.com:8080/ (login 200); stack already up.
+- PHPUnit CategoryCrudTest: 25 passed (includes debt-flag rejection).
+- Frontend categories.test.tsx: 9 passed (includes locked-kind component test).
+- Re-ran Playwright category-edit-flags.spec.ts: passed.
+- Playwright category-edit-debt-flag-locked.spec.ts: passed.
+- Screenshots: verification/category-edit-debt-flag-locked-{before,dialog,after}.png
+  Dialog shows locked message and disabled Expense/Debt/Income radios; no Debt
+  badge after rejected change; name update still succeeds.
+- Puppeteer MCP blocked this session (interactive approval); used /dev Playwright.
+
+Issues found
+- None functional. Host Puppeteer MCP still needs interactive approval.
+
+Next
+- Feature #10: reject income-flag change when transactions exist.
+- Then inactivate/reactivate and remaining category edit flows.
+- Current completion: 9/106 features passing; 97 remaining.
