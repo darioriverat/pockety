@@ -700,4 +700,60 @@ class CategoryCrudTest extends TestCase
         }
         $this->assertTrue($found, "Updated category {$code} should be present in the index response");
     }
+
+    public function test_delete_response_includes_hateoas_index_link(): void
+    {
+        // Create a category without dependencies
+        $createResponse = $this->postJson('/api/categories', [
+            'name' => 'HATEOAS Delete Test',
+            'is_debt_category' => false,
+            'is_income_category' => false,
+        ]);
+
+        $createResponse->assertStatus(201);
+        $code = $createResponse->json('data.code');
+
+        // Delete the category
+        $deleteResponse = $this->deleteJson('/api/categories/'.$code);
+
+        // Verify response structure
+        $deleteResponse->assertStatus(200)
+            ->assertJsonStructure([
+                'message',
+                'links' => ['index'],
+            ]);
+
+        // Verify links.index
+        $index = $deleteResponse->json('links.index');
+        $this->assertIsString($index);
+        $this->assertNotEmpty($index);
+        $this->assertEquals(
+            route('categories.index'),
+            $index
+        );
+
+        // Follow links.index and verify the list endpoint works
+        $followIndexPath = parse_url($index, PHP_URL_PATH);
+        $this->assertIsString($followIndexPath);
+
+        $followIndex = $this->getJson($followIndexPath);
+        $followIndex->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'code', 'name'],
+                ],
+                'meta' => ['total'],
+            ]);
+
+        // Verify the deleted category is NOT in the list
+        $categories = $followIndex->json('data');
+        $found = false;
+        foreach ($categories as $category) {
+            if ($category['code'] === $code) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertFalse($found, "Deleted category {$code} should not be present in the index response");
+    }
 }
