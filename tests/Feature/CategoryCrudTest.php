@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Account;
 use App\Models\Budget;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -14,11 +15,20 @@ class CategoryCrudTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Account $account;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->actingAs(User::factory()->create());
         $this->seed(CategorySeeder::class);
+
+        // Create a test account for transactions
+        $this->account = Account::create([
+            'name' => 'Test Account',
+            'type' => 'bank',
+            'currency' => 'CAD',
+        ]);
     }
 
     public function test_create_expense_category(): void
@@ -223,8 +233,13 @@ class CategoryCrudTest extends TestCase
         $category = Category::where('code', 'C001')->first();
 
         // Create a transaction for this category
-        Transaction::factory()->create([
+        Transaction::create([
+            'date' => '2026-01-15',
+            'period' => '202601',
             'category_id' => $category->id,
+            'account_id' => $this->account->id,
+            'amount_cad' => 100.00,
+            'comments' => 'Test transaction',
         ]);
 
         $response = $this->putJson("/api/categories/C001", [
@@ -244,8 +259,13 @@ class CategoryCrudTest extends TestCase
         $category = Category::where('code', 'C001')->first();
 
         // Create a transaction
-        Transaction::factory()->create([
+        Transaction::create([
+            'date' => '2026-01-15',
+            'period' => '202601',
             'category_id' => $category->id,
+            'account_id' => $this->account->id,
+            'amount_cad' => 100.00,
+            'comments' => 'Test transaction',
         ]);
 
         $response = $this->putJson("/api/categories/C001", [
@@ -261,8 +281,13 @@ class CategoryCrudTest extends TestCase
         $category = Category::where('code', 'C001')->first();
 
         // Create a transaction
-        Transaction::factory()->create([
+        Transaction::create([
+            'date' => '2026-01-15',
+            'period' => '202601',
             'category_id' => $category->id,
+            'account_id' => $this->account->id,
+            'amount_cad' => 100.00,
+            'comments' => 'Test transaction',
         ]);
 
         $response = $this->putJson("/api/categories/C001", [
@@ -327,8 +352,13 @@ class CategoryCrudTest extends TestCase
         $category = Category::where('code', 'C001')->first();
 
         // Create a transaction
-        Transaction::factory()->create([
+        Transaction::create([
+            'date' => '2026-01-15',
+            'period' => '202601',
             'category_id' => $category->id,
+            'account_id' => $this->account->id,
+            'amount_cad' => 100.00,
+            'comments' => 'Test transaction',
         ]);
 
         $response = $this->deleteJson("/api/categories/C001");
@@ -345,8 +375,10 @@ class CategoryCrudTest extends TestCase
         $category = Category::where('code', 'C001')->first();
 
         // Create a budget
-        Budget::factory()->create([
+        Budget::create([
             'category_id' => $category->id,
+            'period' => '202601',
+            'amount_cad' => 500.00,
         ]);
 
         $response = $this->deleteJson("/api/categories/C001");
