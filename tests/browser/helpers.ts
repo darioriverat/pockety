@@ -71,20 +71,35 @@ export async function ensureTransactionInPeriod(
 }
 
 export function resetBrowserState(): void {
-    execFileSync(
-        'php',
-        [
-            'artisan',
-            'migrate:fresh',
-            '--seed',
-            '--seeder=BrowserTestSeeder',
-            '--force',
-        ],
-        {
-            cwd: process.cwd(),
-            stdio: 'inherit',
-        },
-    );
+    try {
+        execFileSync(
+            'php',
+            [
+                'artisan',
+                'migrate:fresh',
+                '--seed',
+                '--seeder=BrowserTestSeeder',
+                '--force',
+            ],
+            {
+                cwd: process.cwd(),
+                stdio: 'inherit',
+            },
+        );
+        return;
+    } catch {
+        // Host Playwright may not have PHP on PATH; fall back to app HTTP helpers.
+    }
+
+    const base =
+        process.env.PLAYWRIGHT_BASE_URL ?? 'http://dev.pockety.com:8080';
+
+    execFileSync('curl', ['-sf', `${base}/dev/migrate-fresh`], {
+        stdio: 'inherit',
+    });
+    execFileSync('curl', ['-sf', `${base}/dev/seed-browser`], {
+        stdio: 'inherit',
+    });
 }
 
 export function trackConsoleErrors(page: Page): string[] {

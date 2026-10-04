@@ -997,7 +997,7 @@
       "Step 5: Verify inactive categories excluded from picker",
       "Step 6: Create budget with active category successfully"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

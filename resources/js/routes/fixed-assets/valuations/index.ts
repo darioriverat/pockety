@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 export const store = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 store.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,7 +43,7 @@ store.url = (args: { id: string | number } | [id: string | number ] | string | n
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 store.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -53,7 +53,7 @@ store.post = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 const storeForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -63,7 +63,7 @@ const storeForm = (args: { id: string | number } | [id: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 storeForm.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

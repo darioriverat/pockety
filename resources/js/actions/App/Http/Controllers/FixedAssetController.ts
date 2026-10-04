@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\FixedAssetController::index
-* @see app/Http/Controllers/FixedAssetController.php:17
+* @see app/Http/Controllers/FixedAssetController.php:22
 * @route '/api/fixed-assets'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::index
-* @see app/Http/Controllers/FixedAssetController.php:17
+* @see app/Http/Controllers/FixedAssetController.php:22
 * @route '/api/fixed-assets'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::index
-* @see app/Http/Controllers/FixedAssetController.php:17
+* @see app/Http/Controllers/FixedAssetController.php:22
 * @route '/api/fixed-assets'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::index
-* @see app/Http/Controllers/FixedAssetController.php:17
+* @see app/Http/Controllers/FixedAssetController.php:22
 * @route '/api/fixed-assets'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::index
-* @see app/Http/Controllers/FixedAssetController.php:17
+* @see app/Http/Controllers/FixedAssetController.php:22
 * @route '/api/fixed-assets'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::index
-* @see app/Http/Controllers/FixedAssetController.php:17
+* @see app/Http/Controllers/FixedAssetController.php:22
 * @route '/api/fixed-assets'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::index
-* @see app/Http/Controllers/FixedAssetController.php:17
+* @see app/Http/Controllers/FixedAssetController.php:22
 * @route '/api/fixed-assets'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::show
-* @see app/Http/Controllers/FixedAssetController.php:50
+* @see app/Http/Controllers/FixedAssetController.php:57
 * @route '/api/fixed-assets/{id}'
 */
 export const show = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::show
-* @see app/Http/Controllers/FixedAssetController.php:50
+* @see app/Http/Controllers/FixedAssetController.php:57
 * @route '/api/fixed-assets/{id}'
 */
 show.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -124,7 +124,7 @@ show.url = (args: { id: string | number } | [id: string | number ] | string | nu
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::show
-* @see app/Http/Controllers/FixedAssetController.php:50
+* @see app/Http/Controllers/FixedAssetController.php:57
 * @route '/api/fixed-assets/{id}'
 */
 show.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -134,7 +134,7 @@ show.get = (args: { id: string | number } | [id: string | number ] | string | nu
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::show
-* @see app/Http/Controllers/FixedAssetController.php:50
+* @see app/Http/Controllers/FixedAssetController.php:57
 * @route '/api/fixed-assets/{id}'
 */
 show.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -144,7 +144,7 @@ show.head = (args: { id: string | number } | [id: string | number ] | string | n
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::show
-* @see app/Http/Controllers/FixedAssetController.php:50
+* @see app/Http/Controllers/FixedAssetController.php:57
 * @route '/api/fixed-assets/{id}'
 */
 const showForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -154,7 +154,7 @@ const showForm = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::show
-* @see app/Http/Controllers/FixedAssetController.php:50
+* @see app/Http/Controllers/FixedAssetController.php:57
 * @route '/api/fixed-assets/{id}'
 */
 showForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -164,7 +164,7 @@ showForm.get = (args: { id: string | number } | [id: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::show
-* @see app/Http/Controllers/FixedAssetController.php:50
+* @see app/Http/Controllers/FixedAssetController.php:57
 * @route '/api/fixed-assets/{id}'
 */
 showForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -181,7 +181,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:83
+* @see app/Http/Controllers/FixedAssetController.php:90
 * @route '/api/fixed-assets'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -196,7 +196,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:83
+* @see app/Http/Controllers/FixedAssetController.php:90
 * @route '/api/fixed-assets'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -205,7 +205,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:83
+* @see app/Http/Controllers/FixedAssetController.php:90
 * @route '/api/fixed-assets'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -215,7 +215,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:83
+* @see app/Http/Controllers/FixedAssetController.php:90
 * @route '/api/fixed-assets'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -225,7 +225,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::store
-* @see app/Http/Controllers/FixedAssetController.php:83
+* @see app/Http/Controllers/FixedAssetController.php:90
 * @route '/api/fixed-assets'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -237,7 +237,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
+* @see app/Http/Controllers/FixedAssetController.php:127
 * @route '/api/fixed-assets/{id}'
 */
 export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -252,7 +252,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
+* @see app/Http/Controllers/FixedAssetController.php:127
 * @route '/api/fixed-assets/{id}'
 */
 update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -279,7 +279,7 @@ update.url = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
+* @see app/Http/Controllers/FixedAssetController.php:127
 * @route '/api/fixed-assets/{id}'
 */
 update.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -289,7 +289,7 @@ update.put = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
+* @see app/Http/Controllers/FixedAssetController.php:127
 * @route '/api/fixed-assets/{id}'
 */
 update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -299,7 +299,7 @@ update.patch = (args: { id: string | number } | [id: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
+* @see app/Http/Controllers/FixedAssetController.php:127
 * @route '/api/fixed-assets/{id}'
 */
 const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -314,7 +314,7 @@ const updateForm = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
+* @see app/Http/Controllers/FixedAssetController.php:127
 * @route '/api/fixed-assets/{id}'
 */
 updateForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -329,7 +329,7 @@ updateForm.put = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::update
-* @see app/Http/Controllers/FixedAssetController.php:117
+* @see app/Http/Controllers/FixedAssetController.php:127
 * @route '/api/fixed-assets/{id}'
 */
 updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -346,7 +346,7 @@ update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::destroy
-* @see app/Http/Controllers/FixedAssetController.php:160
+* @see app/Http/Controllers/FixedAssetController.php:170
 * @route '/api/fixed-assets/{id}'
 */
 export const destroy = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -361,7 +361,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::destroy
-* @see app/Http/Controllers/FixedAssetController.php:160
+* @see app/Http/Controllers/FixedAssetController.php:170
 * @route '/api/fixed-assets/{id}'
 */
 destroy.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -388,7 +388,7 @@ destroy.url = (args: { id: string | number } | [id: string | number ] | string |
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::destroy
-* @see app/Http/Controllers/FixedAssetController.php:160
+* @see app/Http/Controllers/FixedAssetController.php:170
 * @route '/api/fixed-assets/{id}'
 */
 destroy.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -398,7 +398,7 @@ destroy.delete = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::destroy
-* @see app/Http/Controllers/FixedAssetController.php:160
+* @see app/Http/Controllers/FixedAssetController.php:170
 * @route '/api/fixed-assets/{id}'
 */
 const destroyForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -413,7 +413,7 @@ const destroyForm = (args: { id: string | number } | [id: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::destroy
-* @see app/Http/Controllers/FixedAssetController.php:160
+* @see app/Http/Controllers/FixedAssetController.php:170
 * @route '/api/fixed-assets/{id}'
 */
 destroyForm.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -430,7 +430,7 @@ destroy.form = destroyForm
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::valuations
-* @see app/Http/Controllers/FixedAssetController.php:182
+* @see app/Http/Controllers/FixedAssetController.php:192
 * @route '/api/fixed-assets/{id}/valuations'
 */
 export const valuations = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -445,7 +445,7 @@ valuations.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::valuations
-* @see app/Http/Controllers/FixedAssetController.php:182
+* @see app/Http/Controllers/FixedAssetController.php:192
 * @route '/api/fixed-assets/{id}/valuations'
 */
 valuations.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -472,7 +472,7 @@ valuations.url = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::valuations
-* @see app/Http/Controllers/FixedAssetController.php:182
+* @see app/Http/Controllers/FixedAssetController.php:192
 * @route '/api/fixed-assets/{id}/valuations'
 */
 valuations.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -482,7 +482,7 @@ valuations.get = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::valuations
-* @see app/Http/Controllers/FixedAssetController.php:182
+* @see app/Http/Controllers/FixedAssetController.php:192
 * @route '/api/fixed-assets/{id}/valuations'
 */
 valuations.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -492,7 +492,7 @@ valuations.head = (args: { id: string | number } | [id: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::valuations
-* @see app/Http/Controllers/FixedAssetController.php:182
+* @see app/Http/Controllers/FixedAssetController.php:192
 * @route '/api/fixed-assets/{id}/valuations'
 */
 const valuationsForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -502,7 +502,7 @@ const valuationsForm = (args: { id: string | number } | [id: string | number ] |
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::valuations
-* @see app/Http/Controllers/FixedAssetController.php:182
+* @see app/Http/Controllers/FixedAssetController.php:192
 * @route '/api/fixed-assets/{id}/valuations'
 */
 valuationsForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -512,7 +512,7 @@ valuationsForm.get = (args: { id: string | number } | [id: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::valuations
-* @see app/Http/Controllers/FixedAssetController.php:182
+* @see app/Http/Controllers/FixedAssetController.php:192
 * @route '/api/fixed-assets/{id}/valuations'
 */
 valuationsForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -529,7 +529,7 @@ valuations.form = valuationsForm
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::storeValuation
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 export const storeValuation = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -544,7 +544,7 @@ storeValuation.definition = {
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::storeValuation
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 storeValuation.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -571,7 +571,7 @@ storeValuation.url = (args: { id: string | number } | [id: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::storeValuation
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 storeValuation.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -581,7 +581,7 @@ storeValuation.post = (args: { id: string | number } | [id: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::storeValuation
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 const storeValuationForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -591,7 +591,7 @@ const storeValuationForm = (args: { id: string | number } | [id: string | number
 
 /**
 * @see \App\Http\Controllers\FixedAssetController::storeValuation
-* @see app/Http/Controllers/FixedAssetController.php:228
+* @see app/Http/Controllers/FixedAssetController.php:238
 * @route '/api/fixed-assets/{id}/valuations'
 */
 storeValuationForm.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

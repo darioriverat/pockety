@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\AccountBalanceController::index
-* @see app/Http/Controllers/AccountBalanceController.php:19
+* @see app/Http/Controllers/AccountBalanceController.php:24
 * @route '/api/accounts/{accountId}/balances'
 */
 export const index = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::index
-* @see app/Http/Controllers/AccountBalanceController.php:19
+* @see app/Http/Controllers/AccountBalanceController.php:24
 * @route '/api/accounts/{accountId}/balances'
 */
 index.url = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,7 +43,7 @@ index.url = (args: { accountId: string | number } | [accountId: string | number 
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::index
-* @see app/Http/Controllers/AccountBalanceController.php:19
+* @see app/Http/Controllers/AccountBalanceController.php:24
 * @route '/api/accounts/{accountId}/balances'
 */
 index.get = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -53,7 +53,7 @@ index.get = (args: { accountId: string | number } | [accountId: string | number 
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::index
-* @see app/Http/Controllers/AccountBalanceController.php:19
+* @see app/Http/Controllers/AccountBalanceController.php:24
 * @route '/api/accounts/{accountId}/balances'
 */
 index.head = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -63,7 +63,7 @@ index.head = (args: { accountId: string | number } | [accountId: string | number
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::index
-* @see app/Http/Controllers/AccountBalanceController.php:19
+* @see app/Http/Controllers/AccountBalanceController.php:24
 * @route '/api/accounts/{accountId}/balances'
 */
 const indexForm = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -73,7 +73,7 @@ const indexForm = (args: { accountId: string | number } | [accountId: string | n
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::index
-* @see app/Http/Controllers/AccountBalanceController.php:19
+* @see app/Http/Controllers/AccountBalanceController.php:24
 * @route '/api/accounts/{accountId}/balances'
 */
 indexForm.get = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -83,7 +83,7 @@ indexForm.get = (args: { accountId: string | number } | [accountId: string | num
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::index
-* @see app/Http/Controllers/AccountBalanceController.php:19
+* @see app/Http/Controllers/AccountBalanceController.php:24
 * @route '/api/accounts/{accountId}/balances'
 */
 indexForm.head = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -100,7 +100,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::store
-* @see app/Http/Controllers/AccountBalanceController.php:65
+* @see app/Http/Controllers/AccountBalanceController.php:70
 * @route '/api/accounts/{accountId}/balances'
 */
 export const store = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -115,7 +115,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::store
-* @see app/Http/Controllers/AccountBalanceController.php:65
+* @see app/Http/Controllers/AccountBalanceController.php:70
 * @route '/api/accounts/{accountId}/balances'
 */
 store.url = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -142,7 +142,7 @@ store.url = (args: { accountId: string | number } | [accountId: string | number 
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::store
-* @see app/Http/Controllers/AccountBalanceController.php:65
+* @see app/Http/Controllers/AccountBalanceController.php:70
 * @route '/api/accounts/{accountId}/balances'
 */
 store.post = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -152,7 +152,7 @@ store.post = (args: { accountId: string | number } | [accountId: string | number
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::store
-* @see app/Http/Controllers/AccountBalanceController.php:65
+* @see app/Http/Controllers/AccountBalanceController.php:70
 * @route '/api/accounts/{accountId}/balances'
 */
 const storeForm = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -162,7 +162,7 @@ const storeForm = (args: { accountId: string | number } | [accountId: string | n
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::store
-* @see app/Http/Controllers/AccountBalanceController.php:65
+* @see app/Http/Controllers/AccountBalanceController.php:70
 * @route '/api/accounts/{accountId}/balances'
 */
 storeForm.post = (args: { accountId: string | number } | [accountId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -174,7 +174,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::show
-* @see app/Http/Controllers/AccountBalanceController.php:131
+* @see app/Http/Controllers/AccountBalanceController.php:137
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 export const show = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -189,7 +189,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::show
-* @see app/Http/Controllers/AccountBalanceController.php:131
+* @see app/Http/Controllers/AccountBalanceController.php:137
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 show.url = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions) => {
@@ -215,7 +215,7 @@ show.url = (args: { accountId: string | number, id: string | number } | [account
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::show
-* @see app/Http/Controllers/AccountBalanceController.php:131
+* @see app/Http/Controllers/AccountBalanceController.php:137
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 show.get = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -225,7 +225,7 @@ show.get = (args: { accountId: string | number, id: string | number } | [account
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::show
-* @see app/Http/Controllers/AccountBalanceController.php:131
+* @see app/Http/Controllers/AccountBalanceController.php:137
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 show.head = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -235,7 +235,7 @@ show.head = (args: { accountId: string | number, id: string | number } | [accoun
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::show
-* @see app/Http/Controllers/AccountBalanceController.php:131
+* @see app/Http/Controllers/AccountBalanceController.php:137
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 const showForm = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -245,7 +245,7 @@ const showForm = (args: { accountId: string | number, id: string | number } | [a
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::show
-* @see app/Http/Controllers/AccountBalanceController.php:131
+* @see app/Http/Controllers/AccountBalanceController.php:137
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 showForm.get = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -255,7 +255,7 @@ showForm.get = (args: { accountId: string | number, id: string | number } | [acc
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::show
-* @see app/Http/Controllers/AccountBalanceController.php:131
+* @see app/Http/Controllers/AccountBalanceController.php:137
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 showForm.head = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -272,7 +272,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::destroy
-* @see app/Http/Controllers/AccountBalanceController.php:165
+* @see app/Http/Controllers/AccountBalanceController.php:180
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 export const destroy = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -287,7 +287,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::destroy
-* @see app/Http/Controllers/AccountBalanceController.php:165
+* @see app/Http/Controllers/AccountBalanceController.php:180
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 destroy.url = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions) => {
@@ -313,7 +313,7 @@ destroy.url = (args: { accountId: string | number, id: string | number } | [acco
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::destroy
-* @see app/Http/Controllers/AccountBalanceController.php:165
+* @see app/Http/Controllers/AccountBalanceController.php:180
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 destroy.delete = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -323,7 +323,7 @@ destroy.delete = (args: { accountId: string | number, id: string | number } | [a
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::destroy
-* @see app/Http/Controllers/AccountBalanceController.php:165
+* @see app/Http/Controllers/AccountBalanceController.php:180
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 const destroyForm = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -338,7 +338,7 @@ const destroyForm = (args: { accountId: string | number, id: string | number } |
 
 /**
 * @see \App\Http\Controllers\AccountBalanceController::destroy
-* @see app/Http/Controllers/AccountBalanceController.php:165
+* @see app/Http/Controllers/AccountBalanceController.php:180
 * @route '/api/accounts/{accountId}/balances/{id}'
 */
 destroyForm.delete = (args: { accountId: string | number, id: string | number } | [accountId: string | number, id: string | number ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

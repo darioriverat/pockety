@@ -285,7 +285,10 @@ export default function Budgets() {
                                         value={selectedCategoryCode}
                                         onValueChange={setSelectedCategoryCode}
                                     >
-                                        <SelectTrigger id="category">
+                                        <SelectTrigger
+                                            id="category"
+                                            data-testid="budget-category-field"
+                                        >
                                             <SelectValue placeholder="Select category" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -293,6 +296,7 @@ export default function Budgets() {
                                                 <SelectItem
                                                     key={category.code}
                                                     value={category.code}
+                                                    data-testid={`budget-category-option-${category.code}`}
                                                 >
                                                     {category.code} — {category.name}
                                                 </SelectItem>
