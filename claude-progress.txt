@@ -261,3 +261,47 @@ Next
 - Continue category editing before reports, overwrite layout, and ownership.
 - Only feature #6 passes field changed; descriptions and steps preserved.
 - Current completion: 6/106 features passing; 100 remaining.
+
+
+===============================================================================
+SESSION 4 - October 4, 2026
+===============================================================================
+Completed feature #7: update category name (API + Edit Category dialog).
+
+Changes
+- Added Edit button on each category card opening an Edit Category dialog.
+- Dialog edits name, kind, and active state via PUT /api/categories/{code}.
+- When the category has transactions, kind radios are disabled with an
+  explanation; server 422 is still surfaced inside the dialog.
+- Successful save updates the card in place without a full page reload.
+- Added component tests for name update and locked-kind behavior (8/8 pass).
+- Added Playwright coverage: tests/browser/category-edit-name.spec.ts
+- Added helper script: scripts/session4-verify-edit.mjs (no DB reset required).
+
+Verification
+- App reachable at http://dev.pockety.com:8080/ (login 200).
+- API create then PUT name for C047 returned 200 with data.name
+  "Updated Name", flags unchanged, and links.self + links.index
+  (verification/create-for-edit.json, verification/update-name.json).
+- Frontend unit tests: categories.test.tsx 8 passed.
+- TypeScript check passed.
+- Local frontend build succeeded with SKIP_WAYFINDER=1 (public/build updated
+  on the shared volume).
+- Docker exec and Puppeteer MCP were blocked this session (daemon socket /
+  interactive approval unavailable). Playwright Chromium download and Chrome
+  launch also failed under sandbox (kill EPERM / SIGABRT).
+- Therefore screenshots category-edit-name-*.png were not produced here.
+  Run the Playwright spec under Docker next session to capture them.
+
+Issues found
+- Host cannot talk to Docker socket without elevated approval.
+- Puppeteer tools require interactive approval that this session cannot grant.
+- Host Playwright needs Chrome channel or browser install; sandbox blocks both.
+
+Next
+- First: run Playwright category-edit-name.spec.ts in Docker and confirm
+  verification/category-edit-name-*.png screenshots.
+- Then feature #8: update category flags when no transactions exist (UI kind
+  change path already wired).
+- Continue category edit flows before report inclusion and ownership work.
+- Current completion: 7/106 features passing; 99 remaining.

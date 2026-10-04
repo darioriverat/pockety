@@ -339,4 +339,128 @@ describe('Categories Page', () => {
         expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
 
+    it('updates a category name through the edit dialog without reload', async () => {
+        const mockCategories = {
+            data: [
+                {
+                    id: 48,
+                    code: 'C047',
+                    name: 'Session4 Edit Target',
+                    is_debt_category: false,
+                    is_income_category: false,
+                    is_active: true,
+                    status: null,
+                },
+            ],
+            links: { self: '/api/categories' },
+            meta: { total: 1 },
+        };
+
+        vi.mocked(fetch)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockCategories,
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ data: [] }),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    data: {
+                        ...mockCategories.data[0],
+                        name: 'Updated Name',
+                    },
+                    links: {
+                        self: '/api/categories/C047',
+                        index: '/api/categories',
+                    },
+                }),
+            } as Response);
+
+        render(<Categories />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-name-C047')).toHaveTextContent(
+                'Session4 Edit Target',
+            );
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: /Edit C047/i }));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('edit-category-dialog')).toBeInTheDocument();
+        });
+
+        fireEvent.change(screen.getByTestId('edit-category-name-input'), {
+            target: { value: 'Updated Name' },
+        });
+        fireEvent.click(screen.getByTestId('edit-category-submit'));
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/categories/C047',
+                expect.objectContaining({
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        name: 'Updated Name',
+                        is_debt_category: false,
+                        is_income_category: false,
+                        is_active: true,
+                    }),
+                }),
+            );
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('edit-category-dialog')).not.toBeInTheDocument();
+            expect(screen.getByTestId('category-name-C047')).toHaveTextContent(
+                'Updated Name',
+            );
+        });
+    });
+
+    it('locks kind controls when the category has transactions', async () => {
+        const mockCategories = {
+            data: [
+                {
+                    id: 1,
+                    code: 'C001',
+                    name: 'Groceries',
+                    is_debt_category: false,
+                    is_income_category: false,
+                    is_active: true,
+                    status: null,
+                },
+            ],
+            links: { self: '/api/categories' },
+            meta: { total: 1 },
+        };
+
+        vi.mocked(fetch)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockCategories,
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    data: [{ id: 99 }],
+                }),
+            } as Response);
+
+        render(<Categories />);
+
+        await screen.findByTestId('category-name-C001');
+        fireEvent.click(screen.getByRole('button', { name: /Edit C001/i }));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('edit-kind-locked-message')).toBeInTheDocument();
+            expect(screen.getByTestId('edit-kind-expense')).toBeDisabled();
+            expect(screen.getByTestId('edit-kind-debt')).toBeDisabled();
+            expect(screen.getByTestId('edit-kind-income')).toBeDisabled();
+        });
+    });
+
 });
