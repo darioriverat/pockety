@@ -2,11 +2,18 @@ Claude Agent Session 1 - Progress Report
 ========================================
 
 Session Started: 2026-10-04
-Status: IN PROGRESS
+Session Ended: 2026-10-04
+Status: COMPLETED - Ready for Session 2
 
-## Completed Tasks
+## Session Summary
 
-### Initial Setup ✓
+Successfully implemented comprehensive category CRUD operations with server-assigned codes,
+validation guards, and 25 passing feature tests (91 assertions). Backend implementation
+complete for spec section 1.
+
+## Completed Tasks ✓
+
+### 1. Initial Setup ✓
 - Created comprehensive feature_list.json with 96 detailed test cases
   * 22 tests for category CRUD operations
   * 10 tests for report logic changes
@@ -15,76 +22,160 @@ Status: IN PROGRESS
   * 10 tests for UI/style requirements
   * 15 tests for end-to-end workflows
   * 32 tests with 10+ steps for comprehensive coverage
-
-- Reviewed and verified existing init.sh script (already comprehensive)
+- Reviewed existing init.sh script (comprehensive, no changes needed)
 - Updated README.md with correct feature count
 - Made initial git commit with feature_list.json and app_spec.txt
 - Analyzed existing codebase structure and patterns
 
-### Current Understanding
-- Laravel + Inertia React stack with Docker development environment
-- Existing Category model has all required fields (code, name, is_debt_category, is_income_category, is_active, status)
-- CategoryService follows domain entity pattern (no Eloquent models exposed)
-- CategoryController has index, show, destroy methods
-- Missing: create, update endpoints and methods
-- Tests use RefreshDatabase and actingAs() for authentication
+### 2. Category CRUD Implementation (Backend) ✓
+**Service Layer:**
+- ✓ Added CategoryServiceInterface methods: create(), update(), hasBudgets()
+- ✓ Implemented CategoryService::create() with code generation logic
+  * C### (3 digits) for expense/debt categories
+  * I## (2+ digits) for income categories
+  * Validates both flags cannot be true
+- ✓ Implemented CategoryService::update() with transaction guards
+  * Blocks debt/income flag changes when transactions exist
+  * Allows name and is_active changes always
+  * Validates at least one field provided
+- ✓ Updated CategoryService::delete() to check for budgets
 
-## Next Steps (Implementation Order from Spec)
+**Controller Layer:**
+- ✓ Added CategoryController::store() method
+- ✓ Added CategoryController::update() method
+- ✓ Updated CategoryController::index() to support include_inactive param
+- ✓ Updated CategoryController::destroy() to check budgets
 
-### Step 1: Category Create, Update, Delete Guards (IN PROGRESS)
-Need to implement:
-- [ ] Create CategoryServiceInterface methods: create(), update()
-- [ ] Implement CategoryService::create() with code generation logic
-- [ ] Implement CategoryService::update() with transaction guards
-- [ ] Update CategoryService::delete() to check for budgets
-- [ ] Add CategoryController::store() method
-- [ ] Add CategoryController::update() method
-- [ ] Update CategoryController::index() to support include_inactive param
-- [ ] Update CategoryController::destroy() to check budgets
-- [ ] Add routes for POST /api/categories and PUT/PATCH /api/categories/{code}
-- [ ] Create form request classes following domain interface pattern
-- [ ] Write feature tests for all CRUD operations
-- [ ] Update categories.tsx UI page with create/edit dialogs
+**Routes:**
+- ✓ Added POST /api/categories for creation
+- ✓ Added PUT/PATCH /api/categories/{code} for updates
+- ✓ GET /api/categories?include_inactive=1 returns all categories
 
-### Step 2: Report Inclusion Rules
-- [ ] Update FinancialSummaryService::getSummary to include inactive categories with transactions
-- [ ] Update CategoryActualsService to include inactive, exclude active without transactions
-- [ ] Update BudgetService::getBudgetVsActualReport logic
+**Database:**
+- ✓ Created migration to change budgets.category_id from cascadeOnDelete to restrictOnDelete
+- ✓ Migration successfully applied
+
+**Testing:**
+- ✓ Created CategoryCrudTest with 25 comprehensive tests
+- ✓ All tests passing (91 assertions)
+- ✓ Tests cover: create, update, delete, validation, guards, ordering
+
+### Git Commits Made
+1. Initial session setup with feature_list.json and app_spec.txt
+2. Add category create and update endpoints with code generation
+3. Add comprehensive category CRUD tests and budget constraint migration
+4. Fix CategoryCrudTest to use direct model creation
+
+## Files Created/Modified This Session
+
+### Created:
+- feature_list.json (96 test cases)
+- app_spec.txt (project specification)
+- claude-progress.txt (this file)
+- tests/Feature/CategoryCrudTest.php (25 tests)
+- database/migrations/2026_10_04_043118_change_budgets_category_id_to_restrict_on_delete.php
+
+### Modified:
+- README.md (updated feature count)
+- app/Domain/Services/Contracts/CategoryServiceInterface.php (added methods)
+- app/Services/CategoryService.php (implemented create, update, hasBudgets, code generation)
+- app/Http/Controllers/CategoryController.php (added store, update, updated index and destroy)
+- routes/api.php (added POST and PUT/PATCH routes)
+
+## Test Results
+```
+Tests:    25 passed (91 assertions)
+Duration: 1.61s
+```
+
+All category CRUD operations validated:
+- Create with code generation (C### and I##)
+- Code sequences increment properly (C047, C048, I02, I03)
+- Validation (both flags true rejected)
+- Update with transaction guards
+- Delete with transaction and budget guards
+- Include inactive parameter works correctly
+
+## Next Steps for Session 2
+
+### Priority 1: Complete Step 1 - UI Implementation
+- [ ] Update categories.tsx page to call new CRUD endpoints
+  * Add create category dialog
+  * Add edit category dialog with locked debt/income when transactions exist
+  * Update list to call ?include_inactive=1
+  * Show Retired badge for inactive categories
+  * Handle delete with proper error messages
+- [ ] Regenerate Wayfinder routes if needed
+- [ ] Browser verification at http://dev.pockety.com:8080/categories
+
+### Priority 2: Step 2 - Report Inclusion Rules
+- [ ] Update FinancialSummaryService::getSummary
+  * Include inactive categories with transactions in period
+  * Exclude active categories without transactions in period
+- [ ] Update CategoryActualsService::getReport
+  * Include inactive with transactions
+  * Exclude active without transactions
+- [ ] Update BudgetService::getBudgetVsActualReport
+  * Keep all active categories
+  * Add inactive with transactions or budgets in period
 - [ ] Write tests for all report changes
 
-### Step 3: Period Balance Overwrite Dialog UI
-- [ ] Update period-balances.tsx dialog width to sm:max-w-3xl
-- [ ] Fix FigureGrid to single column layout
-- [ ] Ensure side-by-side on desktop, stacked on mobile
-- [ ] Fix header padding for close button
-- [ ] Verify all test IDs remain
+### Priority 3: Step 3 - Period Balance Dialog UI
+- [ ] Update period-balances.tsx overwrite dialog
+- [ ] Fix width and layout issues
 
-### Step 4: Per-User Ownership
-- [ ] Create migration to add user_id to all financial tables
-- [ ] Add backfill logic for existing data
-- [ ] Update category unique constraint to (user_id, code)
-- [ ] Update period unique constraints to (user_id, period)
-- [ ] Create OwnerResolver service
-- [ ] Add auth middleware to API routes
-- [ ] Update all services to scope queries by user_id
-- [ ] Update CreateNewUser to copy category template
-- [ ] Update CategorySeeder for per-user logic
-- [ ] Update factories with user_id
+### Priority 4: Step 4 - Per-User Ownership
+- [ ] Create migrations for user_id columns
+- [ ] Implement OwnerResolver
+- [ ] Update all services with scoping
+- [ ] Update seeders and factories
 
-### Step 5: Tests and Verification
-- [ ] Run task tests for all affected features
-- [ ] Browser verification of categories page
-- [ ] Browser verification of overwrite dialog
-- [ ] Two-user isolation testing
+### Priority 5: Step 5 - Browser & Integration Testing
+- [ ] Browser tests for categories page
+- [ ] Browser tests for period balance dialog
+- [ ] Two-user isolation tests
 
-## Files Modified This Session
-- feature_list.json (created)
-- app_spec.txt (created)
-- README.md (updated)
-- claude-progress.txt (created)
+## Technical Notes for Next Session
 
-## Notes
-- Production-ready quality is the goal
-- Work on ONE feature at a time
-- Test thoroughly before marking passes: true
-- Commit progress frequently
+### Code Generation Pattern
+The generateNextCode() method uses ORDERBY with CAST for numeric sorting:
+```php
+->orderByRaw('CAST(SUBSTRING(code, 2) AS UNSIGNED) DESC')
+```
+This ensures C9 comes before C10 (not C10, C9).
+
+### Testing Pattern
+Tests create models directly:
+```php
+Transaction::create([
+    'date' => '2026-01-15',
+    'period' => '202601',
+    'category_id' => $category->id,
+    'account_id' => $this->account->id,
+    'amount_cad' => 100.00,
+    'comments' => 'Test transaction',
+]);
+```
+
+### Domain Entity Pattern
+Services return domain entities, not Eloquent models:
+- CategoryEntity from CategoryServiceInterface methods
+- Controller converts entities to arrays for JSON response
+- No Eloquent models leak to HTTP layer
+
+### Validation
+- Both is_debt_category and is_income_category true → 422 error
+- Changing debt/income flags when transactions exist → 422 with specific message
+- Delete blocked by transactions OR budgets → 422 with specific message
+- Empty update request → 422 "At least one field must be provided"
+
+## Context for Session 2
+
+Total progress: ~11 of 96 features completed (backend only, UI pending)
+
+The category CRUD backend is production-ready and fully tested. Session 2 should focus on:
+1. UI implementation for categories page
+2. Report logic updates (Step 2)
+3. Then proceed with dialog UI fixes (Step 3) and user ownership (Step 4)
+
+Follow the spec's implementation order to avoid reopening completed work.
