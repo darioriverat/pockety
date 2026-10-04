@@ -1431,7 +1431,7 @@
       "Step 9: Verify no page reload occurred",
       "Step 10: Close browser and verify test passes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
