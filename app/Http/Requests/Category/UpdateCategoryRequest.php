@@ -12,6 +12,9 @@ class UpdateCategoryRequest extends FormRequest implements UpdateCategoryRequest
         return true;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function rules(): array
     {
         return [
@@ -44,9 +47,9 @@ class UpdateCategoryRequest extends FormRequest implements UpdateCategoryRequest
 
     public function hasAnyField(): bool
     {
-        return $this->has('name') 
-            || $this->has('is_debt_category') 
-            || $this->has('is_income_category') 
+        return $this->has('name')
+            || $this->has('is_debt_category')
+            || $this->has('is_income_category')
             || $this->has('is_active');
     }
 }

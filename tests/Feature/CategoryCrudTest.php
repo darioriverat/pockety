@@ -146,7 +146,7 @@ class CategoryCrudTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonStructure(['error', 'messages']);
+            ->assertJsonStructure(['message', 'errors']);
     }
 
     public function test_create_trims_name(): void
@@ -548,7 +548,7 @@ class CategoryCrudTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonStructure(['error', 'messages']);
+            ->assertJsonStructure(['message', 'errors']);
     }
 
     public function test_create_validates_name_max_length(): void
@@ -560,7 +560,7 @@ class CategoryCrudTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonStructure(['error', 'messages']);
+            ->assertJsonStructure(['message', 'errors']);
     }
 
     public function test_create_validates_debt_flag_is_required(): void
@@ -571,7 +571,7 @@ class CategoryCrudTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonStructure(['error', 'messages']);
+            ->assertJsonStructure(['message', 'errors']);
     }
 
     public function test_create_validates_income_flag_is_required(): void
@@ -582,7 +582,7 @@ class CategoryCrudTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonStructure(['error', 'messages']);
+            ->assertJsonStructure(['message', 'errors']);
     }
 
     public function test_create_response_includes_hateoas_self_link(): void

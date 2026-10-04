@@ -12,6 +12,9 @@ class StoreCategoryRequest extends FormRequest implements StoreCategoryRequestIn
         return true;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function rules(): array
     {
         return [
