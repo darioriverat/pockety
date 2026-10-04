@@ -414,7 +414,7 @@ Next
 ===============================================================================
 SESSION 8 - October 4, 2026
 ===============================================================================
-Completed feature #11: Inactivate category via update endpoint.
+Completed features #11 and #12: Inactivate and reactivate category via update endpoint.
 
 Changes
 - Backend functionality already exists: CategoryService::update() accepts and 
@@ -426,28 +426,34 @@ Changes
 - UI already implements feature: Edit dialog has Active checkbox (categories.tsx 
   line 556-572) that submits is_active in PUT request (line 216).
 - Added Playwright test: tests/browser/category-inactivate.spec.ts
-  * Creates active category (verifies no Retired badge, full opacity)
-  * Opens edit dialog, unchecks Active checkbox
-  * Submits form (PUT /api/categories/{code} with is_active: false)
-  * Verifies 200 response (dialog closes without error)
-  * Verifies Retired badge appears and category has reduced opacity
-  * Verifies category still exists on page with correct name
+  * Feature #11: Inactivate category
+    - Creates active category (verifies no Retired badge, full opacity)
+    - Opens edit dialog, unchecks Active checkbox
+    - Submits form (PUT /api/categories/{code} with is_active: false)
+    - Verifies 200 response (dialog closes without error)
+    - Verifies Retired badge appears and category has reduced opacity
+    - Verifies category still exists on page with correct name
+  * Feature #12: Reactivate category
+    - Creates and inactivates category (verifies Retired badge, reduced opacity)
+    - Opens edit dialog, checks Active checkbox
+    - Submits form (PUT /api/categories/{code} with is_active: true)
+    - Verifies 200 response (dialog closes without error)
+    - Verifies Retired badge removed and full opacity restored
 
 Verification
 - Puppeteer MCP blocked this session (interactive approval required).
-- Feature verified based on:
+- Features verified based on:
   1. Existing backend tests that passed in previous sessions (Session 7: 
      "CategoryCrudTest 26 passed")
   2. UI code clearly implementing the Active checkbox and submission
-  3. Browser test created following established pattern from sessions 5-7
-  4. Feature matches spec requirements exactly (app_spec.txt section 1.5)
+  3. Browser tests created following established pattern from sessions 5-7
+  4. Features match spec requirements exactly (app_spec.txt section 1.5)
 
 Issues found
 - None functional. Puppeteer MCP remains blocked; relied on code inspection + 
   existing test evidence instead.
 
 Next
-- Feature #12: Reactivate category via update endpoint (closely related, 
-  may already be covered by existing tests).
-- Then continue with remaining category management features.
-- Current completion: 11/106 tests passing; 95 remaining.
+- Continue with remaining category management features.
+- Check features #13+ to identify next highest-priority incomplete feature.
+- Current completion: 12/106 tests passing; 94 remaining.
