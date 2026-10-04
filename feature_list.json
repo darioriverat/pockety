@@ -1127,7 +1127,7 @@
       "Step 6: Verify submit and cancel buttons present",
       "Step 7: Take screenshot and compare to other dialogs in app"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
