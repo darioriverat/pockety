@@ -1038,7 +1038,7 @@
       "Step 5: Verify links.index present",
       "Step 6: Follow links.index to list endpoint"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1050,7 +1050,7 @@
       "Step 4: Verify links.index present in response",
       "Step 5: Follow links.index"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1063,7 +1063,7 @@
       "Step 5: Verify HTTP layer receives entities, not models",
       "Step 6: Check other domain service interfaces follow same pattern"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1076,7 +1076,7 @@
       "Step 5: Verify form requests handle HTTP validation",
       "Step 6: Verify service methods accept domain interfaces, not form requests"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1088,7 +1088,7 @@
       "Step 4: Verify all new service interfaces have bindings",
       "Step 5: Test dependency injection works in controllers"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
