@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
     ensureTransactionInPeriod,
     loginAsBrowserTestUser,
+    selectDisplayedPeriod,
     resetBrowserState,
     trackConsoleErrors,
 } from './helpers';
@@ -21,7 +22,7 @@ test('feature 115: user can generate PDF report of balance sheet for a period', 
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -67,13 +68,11 @@ test('feature 115: user can generate PDF report of balance sheet for a period', 
 
     // Step 1: Navigate to balance sheet for period 202501
     await ensureTransactionInPeriod(request, '202501');
-    await page.goto('/balance-sheet?period=202501');
+    await page.goto('/balance-sheet');
     await expect(
         page.getByRole('heading', { name: 'Balance Sheet' }),
     ).toBeVisible();
-    await expect(page.getByTestId('page-period-selector')).toContainText(
-        'January 2025',
-    );
+    await selectDisplayedPeriod(page, 'January 2025');
     await expect(page.getByTestId('total-assets-cad')).toBeVisible();
     await expect(page.getByTestId('export-balance-sheet-pdf')).toBeVisible();
 

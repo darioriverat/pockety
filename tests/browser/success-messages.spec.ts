@@ -10,7 +10,7 @@ test('success messages after create, update, and delete', async ({
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     const categoriesResponse = await request.get('/api/categories');
     expect(categoriesResponse.ok()).toBeTruthy();

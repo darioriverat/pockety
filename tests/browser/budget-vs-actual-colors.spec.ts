@@ -2,6 +2,7 @@ import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
+    selectDisplayedPeriod,
     trackConsoleErrors,
 } from './helpers';
 
@@ -58,6 +59,7 @@ test('feature 170: under-budget categories display with green colors', async ({
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page, request);
 
     // Set budget of $1000 for C001 (Groceries)
     await setBudget(request, '202501', 'C001', 1000);
@@ -65,8 +67,8 @@ test('feature 170: under-budget categories display with green colors', async ({
     // Create transaction for $800 (under budget)
     await createTransaction(request, 'C001', 800);
 
-    await loginAsBrowserTestUser(page);
     await page.goto('/budgets');
+    await selectDisplayedPeriod(page, 'January 2025');
 
     // Wait for the report to load
     await expect(page.getByTestId('budget-vs-actual-table')).toBeVisible();
@@ -99,6 +101,7 @@ test('feature 170: over-budget categories display with red colors', async ({
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page, request);
 
     // Set budget of $500 for C002 (Baking)
     await setBudget(request, '202501', 'C002', 500);
@@ -106,8 +109,8 @@ test('feature 170: over-budget categories display with red colors', async ({
     // Create transaction for $600 (over budget)
     await createTransaction(request, 'C002', 600);
 
-    await loginAsBrowserTestUser(page);
     await page.goto('/budgets');
+    await selectDisplayedPeriod(page, 'January 2025');
 
     // Wait for the report to load
     await expect(page.getByTestId('budget-vs-actual-table')).toBeVisible();
@@ -140,6 +143,7 @@ test('feature 170: progress bars show correct visual proportions', async ({
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page, request);
 
     // Set budgets with different utilization levels
     await setBudget(request, '202501', 'C004', 1000); // 50% usage
@@ -148,8 +152,8 @@ test('feature 170: progress bars show correct visual proportions', async ({
     await setBudget(request, '202501', 'C005', 1000); // 90% usage
     await createTransaction(request, 'C005', 900);
 
-    await loginAsBrowserTestUser(page);
     await page.goto('/budgets');
+    await selectDisplayedPeriod(page, 'January 2025');
 
     // Wait for the report to load
     await expect(page.getByTestId('budget-vs-actual-table')).toBeVisible();

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
+    selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
 } from './helpers';
@@ -16,7 +17,7 @@ test('feature: user can navigate to different periods using period selector', as
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -70,7 +71,7 @@ test('feature: user can navigate to different periods using period selector', as
 
     const headerSelector = page.getByTestId('period-selector');
     await expect(headerSelector).toBeVisible();
-    await expect(headerSelector).toContainText('January 2025');
+    await selectDisplayedPeriod(page, 'January 2025', 'period-selector');
 
     await expect(page.getByTestId('total-recorded-disbursements')).toContainText(
         '100',

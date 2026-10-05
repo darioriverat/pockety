@@ -2,8 +2,10 @@ import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+    ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
+    selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
 } from './helpers';
@@ -21,7 +23,7 @@ test('feature 116: user can generate PDF report of income statement for a period
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -67,13 +69,12 @@ test('feature 116: user can generate PDF report of income statement for a period
     });
 
     // Step 1: Navigate to income statement/summary for period 202501
-    await page.goto('/financial-summary?period=202501');
+    await ensureTransactionInPeriod(request, '202501');
+    await page.goto('/financial-summary');
     await expect(
         page.getByRole('heading', { name: 'Financial Summary' }),
     ).toBeVisible();
-    await expect(page.getByTestId('page-period-selector')).toContainText(
-        'January 2025',
-    );
+    await selectDisplayedPeriod(page, 'January 2025');
     await expect(page.getByTestId('export-income-statement-pdf')).toBeVisible();
     await expect(page.getByTestId('total-income')).toBeVisible();
     await expect(page.getByTestId('income-lines-table')).toBeVisible();

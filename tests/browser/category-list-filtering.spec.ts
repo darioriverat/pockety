@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { loginAsBrowserTestUser } from './helpers';
+import { loginAsBrowserTestUser, resetBrowserState } from './helpers';
 
 test.describe('Category List Filtering', () => {
+    test.beforeEach(() => {
+        resetBrowserState();
+    });
+
     test('GET /api/categories returns only active categories by default (Feature #14)', async ({ page, request }) => {
         await loginAsBrowserTestUser(page, request);
 

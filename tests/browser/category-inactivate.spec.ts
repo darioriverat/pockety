@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { loginAsBrowserTestUser as login } from './helpers';
+import { loginAsBrowserTestUser as login, resetBrowserState } from './helpers';
 
 test.describe('Category Inactivate and Reactivate', () => {
+    test.beforeEach(() => {
+        resetBrowserState();
+    });
+
     test('inactivate category via update endpoint (Feature #11)', async ({ page }) => {
         await login(page);
         await page.goto('/categories');
@@ -102,7 +106,7 @@ test.describe('Category Inactivate and Reactivate', () => {
     });
 
     test('inactivate category even when transactions exist (Feature #13)', async ({ page, request }) => {
-        await login(page);
+        await login(page, request);
 
         // Step 1: Create category
         await page.goto('/categories');
@@ -122,11 +126,15 @@ test.describe('Category Inactivate and Reactivate', () => {
         const category = categoriesBody.data.find((c: any) => c.code === 'C047');
         expect(category).toBeTruthy();
 
-        // Get an account ID for the transaction
-        const accountsResponse = await request.get('/api/accounts');
-        expect(accountsResponse.ok()).toBeTruthy();
-        const accountsBody = await accountsResponse.json();
-        const account = accountsBody.data[0];
+        const accountResponse = await request.post('/api/accounts', {
+            data: {
+                name: 'Inactivate Checking',
+                type: 'bank',
+                primary_currency: 'CAD',
+            },
+        });
+        expect(accountResponse.ok()).toBeTruthy();
+        const account = (await accountResponse.json()).data as { id: number };
         expect(account).toBeTruthy();
 
         // Step 2: Create transaction using this category

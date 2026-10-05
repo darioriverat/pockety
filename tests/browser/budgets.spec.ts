@@ -3,6 +3,7 @@ import {
     ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
+    selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
 } from './helpers';
@@ -17,7 +18,7 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     // Ensure exchange rates exist for multi-currency conversion
     await request.post('/api/exchange-rates', {
@@ -62,6 +63,7 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
     ).toBeVisible();
     await expect(page.getByTestId('budget-vs-actual-table')).toBeVisible();
     await expect(page.getByTestId('page-period-selector')).toBeVisible();
+    await selectDisplayedPeriod(page, 'January 2025');
     await expect(page.getByLabel('Category')).toBeVisible();
     await expect(page.getByLabel('Budget Amount (CAD)')).toBeVisible();
 

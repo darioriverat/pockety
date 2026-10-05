@@ -38,9 +38,9 @@ async function getCategoryId(request: APIRequestContext): Promise<number> {
     return category.id;
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 149: positive and negative amounts are visually distinguished', async ({

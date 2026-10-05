@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
+    selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
 } from './helpers';
@@ -16,7 +17,7 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -81,6 +82,7 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
     });
 
     await page.goto('/financial-summary');
+    await selectDisplayedPeriod(page, 'January 2025');
 
     await expect(
         page.getByRole('heading', { name: 'Financial Summary' }),

@@ -10,7 +10,7 @@ test.describe('Bulk edit transactions', () => {
         request,
     }) => {
         const consoleErrors = trackConsoleErrors(page);
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         const categoriesResponse = await request.get('/api/categories');
         expect(categoriesResponse.ok()).toBeTruthy();

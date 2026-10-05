@@ -40,9 +40,9 @@ async function getCategories(
     return { expenseId: expense!.id, debtId: debt!.id };
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('liability account: charges are + red and principal is - green', async ({

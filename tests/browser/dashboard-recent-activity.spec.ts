@@ -64,9 +64,9 @@ async function seedRecentActivityData(
     return { expenseId: transaction.data.id, incomeId: income.data.id };
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 111: dashboard shows recent activity feed with clickable details', async ({

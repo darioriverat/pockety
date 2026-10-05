@@ -32,7 +32,7 @@ for (const theme of ['light', 'dark'] as const) {
         const consoleErrors = trackConsoleErrors(page);
         await page.emulateMedia({ colorScheme: theme });
         await page.setViewportSize({ width: 1440, height: 1000 });
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
         await ensureTransactionInPeriod(request, '202412');
 
         const categoriesResponse = await request.get('/api/categories');

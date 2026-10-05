@@ -74,6 +74,7 @@ test('reconciliation: computed balance reflects linked transactions', async ({
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page, request);
 
     const categoriesResponse = await request.get('/api/categories');
     expect(categoriesResponse.ok()).toBeTruthy();
@@ -92,7 +93,6 @@ test('reconciliation: computed balance reflects linked transactions', async ({
         amountCad: 100,
     });
 
-    await loginAsBrowserTestUser(page);
     await page.goto('/reconciliation');
 
     await expect(page.getByRole('heading', { name: 'Reconciliation' })).toBeVisible();

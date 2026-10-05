@@ -81,7 +81,7 @@ test('feature 112: user can set default currency preference for views', async ({
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
     await seedCurrencyPreferenceData(request);
 
     // Step 1-3: Preferences - set default display currency to CAD and save

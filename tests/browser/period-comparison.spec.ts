@@ -135,9 +135,9 @@ async function seedComparisonData(request: APIRequestContext): Promise<void> {
     expect(balFebLoan.ok()).toBeTruthy();
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 104: user can compare two periods side-by-side', async ({

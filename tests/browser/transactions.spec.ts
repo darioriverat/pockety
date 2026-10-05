@@ -196,9 +196,9 @@ async function createAccount(
     return body.data;
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 5: user can create a CAD expense transaction', async ({

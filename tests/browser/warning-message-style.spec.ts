@@ -83,7 +83,7 @@ for (const theme of ['light', 'dark'] as const) {
         const consoleErrors = trackConsoleErrors(page);
         await page.emulateMedia({ colorScheme: theme });
         await page.setViewportSize({ width: 1440, height: 1000 });
-        await loginAsBrowserTestUser(page);
+        await loginAsBrowserTestUser(page, request);
 
         const accountId = await seedUnreconciledAccount(
             request,

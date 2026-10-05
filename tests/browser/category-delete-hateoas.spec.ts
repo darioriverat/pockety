@@ -57,13 +57,14 @@ test.describe('HATEOAS links on category delete response', () => {
             fullPage: true,
         });
 
-        // Delete the category
-        await page.getByTestId(`category-delete-${categoryCode}`).click();
-        
-        // Confirm deletion in dialog
-        await expect(page.getByTestId('delete-category-dialog')).toBeVisible();
+        const dialogMessages: string[] = [];
+        page.on('dialog', async (dialog) => {
+            dialogMessages.push(dialog.message());
+            await dialog.accept();
+        });
+
         await page.screenshot({
-            path: `${SHOT_DIR}/03-delete-dialog.png`,
+            path: `${SHOT_DIR}/03-before-delete.png`,
         });
 
         const deleteWait = page.waitForResponse(
@@ -71,8 +72,12 @@ test.describe('HATEOAS links on category delete response', () => {
                 response.request().method() === 'DELETE' &&
                 response.url().endsWith(`/api/categories/${categoryCode}`),
         );
-        await page.getByTestId('delete-category-confirm').click();
+        await page
+            .getByTestId(`category-card-${categoryCode}`)
+            .getByRole('button', { name: new RegExp(`delete ${categoryCode}`, 'i') })
+            .click();
         const deleteResponse = await deleteWait;
+        await expect.poll(() => dialogMessages.length).toBe(1);
         expect(deleteResponse.status()).toBe(200);
 
         const deleteBody = (await deleteResponse.json()) as {
@@ -105,8 +110,6 @@ test.describe('HATEOAS links on category delete response', () => {
         );
         expect(foundCategory).toBeFalsy();
 
-        // Verify UI removed the category
-        await expect(page.getByTestId('delete-category-dialog')).toHaveCount(0);
         await expect(
             page.getByTestId(`category-card-${categoryCode}`),
         ).toHaveCount(0);

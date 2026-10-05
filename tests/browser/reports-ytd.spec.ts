@@ -65,9 +65,9 @@ async function seedYtdData(request: APIRequestContext): Promise<void> {
     }
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 105: user can view year-to-date totals for income and expenses', async ({

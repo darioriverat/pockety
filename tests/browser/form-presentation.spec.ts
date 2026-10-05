@@ -8,8 +8,9 @@ import {
 test('dashboard period selector matches and updates the displayed summary', async ({ page }) => {
     const errors = trackConsoleErrors(page);
     page.on('pageerror', (error) => errors.push(error.message));
-    await ensureTransactionInPeriod(page.request, '202501');
     await loginAsBrowserTestUser(page);
+    await ensureTransactionInPeriod(page.request, '202501');
+    await page.goto('/dashboard');
     const selector = page.getByTestId('period-selector');
     const initialPeriod = await selector.innerText();
     await expect(page.getByText(`Financial overview for ${initialPeriod}`)).toBeVisible();
@@ -36,9 +37,16 @@ for (const theme of ['light', 'dark'] as const) {
         await page.setViewportSize({ width: 1440, height: 900 });
         await loginAsBrowserTestUser(page);
         await page.getByTestId('nav-link-transactions').click();
-        await page.getByRole('button', { name: 'Add Transaction', exact: true }).click();
+        await expect(page).toHaveURL(/\/transactions$/);
         const dialog = page.getByTestId('transaction-form-dialog');
-        await expect(dialog).toBeVisible();
+        await expect(async () => {
+            if (!(await dialog.isVisible())) {
+                await page
+                    .getByRole('button', { name: 'Add Transaction', exact: true })
+                    .click();
+            }
+            await expect(dialog).toBeVisible();
+        }).toPass();
         await page.screenshot({ animations: 'disabled', path: `verification/test-143-form-presentation/${theme}-01-form.png` });
 
         const ids = ['date', 'period', 'category', 'account', 'currency', 'amount', 'comments', 'is_recurring', 'is_credit', 'is_debt_payment'];

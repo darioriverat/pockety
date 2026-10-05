@@ -70,6 +70,17 @@ export async function ensureTransactionInPeriod(
     expect(response.ok()).toBeTruthy();
 }
 
+export async function selectDisplayedPeriod(
+    page: Page,
+    label: string,
+    testId = 'page-period-selector',
+): Promise<void> {
+    const selector = page.getByTestId(testId);
+    await selector.click();
+    await page.getByRole('option', { name: label, exact: true }).click();
+    await expect(selector).toContainText(label);
+}
+
 export function resetBrowserState(): void {
     try {
         execFileSync(

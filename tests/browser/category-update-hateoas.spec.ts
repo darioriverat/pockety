@@ -58,7 +58,7 @@ test.describe('HATEOAS links on category update response', () => {
         });
 
         // Edit the category
-        await page.getByTestId(`category-edit-${categoryCode}`).click();
+        await page.getByTestId(`edit-category-${categoryCode}`).click();
         await expect(page.getByTestId('edit-category-dialog')).toBeVisible();
         await page.getByLabel('Name', { exact: true }).clear();
         await page.getByLabel('Name', { exact: true }).fill('HATEOAS Updated Name');

@@ -41,8 +41,7 @@ test.describe('Category 404 and Validation', () => {
         // Step 2: Verify response 422 with name required error
         expect(emptyNameResponse.status()).toBe(422);
         const emptyNameBody = await emptyNameResponse.json();
-        expect(emptyNameBody).toHaveProperty('error');
-        expect(emptyNameBody).toHaveProperty('messages');
+        expect(emptyNameBody.errors?.name?.length).toBeGreaterThan(0);
 
         // Step 3: POST with name over 255 characters
         const longNameResponse = await request.post('/api/categories', {

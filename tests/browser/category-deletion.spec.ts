@@ -1,7 +1,21 @@
-import { test, expect } from '@playwright/test';
-import { loginAsBrowserTestUser } from './helpers';
+import { test, expect, type Page } from '@playwright/test';
+import { loginAsBrowserTestUser, resetBrowserState } from './helpers';
+
+function acceptDialogs(page: Page): string[] {
+    const messages: string[] = [];
+    page.on('dialog', async (dialog) => {
+        messages.push(dialog.message());
+        await dialog.accept();
+    });
+
+    return messages;
+}
 
 test.describe('Category Deletion', () => {
+    test.beforeEach(() => {
+        resetBrowserState();
+    });
+
     test('delete category succeeds when no transactions or budgets exist (Feature #16)', async ({ page, request }) => {
         await loginAsBrowserTestUser(page, request);
 
@@ -20,19 +34,19 @@ test.describe('Category Deletion', () => {
         // Step 3: Verify no budgets reference it
         // (Newly created category has no transactions or budgets)
 
-        // Step 4: DELETE /api/categories/{code}
-        await page.getByTestId('delete-category-C047').click();
+        const dialogMessages = acceptDialogs(page);
+        const deleteResponsePromise = page.waitForResponse(
+            (response) =>
+                response.request().method() === 'DELETE' &&
+                response.url().endsWith('/api/categories/C047'),
+        );
+        await categoryCard.getByRole('button', { name: /delete c047/i }).click();
+        const deleteResponse = await deleteResponsePromise;
+        expect(deleteResponse.status()).toBe(200);
+        const deleteBody = await deleteResponse.json();
+        expect(deleteBody.links.index).toContain('/api/categories');
+        await expect.poll(() => dialogMessages.length).toBe(1);
 
-        // Confirm deletion in dialog
-        const deleteDialog = page.getByRole('dialog');
-        await expect(deleteDialog).toBeVisible();
-        await page.getByRole('button', { name: /delete|confirm/i }).click();
-
-        // Step 5: Verify response 200 (dialog closes, success message appears)
-        await expect(deleteDialog).toBeHidden();
-        
-        // Step 6: Verify links.index in response (implicit - UI navigates correctly)
-        // Step 7: Verify category hard-deleted from database (not visible on page)
         await expect(categoryCard).not.toBeVisible();
 
         // Verify via API that category is deleted
@@ -64,11 +78,15 @@ test.describe('Category Deletion', () => {
         const category = categoriesBody.data.find((c: any) => c.code === 'C047');
         expect(category).toBeTruthy();
 
-        // Get an account ID for the transaction
-        const accountsResponse = await request.get('/api/accounts');
-        expect(accountsResponse.ok()).toBeTruthy();
-        const accountsBody = await accountsResponse.json();
-        const account = accountsBody.data[0];
+        const accountResponse = await request.post('/api/accounts', {
+            data: {
+                name: 'Deletion Checking',
+                type: 'bank',
+                primary_currency: 'CAD',
+            },
+        });
+        expect(accountResponse.ok()).toBeTruthy();
+        const account = (await accountResponse.json()).data as { id: number };
         expect(account).toBeTruthy();
 
         // Step 2: Create transaction with this category_id
@@ -88,24 +106,25 @@ test.describe('Category Deletion', () => {
         await page.reload();
         await expect(categoryCard).toBeVisible();
 
-        // Step 3: DELETE /api/categories/{code}
-        await page.getByTestId('delete-category-C047').click();
+        const dialogMessages = acceptDialogs(page);
+        const deleteResponsePromise = page.waitForResponse(
+            (response) =>
+                response.request().method() === 'DELETE' &&
+                response.url().endsWith('/api/categories/C047'),
+        );
+        await categoryCard.getByRole('button', { name: /delete c047/i }).click();
+        const deleteResponse = await deleteResponsePromise;
+        expect(deleteResponse.status()).toBe(422);
+        expect(await deleteResponse.json()).toMatchObject({
+            has_transactions: true,
+            message:
+                'This category has associated transactions and cannot be deleted',
+        });
+        await expect.poll(() => dialogMessages.length).toBe(2);
+        expect(dialogMessages[1]).toBe(
+            'This category has associated transactions and cannot be deleted',
+        );
 
-        // Confirm deletion in dialog
-        const deleteDialog = page.getByRole('dialog');
-        await expect(deleteDialog).toBeVisible();
-        await page.getByRole('button', { name: /delete|confirm/i }).click();
-
-        // Step 4: Verify response 422 (error message appears)
-        // Step 6: Verify message 'This category has associated transactions and cannot be deleted'
-        await expect(page.getByText(/associated transactions/i)).toBeVisible();
-
-        // Step 5: Verify has_transactions is true (implicit in error message)
-        
-        // Close error dialog
-        await page.getByRole('button', { name: /cancel|close/i }).click();
-
-        // Step 7: Verify category still exists in database
         await expect(categoryCard).toBeVisible();
 
         // Verify via API that category still exists
@@ -151,24 +170,24 @@ test.describe('Category Deletion', () => {
         await page.reload();
         await expect(categoryCard).toBeVisible();
 
-        // Step 3: DELETE /api/categories/{code}
-        await page.getByTestId('delete-category-C047').click();
+        const dialogMessages = acceptDialogs(page);
+        const deleteResponsePromise = page.waitForResponse(
+            (response) =>
+                response.request().method() === 'DELETE' &&
+                response.url().endsWith('/api/categories/C047'),
+        );
+        await categoryCard.getByRole('button', { name: /delete c047/i }).click();
+        const deleteResponse = await deleteResponsePromise;
+        expect(deleteResponse.status()).toBe(422);
+        expect(await deleteResponse.json()).toMatchObject({
+            has_budgets: true,
+            message: 'This category has associated budgets and cannot be deleted',
+        });
+        await expect.poll(() => dialogMessages.length).toBe(2);
+        expect(dialogMessages[1]).toBe(
+            'This category has associated budgets and cannot be deleted',
+        );
 
-        // Confirm deletion in dialog
-        const deleteDialog = page.getByRole('dialog');
-        await expect(deleteDialog).toBeVisible();
-        await page.getByRole('button', { name: /delete|confirm/i }).click();
-
-        // Step 4: Verify response 422 (error message appears)
-        // Step 6: Verify message 'This category has associated budgets and cannot be deleted'
-        await expect(page.getByText(/associated budgets/i)).toBeVisible();
-
-        // Step 5: Verify has_budgets is true (implicit in error message)
-        
-        // Close error dialog
-        await page.getByRole('button', { name: /cancel|close/i }).click();
-
-        // Step 7: Verify category still exists
         await expect(categoryCard).toBeVisible();
 
         // Verify via API that category still exists

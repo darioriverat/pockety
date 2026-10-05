@@ -53,9 +53,9 @@ function rowCategories(page: Page): Promise<string[]> {
     return page.locator('[data-testid^="transaction-category-"]').allTextContents();
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 120: user can sort transactions table by date', async ({

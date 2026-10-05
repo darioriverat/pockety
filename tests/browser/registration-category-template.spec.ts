@@ -31,11 +31,15 @@ test('feature 71: registration preserves the retired C040 template category', as
     }));
 
     const retired = page.getByTestId('category-card-C040');
-    await retired.scrollIntoViewIfNeeded();
     await expect(retired).toContainText('Retired');
     await expect(retired).toContainText('retired_merged_into_C031');
+    await expect(async () => {
+        await retired.scrollIntoViewIfNeeded({ timeout: 2_000 });
+        await retired.screenshot({
+            path: 'verification/registration-template/retired-C040.png',
+        });
+    }).toPass();
     await page.screenshot({ path: 'verification/registration-template/categories.png' });
-    await retired.screenshot({ path: 'verification/registration-template/retired-C040.png' });
 
     const activeResponse = await page.request.get('/api/categories');
     expect(activeResponse.status()).toBe(200);

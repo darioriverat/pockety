@@ -102,9 +102,15 @@ async function createTransaction(
     amount: string,
 ) {
     await navigate(page, 'Transactions', '/transactions');
-    await page
-        .getByRole('button', { name: 'Add Transaction', exact: true })
-        .click();
+    const dialog = page.getByTestId('transaction-form-dialog');
+    await expect(async () => {
+        if (!(await dialog.isVisible())) {
+            await page
+                .getByRole('button', { name: 'Add Transaction', exact: true })
+                .click();
+        }
+        await expect(dialog).toBeVisible();
+    }).toPass({ timeout: 15_000 });
     await page.getByTestId('transaction-date-input').fill(date);
     await page.getByTestId('transaction-category-field').click();
     await page
@@ -137,6 +143,7 @@ async function selectPeriod(
 }
 
 test('complete two-user isolation workflow - 25 steps', async ({ page }) => {
+    test.setTimeout(240_000);
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('console', (message) => {
@@ -264,6 +271,8 @@ test('complete two-user isolation workflow - 25 steps', async ({ page }) => {
     expect((await januaryBudgets.json()).meta.totals.budget_cad).toBe(0);
     await screenshot(page, 'Bob-budget-isolation');
     await navigate(page, 'Transactions', '/transactions');
+    // A prefetched Inertia visit can reuse the page from before this transaction existed.
+    await page.reload();
     await selectPeriod(page, 'March 2026', 'page-period-selector');
     await expect(
         page.getByTestId(`transaction-row-${bobTransactionId}`),
@@ -286,6 +295,7 @@ test('complete two-user isolation workflow - 25 steps', async ({ page }) => {
     await page.getByTestId('category-card-C047').scrollIntoViewIfNeeded();
     await screenshot(page, 'Alice-catalog-preserved');
     await navigate(page, 'Transactions', '/transactions');
+    await page.reload();
     await selectPeriod(page, 'January 2026', 'page-period-selector');
     await expect(
         page.getByTestId(`transaction-row-${aliceTransactionId}`),

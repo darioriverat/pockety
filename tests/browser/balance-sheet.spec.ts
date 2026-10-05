@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 import {
+    ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
+    selectDisplayedPeriod,
     trackConsoleErrors,
 } from './helpers';
 
@@ -15,7 +17,7 @@ test('feature 65-70: balance sheet shows assets liabilities equity in CAD USD CO
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -99,8 +101,10 @@ test('feature 65-70: balance sheet shows assets liabilities equity in CAD USD CO
         '/dev/seed-balance-sheet-fixture?period=202501&book_value=25000',
     );
     expect(seedFixed.ok()).toBeTruthy();
+    await ensureTransactionInPeriod(request, '202501');
 
     await page.goto('/balance-sheet');
+    await selectDisplayedPeriod(page, 'January 2025');
 
     await expect(
         page.getByRole('heading', { name: 'Balance Sheet' }),
@@ -154,7 +158,7 @@ test('feature 71: balance sheet time series shows historical trend across period
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {

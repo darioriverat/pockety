@@ -67,9 +67,9 @@ async function seedTopSpendingData(
     }
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 103: dashboard shows top spending categories for current period', async ({

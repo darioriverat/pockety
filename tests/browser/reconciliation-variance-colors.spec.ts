@@ -74,6 +74,7 @@ test('feature 169: zero variance displays in green', async ({
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page, request);
 
     const categoriesResponse = await request.get('/api/categories');
     expect(categoriesResponse.ok()).toBeTruthy();
@@ -95,7 +96,6 @@ test('feature 169: zero variance displays in green', async ({
     // Don't create any transactions - computed will be 1000 (from recorded) minus 0 = 1000
     // Actually, the backend should set computed = recorded when balanced
 
-    await loginAsBrowserTestUser(page);
     await page.goto('/reconciliation');
 
     await page.getByLabel('Period (YYYYMM)').fill('202501');
@@ -127,6 +127,7 @@ test('feature 169: significant positive variance displays in yellow/amber', asyn
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page, request);
 
     const categoriesResponse = await request.get('/api/categories');
     expect(categoriesResponse.ok()).toBeTruthy();
@@ -154,7 +155,6 @@ test('feature 169: significant positive variance displays in yellow/amber', asyn
         amountCad: 20,
     });
 
-    await loginAsBrowserTestUser(page);
     await page.goto('/reconciliation');
 
     await page.getByLabel('Period (YYYYMM)').fill('202501');
@@ -186,6 +186,7 @@ test('feature 169: minor variance displays in neutral/muted color', async ({
     request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    await loginAsBrowserTestUser(page, request);
 
     const categoriesResponse = await request.get('/api/categories');
     expect(categoriesResponse.ok()).toBeTruthy();
@@ -206,7 +207,6 @@ test('feature 169: minor variance displays in neutral/muted color', async ({
         amountCad: 5,
     });
 
-    await loginAsBrowserTestUser(page);
     await page.goto('/reconciliation');
 
     await page.getByLabel('Period (YYYYMM)').fill('202501');

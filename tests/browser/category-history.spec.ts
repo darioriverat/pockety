@@ -32,9 +32,9 @@ async function createAccount(request: APIRequestContext): Promise<number> {
     return body.data.id;
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 98: user can view all transactions for a category across periods', async ({

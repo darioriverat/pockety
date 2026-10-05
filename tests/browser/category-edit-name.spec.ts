@@ -5,9 +5,9 @@ import {
     trackConsoleErrors,
 } from './helpers';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 7: update category name through edit dialog', async ({

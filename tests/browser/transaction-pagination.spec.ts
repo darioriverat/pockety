@@ -48,9 +48,9 @@ async function openSeptember2026Transactions(page: Page): Promise<void> {
     );
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 92: system supports pagination for large transaction lists', async ({

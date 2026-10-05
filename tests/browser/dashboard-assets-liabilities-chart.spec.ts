@@ -83,9 +83,9 @@ async function seedAssetsLiabilitiesData(
     }
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
     resetBrowserState();
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 });
 
 test('feature 102: dashboard shows assets vs liabilities chart over time', async ({

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
+    selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
 } from './helpers';
@@ -16,7 +17,7 @@ test('feature 86: category actuals aggregates by category and period', async ({
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
+    await loginAsBrowserTestUser(page, request);
 
     await request.post('/api/exchange-rates', {
         data: {
@@ -57,6 +58,7 @@ test('feature 86: category actuals aggregates by category and period', async ({
     await expect(
         page.getByTestId('category-actuals-heading'),
     ).toBeVisible();
+    await selectDisplayedPeriod(page, 'January 2025');
     await expect(page.getByTestId('category-actuals-table')).toBeVisible();
 
     await page.screenshot({
