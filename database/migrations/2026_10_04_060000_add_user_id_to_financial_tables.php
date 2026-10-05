@@ -36,15 +36,6 @@ return new class extends Migration
             foreach ($this->tables as $table) {
                 DB::table($table)->whereNull('user_id')->update(['user_id' => $ownerId]);
             }
-
-            $otherUserIds = DB::table('users')
-                ->where('id', '!=', $ownerId)
-                ->orderBy('id')
-                ->pluck('id');
-
-            foreach ($otherUserIds as $userId) {
-                CategoryTemplate::seedForUser((int) $userId);
-            }
         } else {
             // Spec: skip backfill when users are empty. Drop any orphan financial
             // rows so the column can become NOT NULL; seeders assign user_id later.
@@ -53,17 +44,41 @@ return new class extends Migration
             }
         }
 
+        // Release global codes before copying the template. MySQL still has
+        // categories_code_unique at this point, so a second user's C001 cannot
+        // be inserted until that index is gone. Composite uniques are added
+        // after user_id is NOT NULL so the column change does not drop them.
+        $this->dropUniqueIndex('categories', 'categories_code_unique', ['code']);
+        $this->dropUniqueIndex('exchange_rates', 'exchange_rates_period_unique', ['period']);
+        $this->dropUniqueIndex('historical_balance_sheets', 'historical_balance_sheets_period_unique', ['period']);
+        $this->dropUniqueIndex('period_balances', 'period_balances_period_unique', ['period']);
+
+        if ($ownerId !== null) {
+            $otherUserIds = DB::table('users')
+                ->where('id', '!=', $ownerId)
+                ->orderBy('id')
+                ->pluck('id');
+
+            foreach ($otherUserIds as $userId) {
+                CategoryTemplate::seedForUser((int) $userId);
+            }
+        }
+
         $this->makeUserIdColumnsNotNullable();
 
-        $this->replaceUniqueIndex('categories', 'categories_code_unique', ['code'], ['user_id', 'code']);
-        $this->replaceUniqueIndex('exchange_rates', 'exchange_rates_period_unique', ['period'], ['user_id', 'period']);
-        $this->replaceUniqueIndex('historical_balance_sheets', 'historical_balance_sheets_period_unique', ['period'], ['user_id', 'period']);
-        $this->replaceUniqueIndex('period_balances', 'period_balances_period_unique', ['period'], ['user_id', 'period']);
+        $this->addUniqueIndex('categories', ['user_id', 'code']);
+        $this->addUniqueIndex('exchange_rates', ['user_id', 'period']);
+        $this->addUniqueIndex('historical_balance_sheets', ['user_id', 'period']);
+        $this->addUniqueIndex('period_balances', ['user_id', 'period']);
     }
 
     private function addNullableUserIdColumns(): void
     {
         foreach ($this->tables as $table) {
+            if (Schema::hasColumn($table, 'user_id')) {
+                continue;
+            }
+
             Schema::table($table, function (Blueprint $blueprint) {
                 $blueprint->foreignId('user_id')
                     ->nullable()
@@ -76,40 +91,71 @@ return new class extends Migration
     private function makeUserIdColumnsNotNullable(): void
     {
         foreach ($this->tables as $table) {
+            if (! $this->columnIsNullable($table, 'user_id')) {
+                continue;
+            }
+
             Schema::table($table, function (Blueprint $blueprint) {
                 $blueprint->unsignedBigInteger('user_id')->nullable(false)->change();
             });
         }
     }
 
-    /**
-     * @param  list<string>  $oldColumns
-     * @param  list<string>  $newColumns
-     */
-    private function replaceUniqueIndex(string $table, string $oldIndexName, array $oldColumns, array $newColumns): void
+    private function columnIsNullable(string $table, string $column): bool
     {
-        Schema::table($table, function (Blueprint $blueprint) use ($table, $oldIndexName, $oldColumns, $newColumns) {
-            $sm = Schema::getConnection()->getSchemaBuilder();
-            $indexes = $sm->getIndexes($table);
-            $indexNames = collect($indexes)->pluck('name')->all();
+        $definition = collect(Schema::getColumns($table))->firstWhere('name', $column);
 
-            if (in_array($oldIndexName, $indexNames, true)) {
-                $blueprint->dropUnique($oldColumns);
-            } else {
-                // SQLite may name composites differently; try dropping by columns when present.
-                foreach ($indexes as $index) {
-                    if ($index['unique'] && $index['columns'] === $oldColumns) {
-                        $blueprint->dropUnique($oldColumns);
-                        break;
-                    }
-                }
-            }
+        return (bool) ($definition['nullable'] ?? true);
+    }
 
-            $newName = $table.'_'.implode('_', $newColumns).'_unique';
-            if (! in_array($newName, $indexNames, true)) {
-                $blueprint->unique($newColumns);
-            }
+    /**
+     * @param  list<string>  $columns
+     */
+    private function dropUniqueIndex(string $table, string $indexName, array $columns): void
+    {
+        if (! $this->uniqueIndexExists($table, $indexName, $columns)) {
+            return;
+        }
+
+        Schema::table($table, function (Blueprint $blueprint) use ($columns) {
+            $blueprint->dropUnique($columns);
         });
+    }
+
+    /**
+     * @param  list<string>  $columns
+     */
+    private function addUniqueIndex(string $table, array $columns): void
+    {
+        $indexName = $table.'_'.implode('_', $columns).'_unique';
+
+        if ($this->uniqueIndexExists($table, $indexName, $columns)) {
+            return;
+        }
+
+        Schema::table($table, function (Blueprint $blueprint) use ($columns) {
+            $blueprint->unique($columns);
+        });
+    }
+
+    /**
+     * @param  list<string>  $columns
+     */
+    private function uniqueIndexExists(string $table, string $indexName, array $columns): bool
+    {
+        $indexes = Schema::getConnection()->getSchemaBuilder()->getIndexes($table);
+
+        foreach ($indexes as $index) {
+            if ($index['name'] === $indexName) {
+                return true;
+            }
+
+            if ($index['unique'] && $index['columns'] === $columns) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function down(): void
