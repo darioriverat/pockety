@@ -28,21 +28,7 @@ return new class extends Migration
 
     public function up(): void
     {
-        // Clean leftover SQLite rebuild tables from a previous failed attempt.
-        foreach ($this->tables as $table) {
-            Schema::dropIfExists('__temp__'.$table);
-        }
-
-        foreach ($this->tables as $table) {
-            if (! Schema::hasColumn($table, 'user_id')) {
-                Schema::table($table, function (Blueprint $blueprint) {
-                    $blueprint->foreignId('user_id')
-                        ->nullable()
-                        ->constrained('users')
-                        ->restrictOnDelete();
-                });
-            }
-        }
+        $this->addNullableUserIdColumns();
 
         $ownerId = DB::table('users')->min('id');
 
@@ -67,19 +53,33 @@ return new class extends Migration
             }
         }
 
-        foreach ($this->tables as $table) {
-            $column = collect(Schema::getColumns($table))->firstWhere('name', 'user_id');
-            if ($column && ($column['nullable'] ?? false)) {
-                Schema::table($table, function (Blueprint $blueprint) {
-                    $blueprint->unsignedBigInteger('user_id')->nullable(false)->change();
-                });
-            }
-        }
+        $this->makeUserIdColumnsNotNullable();
 
         $this->replaceUniqueIndex('categories', 'categories_code_unique', ['code'], ['user_id', 'code']);
         $this->replaceUniqueIndex('exchange_rates', 'exchange_rates_period_unique', ['period'], ['user_id', 'period']);
         $this->replaceUniqueIndex('historical_balance_sheets', 'historical_balance_sheets_period_unique', ['period'], ['user_id', 'period']);
         $this->replaceUniqueIndex('period_balances', 'period_balances_period_unique', ['period'], ['user_id', 'period']);
+    }
+
+    private function addNullableUserIdColumns(): void
+    {
+        foreach ($this->tables as $table) {
+            Schema::table($table, function (Blueprint $blueprint) {
+                $blueprint->foreignId('user_id')
+                    ->nullable()
+                    ->constrained('users')
+                    ->restrictOnDelete();
+            });
+        }
+    }
+
+    private function makeUserIdColumnsNotNullable(): void
+    {
+        foreach ($this->tables as $table) {
+            Schema::table($table, function (Blueprint $blueprint) {
+                $blueprint->unsignedBigInteger('user_id')->nullable(false)->change();
+            });
+        }
     }
 
     /**
