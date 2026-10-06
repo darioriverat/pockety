@@ -88,7 +88,13 @@ class AccountController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|max:255|unique:accounts,name',
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    \Illuminate\Validation\Rule::unique('accounts', 'name')
+                        ->where('user_id', $this->owner->id()),
+                ],
                 'type' => 'required|in:bank,investment,liability,receivable',
                 'primary_currency' => 'nullable|in:CAD,USD,COP',
                 'notes' => 'nullable|string|max:1000',
@@ -124,8 +130,25 @@ class AccountController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         try {
+            // Get the current account to check if type is changing
+            $currentAccount = $this->service->getById($id);
+
+            if (! $currentAccount) {
+                return response()->json([
+                    'error' => 'Account not found',
+                ], 404);
+            }
+
             $validated = $request->validate([
-                'name' => "sometimes|required|string|max:255|unique:accounts,name,{$id}",
+                'name' => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    'max:255',
+                    \Illuminate\Validation\Rule::unique('accounts', 'name')
+                        ->where('user_id', $this->owner->id())
+                        ->ignore($id),
+                ],
                 'type' => 'sometimes|required|in:bank,investment,liability,receivable',
                 'primary_currency' => 'nullable|in:CAD,USD,COP',
                 'notes' => 'nullable|string|max:1000',
@@ -133,6 +156,24 @@ class AccountController extends Controller
             ], [
                 'name.unique' => 'An account with this name already exists.',
             ]);
+
+            // Check if type is being changed and account has transactions
+            if (isset($validated['type']) && $validated['type'] !== $currentAccount->type) {
+                $userId = $this->owner->id();
+                $hasTransactions = Transaction::query()
+                    ->forUser($userId)
+                    ->where('account_id', $id)
+                    ->exists();
+
+                if ($hasTransactions) {
+                    return response()->json([
+                        'error' => 'Validation failed',
+                        'messages' => [
+                            'type' => ['The account type cannot be changed because transactions are registered for this account.'],
+                        ],
+                    ], 422);
+                }
+            }
 
             $account = $this->service->update($id, $validated);
 

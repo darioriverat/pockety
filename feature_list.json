@@ -162,7 +162,7 @@
       "Step 3: Click Edit on an account and confirm a dialog opens",
       "Step 4: Close the dialog and confirm the list is unchanged"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -181,7 +181,7 @@
       "Step 11: Verify another user with the same account name is not affected",
       "Step 12: Confirm no console or network error occurred"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -198,7 +198,7 @@
       "Step 9: Submit a forced type change and verify the 422 message is shown in the dialog",
       "Step 10: Verify the stored type is still unchanged"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -217,7 +217,7 @@
       "Step 11: Assert another user's account with the same name does not collide and owner-scoped uniqueness holds",
       "Step 12: Run php artisan test --filter the account update tests and confirm all pass"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

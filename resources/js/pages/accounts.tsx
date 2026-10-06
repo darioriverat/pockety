@@ -37,7 +37,8 @@ import {
     SubsectionHeading,
 } from '@/components/section-heading';
 import { formatCurrencyAmount } from '@/lib/currency';
-import { PlusIcon, Building2, Wallet, AlertCircle } from 'lucide-react';
+import { PlusIcon, Building2, Wallet, AlertCircle, PencilIcon } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Account {
     id: number;
@@ -102,6 +103,14 @@ export default function Accounts() {
     const [formData, setFormData] = useState<AccountFormData>(emptyForm);
     const [formError, setFormError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+
+    const [editAccount, setEditAccount] = useState<Account | null>(null);
+    const [editFormData, setEditFormData] = useState<AccountFormData & { is_active: boolean }>(
+        { ...emptyForm, is_active: true }
+    );
+    const [editFormError, setEditFormError] = useState<string | null>(null);
+    const [editSubmitting, setEditSubmitting] = useState(false);
+    const [accountHasTransactions, setAccountHasTransactions] = useState(false);
 
     const [balanceDialogAccount, setBalanceDialogAccount] =
         useState<Account | null>(null);
@@ -182,6 +191,85 @@ export default function Accounts() {
             );
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const openEditDialog = async (account: Account) => {
+        // Check if account has transactions FIRST
+        let hasTransactions = false;
+        try {
+            const response = await fetch(`/api/accounts/${account.id}/transactions`);
+            if (response.ok) {
+                const data: any = await response.json();
+                hasTransactions = data.meta.total_count > 0;
+            }
+        } catch (err) {
+            // If we can't fetch transactions, assume no transactions
+            hasTransactions = false;
+        }
+
+        // Then set all state at once to open the dialog
+        setAccountHasTransactions(hasTransactions);
+        setEditFormData({
+            name: account.name,
+            type: account.type,
+            primary_currency: (account.primary_currency as 'CAD' | 'USD' | 'COP') || 'none',
+            notes: account.notes || '',
+            is_active: account.is_active,
+        });
+        setEditFormError(null);
+        setEditAccount(account);
+    };
+
+    const closeEditDialog = () => {
+        setEditAccount(null);
+        setEditFormData({ ...emptyForm, is_active: true });
+        setEditFormError(null);
+        setAccountHasTransactions(false);
+    };
+
+    const handleEditSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setEditFormError(null);
+
+        if (!editAccount) return;
+
+        const payload: Record<string, unknown> = {
+            name: editFormData.name.trim(),
+            type: editFormData.type,
+            primary_currency:
+                editFormData.primary_currency === 'none'
+                    ? null
+                    : editFormData.primary_currency,
+            notes: editFormData.notes.trim() || null,
+            is_active: editFormData.is_active,
+        };
+
+        try {
+            setEditSubmitting(true);
+            const response = await fetch(`/api/accounts/${editAccount.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                const message =
+                    errorData.messages
+                        ? Object.values(errorData.messages).flat().join(' ')
+                        : errorData.error || 'Failed to update account';
+                throw new Error(message);
+            }
+
+            await fetchAccounts();
+            closeEditDialog();
+        } catch (err) {
+            setEditFormError(
+                err instanceof Error ? err.message : 'An error occurred'
+            );
+        } finally {
+            setEditSubmitting(false);
         }
     };
 
@@ -348,6 +436,15 @@ export default function Accounts() {
             </CardHeader>
             <CardContent>
                 <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEditDialog(account)}
+                        data-testid={`edit-account-${account.id}`}
+                    >
+                        <PencilIcon className="size-4 shrink-0 fill-none" />
+                        Edit
+                    </Button>
                     <Link href={`/accounts/${account.id}`}>
                         <Button variant="outline" size="sm">
                             View Transactions
@@ -530,6 +627,175 @@ export default function Accounts() {
                         </DialogContent>
                     </Dialog>
                 </div>
+
+                {/* Edit Account Dialog */}
+                <Dialog
+                    open={editAccount !== null}
+                    onOpenChange={(open) => {
+                        if (!open) closeEditDialog();
+                    }}
+                >
+                    <DialogContent className="max-w-md">
+                        <form onSubmit={handleEditSubmit}>
+                            <DialogHeader>
+                                <DialogTitle>Edit Account</DialogTitle>
+                                <DialogDescription>
+                                    Update account details.
+                                    {accountHasTransactions && (
+                                        <span className="mt-2 block text-amber-600 dark:text-amber-400">
+                                            The account type cannot be changed because
+                                            transactions are registered for this account.
+                                        </span>
+                                    )}
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-account-name">
+                                        Account Name
+                                    </Label>
+                                    <Input
+                                        id="edit-account-name"
+                                        value={editFormData.name}
+                                        onChange={(e) =>
+                                            setEditFormData({
+                                                ...editFormData,
+                                                name: e.target.value,
+                                            })
+                                        }
+                                        placeholder="e.g. RBC Checking"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-account-type">
+                                        Account Type
+                                    </Label>
+                                    <Select
+                                        value={editFormData.type}
+                                        onValueChange={(value) =>
+                                            setEditFormData({
+                                                ...editFormData,
+                                                type: value as AccountFormData['type'],
+                                            })
+                                        }
+                                        disabled={accountHasTransactions}
+                                    >
+                                        <SelectTrigger id="edit-account-type">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="bank">
+                                                Bank Account
+                                            </SelectItem>
+                                            <SelectItem value="investment">
+                                                Investment
+                                            </SelectItem>
+                                            <SelectItem value="liability">
+                                                Credit Card/Loan
+                                            </SelectItem>
+                                            <SelectItem value="receivable">
+                                                Accounts Receivable
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-account-currency">
+                                        Primary Currency
+                                    </Label>
+                                    <Select
+                                        value={editFormData.primary_currency}
+                                        onValueChange={(value) =>
+                                            setEditFormData({
+                                                ...editFormData,
+                                                primary_currency:
+                                                    value as AccountFormData['primary_currency'],
+                                            })
+                                        }
+                                    >
+                                        <SelectTrigger id="edit-account-currency">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="CAD">
+                                                CAD
+                                            </SelectItem>
+                                            <SelectItem value="USD">
+                                                USD
+                                            </SelectItem>
+                                            <SelectItem value="COP">
+                                                COP
+                                            </SelectItem>
+                                            <SelectItem value="none">
+                                                None
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-account-notes">
+                                        Notes
+                                    </Label>
+                                    <Textarea
+                                        id="edit-account-notes"
+                                        value={editFormData.notes}
+                                        onChange={(e) =>
+                                            setEditFormData({
+                                                ...editFormData,
+                                                notes: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Optional notes"
+                                    />
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="edit-account-is-active"
+                                        checked={editFormData.is_active}
+                                        onCheckedChange={(checked) =>
+                                            setEditFormData({
+                                                ...editFormData,
+                                                is_active: checked === true,
+                                            })
+                                        }
+                                    />
+                                    <Label
+                                        htmlFor="edit-account-is-active"
+                                        className="text-sm font-normal"
+                                    >
+                                        Active
+                                    </Label>
+                                </div>
+
+                                {editFormError && (
+                                    <p className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400">
+                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                        <span>{editFormError}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={closeEditDialog}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={editSubmitting}>
+                                    {editSubmitting ? 'Saving...' : 'Save Changes'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
 
                 {error && (
                     <Card className="border-destructive">
