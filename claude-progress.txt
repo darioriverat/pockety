@@ -482,3 +482,35 @@ Then final sweep (forbidden strings, dependency check, full suites).
 - No outstanding app_spec feature. Optional follow-ups only:
   - Gate /dev/* routes more tightly before any non-local deploy (already APP_ENV=local).
   - Prefer sequential Playwright runs when using /dev/browser-tests (each run seeds).
+
+## Session: 2026-10-06 (regression verification — fresh context)
+
+### Accomplished
+- Fresh context window: feature_list.json is 87/87 passing; 0 remaining "passes": false.
+- App reachable at http://dev.pockety.com:8080/login (HTTP 200). Docker socket and
+  Puppeteer MCP navigate were blocked by host/sandbox approval policy this session;
+  verification used /dev/* HTTP routes and Playwright screenshots instead.
+- Spec sweep: no matches for github.com/dariorivera/pockety, plan/extracted, or the
+  forbidden fallback rates under resources/js and app.
+
+### Verification (this session)
+- Backend: PHPUnit 402 tests / 2622 assertions via /dev/run-tests — OK.
+- Frontend: vitest 64 files / 254 tests via /dev/frontend-tests — OK.
+- Playwright (sequential via /dev/browser-tests) — all OK:
+  app-footer (2), transaction-account-filter (2), edit-account (6),
+  import-upload (5), style-sweep (1), account-actions-layout (1),
+  manage-balances-scroll (2), locale-preference (3), exchange-rates (2),
+  docsify (1), removed-github-links (1).
+- Visual review of refreshed verification/style-sweep/ screenshots:
+  footer clean (no GitHub links), header without starter-kit links,
+  account type-lock message readable, Manage Balances dialog intact,
+  account filter present on Transactions.
+
+### Progress
+- 87/87 features passing (unchanged; no feature_list.json edits).
+- Definition of done from app_spec remains satisfied.
+
+### Next priority
+- No outstanding app_spec feature. Optional follow-ups only:
+  - Gate /dev/* routes more tightly before any non-local deploy (already APP_ENV=local).
+  - Prefer sequential Playwright runs when using /dev/browser-tests (each run seeds).
