@@ -1,0 +1,339 @@
+Pockety change specification
+Authoritative for an autonomous coding agent
+Scope: the change set below. Behavior not specified here must stay as it is.
+
+This file is the source of truth for this work. Do not invent features, currencies, languages, or import formats beyond what it states. If an existing test encodes behavior this spec replaces, update the test to the new behavior. Do not weaken or delete coverage.
+
+Stack
+- Backend: Laravel. Frontend: React, TypeScript, Inertia.
+- Authenticated owner is the current user. Financial rows are scoped with user_id.
+- Accounts, categories, transactions, reconciliation, period balances, and exchange rates already exist.
+- Supported currencies remain CAD, USD, and COP only.
+- Default locale is English.
+
+Out of scope
+- Do not delete or rewrite files under plan/extracted. Application code and tests must stop reading that directory.
+- Do not add a link to the GitHub repository or to these docs in the application UI.
+- Do not translate names, comments, or categories stored as user data.
+- Do not translate the docsify guides. They stay in English.
+- Do not add currencies other than CAD, USD, and COP to calculations or preferences.
+- Do not call Open Exchange Rates historical, time-series, or convert endpoints. Use latest.json only.
+- Do not change the shared dialog component's default classes. Only the Manage Balances dialog gets the scroll constraint.
+- Do not block edits to account name, primary currency, notes, or active status when transactions exist. Only the account type is blocked.
+- Do not remove the Import page. Users upload their own files.
+
+
+1. Remove GitHub links from the UI
+
+Current
+- resources/js/components/app-footer.tsx links to https://github.com/dariorivera/pockety and https://github.com/dariorivera/pockety#readme.
+- resources/js/components/app-sidebar.tsx footerNavItems has the same two links, titled Repository and Documentation.
+- resources/js/components/app-header.tsx rightNavItems links to https://github.com/laravel/react-starter-kit and https://laravel.com/docs/starter-kits#react.
+
+Required
+- Remove all four links and any nav item whose only purpose is one of those links.
+- If a footer or header section becomes empty, remove that section rather than leaving a blank heading.
+- Update resources/js/components/app-footer.test.tsx and tests/browser/app-footer.spec.ts so they no longer expect those hrefs.
+- Update any header test that expects the starter-kit links.
+
+Acceptance
+- A signed-in user cannot find a link to github.com/dariorivera/pockety, github.com/laravel/react-starter-kit, or the Laravel starter-kit docs in the footer, sidebar, or header.
+
+
+2. Import by user upload
+
+Current
+- resources/js/pages/import.tsx posts hardcoded paths: gastos_ledger_2025_2026.json, directory month_sheets, and estado_financiero_2025_2026.json.
+- TransactionImportController, AccountImportController, and BalanceSheetImportController resolve those paths under base_path('plan/extracted').
+- resources/js/pages/exchange-rates.tsx can import rates from month_sheets. That action is removed in section 8.
+- Tests in tests/Feature and tests/browser call those personal files or POST directory month_sheets.
+- tests/fixtures/month_sheets/202501_sample.json is a valid month-sheet example.
+
+Required UI
+- The Import page stays in navigation.
+- No file path, directory, or filename is preselected or hardcoded in the request body.
+- Transactions card: the user chooses one .json or one .csv file, then submits.
+- Accounts card: the user chooses one or more .json month-sheet files, then submits.
+- Balance sheet card: the user chooses one .json file, then submits.
+- Show the import result (imported, skipped, errors) already returned by the services.
+- Reject a submit with no file before calling the API.
+
+Required API
+- Stop accepting file_path and directory as locations on the server.
+- Accept multipart uploads only. Store them temporarily, parse them, then delete the temp files.
+- Never resolve a client-supplied path under plan/extracted or anywhere else on disk.
+- Transactions JSON: a JSON array of objects. Each object uses the fields TransactionImportService already reads: fecha, periodo, concepto_code, cad.value, usd.value, cop.value, comentarios. Rows missing fecha or periodo are skipped, as today.
+- Transactions CSV: header row with columns fecha, periodo, concepto_code, cad, usd, cop, comentarios. Map cad, usd, and cop onto the same nested value fields the JSON importer uses. Extra columns are ignored. A missing required header is a 422.
+- Accounts: each uploaded file is a month-sheet JSON document with header.period.value (YYYYMM) and sections.Cuentas.items (label plus recorded.cad/usd/cop.value). Pass those files to the existing month-sheet parser. Do not require a directory on disk.
+- Balance sheet JSON: a JSON array of objects with periodo (YYYYMM), activo_value, pasivo_value, and patrimonio_value, parsed by BalanceSheetImportService.
+- Invalid JSON, the wrong top-level shape, or a disallowed extension returns 422 with a readable message. Do not return 500 for validation failures.
+
+Test data
+- Add small synthetic files under tests/fixtures/. Do not copy personal ledgers from plan/extracted.
+- PHPUnit and Playwright must import through uploads of those fixtures, or through factories when the scenario does not need a file.
+- Browser tests must not POST { directory: "month_sheets" } or a plan/extracted file_path.
+
+Acceptance
+- A new user opening Import sees empty file inputs and no personal filenames.
+- Uploading a fixture creates only that user's data.
+- A request that names plan/extracted is rejected and does not import those files.
+
+
+3. Manage Balances dialog scroll
+
+Current
+- The Manage Balances dialog is inline in resources/js/pages/accounts.tsx.
+- DialogContent is vertically centered and has no max height. The recorded-balances list is an unbounded ul. Many rows grow past the viewport and cannot be scrolled.
+
+Required
+- Apply the constraint only on this dialog's DialogContent.
+- Limit the dialog to about 85vh.
+- Keep the title, description, and the new-balance form visible.
+- The recorded-balances list is the region that scrolls (min-h-0 and overflow-y-auto).
+- With a short list, the dialog still fits its content and does not show a useless scrollbar on the page behind it.
+- The page behind the open dialog does not scroll instead of the list.
+
+Acceptance
+- With enough balance rows to exceed the viewport, the user can scroll the list to the first and last row, and can still reach the form.
+
+
+4. Edit an account
+
+Current
+- PUT and PATCH /api/accounts/{id} accept name, type, primary_currency, notes, and is_active.
+- Type is one of bank, investment, liability, receivable.
+- The accounts page can create an account and manage balances. It has no edit form.
+- AccountService::update writes the payload with no type guard.
+- Transactions reference accounts through transactions.account_id.
+
+Required API
+- Keep the existing update route and fields.
+- When the submitted type differs from the stored type and the account has at least one transaction, return 422. The account must not change.
+- Transactions are counted for the account owner. Soft-deleted transactions still count if the model uses soft deletes.
+- Name, primary currency, notes, and is_active can change even when transactions exist.
+- A type change is allowed when the account has no transactions.
+- Name uniqueness stays scoped so another user's account name does not collide. Preserve the current owner-scoped uniqueness behavior.
+
+Required UI
+- Each account row has an Edit action.
+- Edit opens a dialog filled with the account's name, type, primary currency, notes, and active flag.
+- Submit calls PUT /api/accounts/{id} and refreshes the list.
+- If the account has transactions, the type control is disabled and the dialog explains that the type cannot change because transactions are registered.
+- Show the 422 message if a type change is submitted anyway.
+
+Acceptance
+- Editing the name of an account that has transactions succeeds and the type is unchanged.
+- Changing the type of an account with no transactions succeeds.
+- Changing the type of an account with transactions fails and the stored type is unchanged.
+- A feature test covers both the allowed update and the blocked type change.
+- A browser pass opens Edit, changes the name, and sees the new name on the list.
+
+
+5. Filter the transaction list by account
+
+Current
+- TransactionService already filters on account_id (alias account).
+- resources/js/pages/transactions.tsx loads accounts for the transaction form.
+- FilterState is period, category_id, currency, is_recurring, and search. fetchTransactions does not send account_id.
+
+Required
+- Add account_id to FilterState.
+- Add an account select to the existing filter row, using the accounts already loaded. Include an empty option meaning all accounts.
+- Send account_id on GET /api/transactions when a specific account is selected.
+- Clearing filters clears the account filter too.
+- The account filter counts as an active filter for the existing clear-filters affordance.
+- Read an account query parameter on load, the same way period and category are read, and write it back when the filter changes.
+- Do not change the transaction create or edit form's account field.
+
+Acceptance
+- Choosing an account shows only that account's transactions, including a second request after clearing other filters.
+- Clearing filters shows transactions for every account again.
+- Opening the page with ?account={id} applies that filter.
+
+
+6. English and Spanish
+
+Current
+- There is no lang directory and no React i18n library.
+- Preferences (resources/js/pages/preferences.tsx, PreferencesController) store only default_currency.
+- config/app.php locale comes from APP_LOCALE and is English.
+- UI strings are hardcoded English in TSX. A few controller flashes use __().
+
+Required data
+- Add users.locale, string, not null, default en.
+- Existing users migrate to en.
+- Allowed values are en and es only. Anything else is a validation error.
+- Share locale on the Inertia auth user next to default_currency.
+
+Required preferences
+- The preferences form gains a language select: English (en) and Spanish (es), beside the existing default currency.
+- Saving posts locale with default_currency.
+- After a successful save, the next full page render uses the new language without a manual reload beyond Inertia's normal redirect.
+
+Required UI i18n
+- Add react-i18next.
+- Catalogs live in resources/js/locales/en and resources/js/locales/es.
+- Initialize the active language from auth.user.locale. If it is missing, use en.
+- Set the document documentElement lang attribute to en or es.
+- Translate user-visible chrome and pages: navigation, footer, dashboard, accounts, account detail, transactions, categories, reconciliation, period balances, balance sheet, preferences, settings, import, exchange rates, income, budgets, reports, and auth screens (login, register, password, two-factor).
+- User-entered data stays as stored: account names, category names, notes, and transaction comments are not passed through the translation catalogs.
+- English catalog is the fallback. A missing Spanish key shows the English string, not the key.
+
+Required Laravel locale
+- For an authenticated web or API request, set the application locale from that user's locale before validation runs.
+- Guests stay on en.
+- Publish or add Spanish validation lines enough that a 422 on these features is Spanish when locale is es. Do not hand-translate the entire Laravel framework.
+
+Acceptance
+- A new user, and a user with no explicit locale, sees English.
+- Choosing Spanish and saving changes navigation and the preferences page to Spanish, and a later visit is still Spanish.
+- Choosing English returns the UI to English.
+- A browser test covers the switch and the reload. A feature test rejects a locale other than en or es.
+
+
+7. Docsify documentation
+
+Required files
+- docs/index.html loads docsify 4 from a CDN. window.$docsify sets name to Pockety, loadSidebar true, and subMaxLevel 2. No docsify package is added to package.json.
+- docs/_sidebar.md links the pages below.
+- docs/README.md explains what Pockety is and that the docs are opened with: npx --yes docsify-cli serve docs
+- docs/accounts.md
+- docs/categories.md
+- docs/transactions.md
+- docs/reconciliation.md
+- docs/period-balances.md
+
+Required content
+- Write from the application behavior after this spec is implemented, in English, for an end user.
+- Accounts: create, edit, type lock when transactions exist, primary currency, active flag, and Manage Balances including scrolling a long list.
+- Categories: what they are for, how they are created and edited, and that names are user data.
+- Transactions: list, filters including account, create and edit, and that amounts stay in the currency entered.
+- Reconciliation: read-only check for one YYYYMM period, recorded versus computed balances, variance, and balanced versus unbalanced. It does not register the month.
+- Period balances: the register step after reconciliation looks right. It stores the month-end figures and can overwrite with history. It is separate from the per-account balances entered in Manage Balances.
+- Do not mention plan/extracted, GitHub, or personal filenames.
+
+Acceptance
+- npx --yes docsify-cli serve docs serves the sidebar and all five feature pages.
+- Each page has a title and describes the behavior above. No page is a stub heading only.
+
+
+8. Daily exchange rates and per-period selection
+
+Current
+- exchange_rates is one row per (user_id, period YYYYMM) with usd_cop, usd_cad, and cad_cop.
+- The exchange-rates page asks the user to type those three numbers. Empty periods fall back to 4400, 0.75, and 3000 in the UI and in services such as DashboardService, BalanceSheetService, BudgetService, CategoryActualsService, FinancialSummaryService, and IncomeService.
+- ExchangeRate::forPeriod(period) is the lookup used by dashboard, balance sheet, reports, budgets, reconciliation, income, and related services. Keep that lookup.
+- Conversion today is inconsistent. usd_cop is COP per 1 USD (multiply). cad_cop is COP per 1 CAD (multiply to convert CAD to COP, divide to convert COP to CAD). usdToCad divides by usd_cad. The form label says "CAD per 1 USD". This spec replaces that math.
+- Open Exchange Rates latest.json is USD-based. rates.CAD and rates.COP are units of that currency per 1 USD. Documentation: https://openexchangerates.org/
+
+Quote convention
+- Store only USD-base quotes: cad_per_usd and cop_per_usd.
+- Both are units of that currency for 1 USD. Example: cad_per_usd 1.36 means 1 USD = 1.36 CAD.
+- USD to CAD = amount * cad_per_usd.
+- CAD to USD = amount / cad_per_usd.
+- USD to COP = amount * cop_per_usd.
+- COP to USD = amount / cop_per_usd.
+- COP to CAD = amount / cop_per_usd * cad_per_usd.
+- CAD to COP = amount / cad_per_usd * cop_per_usd.
+- toCad: CAD returns the amount; USD multiplies by cad_per_usd; COP converts through the cross rate above.
+- A zero quote returns 0 for a conversion that would divide by it.
+- Derived values, for existing API payloads that still expose the old keys:
+  - usd_cop = cop_per_usd
+  - usd_cad = cad_per_usd
+  - cad_cop = cop_per_usd / cad_per_usd
+- Do not accept those three numbers as user input anymore.
+
+Snapshots
+- New table exchange_rate_snapshots:
+  - id
+  - rate_date (date)
+  - source: openexchangerates or manual
+  - user_id nullable, foreign key to users, null only for the shared feed
+  - cad_per_usd decimal
+  - cop_per_usd decimal
+  - timestamps
+- A fetched row is global: source openexchangerates, user_id null, one row per rate_date. Upsert must be idempotent. Do not rely on a unique index alone if the database allows multiple NULLs; the command's update-or-create must match rate_date + source + null user_id.
+- A manual row belongs to the signed-in user: source manual, user_id set, one row per user per rate_date. A second save on the same date updates that user's row.
+- A manual row must not overwrite the global row for the same date.
+
+Fetch command
+- Artisan command exchange-rates:fetch.
+- Read the app id from config services.openexchangerates.app_id, environment variable OPENEXCHANGERATES_APP_ID. Document it in .env.example. Do not commit a real app id.
+- Request GET https://openexchangerates.org/api/latest.json?app_id={app_id}.
+- Persist rates.CAD as cad_per_usd and rates.COP as cop_per_usd for the response date (timestamp), source openexchangerates.
+- Ignore every other currency in the payload.
+- If the app id is missing, log a warning and exit successfully. Do not throw and do not write a row.
+- HTTP or payload failure logs the error and exits non-zero. Do not write a partial row.
+- Schedule the command daily in routes/console.php. Document that production needs the Laravel scheduler (schedule:run). Local use is php artisan exchange-rates:fetch until cron is running.
+- Tests fake the HTTP client. Do not call the live API in tests.
+
+Manual entry
+- On the exchange-rates page, a form separate from period selection asks for a date, CAD per 1 USD, and COP per 1 USD.
+- Both quotes are required and must be greater than zero.
+- Submit creates or updates the current user's manual snapshot for that date.
+- The form does not ask for CAD/COP. That cross rate is derived.
+
+Period selection
+- exchange_rates keeps its unique (user_id, period) row.
+- Add a required foreign key snapshot_id to exchange_rate_snapshots, set when the user assigns a rate. Existing rows are backfilled by the migration below before the foreign key is enforced.
+- The user picks one snapshot for a YYYYMM period. The picker lists global fetched snapshots and that user's manual snapshots. Default the date filter to dates inside that month, and allow choosing a nearby date such as the last day of the month.
+- Assigning replaces the previous snapshot for that period. It does not delete the snapshot.
+- Removing the three numeric inputs also removes the month-sheet import button from the exchange-rates page and the ExchangeRateImportController route used by that button. Delete that import path only after tests no longer need it.
+- The page shows attribution: exchange rates by Open Exchange Rates, linking to https://openexchangerates.org/.
+
+Calculation
+- ExchangeRate::forPeriod still returns the owner's row for that period.
+- Conversion methods read the linked snapshot and use the quote convention above. usdToCad must multiply by cad_per_usd.
+- Call sites may keep using forPeriod and the conversion methods. Where they read usd_cop, usd_cad, or cad_cop for display, those values are the derived accessors, not independently stored inputs.
+- If the period has no row, or the row has no snapshot, do not synthesize 4400, 0.75, or 3000. Services return a missing-rate result, and the UI says that period needs an exchange rate. Converted totals are omitted rather than invented.
+- Search the codebase for 4400, 0.75, and 3000 and remove those fallbacks.
+
+Migration of existing period rows
+- For each existing exchange_rates row, create a manual snapshot owned by that row's user_id.
+- rate_date is the last calendar day of the row's YYYYMM period.
+- cop_per_usd = the stored usd_cop.
+- cad_per_usd = the stored usd_cad. Treat the stored number as CAD per 1 USD, matching the old form label, not as USD per 1 CAD.
+- Do not copy cad_cop. The cross rate is derived after migration.
+- Point the period row at that snapshot.
+- If two periods in the same month would share one manual date, give each period its own snapshot only when the quotes differ; identical quotes for the same user and date reuse one snapshot.
+- After migration, drop usd_cop, usd_cad, and cad_cop from exchange_rates once nothing reads them as columns. Accessors may keep the names for API output.
+
+Tests to update
+- Tests that expect usdToCad to divide by usd_cad must expect multiplication.
+- Tests that depended on an independent cad_cop must expect cop_per_usd / cad_per_usd.
+- Tests that depended on the 4400 / 0.75 / 3000 fallback must create a snapshot and assign it, or assert the missing-rate behavior.
+
+Acceptance
+- Running the fetch command twice on the same day leaves one global snapshot.
+- A user can save a manual quote for that same day without changing the global snapshot.
+- Assigning either snapshot to 202501 makes forPeriod('202501') convert with that snapshot.
+- 100 USD at cad_per_usd 1.36 becomes 136.00 CAD. 136 CAD becomes 100.00 USD.
+- COP to CAD uses the cross rate, not a separately typed CAD/COP input.
+- A period with no assignment does not display converted money using 4400, 0.75, or 3000.
+- The exchange-rates page has no USD/COP, USD/CAD, or CAD/COP inputs and no month-sheet import.
+- Feature tests cover fetch (HTTP faked), manual upsert, period assignment, and both conversion directions.
+- A browser pass assigns a snapshot to a period and confirms the three old inputs are gone.
+
+
+Implementation order
+1. GitHub link removal.
+2. Manage Balances scroll.
+3. Account edit and type lock.
+4. Transaction account filter.
+5. Import uploads and fixture swap.
+6. Locale preference and translations.
+7. Exchange-rate snapshots, migration, fetch command, and period picker.
+8. Docsify guides, written last so they describe the finished behavior.
+
+Verification
+- Backend: php artisan test for the account update, import upload, locale validation, and exchange-rate tests.
+- Frontend unit tests for the footer and header link removal.
+- Browser: edit an account, filter transactions by account, switch language to Spanish and back, open Manage Balances with a long list and scroll it, upload a fixture import, and assign an exchange-rate snapshot.
+- Docs: npx --yes docsify-cli serve docs and open each sidebar page.
+- Confirm with a search that resources/js and app no longer contain github.com/dariorivera/pockety, plan/extracted, or the fallback rates 4400, 0.75, and 3000.
+
+Definition of done
+- Every acceptance item above is true.
+- Existing owner scoping still holds: one user cannot read or change another user's accounts, transactions, imports, manual snapshots, or period assignments.
+- The scheduler registration is present even when OPENEXCHANGERATES_APP_ID is empty.
+- No new dependency other than react-i18next (and its i18next peer) is required. docsify is not an application dependency.
