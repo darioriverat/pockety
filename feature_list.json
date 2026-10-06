@@ -91,7 +91,7 @@
       "Step 6: Confirm the recorded-balances list is the region with min-h-0 and overflow-y-auto",
       "Step 7: Confirm the dialog remains vertically centered"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -110,7 +110,7 @@
       "Step 11: Verify the list scrollbar appears on the list region, not on the whole page",
       "Step 12: Take screenshots of the top and bottom of the scrolled list as evidence"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -123,7 +123,7 @@
       "Step 5: Verify the page behind the dialog does not scroll",
       "Step 6: Verify the dialog closes normally and the page is still at its previous scroll position"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -151,7 +151,7 @@
       "Step 3: Inspect the Manage Balances dialog in resources/js/pages/accounts.tsx and confirm it passes its own 85vh constraint class",
       "Step 4: Open another dialog in the app and confirm it is not constrained to 85vh"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

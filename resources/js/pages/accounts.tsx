@@ -601,8 +601,8 @@ export default function Accounts() {
                     open={balanceDialogAccount !== null}
                     onOpenChange={closeBalanceDialog}
                 >
-                    <DialogContent className="max-w-lg">
-                        <DialogHeader>
+                    <DialogContent className="flex max-h-[85vh] max-w-lg flex-col overflow-hidden">
+                        <DialogHeader className="shrink-0">
                             <DialogTitle>
                                 Manage Balances
                                 {balanceDialogAccount
@@ -615,7 +615,10 @@ export default function Accounts() {
                             </DialogDescription>
                         </DialogHeader>
 
-                        <form onSubmit={handleBalanceSubmit}>
+                        <form
+                            onSubmit={handleBalanceSubmit}
+                            className="shrink-0"
+                        >
                             <div className="grid gap-4 py-2">
                                 <div className="grid gap-2">
                                     <Label htmlFor="balance-period">
@@ -739,7 +742,7 @@ export default function Accounts() {
                             </DialogFooter>
                         </form>
 
-                        <div className="mt-4 space-y-2 border-t pt-4">
+                        <div className="mt-4 min-h-0 space-y-2 overflow-y-auto border-t pt-4">
                             <h3 className="text-sm font-semibold">
                                 Recorded Balances
                             </h3>
