@@ -88,7 +88,9 @@ test.describe('Existing transaction after category inactivation', () => {
             page.getByRole('heading', { name: 'Transactions' }),
         ).toBeVisible();
         await page.getByTestId('page-period-selector').click();
-        await page.getByRole('option', { name: 'January 2026', exact: true }).click();
+        await page
+            .getByRole('option', { name: 'January 2026', exact: true })
+            .click();
         await expect(page.getByTestId('page-period-selector')).toContainText(
             'January 2026',
         );
@@ -117,11 +119,15 @@ test.describe('Existing transaction after category inactivation', () => {
         // Step 8: Verify reports include this transaction
         await page.goto('/category-actuals');
         await page.getByTestId('page-period-selector').click();
-        await page.getByRole('option', { name: 'January 2026', exact: true }).click();
-        await expect(page.getByTestId('category-actual-row-C047')).toBeVisible();
-        await expect(page.getByTestId('category-actual-amount-C047')).toContainText(
-            '87.25',
-        );
+        await page
+            .getByRole('option', { name: 'January 2026', exact: true })
+            .click();
+        await expect(
+            page.getByTestId('category-actual-row-C047'),
+        ).toBeVisible();
+        await expect(
+            page.getByTestId('category-actual-amount-C047'),
+        ).toContainText('87.25');
         await page.screenshot({
             path: `${SHOT_DIR}/03-category-actuals.png`,
             fullPage: true,
@@ -129,7 +135,9 @@ test.describe('Existing transaction after category inactivation', () => {
 
         await page.goto('/financial-summary');
         await page.getByTestId('page-period-selector').click();
-        await page.getByRole('option', { name: 'January 2026', exact: true }).click();
+        await page
+            .getByRole('option', { name: 'January 2026', exact: true })
+            .click();
         await expect(page.getByTestId('summary-row-C047')).toBeVisible();
         await expect(page.getByTestId('total-C047')).toContainText('87.25');
         await page.screenshot({

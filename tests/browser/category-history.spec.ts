@@ -69,7 +69,9 @@ test('feature 98: user can view all transactions for a category across periods',
 
     // Step 1: Navigate to categories page
     await page.goto('/categories');
-    await expect(page.getByRole('heading', { name: 'Categories' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Categories' }),
+    ).toBeVisible();
 
     await page.screenshot({
         path: 'verification/test-98-category-history/01-categories-list.png',
@@ -88,7 +90,9 @@ test('feature 98: user can view all transactions for a category across periods',
     await expect(page.getByText('cat-hist-jan')).toBeVisible();
     await expect(page.getByText('cat-hist-feb')).toBeVisible();
     await expect(page.getByTestId('category-transactions-table')).toBeVisible();
-    await expect(page.getByTestId('category-transaction-count')).toHaveText('2');
+    await expect(page.getByTestId('category-transaction-count')).toHaveText(
+        '2',
+    );
 
     await page.screenshot({
         path: 'verification/test-98-category-history/02-all-periods.png',
@@ -110,7 +114,9 @@ test('feature 98: user can view all transactions for a category across periods',
     await expect(page.getByTestId('category-total-spending')).toContainText(
         '$100.00',
     );
-    await expect(page.getByTestId('category-transaction-count')).toHaveText('1');
+    await expect(page.getByTestId('category-transaction-count')).toHaveText(
+        '1',
+    );
 
     await page.screenshot({
         path: 'verification/test-98-category-history/03-filtered-202501.png',
@@ -168,7 +174,9 @@ test('feature 99: category details show summary statistics', async ({
     await expect(page.getByTestId('category-period-count')).toHaveText('2');
 
     // Step 5: Verify number of total transactions is shown
-    await expect(page.getByTestId('category-transaction-count')).toHaveText('2');
+    await expect(page.getByTestId('category-transaction-count')).toHaveText(
+        '2',
+    );
 
     await page.screenshot({
         path: 'verification/test-98-category-history/04-summary-stats-feature-99.png',

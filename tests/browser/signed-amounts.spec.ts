@@ -1,8 +1,6 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
-import {
-    formatSignedDisplayCurrency,
-} from '../../resources/js/lib/currency';
+import { formatSignedDisplayCurrency } from '../../resources/js/lib/currency';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -23,7 +21,9 @@ async function createAccount(
         },
     });
     expect(response.ok()).toBeTruthy();
-    const body = (await response.json()) as { data: { id: number; name: string } };
+    const body = (await response.json()) as {
+        data: { id: number; name: string };
+    };
     return body.data;
 }
 
@@ -33,7 +33,8 @@ async function getCategoryId(request: APIRequestContext): Promise<number> {
     const body = (await response.json()) as {
         data: Array<{ id: number; code: string }>;
     };
-    const category = body.data.find((item) => item.code === 'C001') ?? body.data[0];
+    const category =
+        body.data.find((item) => item.code === 'C001') ?? body.data[0];
     expect(category).toBeTruthy();
     return category.id;
 }
@@ -55,14 +56,17 @@ test('feature 149: positive and negative amounts are visually distinguished', as
     const categoryId = await getCategoryId(request);
 
     // Ending balance after -$200 withdrawal + $75 deposit = $875 from $1000 start
-    const balanceResponse = await request.post(`/api/accounts/${account.id}/balances`, {
-        data: {
-            period: '202501',
-            recorded_balance_cad: 875,
-            recorded_balance_usd: 0,
-            recorded_balance_cop: 0,
+    const balanceResponse = await request.post(
+        `/api/accounts/${account.id}/balances`,
+        {
+            data: {
+                period: '202501',
+                recorded_balance_cad: 875,
+                recorded_balance_usd: 0,
+                recorded_balance_cop: 0,
+            },
         },
-    });
+    );
     expect(balanceResponse.ok()).toBeTruthy();
 
     const withdrawal = await request.post('/api/transactions', {
@@ -120,7 +124,10 @@ test('feature 149: positive and negative amounts are visually distinguished', as
     expect(expectedDeposit.startsWith('+')).toBe(true);
 
     await expect(withdrawalCell).toHaveText(expectedWithdrawal);
-    await expect(withdrawalCell).toHaveAttribute('data-amount-tone', 'negative');
+    await expect(withdrawalCell).toHaveAttribute(
+        'data-amount-tone',
+        'negative',
+    );
     await expect(withdrawalCell).toHaveClass(/text-red/);
     expect(expectedWithdrawal.startsWith('-')).toBe(true);
 

@@ -1,7 +1,4 @@
-import {
-    expect,
-    test,
-    type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -77,12 +74,16 @@ test('feature 111: dashboard shows recent activity feed with clickable details',
 
     // Step 1: Navigate to dashboard
     await page.goto('/dashboard?period=202601');
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Dashboard' }),
+    ).toBeVisible();
 
     // Step 2: Verify recent activity widget is displayed
     const card = page.getByTestId('recent-activity-card');
     await expect(card).toBeVisible();
-    await expect(card.getByText('Recent Activity', { exact: true })).toBeVisible();
+    await expect(
+        card.getByText('Recent Activity', { exact: true }),
+    ).toBeVisible();
 
     await page.screenshot({
         path: 'verification/session-61/01-dashboard-with-recent-activity.png',

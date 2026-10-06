@@ -1,4 +1,9 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext,
+    type Page,
+} from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -32,10 +37,14 @@ async function createTransaction(
 async function openSeptember2026(page: Page) {
     await page.goto('/transactions');
     await expect(page).toHaveURL(/\/transactions$/);
-    await expect(page.getByRole('heading', { name: 'Transactions' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Transactions' }),
+    ).toBeVisible();
 
     await page.getByTestId('page-period-selector').click();
-    await page.getByRole('option', { name: 'September 2026', exact: true }).click();
+    await page
+        .getByRole('option', { name: 'September 2026', exact: true })
+        .click();
     await expect(page.getByTestId('page-period-selector')).toContainText(
         'September 2026',
     );
@@ -46,11 +55,15 @@ function rowDates(page: Page): Promise<string[]> {
 }
 
 function rowAmounts(page: Page): Promise<string[]> {
-    return page.locator('[data-testid^="transaction-amount-"]').allTextContents();
+    return page
+        .locator('[data-testid^="transaction-amount-"]')
+        .allTextContents();
 }
 
 function rowCategories(page: Page): Promise<string[]> {
-    return page.locator('[data-testid^="transaction-category-"]').allTextContents();
+    return page
+        .locator('[data-testid^="transaction-category-"]')
+        .allTextContents();
 }
 
 test.beforeEach(async ({ page, request }) => {
@@ -100,7 +113,9 @@ test('feature 120: user can sort transactions table by date', async ({
     await expect
         .poll(async () => {
             const dates = await rowDates(page);
-            return dates.map((text) => text.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? '');
+            return dates.map(
+                (text) => text.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? '',
+            );
         })
         .toEqual(['2026-09-01', '2026-09-10', '2026-09-20']);
 
@@ -118,7 +133,9 @@ test('feature 120: user can sort transactions table by date', async ({
     await expect
         .poll(async () => {
             const dates = await rowDates(page);
-            return dates.map((text) => text.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? '');
+            return dates.map(
+                (text) => text.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? '',
+            );
         })
         .toEqual(['2026-09-20', '2026-09-10', '2026-09-01']);
 

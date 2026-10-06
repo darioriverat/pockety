@@ -104,7 +104,7 @@ describe('Transactions - account filter', () => {
         window.history.replaceState({}, '', '/transactions');
 
         global.fetch = vi.fn(async (input: RequestInfo | URL) => {
-            const url = String(input);
+            const url = input instanceof Request ? input.url : String(input);
 
             if (url.startsWith('/api/categories')) {
                 return jsonResponse({ data: [category] });
@@ -130,10 +130,7 @@ describe('Transactions - account filter', () => {
                     links: { self: '/api/transactions' },
                     meta: {
                         total: totalForPagination ?? data.length,
-                        page: Number.parseInt(
-                            params.get('page') ?? '1',
-                            10,
-                        ),
+                        page: Number.parseInt(params.get('page') ?? '1', 10),
                         per_page: 50,
                         last_page: totalForPagination ? 2 : 1,
                     },
@@ -360,7 +357,9 @@ describe('Transactions - account filter', () => {
             expect(screen.getByTestId('transaction-row-1')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
 
         await waitFor(() => {
             expect(

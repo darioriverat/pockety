@@ -1,4 +1,9 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext,
+    type Page,
+} from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -11,7 +16,8 @@ async function getCategoryId(request: APIRequestContext): Promise<number> {
     const body = (await response.json()) as {
         data: Array<{ id: number; code: string }>;
     };
-    const category = body.data.find((item) => item.code === 'C001') ?? body.data[0];
+    const category =
+        body.data.find((item) => item.code === 'C001') ?? body.data[0];
     expect(category).toBeTruthy();
     return category.id;
 }
@@ -39,10 +45,14 @@ async function seedTransactions(
 async function openSeptember2026Transactions(page: Page): Promise<void> {
     await page.goto('/transactions');
     await expect(page).toHaveURL(/\/transactions$/);
-    await expect(page.getByRole('heading', { name: 'Transactions' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Transactions' }),
+    ).toBeVisible();
 
     await page.getByTestId('page-period-selector').click();
-    await page.getByRole('option', { name: 'September 2026', exact: true }).click();
+    await page
+        .getByRole('option', { name: 'September 2026', exact: true })
+        .click();
     await expect(page.getByTestId('page-period-selector')).toContainText(
         'September 2026',
     );
@@ -73,9 +83,15 @@ test('feature 92: system supports pagination for large transaction lists', async
     );
 
     await page.getByTestId('page-size-select').click();
-    await expect(page.getByRole('option', { name: '25', exact: true })).toBeVisible();
-    await expect(page.getByRole('option', { name: '50', exact: true })).toBeVisible();
-    await expect(page.getByRole('option', { name: '100', exact: true })).toBeVisible();
+    await expect(
+        page.getByRole('option', { name: '25', exact: true }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole('option', { name: '50', exact: true }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole('option', { name: '100', exact: true }),
+    ).toBeVisible();
     await page.getByRole('option', { name: '50', exact: true }).click();
 
     const pageOneRows = page.locator('[data-testid^="transaction-row-"]');
@@ -94,7 +110,9 @@ test('feature 92: system supports pagination for large transaction lists', async
     await expect(page.getByTestId('pagination-status')).toContainText(
         'Page 2 of 2',
     );
-    await expect(page.locator('[data-testid^="transaction-row-"]')).toHaveCount(5);
+    await expect(page.locator('[data-testid^="transaction-row-"]')).toHaveCount(
+        5,
+    );
 
     const secondPageFirstComment = await page
         .locator('[data-testid^="transaction-row-"]')
@@ -112,7 +130,9 @@ test('feature 92: system supports pagination for large transaction lists', async
     await expect(page.getByTestId('pagination-status')).toContainText(
         'Page 1 of 3',
     );
-    await expect(page.locator('[data-testid^="transaction-row-"]')).toHaveCount(25);
+    await expect(page.locator('[data-testid^="transaction-row-"]')).toHaveCount(
+        25,
+    );
 
     await page.screenshot({
         path: 'verification/test-92-pagination/03-page-size-25.png',

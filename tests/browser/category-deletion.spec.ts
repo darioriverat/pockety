@@ -16,7 +16,10 @@ test.describe('Category Deletion', () => {
         resetBrowserState();
     });
 
-    test('delete category succeeds when no transactions or budgets exist (Feature #16)', async ({ page, request }) => {
+    test('delete category succeeds when no transactions or budgets exist (Feature #16)', async ({
+        page,
+        request,
+    }) => {
         await loginAsBrowserTestUser(page, request);
 
         // Step 1: Create new category
@@ -40,7 +43,9 @@ test.describe('Category Deletion', () => {
                 response.request().method() === 'DELETE' &&
                 response.url().endsWith('/api/categories/C047'),
         );
-        await categoryCard.getByRole('button', { name: /delete c047/i }).click();
+        await categoryCard
+            .getByRole('button', { name: /delete c047/i })
+            .click();
         const deleteResponse = await deleteResponsePromise;
         expect(deleteResponse.status()).toBe(200);
         const deleteBody = await deleteResponse.json();
@@ -50,20 +55,27 @@ test.describe('Category Deletion', () => {
         await expect(categoryCard).not.toBeVisible();
 
         // Verify via API that category is deleted
-        const response = await request.get('/api/categories?include_inactive=1');
+        const response = await request.get(
+            '/api/categories?include_inactive=1',
+        );
         expect(response.ok()).toBeTruthy();
         const body = await response.json();
         const codes = body.data.map((cat: any) => cat.code);
         expect(codes).not.toContain('C047');
     });
 
-    test('delete blocked when transactions exist (Feature #17)', async ({ page, request }) => {
+    test('delete blocked when transactions exist (Feature #17)', async ({
+        page,
+        request,
+    }) => {
         await loginAsBrowserTestUser(page, request);
 
         // Step 1: Create category
         await page.goto('/categories');
         await page.getByTestId('create-category-button').click();
-        await page.getByTestId('category-name-input').fill('Category with Transactions');
+        await page
+            .getByTestId('category-name-input')
+            .fill('Category with Transactions');
         await page.getByTestId('kind-expense').check();
         await page.getByTestId('create-category-submit').click();
         await expect(page.getByTestId('create-category-dialog')).toBeHidden();
@@ -75,7 +87,9 @@ test.describe('Category Deletion', () => {
         const categoriesResponse = await request.get('/api/categories');
         expect(categoriesResponse.ok()).toBeTruthy();
         const categoriesBody = await categoriesResponse.json();
-        const category = categoriesBody.data.find((c: any) => c.code === 'C047');
+        const category = categoriesBody.data.find(
+            (c: any) => c.code === 'C047',
+        );
         expect(category).toBeTruthy();
 
         const accountResponse = await request.post('/api/accounts', {
@@ -96,7 +110,7 @@ test.describe('Category Deletion', () => {
                 period: '202610',
                 category_id: category.id,
                 account_id: account.id,
-                amount_cad: 100.00,
+                amount_cad: 100.0,
                 comments: 'Test transaction to block deletion',
             },
         });
@@ -112,7 +126,9 @@ test.describe('Category Deletion', () => {
                 response.request().method() === 'DELETE' &&
                 response.url().endsWith('/api/categories/C047'),
         );
-        await categoryCard.getByRole('button', { name: /delete c047/i }).click();
+        await categoryCard
+            .getByRole('button', { name: /delete c047/i })
+            .click();
         const deleteResponse = await deleteResponsePromise;
         expect(deleteResponse.status()).toBe(422);
         expect(await deleteResponse.json()).toMatchObject({
@@ -128,20 +144,27 @@ test.describe('Category Deletion', () => {
         await expect(categoryCard).toBeVisible();
 
         // Verify via API that category still exists
-        const verifyResponse = await request.get('/api/categories?include_inactive=1');
+        const verifyResponse = await request.get(
+            '/api/categories?include_inactive=1',
+        );
         expect(verifyResponse.ok()).toBeTruthy();
         const verifyBody = await verifyResponse.json();
         const codes = verifyBody.data.map((cat: any) => cat.code);
         expect(codes).toContain('C047');
     });
 
-    test('delete blocked when budgets exist (Feature #18)', async ({ page, request }) => {
+    test('delete blocked when budgets exist (Feature #18)', async ({
+        page,
+        request,
+    }) => {
         await loginAsBrowserTestUser(page, request);
 
         // Step 1: Create category
         await page.goto('/categories');
         await page.getByTestId('create-category-button').click();
-        await page.getByTestId('category-name-input').fill('Category with Budgets');
+        await page
+            .getByTestId('category-name-input')
+            .fill('Category with Budgets');
         await page.getByTestId('kind-expense').check();
         await page.getByTestId('create-category-submit').click();
         await expect(page.getByTestId('create-category-dialog')).toBeHidden();
@@ -153,7 +176,9 @@ test.describe('Category Deletion', () => {
         const categoriesResponse = await request.get('/api/categories');
         expect(categoriesResponse.ok()).toBeTruthy();
         const categoriesBody = await categoriesResponse.json();
-        const category = categoriesBody.data.find((c: any) => c.code === 'C047');
+        const category = categoriesBody.data.find(
+            (c: any) => c.code === 'C047',
+        );
         expect(category).toBeTruthy();
 
         // Step 2: Create budget with this category_id
@@ -161,7 +186,7 @@ test.describe('Category Deletion', () => {
             data: {
                 period: '202610',
                 category_id: category.id,
-                amount_cad: 500.00,
+                amount_cad: 500.0,
             },
         });
         expect(budgetResponse.ok()).toBeTruthy();
@@ -176,12 +201,15 @@ test.describe('Category Deletion', () => {
                 response.request().method() === 'DELETE' &&
                 response.url().endsWith('/api/categories/C047'),
         );
-        await categoryCard.getByRole('button', { name: /delete c047/i }).click();
+        await categoryCard
+            .getByRole('button', { name: /delete c047/i })
+            .click();
         const deleteResponse = await deleteResponsePromise;
         expect(deleteResponse.status()).toBe(422);
         expect(await deleteResponse.json()).toMatchObject({
             has_budgets: true,
-            message: 'This category has associated budgets and cannot be deleted',
+            message:
+                'This category has associated budgets and cannot be deleted',
         });
         await expect.poll(() => dialogMessages.length).toBe(2);
         expect(dialogMessages[1]).toBe(
@@ -191,7 +219,9 @@ test.describe('Category Deletion', () => {
         await expect(categoryCard).toBeVisible();
 
         // Verify via API that category still exists
-        const verifyResponse = await request.get('/api/categories?include_inactive=1');
+        const verifyResponse = await request.get(
+            '/api/categories?include_inactive=1',
+        );
         expect(verifyResponse.ok()).toBeTruthy();
         const verifyBody = await verifyResponse.json();
         const codes = verifyBody.data.map((cat: any) => cat.code);

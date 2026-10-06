@@ -107,9 +107,21 @@ describe('Transactions - Column Sorting', () => {
         lastTransactionsUrl = '';
 
         const byDateDesc = [
-            makeTransaction(3, { date: '2026-09-20', amount: 30, comments: 'late' }),
-            makeTransaction(1, { date: '2026-09-10', amount: 10, comments: 'mid' }),
-            makeTransaction(2, { date: '2026-09-01', amount: 20, comments: 'early' }),
+            makeTransaction(3, {
+                date: '2026-09-20',
+                amount: 30,
+                comments: 'late',
+            }),
+            makeTransaction(1, {
+                date: '2026-09-10',
+                amount: 10,
+                comments: 'mid',
+            }),
+            makeTransaction(2, {
+                date: '2026-09-01',
+                amount: 20,
+                comments: 'early',
+            }),
         ];
         const byDateAsc = [...byDateDesc].reverse();
         const byAmountAsc = [
@@ -135,7 +147,7 @@ describe('Transactions - Column Sorting', () => {
         const byCategoryDesc = [...byCategoryAsc].reverse();
 
         global.fetch = vi.fn(async (input: RequestInfo | URL) => {
-            const url = String(input);
+            const url = input instanceof Request ? input.url : String(input);
 
             if (url.startsWith('/api/categories')) {
                 return {
@@ -198,11 +210,17 @@ describe('Transactions - Column Sorting', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transactions-sort-headers')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transactions-sort-headers'),
+            ).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('sort-header-date')).toHaveTextContent('Date');
-        expect(screen.getByTestId('sort-header-amount')).toHaveTextContent('Amount');
+        expect(screen.getByTestId('sort-header-date')).toHaveTextContent(
+            'Date',
+        );
+        expect(screen.getByTestId('sort-header-amount')).toHaveTextContent(
+            'Amount',
+        );
         expect(screen.getByTestId('sort-header-category')).toHaveTextContent(
             'Category',
         );
@@ -247,7 +265,9 @@ describe('Transactions - Column Sorting', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('sort-header-amount')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('sort-header-amount'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('sort-header-amount'));
@@ -278,7 +298,9 @@ describe('Transactions - Column Sorting', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('sort-header-category')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('sort-header-category'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('sort-header-category'));

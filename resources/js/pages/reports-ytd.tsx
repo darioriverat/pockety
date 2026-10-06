@@ -80,132 +80,156 @@ export default function ReportsYtd({
             <Head title={t('pages.reports.title')} />
 
             <PageContainer>
-                    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <PageTitle
-                            title={t('pages.reports.title')}
-                            description="View year-to-date totals for income and expenses"
-                            data-testid="reports-ytd-heading"
-                        />
-                    </div>
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <PageTitle
+                        title={t('pages.reports.title')}
+                        description="View year-to-date totals for income and expenses"
+                        data-testid="reports-ytd-heading"
+                    />
+                </div>
 
-                    <Card className="mb-6" data-testid="year-selector-card">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-base flex items-center gap-2">
-                                <FileText className="h-4 w-4" />
-                                Select Year
+                <Card className="mb-6" data-testid="year-selector-card">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <FileText className="h-4 w-4" />
+                            Select Year
+                        </CardTitle>
+                        <CardDescription>
+                            Choose a year to view year-to-date income and
+                            expense totals
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-col gap-4 md:max-w-xs">
+                            <div className="space-y-2">
+                                <Label htmlFor="year-select">Year</Label>
+                                <Select
+                                    value={currentYear.toString()}
+                                    onValueChange={handleYearChange}
+                                >
+                                    <SelectTrigger
+                                        id="year-select"
+                                        data-testid="year-select"
+                                    >
+                                        <SelectValue placeholder="Select year" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {available_years.map((year) => (
+                                            <SelectItem
+                                                key={year}
+                                                value={year.toString()}
+                                                data-testid={`year-option-${year}`}
+                                            >
+                                                {year}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <div className="mb-6">
+                    <Card data-testid="ytd-summary-card">
+                        <CardHeader>
+                            <CardTitle>
+                                Year-to-Date Summary for {ytd_totals.year}
                             </CardTitle>
                             <CardDescription>
-                                Choose a year to view year-to-date income and expense totals
+                                Covering {formatPeriod(ytd_totals.from_period)}{' '}
+                                through {formatPeriod(ytd_totals.to_period)} (
+                                {ytd_totals.period_count}{' '}
+                                {ytd_totals.period_count === 1
+                                    ? 'period'
+                                    : 'periods'}
+                                )
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex flex-col gap-4 md:max-w-xs">
-                                <div className="space-y-2">
-                                    <Label htmlFor="year-select">Year</Label>
-                                    <Select
-                                        value={currentYear.toString()}
-                                        onValueChange={handleYearChange}
-                                    >
-                                        <SelectTrigger
-                                            id="year-select"
-                                            data-testid="year-select"
+                            <div className="grid gap-4 md:grid-cols-3">
+                                <Card
+                                    className="border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/40"
+                                    data-testid="ytd-income-card"
+                                >
+                                    <CardHeader className="pb-2">
+                                        <div className="flex items-center justify-between">
+                                            <CardDescription className="font-medium text-emerald-700 dark:text-emerald-400">
+                                                YTD Income
+                                            </CardDescription>
+                                            <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div
+                                            className="text-2xl font-bold text-emerald-900 dark:text-emerald-100"
+                                            data-testid="ytd-income-total"
                                         >
-                                            <SelectValue placeholder="Select year" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {available_years.map((year) => (
-                                                <SelectItem
-                                                    key={year}
-                                                    value={year.toString()}
-                                                    data-testid={`year-option-${year}`}
-                                                >
-                                                    {year}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                                            {formatCad(
+                                                ytd_totals.ytd_income_cad,
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card
+                                    className="border-rose-200 bg-rose-50 dark:border-rose-800 dark:bg-rose-950/40"
+                                    data-testid="ytd-expenses-card"
+                                >
+                                    <CardHeader className="pb-2">
+                                        <div className="flex items-center justify-between">
+                                            <CardDescription className="font-medium text-rose-700 dark:text-rose-400">
+                                                YTD Expenses
+                                            </CardDescription>
+                                            <TrendingDown className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div
+                                            className="text-2xl font-bold text-rose-900 dark:text-rose-100"
+                                            data-testid="ytd-expenses-total"
+                                        >
+                                            {formatCad(
+                                                ytd_totals.ytd_expenses_cad,
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card
+                                    className={`${ytd_totals.ytd_net_cad >= 0 ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/40' : 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40'}`}
+                                    data-testid="ytd-net-card"
+                                >
+                                    <CardHeader className="pb-2">
+                                        <div className="flex items-center justify-between">
+                                            <CardDescription
+                                                className={`${ytd_totals.ytd_net_cad >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-amber-700 dark:text-amber-400'} font-medium`}
+                                            >
+                                                YTD Net
+                                            </CardDescription>
+                                            {ytd_totals.ytd_net_cad >= 0 ? (
+                                                <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                            ) : (
+                                                <TrendingDown className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                            )}
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div
+                                            className={`text-2xl font-bold ${ytd_totals.ytd_net_cad >= 0 ? 'text-blue-900 dark:text-blue-100' : 'text-amber-900 dark:text-amber-100'}`}
+                                            data-testid="ytd-net-total"
+                                        >
+                                            {formatCad(ytd_totals.ytd_net_cad)}
+                                        </div>
+                                        <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                                            Income - Expenses
+                                        </p>
+                                    </CardContent>
+                                </Card>
                             </div>
                         </CardContent>
                     </Card>
-
-                    <div className="mb-6">
-                        <Card data-testid="ytd-summary-card">
-                            <CardHeader>
-                                <CardTitle>Year-to-Date Summary for {ytd_totals.year}</CardTitle>
-                                <CardDescription>
-                                    Covering {formatPeriod(ytd_totals.from_period)} through {formatPeriod(ytd_totals.to_period)} ({ytd_totals.period_count} {ytd_totals.period_count === 1 ? 'period' : 'periods'})
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid gap-4 md:grid-cols-3">
-                                    <Card className="bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800" data-testid="ytd-income-card">
-                                        <CardHeader className="pb-2">
-                                            <div className="flex items-center justify-between">
-                                                <CardDescription className="text-emerald-700 dark:text-emerald-400 font-medium">
-                                                    YTD Income
-                                                </CardDescription>
-                                                <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div
-                                                className="text-2xl font-bold text-emerald-900 dark:text-emerald-100"
-                                                data-testid="ytd-income-total"
-                                            >
-                                                {formatCad(ytd_totals.ytd_income_cad)}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-
-                                    <Card className="bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800" data-testid="ytd-expenses-card">
-                                        <CardHeader className="pb-2">
-                                            <div className="flex items-center justify-between">
-                                                <CardDescription className="text-rose-700 dark:text-rose-400 font-medium">
-                                                    YTD Expenses
-                                                </CardDescription>
-                                                <TrendingDown className="h-4 w-4 text-rose-600 dark:text-rose-400" />
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div
-                                                className="text-2xl font-bold text-rose-900 dark:text-rose-100"
-                                                data-testid="ytd-expenses-total"
-                                            >
-                                                {formatCad(ytd_totals.ytd_expenses_cad)}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-
-                                    <Card className={`${ytd_totals.ytd_net_cad >= 0 ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800' : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800'}`} data-testid="ytd-net-card">
-                                        <CardHeader className="pb-2">
-                                            <div className="flex items-center justify-between">
-                                                <CardDescription className={`${ytd_totals.ytd_net_cad >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-amber-700 dark:text-amber-400'} font-medium`}>
-                                                    YTD Net
-                                                </CardDescription>
-                                                {ytd_totals.ytd_net_cad >= 0 ? (
-                                                    <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                                ) : (
-                                                    <TrendingDown className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                                                )}
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div
-                                                className={`text-2xl font-bold ${ytd_totals.ytd_net_cad >= 0 ? 'text-blue-900 dark:text-blue-100' : 'text-amber-900 dark:text-amber-100'}`}
-                                                data-testid="ytd-net-total"
-                                            >
-                                                {formatCad(ytd_totals.ytd_net_cad)}
-                                            </div>
-                                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                                Income - Expenses
-                                            </p>
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                </div>
             </PageContainer>
         </>
     );

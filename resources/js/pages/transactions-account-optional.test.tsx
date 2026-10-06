@@ -1,3 +1,4 @@
+import { requestBodyText } from '@/test/request';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Transactions from './transactions';
@@ -84,71 +85,88 @@ describe('Transactions - optional account field', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
+        global.fetch = vi.fn(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
 
-            if (url.startsWith('/api/categories')) {
-                return jsonResponse({
-                    data: [
+                if (url.startsWith('/api/categories')) {
+                    return jsonResponse({
+                        data: [
+                            {
+                                id: 1,
+                                code: 'C001',
+                                name: 'Groceries',
+                                is_debt_category: false,
+                            },
+                        ],
+                    });
+                }
+
+                if (url.startsWith('/api/accounts')) {
+                    return jsonResponse({ data: [account] });
+                }
+
+                if (url === '/api/transactions' && init?.method === 'POST') {
+                    return jsonResponse(
                         {
-                            id: 1,
-                            code: 'C001',
-                            name: 'Groceries',
-                            is_debt_category: false,
+                            data: {
+                                ...transactionWithAccount,
+                                id: 999,
+                                account_id: null,
+                                account: null,
+                            },
+                            message: 'Transaction created successfully',
                         },
-                    ],
-                });
-            }
+                        { status: 201 },
+                    );
+                }
 
-            if (url.startsWith('/api/accounts')) {
-                return jsonResponse({ data: [account] });
-            }
+                if (
+                    url.startsWith('/api/transactions/') &&
+                    init?.method === 'PUT'
+                ) {
+                    const body = JSON.parse(requestBodyText(init)) as {
+                        account_id: number | null;
+                    };
+                    return jsonResponse({
+                        data: {
+                            ...transactionWithAccount,
+                            account_id: body.account_id,
+                            account: body.account_id ? account : null,
+                        },
+                        message: 'Transaction updated successfully',
+                    });
+                }
 
-            if (url === '/api/transactions' && init?.method === 'POST') {
-                return jsonResponse(
-                    {
-                        data: { ...transactionWithAccount, id: 999, account_id: null, account: null },
-                        message: 'Transaction created successfully',
-                    },
-                    { status: 201 },
-                );
-            }
+                if (url.startsWith('/api/transactions')) {
+                    return jsonResponse({
+                        data: [transactionWithAccount],
+                        links: { self: '/api/transactions' },
+                        meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
+                    });
+                }
 
-            if (url.startsWith('/api/transactions/') && init?.method === 'PUT') {
-                const body = JSON.parse(String(init.body)) as { account_id: number | null };
-                return jsonResponse({
-                    data: {
-                        ...transactionWithAccount,
-                        account_id: body.account_id,
-                        account: body.account_id ? account : null,
-                    },
-                    message: 'Transaction updated successfully',
-                });
-            }
-
-            if (url.startsWith('/api/transactions')) {
-                return jsonResponse({
-                    data: [transactionWithAccount],
-                    links: { self: '/api/transactions' },
-                    meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
-                });
-            }
-
-            throw new Error(`Unexpected fetch: ${url}`);
-        });
+                throw new Error(`Unexpected fetch: ${url}`);
+            },
+        );
     });
 
     it('lets the user clear a selected account when editing', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getAllByTestId('edit-transaction-button')[0]);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
         });
 
         const accountField = screen.getByTestId('account-field');
@@ -164,14 +182,16 @@ describe('Transactions - optional account field', () => {
         fireEvent.click(screen.getByTestId('transaction-form-submit'));
 
         await waitFor(() => {
-            const putCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+            const putCall = (
+                global.fetch as ReturnType<typeof vi.fn>
+            ).mock.calls.find(
                 ([url, init]) =>
                     String(url) === '/api/transactions/123' &&
                     (init as RequestInit | undefined)?.method === 'PUT',
             );
 
             expect(putCall).toBeDefined();
-            const body = JSON.parse(String((putCall?.[1] as RequestInit).body));
+            const body = JSON.parse(requestBodyText(putCall?.[1]));
             expect(body.account_id).toBeNull();
         });
     });
@@ -180,20 +200,30 @@ describe('Transactions - optional account field', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
         });
 
         const accountField = screen.getByTestId('account-field');
         expect(accountField).toHaveTextContent('None');
 
         fireEvent.click(accountField);
-        expect(await screen.findByRole('option', { name: 'None' })).toBeInTheDocument();
-        expect(screen.getByRole('option', { name: 'RBC Checking' })).toBeInTheDocument();
+        expect(
+            await screen.findByRole('option', { name: 'None' }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole('option', { name: 'RBC Checking' }),
+        ).toBeInTheDocument();
     });
 });

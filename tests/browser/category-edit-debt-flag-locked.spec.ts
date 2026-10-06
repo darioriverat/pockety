@@ -59,10 +59,11 @@ test('feature 9: reject debt flag change when transactions exist', async ({
         },
     });
     expect(updateResponse.status()).toBe(422);
-    const updateBody = (await updateResponse.json()) as { error?: string; message?: string };
-    expect(
-        updateBody.error ?? updateBody.message,
-    ).toBe(
+    const updateBody = (await updateResponse.json()) as {
+        error?: string;
+        message?: string;
+    };
+    expect(updateBody.error ?? updateBody.message).toBe(
         'Debt and income settings cannot be changed because this category has transactions',
     );
 
@@ -106,7 +107,9 @@ test('feature 9: reject debt flag change when transactions exist', async ({
     });
 
     // Name update still allowed; kind stays expense
-    await page.getByTestId('edit-category-name-input').fill('Debt Lock Target Kept');
+    await page
+        .getByTestId('edit-category-name-input')
+        .fill('Debt Lock Target Kept');
     const nameUpdate = page.waitForResponse(
         (response) =>
             response.request().method() === 'PUT' &&

@@ -64,7 +64,9 @@ describe('AppSidebarHeader', () => {
         expect(screen.getByTestId('nav-menu-trigger')).toBeInTheDocument();
         expect(screen.getByTestId('global-search')).toBeInTheDocument();
         expect(screen.getByTestId('period-selector')).toBeInTheDocument();
-        expect(screen.queryByTestId('breadcrumb-trail')).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId('breadcrumb-trail'),
+        ).not.toBeInTheDocument();
     });
 
     it('shows the breadcrumb trail when breadcrumbs are provided', () => {

@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -22,7 +20,10 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const categoriesResponse = await request.get('/api/categories');
     const categoriesPayload = await categoriesResponse.json();
@@ -87,14 +88,22 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
     await expect(page.getByTestId('financial-summary-table')).toBeVisible();
     await expect(page.getByTestId('debt-category-codes')).toBeVisible();
 
-    for (const code of ['C009', 'C010', 'C027', 'C038', 'C039', 'C044', 'C046']) {
+    for (const code of [
+        'C009',
+        'C010',
+        'C027',
+        'C038',
+        'C039',
+        'C044',
+        'C046',
+    ]) {
         await expect(page.getByTestId(`debt-code-${code}`)).toBeVisible();
     }
 
     // 100 + 500 + 50 + 75 = 725
-    await expect(page.getByTestId('total-recorded-disbursements')).toContainText(
-        '725',
-    );
+    await expect(
+        page.getByTestId('total-recorded-disbursements'),
+    ).toContainText('725');
     // 725 - 500 principal - 75 depreciation = 150
     await expect(page.getByTestId('net-operating-expenses')).toContainText(
         '150',

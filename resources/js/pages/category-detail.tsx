@@ -87,7 +87,10 @@ const formatPeriod = (period: string): string => {
     const year = period.slice(0, 4);
     const month = period.slice(4, 6);
     const date = new Date(`${year}-${month}-01T00:00:00`);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+    });
 };
 
 export default function CategoryDetail() {
@@ -175,10 +178,14 @@ export default function CategoryDetail() {
                 <PageContainer className="overflow-x-auto">
                     <Card className="border-destructive">
                         <CardHeader>
-                            <CardTitle className="text-destructive">Error</CardTitle>
+                            <CardTitle className="text-destructive">
+                                Error
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{error}</p>
+                            <p className="text-muted-foreground text-sm">
+                                {error}
+                            </p>
                             <Link href="/categories">
                                 <Button variant="outline" className="mt-4">
                                     <ArrowLeft className="size-4 shrink-0 fill-none" />
@@ -220,7 +227,9 @@ export default function CategoryDetail() {
                                     : 'Loading...'
                             }
                             description="Transaction history across all periods"
-                            leading={<Tags className="size-7 shrink-0 fill-none" />}
+                            leading={
+                                <Tags className="size-7 shrink-0 fill-none" />
+                            }
                             trailing={
                                 category?.is_debt_category ? (
                                     <Badge variant="secondary">Debt</Badge>
@@ -235,9 +244,12 @@ export default function CategoryDetail() {
 
                 <Card data-testid="category-period-filter">
                     <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Filter by period</CardTitle>
+                        <CardTitle className="text-base">
+                            Filter by period
+                        </CardTitle>
                         <CardDescription>
-                            Show only transactions from a specific YYYYMM period.
+                            Show only transactions from a specific YYYYMM
+                            period.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -265,7 +277,10 @@ export default function CategoryDetail() {
                                 </select>
                             </div>
                             <div className="flex gap-2">
-                                <Button type="submit" data-testid="apply-period-filter">
+                                <Button
+                                    type="submit"
+                                    data-testid="apply-period-filter"
+                                >
                                     Apply filter
                                 </Button>
                                 <Button
@@ -280,7 +295,7 @@ export default function CategoryDetail() {
                         </form>
                         {isFiltered && appliedPeriod && (
                             <p
-                                className="mt-3 text-sm text-muted-foreground"
+                                className="text-muted-foreground mt-3 text-sm"
                                 data-testid="active-period-filter"
                             >
                                 Showing period {appliedPeriod} (
@@ -310,7 +325,7 @@ export default function CategoryDetail() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Sum of CAD amounts
                                     {isFiltered ? ' in selected period' : ''}
                                 </p>
@@ -327,7 +342,7 @@ export default function CategoryDetail() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Total transactions shown
                                 </p>
                             </CardContent>
@@ -343,7 +358,7 @@ export default function CategoryDetail() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Periods with transactions
                                 </p>
                             </CardContent>
@@ -359,7 +374,7 @@ export default function CategoryDetail() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Average CAD spending per period
                                 </p>
                             </CardContent>
@@ -377,7 +392,7 @@ export default function CategoryDetail() {
                 ) : transactions.length === 0 ? (
                     <Card>
                         <CardContent
-                            className="py-8 text-center text-muted-foreground"
+                            className="text-muted-foreground py-8 text-center"
                             data-testid="no-category-transactions-message"
                         >
                             {isFiltered
@@ -392,7 +407,9 @@ export default function CategoryDetail() {
                             <CardDescription>
                                 {transactions.length} transaction
                                 {transactions.length !== 1 ? 's' : ''}
-                                {isFiltered ? ' in selected period' : ' across all periods'}{' '}
+                                {isFiltered
+                                    ? ' in selected period'
+                                    : ' across all periods'}{' '}
                                 · Sorted by date (newest first)
                             </CardDescription>
                         </CardHeader>
@@ -432,14 +449,15 @@ export default function CategoryDetail() {
                                                     </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right font-medium text-destructive">
+                                            <TableCell className="text-destructive text-right font-medium">
                                                 −
                                                 {formatCurrency(
                                                     transaction.amount ?? 0,
-                                                    transaction.currency || 'CAD'
+                                                    transaction.currency ||
+                                                        'CAD',
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-sm text-muted-foreground">
+                                            <TableCell className="text-muted-foreground text-sm">
                                                 {transaction.comments || '—'}
                                             </TableCell>
                                         </TableRow>

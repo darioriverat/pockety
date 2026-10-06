@@ -43,7 +43,12 @@ export function PeriodSelector({
                     onValueChange?.(next);
                 }}
             >
-                <SelectTrigger id={id} data-testid={testId} aria-label={label}>
+                <SelectTrigger
+                    className="w-full min-w-0"
+                    id={id}
+                    data-testid={testId}
+                    aria-label={label}
+                >
                     <SelectValue placeholder="Select period" />
                 </SelectTrigger>
                 <SelectContent>

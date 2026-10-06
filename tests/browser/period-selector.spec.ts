@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -22,9 +20,15 @@ test('feature: user can navigate to different periods using period selector', as
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
-    await ensureExchangeRateForPeriod(request, '202502', { copPerUsd: 4500, cadPerUsd: 0.8 });
+    await ensureExchangeRateForPeriod(request, '202502', {
+        copPerUsd: 4500,
+        cadPerUsd: 0.8,
+    });
 
     const categoriesResponse = await request.get('/api/categories');
     const categoriesPayload = await categoriesResponse.json();
@@ -62,21 +66,23 @@ test('feature: user can navigate to different periods using period selector', as
     await expect(headerSelector).toBeVisible();
     await selectDisplayedPeriod(page, 'January 2025', 'period-selector');
 
-    await expect(page.getByTestId('total-recorded-disbursements')).toContainText(
-        '100',
-    );
+    await expect(
+        page.getByTestId('total-recorded-disbursements'),
+    ).toContainText('100');
 
     await page.screenshot({
         path: 'verification/period-selector-01-financial-summary.png',
     });
 
     await headerSelector.click();
-    await page.getByRole('option', { name: 'February 2025', exact: true }).click();
+    await page
+        .getByRole('option', { name: 'February 2025', exact: true })
+        .click();
 
     await expect(headerSelector).toContainText('February 2025');
-    await expect(page.getByTestId('total-recorded-disbursements')).toContainText(
-        '250',
-    );
+    await expect(
+        page.getByTestId('total-recorded-disbursements'),
+    ).toContainText('250');
     await expect(page.getByTestId('page-period-selector')).toContainText(
         'February 2025',
     );

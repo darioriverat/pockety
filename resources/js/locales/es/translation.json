@@ -1,276 +1,276 @@
 {
-  "nav": {
-    "label": "Navegación",
-    "dashboard": "Panel",
-    "accounts": "Cuentas",
-    "income": "Ingresos",
-    "reconciliation": "Conciliación",
-    "categories": "Categorías",
-    "transactions": "Transacciones",
-    "periods": "Periodos",
-    "comparePeriods": "Comparar periodos",
-    "reports": "Informes",
-    "categoryActuals": "Reales por categoría",
-    "budgets": "Presupuestos",
-    "financialSummary": "Resumen financiero",
-    "balanceSheet": "Balance general",
-    "periodBalances": "Saldos del periodo",
-    "bsTimeSeries": "Serie temporal BG",
-    "fixedAssets": "Activos fijos",
-    "exchangeRates": "Tipos de cambio",
-    "import": "Importar",
-    "preferences": "Preferencias",
-    "settings": "Configuración",
-    "profile": "Perfil",
-    "security": "Seguridad",
-    "appearance": "Apariencia",
-    "logOut": "Cerrar sesión"
-  },
-  "footer": {
-    "rights": "Todos los derechos reservados"
-  },
-  "common": {
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "create": "Crear",
-    "search": "Buscar",
-    "clearFilters": "Limpiar filtros",
-    "loading": "Cargando...",
-    "saving": "Guardando...",
-    "allAccounts": "Todas las cuentas",
-    "active": "Activo",
-    "inactive": "Inactivo",
-    "name": "Nombre",
-    "type": "Tipo",
-    "notes": "Notas",
-    "actions": "Acciones",
-    "period": "Periodo",
-    "account": "Cuenta",
-    "category": "Categoría",
-    "currency": "Moneda",
-    "amount": "Monto",
-    "date": "Fecha",
-    "success": "Éxito",
-    "error": "Error",
-    "submit": "Enviar",
-    "close": "Cerrar",
-    "back": "Volver",
-    "yes": "Sí",
-    "no": "No",
-    "confirm": "Confirmar",
-    "filter": "Filtrar",
-    "export": "Exportar",
-    "import": "Importar",
-    "required": "Obligatorio"
-  },
-  "preferences": {
-    "title": "Preferencias",
-    "cardTitle": "Preferencias del usuario",
-    "cardDescription": "Administra las preferencias de tu cuenta y la configuración de visualización",
-    "defaultCurrency": "Moneda predeterminada",
-    "selectCurrency": "Seleccionar moneda",
-    "currencyHelp": "Elige tu moneda preferida para mostrar montos en la aplicación. Aún puedes cambiar la moneda en el panel en cualquier momento.",
-    "language": "Idioma",
-    "selectLanguage": "Seleccionar idioma",
-    "languageHelp": "Elige el idioma de la interfaz de la aplicación.",
-    "english": "Inglés",
-    "spanish": "Español",
-    "save": "Guardar preferencias",
-    "saving": "Guardando...",
-    "success": "¡Preferencias actualizadas correctamente!"
-  },
-  "settings": {
-    "title": "Configuración",
-    "description": "Administra tu perfil y la configuración de la cuenta",
-    "profile": "Perfil",
-    "security": "Seguridad",
-    "appearance": "Apariencia"
-  },
-  "auth": {
-    "login": {
-      "title": "Inicia sesión en tu cuenta",
-      "description": "Ingresa tu correo y contraseña para iniciar sesión",
-      "head": "Iniciar sesión",
-      "email": "Correo electrónico",
-      "password": "Contraseña",
-      "forgot": "¿Olvidaste tu contraseña?",
-      "remember": "Recordarme",
-      "submit": "Iniciar sesión",
-      "noAccount": "¿No tienes una cuenta?",
-      "signUp": "Regístrate"
+    "nav": {
+        "label": "Navegación",
+        "dashboard": "Panel",
+        "accounts": "Cuentas",
+        "income": "Ingresos",
+        "reconciliation": "Conciliación",
+        "categories": "Categorías",
+        "transactions": "Transacciones",
+        "periods": "Periodos",
+        "comparePeriods": "Comparar periodos",
+        "reports": "Informes",
+        "categoryActuals": "Reales por categoría",
+        "budgets": "Presupuestos",
+        "financialSummary": "Resumen financiero",
+        "balanceSheet": "Balance general",
+        "periodBalances": "Saldos del periodo",
+        "bsTimeSeries": "Serie temporal BG",
+        "fixedAssets": "Activos fijos",
+        "exchangeRates": "Tipos de cambio",
+        "import": "Importar",
+        "preferences": "Preferencias",
+        "settings": "Configuración",
+        "profile": "Perfil",
+        "security": "Seguridad",
+        "appearance": "Apariencia",
+        "logOut": "Cerrar sesión"
     },
-    "register": {
-      "title": "Crear una cuenta",
-      "description": "Ingresa tus datos para crear tu cuenta",
-      "head": "Registrarse",
-      "name": "Nombre",
-      "fullName": "Nombre completo",
-      "email": "Correo electrónico",
-      "password": "Contraseña",
-      "confirmPassword": "Confirmar contraseña",
-      "submit": "Crear cuenta",
-      "hasAccount": "¿Ya tienes una cuenta?",
-      "logIn": "Iniciar sesión"
+    "footer": {
+        "rights": "Todos los derechos reservados"
     },
-    "forgotPassword": {
-      "title": "Olvidé mi contraseña",
-      "description": "Ingresa tu correo para recibir un enlace de restablecimiento",
-      "head": "Olvidé mi contraseña",
-      "email": "Correo electrónico",
-      "submit": "Enviar enlace de restablecimiento",
-      "back": "Volver al inicio de sesión"
+    "common": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "create": "Crear",
+        "search": "Buscar",
+        "clearFilters": "Limpiar filtros",
+        "loading": "Cargando...",
+        "saving": "Guardando...",
+        "allAccounts": "Todas las cuentas",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "name": "Nombre",
+        "type": "Tipo",
+        "notes": "Notas",
+        "actions": "Acciones",
+        "period": "Periodo",
+        "account": "Cuenta",
+        "category": "Categoría",
+        "currency": "Moneda",
+        "amount": "Monto",
+        "date": "Fecha",
+        "success": "Éxito",
+        "error": "Error",
+        "submit": "Enviar",
+        "close": "Cerrar",
+        "back": "Volver",
+        "yes": "Sí",
+        "no": "No",
+        "confirm": "Confirmar",
+        "filter": "Filtrar",
+        "export": "Exportar",
+        "import": "Importar",
+        "required": "Obligatorio"
     },
-    "resetPassword": {
-      "title": "Restablecer contraseña",
-      "description": "Ingresa tu nueva contraseña a continuación",
-      "head": "Restablecer contraseña",
-      "email": "Correo",
-      "password": "Contraseña",
-      "confirmPassword": "Confirmar contraseña",
-      "submit": "Restablecer contraseña"
+    "preferences": {
+        "title": "Preferencias",
+        "cardTitle": "Preferencias del usuario",
+        "cardDescription": "Administra las preferencias de tu cuenta y la configuración de visualización",
+        "defaultCurrency": "Moneda predeterminada",
+        "selectCurrency": "Seleccionar moneda",
+        "currencyHelp": "Elige tu moneda preferida para mostrar montos en la aplicación. Aún puedes cambiar la moneda en el panel en cualquier momento.",
+        "language": "Idioma",
+        "selectLanguage": "Seleccionar idioma",
+        "languageHelp": "Elige el idioma de la interfaz de la aplicación.",
+        "english": "Inglés",
+        "spanish": "Español",
+        "save": "Guardar preferencias",
+        "saving": "Guardando...",
+        "success": "¡Preferencias actualizadas correctamente!"
     },
-    "confirmPassword": {
-      "title": "Confirmar contraseña",
-      "description": "Esta es un área segura de la aplicación. Confirma tu contraseña antes de continuar.",
-      "head": "Confirmar contraseña",
-      "password": "Contraseña",
-      "submit": "Confirmar"
+    "settings": {
+        "title": "Configuración",
+        "description": "Administra tu perfil y la configuración de la cuenta",
+        "profile": "Perfil",
+        "security": "Seguridad",
+        "appearance": "Apariencia"
     },
-    "verifyEmail": {
-      "title": "Verificar correo",
-      "description": "Verifica tu correo electrónico haciendo clic en el enlace que te enviamos.",
-      "head": "Verificar correo",
-      "resend": "Reenviar correo de verificación",
-      "logout": "Cerrar sesión"
+    "auth": {
+        "login": {
+            "title": "Inicia sesión en tu cuenta",
+            "description": "Ingresa tu correo y contraseña para iniciar sesión",
+            "head": "Iniciar sesión",
+            "email": "Correo electrónico",
+            "password": "Contraseña",
+            "forgot": "¿Olvidaste tu contraseña?",
+            "remember": "Recordarme",
+            "submit": "Iniciar sesión",
+            "noAccount": "¿No tienes una cuenta?",
+            "signUp": "Regístrate"
+        },
+        "register": {
+            "title": "Crear una cuenta",
+            "description": "Ingresa tus datos para crear tu cuenta",
+            "head": "Registrarse",
+            "name": "Nombre",
+            "fullName": "Nombre completo",
+            "email": "Correo electrónico",
+            "password": "Contraseña",
+            "confirmPassword": "Confirmar contraseña",
+            "submit": "Crear cuenta",
+            "hasAccount": "¿Ya tienes una cuenta?",
+            "logIn": "Iniciar sesión"
+        },
+        "forgotPassword": {
+            "title": "Olvidé mi contraseña",
+            "description": "Ingresa tu correo para recibir un enlace de restablecimiento",
+            "head": "Olvidé mi contraseña",
+            "email": "Correo electrónico",
+            "submit": "Enviar enlace de restablecimiento",
+            "back": "Volver al inicio de sesión"
+        },
+        "resetPassword": {
+            "title": "Restablecer contraseña",
+            "description": "Ingresa tu nueva contraseña a continuación",
+            "head": "Restablecer contraseña",
+            "email": "Correo",
+            "password": "Contraseña",
+            "confirmPassword": "Confirmar contraseña",
+            "submit": "Restablecer contraseña"
+        },
+        "confirmPassword": {
+            "title": "Confirmar contraseña",
+            "description": "Esta es un área segura de la aplicación. Confirma tu contraseña antes de continuar.",
+            "head": "Confirmar contraseña",
+            "password": "Contraseña",
+            "submit": "Confirmar"
+        },
+        "verifyEmail": {
+            "title": "Verificar correo",
+            "description": "Verifica tu correo electrónico haciendo clic en el enlace que te enviamos.",
+            "head": "Verificar correo",
+            "resend": "Reenviar correo de verificación",
+            "logout": "Cerrar sesión"
+        },
+        "twoFactor": {
+            "title": "Confirmación de dos factores",
+            "description": "Confirma el acceso a tu cuenta ingresando el código de tu aplicación de autenticación.",
+            "head": "Desafío de dos factores",
+            "code": "Código",
+            "recoveryCode": "Código de recuperación",
+            "useRecovery": "Usar un código de recuperación",
+            "useAuthCode": "Usar un código de autenticación",
+            "submit": "Continuar"
+        }
     },
-    "twoFactor": {
-      "title": "Confirmación de dos factores",
-      "description": "Confirma el acceso a tu cuenta ingresando el código de tu aplicación de autenticación.",
-      "head": "Desafío de dos factores",
-      "code": "Código",
-      "recoveryCode": "Código de recuperación",
-      "useRecovery": "Usar un código de recuperación",
-      "useAuthCode": "Usar un código de autenticación",
-      "submit": "Continuar"
+    "pages": {
+        "dashboard": {
+            "title": "Panel"
+        },
+        "accounts": {
+            "title": "Cuentas",
+            "edit": "Editar cuenta",
+            "create": "Crear cuenta",
+            "manageBalances": "Administrar saldos",
+            "typeLocked": "No se puede cambiar el tipo de cuenta porque hay transacciones registradas para esta cuenta.",
+            "primaryCurrency": "Moneda principal",
+            "activeFlag": "Activo"
+        },
+        "accountDetail": {
+            "title": "Detalle de la cuenta"
+        },
+        "transactions": {
+            "title": "Transacciones",
+            "filters": "Filtros",
+            "accountFilter": "Cuenta",
+            "allAccounts": "Todas las cuentas",
+            "categoryFilter": "Categoría",
+            "search": "Buscar",
+            "create": "Nueva transacción",
+            "edit": "Editar transacción"
+        },
+        "categories": {
+            "title": "Categorías",
+            "create": "Crear categoría",
+            "edit": "Editar categoría"
+        },
+        "reconciliation": {
+            "title": "Conciliación"
+        },
+        "periodBalances": {
+            "title": "Saldos del periodo",
+            "registered": "Saldo registrado",
+            "history": "Historial de saldos"
+        },
+        "balanceSheet": {
+            "title": "Balance general",
+            "assets": "Desglose de activos"
+        },
+        "import": {
+            "title": "Importar datos históricos",
+            "transactions": "Transacciones",
+            "accounts": "Cuentas",
+            "balanceSheet": "Balance general",
+            "statistics": "Estadísticas de importación",
+            "chooseFile": "Elegir archivo",
+            "upload": "Subir",
+            "noFile": "Elige un archivo antes de enviar."
+        },
+        "exchangeRates": {
+            "title": "Tipos de cambio",
+            "description": "Guarda cotizaciones con base USD y asigna una captura a cada periodo. Los cruces se derivan.",
+            "attribution": "Tipos de cambio por",
+            "manualTitle": "Captura manual",
+            "manualDescription": "Ingresa CAD por 1 USD y COP por 1 USD para una fecha. No sobrescribe el feed global.",
+            "date": "Fecha",
+            "cadPerUsd": "CAD por 1 USD",
+            "copPerUsd": "COP por 1 USD",
+            "saveManual": "Guardar captura manual",
+            "manualSaved": "Captura manual guardada correctamente",
+            "manualSaveFailed": "No se pudo guardar la captura manual",
+            "assignTitle": "Asignar al periodo",
+            "assignDescription": "Elige una captura obtenida o manual para el periodo seleccionado.",
+            "period": "Periodo",
+            "selectPeriod": "Seleccionar periodo",
+            "snapshot": "Captura",
+            "selectSnapshot": "Seleccionar captura",
+            "sourceManual": "Manual",
+            "sourceFetched": "Obtenida",
+            "assign": "Asignar captura",
+            "assigned": "Tipos de cambio guardados correctamente",
+            "assignFailed": "No se pudo asignar la captura",
+            "snapshotRequired": "Elige una captura antes de asignar.",
+            "missingForPeriod": "Este periodo necesita un tipo de cambio. Asigna una captura para convertir montos.",
+            "derivedUsdCop": "USD/COP derivado",
+            "derivedUsdCad": "USD/CAD derivado",
+            "derivedCadCop": "CAD/COP derivado",
+            "historyTitle": "Asignaciones por periodo",
+            "historyDescription": "Capturas asignadas a cada periodo",
+            "noRates": "Aún no hay asignaciones. Guarda una captura manual y asígnala a un periodo."
+        },
+        "income": {
+            "title": "Ingresos"
+        },
+        "budgets": {
+            "title": "Presupuestos",
+            "report": "Informe presupuesto vs real"
+        },
+        "reports": {
+            "title": "Informes año hasta la fecha",
+            "ytd": "Año hasta la fecha"
+        },
+        "financialSummary": {
+            "title": "Resumen financiero"
+        },
+        "categoryActuals": {
+            "title": "Reales por categoría",
+            "byCategory": "Reales por categoría"
+        },
+        "comparePeriods": {
+            "title": "Comparación de periodos",
+            "metrics": "Métricas lado a lado"
+        },
+        "periods": {
+            "title": "Periodos"
+        },
+        "fixedAssets": {
+            "title": "Activos fijos"
+        },
+        "bsTimeSeries": {
+            "title": "Serie temporal del balance"
+        }
     }
-  },
-  "pages": {
-    "dashboard": {
-      "title": "Panel"
-    },
-    "accounts": {
-      "title": "Cuentas",
-      "edit": "Editar cuenta",
-      "create": "Crear cuenta",
-      "manageBalances": "Administrar saldos",
-      "typeLocked": "No se puede cambiar el tipo de cuenta porque hay transacciones registradas para esta cuenta.",
-      "primaryCurrency": "Moneda principal",
-      "activeFlag": "Activo"
-    },
-    "accountDetail": {
-      "title": "Detalle de la cuenta"
-    },
-    "transactions": {
-      "title": "Transacciones",
-      "filters": "Filtros",
-      "accountFilter": "Cuenta",
-      "allAccounts": "Todas las cuentas",
-      "categoryFilter": "Categoría",
-      "search": "Buscar",
-      "create": "Nueva transacción",
-      "edit": "Editar transacción"
-    },
-    "categories": {
-      "title": "Categorías",
-      "create": "Crear categoría",
-      "edit": "Editar categoría"
-    },
-    "reconciliation": {
-      "title": "Conciliación"
-    },
-    "periodBalances": {
-      "title": "Saldos del periodo",
-      "registered": "Saldo registrado",
-      "history": "Historial de saldos"
-    },
-    "balanceSheet": {
-      "title": "Balance general",
-      "assets": "Desglose de activos"
-    },
-    "import": {
-      "title": "Importar datos históricos",
-      "transactions": "Transacciones",
-      "accounts": "Cuentas",
-      "balanceSheet": "Balance general",
-      "statistics": "Estadísticas de importación",
-      "chooseFile": "Elegir archivo",
-      "upload": "Subir",
-      "noFile": "Elige un archivo antes de enviar."
-    },
-    "exchangeRates": {
-      "title": "Tipos de cambio",
-      "description": "Guarda cotizaciones con base USD y asigna una captura a cada periodo. Los cruces se derivan.",
-      "attribution": "Tipos de cambio por",
-      "manualTitle": "Captura manual",
-      "manualDescription": "Ingresa CAD por 1 USD y COP por 1 USD para una fecha. No sobrescribe el feed global.",
-      "date": "Fecha",
-      "cadPerUsd": "CAD por 1 USD",
-      "copPerUsd": "COP por 1 USD",
-      "saveManual": "Guardar captura manual",
-      "manualSaved": "Captura manual guardada correctamente",
-      "manualSaveFailed": "No se pudo guardar la captura manual",
-      "assignTitle": "Asignar al periodo",
-      "assignDescription": "Elige una captura obtenida o manual para el periodo seleccionado.",
-      "period": "Periodo",
-      "selectPeriod": "Seleccionar periodo",
-      "snapshot": "Captura",
-      "selectSnapshot": "Seleccionar captura",
-      "sourceManual": "Manual",
-      "sourceFetched": "Obtenida",
-      "assign": "Asignar captura",
-      "assigned": "Tipos de cambio guardados correctamente",
-      "assignFailed": "No se pudo asignar la captura",
-      "snapshotRequired": "Elige una captura antes de asignar.",
-      "missingForPeriod": "Este periodo necesita un tipo de cambio. Asigna una captura para convertir montos.",
-      "derivedUsdCop": "USD/COP derivado",
-      "derivedUsdCad": "USD/CAD derivado",
-      "derivedCadCop": "CAD/COP derivado",
-      "historyTitle": "Asignaciones por periodo",
-      "historyDescription": "Capturas asignadas a cada periodo",
-      "noRates": "Aún no hay asignaciones. Guarda una captura manual y asígnala a un periodo."
-    },
-    "income": {
-      "title": "Ingresos"
-    },
-    "budgets": {
-      "title": "Presupuestos",
-      "report": "Informe presupuesto vs real"
-    },
-    "reports": {
-      "title": "Informes año hasta la fecha",
-      "ytd": "Año hasta la fecha"
-    },
-    "financialSummary": {
-      "title": "Resumen financiero"
-    },
-    "categoryActuals": {
-      "title": "Reales por categoría",
-      "byCategory": "Reales por categoría"
-    },
-    "comparePeriods": {
-      "title": "Comparación de periodos",
-      "metrics": "Métricas lado a lado"
-    },
-    "periods": {
-      "title": "Periodos"
-    },
-    "fixedAssets": {
-      "title": "Activos fijos"
-    },
-    "bsTimeSeries": {
-      "title": "Serie temporal del balance"
-    }
-  }
 }

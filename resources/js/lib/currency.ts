@@ -91,7 +91,12 @@ export function formatSignedCurrencyAmount(
     currency: string | null | undefined,
     empty: string = '—',
 ): string {
-    if (amount === null || amount === undefined || currency === null || currency === undefined) {
+    if (
+        amount === null ||
+        amount === undefined ||
+        currency === null ||
+        currency === undefined
+    ) {
         return empty;
     }
 
@@ -122,7 +127,10 @@ export function amountToneClass(amount: number, invert = false): string {
     return 'text-muted-foreground';
 }
 
-export function amountTone(amount: number, invert = false): 'positive' | 'negative' | 'neutral' {
+export function amountTone(
+    amount: number,
+    invert = false,
+): 'positive' | 'negative' | 'neutral' {
     const value = invert ? -amount : amount;
 
     if (value < 0) {
@@ -144,7 +152,12 @@ export function formatCurrencyAmount(
     currency: string | null | undefined,
     empty: string = '—',
 ): string {
-    if (amount === null || amount === undefined || currency === null || currency === undefined) {
+    if (
+        amount === null ||
+        amount === undefined ||
+        currency === null ||
+        currency === undefined
+    ) {
         return empty;
     }
 
@@ -156,7 +169,9 @@ export function formatCurrencyAmount(
 }
 
 export function amountForCurrency<Prefix extends string>(
-    row: Partial<Record<`${Prefix}_${Lowercase<DisplayCurrency>}`, number | null>>,
+    row: Partial<
+        Record<`${Prefix}_${Lowercase<DisplayCurrency>}`, number | null>
+    >,
     prefix: Prefix,
     currency: DisplayCurrency,
 ): number {

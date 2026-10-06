@@ -86,7 +86,7 @@ describe('Budgets - Budget vs Actual Colors', () => {
         });
 
         const row = screen.getByTestId('budget-row-C001');
-        
+
         // Should NOT be marked as over-budget
         expect(row).toHaveAttribute('data-over-budget', 'false');
 
@@ -140,7 +140,7 @@ describe('Budgets - Budget vs Actual Colors', () => {
         });
 
         const row = screen.getByTestId('budget-row-C001');
-        
+
         // Should be marked as over-budget
         expect(row).toHaveAttribute('data-over-budget', 'true');
 
@@ -238,6 +238,8 @@ describe('Budgets - Budget vs Actual Colors', () => {
         expect(badge).toBeInTheDocument();
 
         // Should not have progress bar test id (shows dash instead)
-        expect(screen.queryByTestId('progress-bar-C001')).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId('progress-bar-C001'),
+        ).not.toBeInTheDocument();
     });
 });

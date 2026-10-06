@@ -21,7 +21,11 @@ describe('typography hierarchy', () => {
 
         const heading = screen.getByRole('heading', { level: 2 });
         expect(heading).toHaveTextContent('Assets');
-        expect(heading).toHaveClass('text-2xl', 'font-semibold', 'tracking-tight');
+        expect(heading).toHaveClass(
+            'text-2xl',
+            'font-semibold',
+            'tracking-tight',
+        );
         expect(screen.getByTestId('section-heading')).toBe(heading);
     });
 
@@ -30,7 +34,11 @@ describe('typography hierarchy', () => {
 
         const heading = screen.getByRole('heading', { level: 3 });
         expect(heading).toHaveTextContent('RBC Checking');
-        expect(heading).toHaveClass('text-lg', 'font-semibold', 'tracking-tight');
+        expect(heading).toHaveClass(
+            'text-lg',
+            'font-semibold',
+            'tracking-tight',
+        );
         expect(screen.getByTestId('subsection-heading')).toBe(heading);
     });
 

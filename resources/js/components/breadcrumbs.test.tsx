@@ -12,10 +12,7 @@ vi.mock('@inertiajs/react', () => ({
         href: string | { url: string };
         [key: string]: unknown;
     }) => (
-        <a
-            href={typeof href === 'string' ? href : href.url}
-            {...props}
-        >
+        <a href={typeof href === 'string' ? href : href.url} {...props}>
             {children}
         </a>
     ),
@@ -69,10 +66,9 @@ describe('Breadcrumbs', () => {
             />,
         );
 
-        expect(screen.getByRole('link', { name: 'Categories' })).toHaveAttribute(
-            'href',
-            '/categories',
-        );
+        expect(
+            screen.getByRole('link', { name: 'Categories' }),
+        ).toHaveAttribute('href', '/categories');
         const current = screen.getByTestId('breadcrumb-current');
         expect(current).toHaveTextContent('Details');
         expect(current.querySelector('a')).toBeNull();

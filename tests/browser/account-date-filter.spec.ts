@@ -17,7 +17,9 @@ async function createAccount(
         },
     });
     expect(response.ok()).toBeTruthy();
-    const body = (await response.json()) as { data: { id: number; name: string } };
+    const body = (await response.json()) as {
+        data: { id: number; name: string };
+    };
     return body.data;
 }
 
@@ -27,7 +29,8 @@ async function getCategoryId(request: APIRequestContext): Promise<number> {
     const body = (await response.json()) as {
         data: Array<{ id: number; code: string }>;
     };
-    const category = body.data.find((item) => item.code === 'C001') ?? body.data[0];
+    const category =
+        body.data.find((item) => item.code === 'C001') ?? body.data[0];
     expect(category).toBeTruthy();
     return category.id;
 }
@@ -46,14 +49,17 @@ test('feature 91: user can filter account transaction history by date range', as
     const categoryId = await getCategoryId(request);
 
     // Ledger ending balance after all expenses: 1000 - 50 - 100 - 200 - 50 = 600
-    const balanceResponse = await request.post(`/api/accounts/${account.id}/balances`, {
-        data: {
-            period: '202502',
-            recorded_balance_cad: 600,
-            recorded_balance_usd: 0,
-            recorded_balance_cop: 0,
+    const balanceResponse = await request.post(
+        `/api/accounts/${account.id}/balances`,
+        {
+            data: {
+                period: '202502',
+                recorded_balance_cad: 600,
+                recorded_balance_usd: 0,
+                recorded_balance_cop: 0,
+            },
         },
-    });
+    );
     expect(balanceResponse.ok()).toBeTruthy();
 
     await request.post('/api/transactions', {
@@ -121,9 +127,13 @@ test('feature 91: user can filter account transaction history by date range', as
     // Step 4: Verify starting balance for filtered view is correct
     // 1000 - 50 (Dec) = 950 at start of January
     await expect(page.getByTestId('starting-balance')).toContainText('950.00');
-    await expect(page.getByTestId('starting-balance-row')).toContainText('950.00');
+    await expect(page.getByTestId('starting-balance-row')).toContainText(
+        '950.00',
+    );
     await expect(page.getByTestId('current-balance')).toContainText('650.00');
-    await expect(page.getByTestId('final-running-balance')).toContainText('650.00');
+    await expect(page.getByTestId('final-running-balance')).toContainText(
+        '650.00',
+    );
 
     const apiResponse = await request.get(
         `/api/accounts/${account.id}/transactions?start_date=2025-01-01&end_date=2025-01-31`,

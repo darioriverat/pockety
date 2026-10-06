@@ -61,8 +61,12 @@ describe('formatSignedDisplayCurrency', () => {
         expect(formatSignedDisplayCurrency(-1234.56, 'CAD')).toBe('-$1,234.56');
         expect(formatSignedDisplayCurrency(50, 'USD')).toBe('+US$50.00');
         expect(formatSignedDisplayCurrency(-50, 'USD')).toBe('-US$50.00');
-        expect(formatSignedDisplayCurrency(2000000, 'COP')).toBe('+COP 2,000,000');
-        expect(formatSignedDisplayCurrency(-2000000, 'COP')).toBe('-COP 2,000,000');
+        expect(formatSignedDisplayCurrency(2000000, 'COP')).toBe(
+            '+COP 2,000,000',
+        );
+        expect(formatSignedDisplayCurrency(-2000000, 'COP')).toBe(
+            '-COP 2,000,000',
+        );
     });
 });
 

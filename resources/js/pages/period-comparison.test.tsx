@@ -120,28 +120,46 @@ describe('PeriodComparison page', () => {
         render(<PeriodComparison />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('period-comparison-heading')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('period-comparison-heading'),
+            ).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('period-a-label')).toHaveTextContent('202501');
-        expect(screen.getByTestId('period-b-label')).toHaveTextContent('202502');
-        expect(screen.getByTestId('period-a-income')).toHaveTextContent(/5,000/);
-        expect(screen.getByTestId('period-b-income')).toHaveTextContent(/5,500/);
-        expect(screen.getByTestId('period-a-expenses')).toHaveTextContent(/1,000/);
-        expect(screen.getByTestId('period-b-expenses')).toHaveTextContent(/800/);
-        expect(screen.getByTestId('period-a-assets')).toHaveTextContent(/10,000/);
-        expect(screen.getByTestId('period-b-assets')).toHaveTextContent(/12,000/);
+        expect(screen.getByTestId('period-a-label')).toHaveTextContent(
+            '202501',
+        );
+        expect(screen.getByTestId('period-b-label')).toHaveTextContent(
+            '202502',
+        );
+        expect(screen.getByTestId('period-a-income')).toHaveTextContent(
+            /5,000/,
+        );
+        expect(screen.getByTestId('period-b-income')).toHaveTextContent(
+            /5,500/,
+        );
+        expect(screen.getByTestId('period-a-expenses')).toHaveTextContent(
+            /1,000/,
+        );
+        expect(screen.getByTestId('period-b-expenses')).toHaveTextContent(
+            /800/,
+        );
+        expect(screen.getByTestId('period-a-assets')).toHaveTextContent(
+            /10,000/,
+        );
+        expect(screen.getByTestId('period-b-assets')).toHaveTextContent(
+            /12,000/,
+        );
 
         expect(screen.getByTestId('comparison-row-income')).toBeInTheDocument();
-        expect(screen.getByTestId('comparison-income-difference')).toHaveTextContent(
-            /\+\$500/,
-        );
-        expect(screen.getByTestId('comparison-expenses-difference')).toHaveTextContent(
-            /-\$200/,
-        );
-        expect(screen.getByTestId('comparison-income-percent')).toHaveTextContent(
-            '+10.00%',
-        );
+        expect(
+            screen.getByTestId('comparison-income-difference'),
+        ).toHaveTextContent(/\+\$500/);
+        expect(
+            screen.getByTestId('comparison-expenses-difference'),
+        ).toHaveTextContent(/-\$200/);
+        expect(
+            screen.getByTestId('comparison-income-percent'),
+        ).toHaveTextContent('+10.00%');
 
         expect(screen.getByTestId('swap-periods-button')).toBeInTheDocument();
         fireEvent.click(screen.getByTestId('swap-periods-button'));

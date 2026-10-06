@@ -13,20 +13,12 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { ChartAxisLabels } from '@/components/charts/chart-axis-labels';
 import { CHART_COLORS } from '@/lib/chart-colors';
-import {
-    getChartLayout,
-    shouldShowXLabel,
-} from '@/lib/chart-layout';
+import { getChartLayout, shouldShowXLabel } from '@/lib/chart-layout';
 import { formatCurrencyAmount } from '@/lib/currency';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
-import {
-    ArrowLeft,
-    LineChart,
-    TrendingUp,
-    XCircle,
-} from 'lucide-react';
+import { ArrowLeft, LineChart, TrendingUp, XCircle } from 'lucide-react';
 
 interface CurrencyTotals {
     cad: number;
@@ -75,7 +67,10 @@ function formatPeriodShort(period: string): string {
     const year = period.substring(0, 4);
     const month = period.substring(4, 6);
     const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1);
-    return date.toLocaleDateString('en-US', { year: '2-digit', month: 'short' });
+    return date.toLocaleDateString('en-US', {
+        year: '2-digit',
+        month: 'short',
+    });
 }
 
 function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
@@ -278,246 +273,236 @@ export default function BalanceSheetTimeSeries() {
             <Head title={t('pages.bsTimeSeries.title')} />
 
             <PageContainer>
-                    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <PageTitle
-                            title={t('pages.bsTimeSeries.title')}
-                            description="Historical Assets, Liabilities, and Equity from January 2025 through September 2026 (Estado Financiero)"
-                        />
-                        <Button variant="outline" asChild>
-                            <Link href="/balance-sheet">
-                                <ArrowLeft className="size-4 shrink-0 fill-none" />
-                                Period view
-                            </Link>
-                        </Button>
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <PageTitle
+                        title={t('pages.bsTimeSeries.title')}
+                        description="Historical Assets, Liabilities, and Equity from January 2025 through September 2026 (Estado Financiero)"
+                    />
+                    <Button variant="outline" asChild>
+                        <Link href="/balance-sheet">
+                            <ArrowLeft className="size-4 shrink-0 fill-none" />
+                            Period view
+                        </Link>
+                    </Button>
+                </div>
+
+                {error && (
+                    <Alert variant="destructive" className="mb-6">
+                        <XCircle className="h-4 w-4" />
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+
+                {loading && !series ? (
+                    <div className="flex justify-center py-16">
+                        <Spinner className="h-8 w-8" />
                     </div>
-
-                    {error && (
-                        <Alert variant="destructive" className="mb-6">
-                            <XCircle className="h-4 w-4" />
-                            <AlertDescription>{error}</AlertDescription>
-                        </Alert>
-                    )}
-
-                    {loading && !series ? (
-                        <div className="flex justify-center py-16">
-                            <Spinner className="h-8 w-8" />
-                        </div>
-                    ) : (
-                        <>
-                            <div
-                                className="mb-6 grid gap-4 sm:grid-cols-3"
-                                data-testid="time-series-summary"
-                            >
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <CardDescription>
-                                            Periods covered
-                                        </CardDescription>
-                                        <CardTitle
-                                            className="text-2xl"
-                                            data-testid="period-count"
-                                        >
-                                            {series?.periods.length ?? 0}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-sm text-gray-600 dark:text-gray-400">
-                                        {series
-                                            ? `${formatPeriod(series.from)} → ${formatPeriod(series.to)}`
-                                            : '—'}
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <CardDescription className="flex items-center gap-2">
-                                            <TrendingUp className="h-4 w-4" />
-                                            Equity change
-                                        </CardDescription>
-                                        <CardTitle
-                                            className="text-2xl"
-                                            data-testid="equity-change"
-                                        >
-                                            {changeSummary
-                                                ? formatCad(
-                                                      changeSummary.equity,
-                                                  )
-                                                : '—'}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-sm text-gray-600 dark:text-gray-400">
-                                        {changeSummary
-                                            ? `${formatPeriod(changeSummary.firstPeriod)} → ${formatPeriod(changeSummary.lastPeriod)}`
-                                            : 'Need at least two periods'}
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <CardDescription>
-                                            Assets / Liabilities change
-                                        </CardDescription>
-                                        <CardTitle className="text-lg">
-                                            <span data-testid="assets-change">
-                                                {changeSummary
-                                                    ? formatCad(
-                                                          changeSummary.assets,
-                                                      )
-                                                    : '—'}
-                                            </span>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-sm text-gray-600 dark:text-gray-400">
-                                        Liabilities:{' '}
-                                        <span data-testid="liabilities-change">
-                                            {changeSummary
-                                                ? formatCad(
-                                                      changeSummary.liabilities,
-                                                  )
-                                                : '—'}
-                                        </span>
-                                    </CardContent>
-                                </Card>
-                            </div>
-
-                            <Card className="mb-6">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <LineChart className="h-5 w-5" />
-                                        Trend chart (CAD)
-                                    </CardTitle>
-                                    <CardDescription
-                                        data-testid="time-series-chart-legend"
-                                        role="list"
-                                        aria-label="Balance sheet chart legend"
-                                    >
-                                        <span
-                                            className="mr-3 inline-flex items-center gap-1"
-                                            role="listitem"
-                                        >
-                                            <span
-                                                className="inline-block h-2 w-2 rounded-full"
-                                                style={{
-                                                    backgroundColor:
-                                                        CHART_COLORS.assets,
-                                                }}
-                                            />
-                                            Assets
-                                        </span>
-                                        <span
-                                            className="mr-3 inline-flex items-center gap-1"
-                                            role="listitem"
-                                        >
-                                            <span
-                                                className="inline-block h-2 w-2 rounded-full"
-                                                style={{
-                                                    backgroundColor:
-                                                        CHART_COLORS.liabilities,
-                                                }}
-                                            />
-                                            Liabilities
-                                        </span>
-                                        <span
-                                            className="inline-flex items-center gap-1"
-                                            role="listitem"
-                                        >
-                                            <span
-                                                className="inline-block h-2 w-2 rounded-full"
-                                                style={{
-                                                    backgroundColor:
-                                                        CHART_COLORS.equity,
-                                                }}
-                                            />
-                                            Equity
-                                        </span>
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    {series && series.periods.length > 0 ? (
-                                        <TrendChart periods={series.periods} />
-                                    ) : (
-                                        <p className="text-sm text-gray-500">
-                                            No period data available.
-                                        </p>
-                                    )}
-                                </CardContent>
-                            </Card>
-
+                ) : (
+                    <>
+                        <div
+                            className="mb-6 grid gap-4 sm:grid-cols-3"
+                            data-testid="time-series-summary"
+                        >
                             <Card>
-                                <CardHeader>
-                                    <CardTitle>
-                                        Historical balance sheet
-                                    </CardTitle>
+                                <CardHeader className="pb-2">
                                     <CardDescription>
-                                        Assets, Liabilities, and Equity by
-                                        period (CAD)
+                                        Periods covered
                                     </CardDescription>
-                                </CardHeader>
-                                <CardContent className="overflow-x-auto">
-                                    <table
-                                        className="w-full text-sm"
-                                        data-testid="time-series-table"
+                                    <CardTitle
+                                        className="text-2xl"
+                                        data-testid="period-count"
                                     >
-                                        <thead>
-                                            <tr className="border-b text-left text-gray-500">
-                                                <th className="py-2 pr-4 font-medium">
-                                                    Period
-                                                </th>
-                                                <th className="py-2 pr-4 text-right font-medium">
-                                                    Assets
-                                                </th>
-                                                <th className="py-2 pr-4 text-right font-medium">
-                                                    Liabilities
-                                                </th>
-                                                <th className="py-2 text-right font-medium">
-                                                    Equity
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {series?.periods.map((row) => (
-                                                <tr
-                                                    key={row.period}
-                                                    className="border-b border-gray-100 dark:border-gray-800"
-                                                    data-testid={`time-series-row-${row.period}`}
-                                                >
-                                                    <td className="py-2 pr-4 font-medium">
-                                                        {formatPeriod(
-                                                            row.period,
-                                                        )}
-                                                    </td>
-                                                    <td
-                                                        className="py-2 pr-4 text-right"
-                                                        data-testid={`assets-${row.period}`}
-                                                    >
-                                                        {formatCad(
-                                                            row.total_assets
-                                                                .cad,
-                                                        )}
-                                                    </td>
-                                                    <td
-                                                        className="py-2 pr-4 text-right"
-                                                        data-testid={`liabilities-${row.period}`}
-                                                    >
-                                                        {formatCad(
-                                                            row
-                                                                .total_liabilities
-                                                                .cad,
-                                                        )}
-                                                    </td>
-                                                    <td
-                                                        className="py-2 text-right font-medium"
-                                                        data-testid={`equity-${row.period}`}
-                                                    >
-                                                        {formatCad(
-                                                            row.equity.cad,
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                        {series?.periods.length ?? 0}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="text-sm text-gray-600 dark:text-gray-400">
+                                    {series
+                                        ? `${formatPeriod(series.from)} → ${formatPeriod(series.to)}`
+                                        : '—'}
                                 </CardContent>
                             </Card>
-                        </>
-                    )}
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardDescription className="flex items-center gap-2">
+                                        <TrendingUp className="h-4 w-4" />
+                                        Equity change
+                                    </CardDescription>
+                                    <CardTitle
+                                        className="text-2xl"
+                                        data-testid="equity-change"
+                                    >
+                                        {changeSummary
+                                            ? formatCad(changeSummary.equity)
+                                            : '—'}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="text-sm text-gray-600 dark:text-gray-400">
+                                    {changeSummary
+                                        ? `${formatPeriod(changeSummary.firstPeriod)} → ${formatPeriod(changeSummary.lastPeriod)}`
+                                        : 'Need at least two periods'}
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardDescription>
+                                        Assets / Liabilities change
+                                    </CardDescription>
+                                    <CardTitle className="text-lg">
+                                        <span data-testid="assets-change">
+                                            {changeSummary
+                                                ? formatCad(
+                                                      changeSummary.assets,
+                                                  )
+                                                : '—'}
+                                        </span>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="text-sm text-gray-600 dark:text-gray-400">
+                                    Liabilities:{' '}
+                                    <span data-testid="liabilities-change">
+                                        {changeSummary
+                                            ? formatCad(
+                                                  changeSummary.liabilities,
+                                              )
+                                            : '—'}
+                                    </span>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <Card className="mb-6">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <LineChart className="h-5 w-5" />
+                                    Trend chart (CAD)
+                                </CardTitle>
+                                <CardDescription
+                                    data-testid="time-series-chart-legend"
+                                    role="list"
+                                    aria-label="Balance sheet chart legend"
+                                >
+                                    <span
+                                        className="mr-3 inline-flex items-center gap-1"
+                                        role="listitem"
+                                    >
+                                        <span
+                                            className="inline-block h-2 w-2 rounded-full"
+                                            style={{
+                                                backgroundColor:
+                                                    CHART_COLORS.assets,
+                                            }}
+                                        />
+                                        Assets
+                                    </span>
+                                    <span
+                                        className="mr-3 inline-flex items-center gap-1"
+                                        role="listitem"
+                                    >
+                                        <span
+                                            className="inline-block h-2 w-2 rounded-full"
+                                            style={{
+                                                backgroundColor:
+                                                    CHART_COLORS.liabilities,
+                                            }}
+                                        />
+                                        Liabilities
+                                    </span>
+                                    <span
+                                        className="inline-flex items-center gap-1"
+                                        role="listitem"
+                                    >
+                                        <span
+                                            className="inline-block h-2 w-2 rounded-full"
+                                            style={{
+                                                backgroundColor:
+                                                    CHART_COLORS.equity,
+                                            }}
+                                        />
+                                        Equity
+                                    </span>
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {series && series.periods.length > 0 ? (
+                                    <TrendChart periods={series.periods} />
+                                ) : (
+                                    <p className="text-sm text-gray-500">
+                                        No period data available.
+                                    </p>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Historical balance sheet</CardTitle>
+                                <CardDescription>
+                                    Assets, Liabilities, and Equity by period
+                                    (CAD)
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="overflow-x-auto">
+                                <table
+                                    className="w-full text-sm"
+                                    data-testid="time-series-table"
+                                >
+                                    <thead>
+                                        <tr className="border-b text-left text-gray-500">
+                                            <th className="py-2 pr-4 font-medium">
+                                                Period
+                                            </th>
+                                            <th className="py-2 pr-4 text-right font-medium">
+                                                Assets
+                                            </th>
+                                            <th className="py-2 pr-4 text-right font-medium">
+                                                Liabilities
+                                            </th>
+                                            <th className="py-2 text-right font-medium">
+                                                Equity
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {series?.periods.map((row) => (
+                                            <tr
+                                                key={row.period}
+                                                className="border-b border-gray-100 dark:border-gray-800"
+                                                data-testid={`time-series-row-${row.period}`}
+                                            >
+                                                <td className="py-2 pr-4 font-medium">
+                                                    {formatPeriod(row.period)}
+                                                </td>
+                                                <td
+                                                    className="py-2 pr-4 text-right"
+                                                    data-testid={`assets-${row.period}`}
+                                                >
+                                                    {formatCad(
+                                                        row.total_assets.cad,
+                                                    )}
+                                                </td>
+                                                <td
+                                                    className="py-2 pr-4 text-right"
+                                                    data-testid={`liabilities-${row.period}`}
+                                                >
+                                                    {formatCad(
+                                                        row.total_liabilities
+                                                            .cad,
+                                                    )}
+                                                </td>
+                                                <td
+                                                    className="py-2 text-right font-medium"
+                                                    data-testid={`equity-${row.period}`}
+                                                >
+                                                    {formatCad(row.equity.cad)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </CardContent>
+                        </Card>
+                    </>
+                )}
             </PageContainer>
         </>
     );

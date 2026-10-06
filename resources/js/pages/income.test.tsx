@@ -122,13 +122,17 @@ describe('Income page', () => {
         localStorage.setItem('pockety.selectedPeriod', '202608');
         initializePeriod();
         renderIncome();
-        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/income?period=202608'));
+        await waitFor(() =>
+            expect(fetchMock).toHaveBeenCalledWith('/api/income?period=202608'),
+        );
         const input = screen.getByLabelText('Period', { exact: true });
         expect(input).toHaveValue('202608');
         fireEvent.change(input, { target: { value: '202607' } });
         expect(localStorage.getItem('pockety.selectedPeriod')).toBe('202608');
         fireEvent.click(screen.getByRole('button', { name: 'Load Period' }));
-        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/income?period=202607'));
+        await waitFor(() =>
+            expect(fetchMock).toHaveBeenCalledWith('/api/income?period=202607'),
+        );
         expect(localStorage.getItem('pockety.selectedPeriod')).toBe('202607');
     });
 
@@ -220,42 +224,45 @@ describe('Income page', () => {
     });
 
     it('submits a new income line via the API', async () => {
-        fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
-            const method = init?.method ?? 'GET';
+        fetchMock.mockImplementation(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
+                const method = init?.method ?? 'GET';
 
-            if (method === 'POST' && url.includes('/api/income')) {
+                if (method === 'POST' && url.includes('/api/income')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: {
+                                id: 10,
+                                period: '202501',
+                                description: 'Salary - Main Job',
+                                line_number: 1,
+                                amount_cad: 5000,
+                                amount_usd: 0,
+                                amount_cop: 0,
+                                notes: null,
+                                total_cad_equivalent: 5000,
+                            },
+                        }),
+                    };
+                }
+
                 return {
                     ok: true,
                     json: async () => ({
-                        data: {
-                            id: 10,
+                        data: [],
+                        meta: {
                             period: '202501',
-                            description: 'Salary - Main Job',
-                            line_number: 1,
-                            amount_cad: 5000,
-                            amount_usd: 0,
-                            amount_cop: 0,
-                            notes: null,
-                            total_cad_equivalent: 5000,
+                            total: 0,
+                            max_lines: 6,
+                            total_cad_equivalent: 0,
                         },
                     }),
                 };
-            }
-
-            return {
-                ok: true,
-                json: async () => ({
-                    data: [],
-                    meta: {
-                        period: '202501',
-                        total: 0,
-                        max_lines: 6,
-                        total_cad_equivalent: 0,
-                    },
-                }),
-            };
-        });
+            },
+        );
 
         renderIncome();
 

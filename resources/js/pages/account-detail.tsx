@@ -19,7 +19,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { formatCurrencyAmount, formatSignedCurrencyAmount, amountToneClass, amountTone } from '@/lib/currency';
+import {
+    formatCurrencyAmount,
+    formatSignedCurrencyAmount,
+    amountToneClass,
+    amountTone,
+} from '@/lib/currency';
 import { LoadingState } from '@/components/ui/loading-state';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
@@ -115,8 +120,8 @@ export default function AccountDetail() {
             return;
         }
 
-        fetchAccountDetails();
-        fetchTransactions();
+        void fetchAccountDetails();
+        void fetchTransactions();
     }, [accountId]);
 
     const fetchAccountDetails = async () => {
@@ -163,7 +168,9 @@ export default function AccountDetail() {
             setTransactions(data.data || []);
             setStartingBalance(data.meta.starting_balance ?? 0);
             setCurrentBalance(data.meta.current_balance ?? 0);
-            setCurrency(data.meta.currency || account?.primary_currency || 'CAD');
+            setCurrency(
+                data.meta.currency || account?.primary_currency || 'CAD',
+            );
             setIsFiltered(Boolean(data.meta.is_filtered));
             if (typeof data.meta.is_liability === 'boolean') {
                 setIsLiability(data.meta.is_liability);
@@ -198,10 +205,14 @@ export default function AccountDetail() {
                 <PageContainer className="overflow-x-auto">
                     <Card className="border-destructive">
                         <CardHeader>
-                            <CardTitle className="text-destructive">Error</CardTitle>
+                            <CardTitle className="text-destructive">
+                                Error
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{error}</p>
+                            <p className="text-muted-foreground text-sm">
+                                {error}
+                            </p>
                             <Link href="/accounts">
                                 <Button variant="outline" className="mt-4">
                                     <ArrowLeft className="size-4 shrink-0 fill-none" />
@@ -238,7 +249,9 @@ export default function AccountDetail() {
                             className="mt-2"
                             title={account?.name || 'Loading...'}
                             description="Transaction history with running balance"
-                            leading={<Building2 className="size-7 shrink-0 fill-none" />}
+                            leading={
+                                <Building2 className="size-7 shrink-0 fill-none" />
+                            }
                             data-testid="account-detail-heading"
                         />
                     </div>
@@ -246,10 +259,13 @@ export default function AccountDetail() {
 
                 <Card data-testid="account-date-filter">
                     <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Filter by date range</CardTitle>
+                        <CardTitle className="text-base">
+                            Filter by date range
+                        </CardTitle>
                         <CardDescription>
-                            Show only transactions in a date range. Starting balance
-                            reflects the balance at the start of the filtered view.
+                            Show only transactions in a date range. Starting
+                            balance reflects the balance at the start of the
+                            filtered view.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -263,7 +279,9 @@ export default function AccountDetail() {
                                     id="start-date"
                                     type="date"
                                     value={startDate}
-                                    onChange={(event) => setStartDate(event.target.value)}
+                                    onChange={(event) =>
+                                        setStartDate(event.target.value)
+                                    }
                                     data-testid="filter-start-date"
                                 />
                             </div>
@@ -273,12 +291,17 @@ export default function AccountDetail() {
                                     id="end-date"
                                     type="date"
                                     value={endDate}
-                                    onChange={(event) => setEndDate(event.target.value)}
+                                    onChange={(event) =>
+                                        setEndDate(event.target.value)
+                                    }
                                     data-testid="filter-end-date"
                                 />
                             </div>
                             <div className="flex gap-2">
-                                <Button type="submit" data-testid="apply-date-filter">
+                                <Button
+                                    type="submit"
+                                    data-testid="apply-date-filter"
+                                >
                                     Apply filter
                                 </Button>
                                 <Button
@@ -293,11 +316,11 @@ export default function AccountDetail() {
                         </form>
                         {isFiltered && (
                             <p
-                                className="mt-3 text-sm text-muted-foreground"
+                                className="text-muted-foreground mt-3 text-sm"
                                 data-testid="active-date-filter"
                             >
-                                Showing{' '}
-                                {appliedStartDate || '…'} to {appliedEndDate || '…'}
+                                Showing {appliedStartDate || '…'} to{' '}
+                                {appliedEndDate || '…'}
                             </p>
                         )}
                     </CardContent>
@@ -319,11 +342,14 @@ export default function AccountDetail() {
                                     className="text-2xl"
                                     data-testid="starting-balance"
                                 >
-                                    {formatCurrency(startingBalance, displayCurrency)}
+                                    {formatCurrency(
+                                        startingBalance,
+                                        displayCurrency,
+                                    )}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     {isFiltered
                                         ? 'Balance before the first transaction in this date range'
                                         : 'Balance before the earliest transaction'}
@@ -341,11 +367,14 @@ export default function AccountDetail() {
                                     className="text-2xl"
                                     data-testid="current-balance"
                                 >
-                                    {formatCurrency(currentBalance, displayCurrency)}
+                                    {formatCurrency(
+                                        currentBalance,
+                                        displayCurrency,
+                                    )}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     {isFiltered
                                         ? 'Balance after the last transaction in this date range'
                                         : 'Balance after all transactions'}
@@ -365,7 +394,7 @@ export default function AccountDetail() {
                 ) : transactions.length === 0 ? (
                     <Card>
                         <CardContent
-                            className="py-8 text-center text-muted-foreground"
+                            className="text-muted-foreground py-8 text-center"
                             data-testid="no-transactions-message"
                         >
                             {isFiltered
@@ -380,9 +409,9 @@ export default function AccountDetail() {
                             <CardDescription>
                                 {transactions.length} transaction
                                 {transactions.length !== 1 ? 's' : ''}
-                                {isFiltered ? ' in selected range' : ''} · Sorted by
-                                date (newest first) · Running balance after each
-                                transaction
+                                {isFiltered ? ' in selected range' : ''} ·
+                                Sorted by date (newest first) · Running balance
+                                after each transaction
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -402,9 +431,8 @@ export default function AccountDetail() {
                                 </TableHeader>
                                 <TableBody>
                                     {transactions.map((transaction, index) => {
-                                        const displayAmount = cashflowAmount(
-                                            transaction,
-                                        );
+                                        const displayAmount =
+                                            cashflowAmount(transaction);
                                         const tone = amountTone(
                                             displayAmount,
                                             isLiability,
@@ -420,17 +448,23 @@ export default function AccountDetail() {
                                                 data-tx-date={transaction.date}
                                             >
                                                 <TableCell className="font-medium">
-                                                    {formatDate(transaction.date)}
+                                                    {formatDate(
+                                                        transaction.date,
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
                                                     {transaction.category_code ? (
                                                         <div>
-                                                            <span className="font-mono text-xs text-muted-foreground">
-                                                                {transaction.category_code}
+                                                            <span className="text-muted-foreground font-mono text-xs">
+                                                                {
+                                                                    transaction.category_code
+                                                                }
                                                             </span>
                                                             {transaction.category_name && (
                                                                 <div className="text-sm">
-                                                                    {transaction.category_name}
+                                                                    {
+                                                                        transaction.category_name
+                                                                    }
                                                                 </div>
                                                             )}
                                                         </div>
@@ -446,12 +480,15 @@ export default function AccountDetail() {
                                                         isLiability,
                                                     )}`}
                                                     data-testid={`account-tx-amount-${transaction.id}`}
-                                                    data-signed-amount={displayAmount}
+                                                    data-signed-amount={
+                                                        displayAmount
+                                                    }
                                                     data-amount-tone={tone}
                                                 >
                                                     {formatSignedCurrency(
                                                         displayAmount,
-                                                        transaction.currency || displayCurrency
+                                                        transaction.currency ||
+                                                            displayCurrency,
                                                     )}
                                                 </TableCell>
                                                 <TableCell
@@ -468,11 +505,13 @@ export default function AccountDetail() {
                                                 >
                                                     {formatCurrency(
                                                         transaction.running_balance,
-                                                        transaction.currency || displayCurrency
+                                                        transaction.currency ||
+                                                            displayCurrency,
                                                     )}
                                                 </TableCell>
-                                                <TableCell className="text-sm text-muted-foreground">
-                                                    {transaction.comments || '—'}
+                                                <TableCell className="text-muted-foreground text-sm">
+                                                    {transaction.comments ||
+                                                        '—'}
                                                 </TableCell>
                                             </TableRow>
                                         );
@@ -483,14 +522,14 @@ export default function AccountDetail() {
                                     >
                                         <TableCell
                                             colSpan={3}
-                                            className="font-medium text-muted-foreground"
+                                            className="text-muted-foreground font-medium"
                                         >
                                             Starting balance
                                         </TableCell>
                                         <TableCell className="text-right font-semibold">
                                             {formatCurrency(
                                                 startingBalance,
-                                                displayCurrency
+                                                displayCurrency,
                                             )}
                                         </TableCell>
                                         <TableCell />

@@ -20,12 +20,12 @@ describe('ChartAxisLabels', () => {
             </svg>,
         );
 
-        expect(getByTestId('income-expense-chart-y-axis-label').textContent).toBe(
-            'Amount (CAD)',
-        );
-        expect(getByTestId('income-expense-chart-x-axis-label').textContent).toBe(
-            'Period',
-        );
+        expect(
+            getByTestId('income-expense-chart-y-axis-label').textContent,
+        ).toBe('Amount (CAD)');
+        expect(
+            getByTestId('income-expense-chart-x-axis-label').textContent,
+        ).toBe('Period');
         expect(getByTestId('income-expense-chart-axis-labels')).toBeTruthy();
     });
 

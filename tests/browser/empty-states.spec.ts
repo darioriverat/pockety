@@ -60,12 +60,10 @@ for (const theme of ['light', 'dark'] as const) {
         });
 
         await cta.click();
-        await expect(
-            page.getByTestId('transaction-form-dialog'),
-        ).toBeVisible();
-        await expect(
-            page.getByTestId('transaction-form-title'),
-        ).toContainText(/Add Transaction/i);
+        await expect(page.getByTestId('transaction-form-dialog')).toBeVisible();
+        await expect(page.getByTestId('transaction-form-title')).toContainText(
+            /Add Transaction/i,
+        );
 
         await page.screenshot({
             path: `${evidence}/${theme}-transactions-empty-cta-opens.png`,
@@ -90,7 +88,10 @@ test('accounts empty state shows helpful CTA', async ({ page }) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify({ data: [], links: { self: '/api/accounts' } }),
+                body: JSON.stringify({
+                    data: [],
+                    links: { self: '/api/accounts' },
+                }),
             });
             return;
         }

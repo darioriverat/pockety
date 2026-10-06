@@ -88,7 +88,9 @@ export default function Categories() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [createError, setCreateError] = useState<string | null>(null);
 
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    const [editingCategory, setEditingCategory] = useState<Category | null>(
+        null,
+    );
     const [editFormData, setEditFormData] = useState({
         name: '',
         kind: 'expense' as CategoryKind,
@@ -100,7 +102,7 @@ export default function Categories() {
     const [isCheckingTransactions, setIsCheckingTransactions] = useState(false);
 
     useEffect(() => {
-        fetchCategories();
+        void fetchCategories();
     }, []);
 
     const fetchCategories = async () => {
@@ -188,7 +190,9 @@ export default function Categories() {
             setCreateDialogOpen(false);
             setCreateError(null);
         } catch (err) {
-            setCreateError(err instanceof Error ? err.message : 'An error occurred');
+            setCreateError(
+                err instanceof Error ? err.message : 'An error occurred',
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -235,18 +239,24 @@ export default function Categories() {
             );
             closeEditDialog();
         } catch (err) {
-            setEditError(err instanceof Error ? err.message : 'An error occurred');
+            setEditError(
+                err instanceof Error ? err.message : 'An error occurred',
+            );
         } finally {
             setIsEditSubmitting(false);
         }
     };
 
     const handleDelete = async (code: string, categoryName: string) => {
-        if (!confirm(`Are you sure you want to delete category ${code} (${categoryName})?`)) {
+        if (
+            !confirm(
+                `Are you sure you want to delete category ${code} (${categoryName})?`,
+            )
+        ) {
             return;
         }
 
-        const categoryId = categories.find(c => c.code === code)?.id;
+        const categoryId = categories.find((c) => c.code === code)?.id;
         setDeletingId(categoryId || null);
 
         try {
@@ -260,16 +270,24 @@ export default function Categories() {
             if (!response.ok) {
                 const errorData = await response.json();
                 if (errorData.has_transactions) {
-                    alert(errorData.message || 'This category has associated transactions and cannot be deleted');
+                    alert(
+                        errorData.message ||
+                            'This category has associated transactions and cannot be deleted',
+                    );
                 } else if (errorData.has_budgets) {
-                    alert(errorData.message || 'This category has associated budgets and cannot be deleted');
+                    alert(
+                        errorData.message ||
+                            'This category has associated budgets and cannot be deleted',
+                    );
                 } else {
-                    throw new Error(errorData.message || 'Failed to delete category');
+                    throw new Error(
+                        errorData.message || 'Failed to delete category',
+                    );
                 }
                 return;
             }
 
-            setCategories(categories.filter(c => c.code !== code));
+            setCategories(categories.filter((c) => c.code !== code));
             setError(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
@@ -307,28 +325,32 @@ export default function Categories() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                                 {error}
                             </p>
                         </CardContent>
                     </Card>
                 )}
 
-                <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                <Dialog
+                    open={createDialogOpen}
+                    onOpenChange={setCreateDialogOpen}
+                >
                     <DialogContent data-testid="create-category-dialog">
                         <DialogHeader>
                             <DialogTitle data-testid="create-category-title">
                                 Create Category
                             </DialogTitle>
                             <DialogDescription>
-                                Create a new expense, debt, or income category for tracking your finances.
+                                Create a new expense, debt, or income category
+                                for tracking your finances.
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleCreate}>
                             {createError && (
                                 <p
                                     role="alert"
-                                    className="mt-4 text-sm text-destructive"
+                                    className="text-destructive mt-4 text-sm"
                                     data-testid="create-category-error"
                                 >
                                     {createError}
@@ -336,9 +358,7 @@ export default function Categories() {
                             )}
                             <div className="grid gap-4 py-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="category-name">
-                                        Name
-                                    </Label>
+                                    <Label htmlFor="category-name">Name</Label>
                                     <Input
                                         id="category-name"
                                         data-testid="category-name-input"
@@ -357,12 +377,15 @@ export default function Categories() {
                                 <div className="grid gap-2">
                                     <Label>Kind</Label>
                                     <div className="grid gap-2">
-                                        <label className="flex items-center gap-2 cursor-pointer">
+                                        <label className="flex cursor-pointer items-center gap-2">
                                             <input
                                                 type="radio"
                                                 name="kind"
                                                 value="expense"
-                                                checked={createFormData.kind === 'expense'}
+                                                checked={
+                                                    createFormData.kind ===
+                                                    'expense'
+                                                }
                                                 onChange={() =>
                                                     setCreateFormData({
                                                         ...createFormData,
@@ -374,12 +397,15 @@ export default function Categories() {
                                             />
                                             <span>Expense</span>
                                         </label>
-                                        <label className="flex items-center gap-2 cursor-pointer">
+                                        <label className="flex cursor-pointer items-center gap-2">
                                             <input
                                                 type="radio"
                                                 name="kind"
                                                 value="debt"
-                                                checked={createFormData.kind === 'debt'}
+                                                checked={
+                                                    createFormData.kind ===
+                                                    'debt'
+                                                }
                                                 onChange={() =>
                                                     setCreateFormData({
                                                         ...createFormData,
@@ -391,12 +417,15 @@ export default function Categories() {
                                             />
                                             <span>Debt</span>
                                         </label>
-                                        <label className="flex items-center gap-2 cursor-pointer">
+                                        <label className="flex cursor-pointer items-center gap-2">
                                             <input
                                                 type="radio"
                                                 name="kind"
                                                 value="income"
-                                                checked={createFormData.kind === 'income'}
+                                                checked={
+                                                    createFormData.kind ===
+                                                    'income'
+                                                }
                                                 onChange={() =>
                                                     setCreateFormData({
                                                         ...createFormData,
@@ -445,17 +474,20 @@ export default function Categories() {
                         <DialogHeader>
                             <DialogTitle data-testid="edit-category-title">
                                 Edit Category
-                                {editingCategory ? ` ${editingCategory.code}` : ''}
+                                {editingCategory
+                                    ? ` ${editingCategory.code}`
+                                    : ''}
                             </DialogTitle>
                             <DialogDescription>
-                                Update the name, kind, or active state for this category.
+                                Update the name, kind, or active state for this
+                                category.
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleUpdate}>
                             {editError && (
                                 <p
                                     role="alert"
-                                    className="mt-4 text-sm text-destructive"
+                                    className="text-destructive mt-4 text-sm"
                                     data-testid="edit-category-error"
                                 >
                                     {editError}
@@ -484,19 +516,26 @@ export default function Categories() {
                                     <Label>Kind</Label>
                                     {kindLocked && (
                                         <p
-                                            className="text-sm text-muted-foreground"
+                                            className="text-muted-foreground text-sm"
                                             data-testid="edit-kind-locked-message"
                                         >
-                                            Debt and income settings are locked because this category has transactions.
+                                            Debt and income settings are locked
+                                            because this category has
+                                            transactions.
                                         </p>
                                     )}
                                     <div className="grid gap-2">
-                                        <label className={`flex items-center gap-2 ${kindLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}>
+                                        <label
+                                            className={`flex items-center gap-2 ${kindLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                                        >
                                             <input
                                                 type="radio"
                                                 name="edit-kind"
                                                 value="expense"
-                                                checked={editFormData.kind === 'expense'}
+                                                checked={
+                                                    editFormData.kind ===
+                                                    'expense'
+                                                }
                                                 onChange={() =>
                                                     setEditFormData({
                                                         ...editFormData,
@@ -512,12 +551,16 @@ export default function Categories() {
                                             />
                                             <span>Expense</span>
                                         </label>
-                                        <label className={`flex items-center gap-2 ${kindLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}>
+                                        <label
+                                            className={`flex items-center gap-2 ${kindLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                                        >
                                             <input
                                                 type="radio"
                                                 name="edit-kind"
                                                 value="debt"
-                                                checked={editFormData.kind === 'debt'}
+                                                checked={
+                                                    editFormData.kind === 'debt'
+                                                }
                                                 onChange={() =>
                                                     setEditFormData({
                                                         ...editFormData,
@@ -533,12 +576,17 @@ export default function Categories() {
                                             />
                                             <span>Debt</span>
                                         </label>
-                                        <label className={`flex items-center gap-2 ${kindLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}>
+                                        <label
+                                            className={`flex items-center gap-2 ${kindLocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                                        >
                                             <input
                                                 type="radio"
                                                 name="edit-kind"
                                                 value="income"
-                                                checked={editFormData.kind === 'income'}
+                                                checked={
+                                                    editFormData.kind ===
+                                                    'income'
+                                                }
                                                 onChange={() =>
                                                     setEditFormData({
                                                         ...editFormData,
@@ -586,7 +634,10 @@ export default function Categories() {
                                 </Button>
                                 <Button
                                     type="submit"
-                                    disabled={isEditSubmitting || isCheckingTransactions}
+                                    disabled={
+                                        isEditSubmitting ||
+                                        isCheckingTransactions
+                                    }
                                     data-testid="edit-category-submit"
                                 >
                                     {isEditSubmitting ? 'Saving...' : 'Save'}
@@ -606,7 +657,7 @@ export default function Categories() {
                 ) : (
                     <>
                         <div className="mb-4">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                                 Total categories: {categories.length}
                             </p>
                         </div>
@@ -616,101 +667,106 @@ export default function Categories() {
                                 const displayName = category.name;
 
                                 return (
-                                <Card
-                                    key={category.id}
-                                    className={
-                                        !category.is_active
-                                            ? 'opacity-50'
-                                            : 'transition-colors hover:bg-muted/40'
-                                    }
-                                    data-testid={`category-card-${category.code}`}
-                                >
-                                    <CardHeader>
-                                        <div className="flex items-start justify-between">
-                                            <CardTitle className="text-lg">
+                                    <Card
+                                        key={category.id}
+                                        className={
+                                            !category.is_active
+                                                ? 'opacity-50'
+                                                : 'hover:bg-muted/40 transition-colors'
+                                        }
+                                        data-testid={`category-card-${category.code}`}
+                                    >
+                                        <CardHeader>
+                                            <div className="flex items-start justify-between">
+                                                <CardTitle className="text-lg">
+                                                    <TextLink
+                                                        href={`/categories/${category.code}`}
+                                                        data-testid={`category-link-${category.code}`}
+                                                    >
+                                                        {category.code}
+                                                    </TextLink>
+                                                </CardTitle>
+                                                <div className="flex items-center gap-2">
+                                                    {category.is_debt_category && (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            data-testid={`debt-badge-${category.code}`}
+                                                        >
+                                                            Debt
+                                                        </Badge>
+                                                    )}
+                                                    {category.is_income_category && (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            data-testid={`income-badge-${category.code}`}
+                                                        >
+                                                            Income
+                                                        </Badge>
+                                                    )}
+                                                    {!category.is_active && (
+                                                        <Badge variant="outline">
+                                                            Retired
+                                                        </Badge>
+                                                    )}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={(event) => {
+                                                            event.preventDefault();
+                                                            event.stopPropagation();
+                                                            void openEditDialog(
+                                                                category,
+                                                            );
+                                                        }}
+                                                        className="h-8 w-8 p-0"
+                                                        aria-label={`Edit ${category.code}`}
+                                                        data-testid={`edit-category-${category.code}`}
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={(event) => {
+                                                            event.preventDefault();
+                                                            event.stopPropagation();
+                                                            void handleDelete(
+                                                                category.code,
+                                                                displayName,
+                                                            );
+                                                        }}
+                                                        disabled={
+                                                            deletingId ===
+                                                            category.id
+                                                        }
+                                                        className="h-8 w-8 p-0"
+                                                        aria-label={`Delete ${category.code}`}
+                                                    >
+                                                        <Trash2 className="text-destructive h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <CardDescription>
                                                 <TextLink
                                                     href={`/categories/${category.code}`}
-                                                    data-testid={`category-link-${category.code}`}
+                                                    className="block space-y-1 no-underline hover:underline"
                                                 >
-                                                    {category.code}
-                                                </TextLink>
-                                            </CardTitle>
-                                            <div className="flex gap-2 items-center">
-                                                {category.is_debt_category && (
-                                                    <Badge
-                                                        variant="secondary"
-                                                        data-testid={`debt-badge-${category.code}`}
+                                                    <div
+                                                        data-testid={`category-name-${category.code}`}
                                                     >
-                                                        Debt
-                                                    </Badge>
-                                                )}
-                                                {category.is_income_category && (
-                                                    <Badge
-                                                        variant="secondary"
-                                                        data-testid={`income-badge-${category.code}`}
-                                                    >
-                                                        Income
-                                                    </Badge>
-                                                )}
-                                                {!category.is_active && (
-                                                    <Badge variant="outline">
-                                                        Retired
-                                                    </Badge>
-                                                )}
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={(event) => {
-                                                        event.preventDefault();
-                                                        event.stopPropagation();
-                                                        void openEditDialog(category);
-                                                    }}
-                                                    className="h-8 w-8 p-0"
-                                                    aria-label={`Edit ${category.code}`}
-                                                    data-testid={`edit-category-${category.code}`}
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={(event) => {
-                                                        event.preventDefault();
-                                                        event.stopPropagation();
-                                                        handleDelete(
-                                                            category.code,
-                                                            displayName,
-                                                        );
-                                                    }}
-                                                    disabled={deletingId === category.id}
-                                                    className="h-8 w-8 p-0"
-                                                    aria-label={`Delete ${category.code}`}
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                        <CardDescription>
-                                            <TextLink
-                                                href={`/categories/${category.code}`}
-                                                className="block space-y-1 no-underline hover:underline"
-                                            >
-                                                <div
-                                                    data-testid={`category-name-${category.code}`}
-                                                >
-                                                    <span className="font-medium">
-                                                        {displayName}
-                                                    </span>
-                                                </div>
-                                                {category.status && (
-                                                    <div className="text-xs text-muted-foreground mt-2">
-                                                        {category.status}
+                                                        <span className="font-medium">
+                                                            {displayName}
+                                                        </span>
                                                     </div>
-                                                )}
-                                            </TextLink>
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>
+                                                    {category.status && (
+                                                        <div className="text-muted-foreground mt-2 text-xs">
+                                                            {category.status}
+                                                        </div>
+                                                    )}
+                                                </TextLink>
+                                            </CardDescription>
+                                        </CardHeader>
+                                    </Card>
                                 );
                             })}
                         </div>

@@ -69,7 +69,8 @@ function periodBounds(period: string): { from: string; to: string } {
 
 export default function ExchangeRates() {
     const { t } = useTranslation();
-    const { period: selectedPeriod, setPeriod: setSelectedPeriod } = usePeriod();
+    const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
+        usePeriod();
     const periods = useSelectablePeriods();
 
     const [rates, setRates] = useState<ExchangeRate[]>([]);
@@ -96,7 +97,7 @@ export default function ExchangeRates() {
     );
 
     useEffect(() => {
-        fetchAllRates();
+        void fetchAllRates();
     }, []);
 
     useEffect(() => {
@@ -104,8 +105,8 @@ export default function ExchangeRates() {
             return;
         }
         setManualDate(lastDayOfPeriod(selectedPeriod));
-        fetchRateForPeriod(selectedPeriod);
-        fetchSnapshotsForPeriod(selectedPeriod);
+        void fetchRateForPeriod(selectedPeriod);
+        void fetchSnapshotsForPeriod(selectedPeriod);
     }, [selectedPeriod]);
 
     const fetchAllRates = async () => {
@@ -174,9 +175,11 @@ export default function ExchangeRates() {
             for (const row of [...rows, ...(wideData.data ?? [])]) {
                 byId.set(row.id, row);
             }
-            setSnapshots(Array.from(byId.values()).sort((a, b) =>
-                a.rate_date < b.rate_date ? 1 : -1,
-            ));
+            setSnapshots(
+                Array.from(byId.values()).sort((a, b) =>
+                    a.rate_date < b.rate_date ? 1 : -1,
+                ),
+            );
         } catch (err) {
             console.error('Failed to fetch snapshots:', err);
         }
@@ -255,7 +258,7 @@ export default function ExchangeRates() {
             }
             setAssignSuccess(true);
             setCurrentRate(data.data);
-            fetchAllRates();
+            void fetchAllRates();
             setTimeout(() => setAssignSuccess(false), 3200);
         } catch (err) {
             setAssignError(
@@ -288,7 +291,7 @@ export default function ExchangeRates() {
                         title={t('pages.exchangeRates.title')}
                         description={t('pages.exchangeRates.description')}
                     />
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mt-2 text-sm">
                         {t('pages.exchangeRates.attribution')}{' '}
                         <a
                             href="https://openexchangerates.org/"
@@ -322,7 +325,9 @@ export default function ExchangeRates() {
                                     id="rate_date"
                                     type="date"
                                     value={manualDate}
-                                    onChange={(e) => setManualDate(e.target.value)}
+                                    onChange={(e) =>
+                                        setManualDate(e.target.value)
+                                    }
                                     data-testid="manual-rate-date"
                                 />
                             </div>
@@ -336,7 +341,9 @@ export default function ExchangeRates() {
                                     step="0.0001"
                                     min="0"
                                     value={cadPerUsd}
-                                    onChange={(e) => setCadPerUsd(e.target.value)}
+                                    onChange={(e) =>
+                                        setCadPerUsd(e.target.value)
+                                    }
                                     placeholder="1.36"
                                     data-testid="manual-cad-per-usd"
                                 />
@@ -351,7 +358,9 @@ export default function ExchangeRates() {
                                     step="0.0001"
                                     min="0"
                                     value={copPerUsd}
-                                    onChange={(e) => setCopPerUsd(e.target.value)}
+                                    onChange={(e) =>
+                                        setCopPerUsd(e.target.value)
+                                    }
                                     placeholder="4000"
                                     data-testid="manual-cop-per-usd"
                                 />
@@ -376,7 +385,9 @@ export default function ExchangeRates() {
                             {manualError && (
                                 <Alert variant="destructive">
                                     <XCircle className="h-4 w-4" />
-                                    <AlertDescription>{manualError}</AlertDescription>
+                                    <AlertDescription>
+                                        {manualError}
+                                    </AlertDescription>
                                 </Alert>
                             )}
                         </CardContent>
@@ -413,7 +424,10 @@ export default function ExchangeRates() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {periods.map((period) => (
-                                            <SelectItem key={period} value={period}>
+                                            <SelectItem
+                                                key={period}
+                                                value={period}
+                                            >
                                                 {formatPeriod(period)}
                                             </SelectItem>
                                         ))}
@@ -443,7 +457,9 @@ export default function ExchangeRates() {
                                         </Label>
                                         <Select
                                             value={selectedSnapshotId}
-                                            onValueChange={setSelectedSnapshotId}
+                                            onValueChange={
+                                                setSelectedSnapshotId
+                                            }
                                         >
                                             <SelectTrigger
                                                 id="snapshot_id"
@@ -462,15 +478,16 @@ export default function ExchangeRates() {
                                                         value={String(snap.id)}
                                                     >
                                                         {snap.rate_date} ·{' '}
-                                                        {snap.source === 'manual'
+                                                        {snap.source ===
+                                                        'manual'
                                                             ? t(
                                                                   'pages.exchangeRates.sourceManual',
                                                               )
                                                             : t(
                                                                   'pages.exchangeRates.sourceFetched',
                                                               )}{' '}
-                                                        · CAD {snap.cad_per_usd} / COP{' '}
-                                                        {snap.cop_per_usd}
+                                                        · CAD {snap.cad_per_usd}{' '}
+                                                        / COP {snap.cop_per_usd}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -478,18 +495,24 @@ export default function ExchangeRates() {
                                     </div>
 
                                     {currentRate && (
-                                        <div className="space-y-1 text-sm text-muted-foreground">
+                                        <div className="text-muted-foreground space-y-1 text-sm">
                                             <p>
-                                                {t('pages.exchangeRates.derivedUsdCop')}:{' '}
-                                                {currentRate.usd_cop}
+                                                {t(
+                                                    'pages.exchangeRates.derivedUsdCop',
+                                                )}
+                                                : {currentRate.usd_cop}
                                             </p>
                                             <p>
-                                                {t('pages.exchangeRates.derivedUsdCad')}:{' '}
-                                                {currentRate.usd_cad}
+                                                {t(
+                                                    'pages.exchangeRates.derivedUsdCad',
+                                                )}
+                                                : {currentRate.usd_cad}
                                             </p>
                                             <p>
-                                                {t('pages.exchangeRates.derivedCadCop')}:{' '}
-                                                {currentRate.cad_cop}
+                                                {t(
+                                                    'pages.exchangeRates.derivedCadCop',
+                                                )}
+                                                : {currentRate.cad_cop}
                                             </p>
                                         </div>
                                     )}
@@ -500,7 +523,9 @@ export default function ExchangeRates() {
                                         className="w-full"
                                         data-testid="assign-snapshot"
                                     >
-                                        {assigning && <Spinner className="mr-2" />}
+                                        {assigning && (
+                                            <Spinner className="mr-2" />
+                                        )}
                                         {t('pages.exchangeRates.assign')}
                                     </Button>
 
@@ -508,7 +533,9 @@ export default function ExchangeRates() {
                                         <Alert>
                                             <CheckCircle className="h-4 w-4" />
                                             <AlertDescription>
-                                                {t('pages.exchangeRates.assigned')}
+                                                {t(
+                                                    'pages.exchangeRates.assigned',
+                                                )}
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -541,29 +568,37 @@ export default function ExchangeRates() {
                                 <Spinner />
                             </div>
                         ) : rates.length === 0 ? (
-                            <p className="py-8 text-center text-muted-foreground">
+                            <p className="text-muted-foreground py-8 text-center">
                                 {t('pages.exchangeRates.noRates')}
                             </p>
                         ) : (
                             <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-border">
+                                <table className="divide-border min-w-full divide-y">
                                     <thead>
                                         <tr>
-                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                                {t('pages.exchangeRates.period')}
+                                            <th className="text-muted-foreground px-4 py-2 text-left text-xs font-medium tracking-wider uppercase">
+                                                {t(
+                                                    'pages.exchangeRates.period',
+                                                )}
                                             </th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                                {t('pages.exchangeRates.cadPerUsd')}
+                                            <th className="text-muted-foreground px-4 py-2 text-left text-xs font-medium tracking-wider uppercase">
+                                                {t(
+                                                    'pages.exchangeRates.cadPerUsd',
+                                                )}
                                             </th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                                {t('pages.exchangeRates.copPerUsd')}
+                                            <th className="text-muted-foreground px-4 py-2 text-left text-xs font-medium tracking-wider uppercase">
+                                                {t(
+                                                    'pages.exchangeRates.copPerUsd',
+                                                )}
                                             </th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                                {t('pages.exchangeRates.derivedCadCop')}
+                                            <th className="text-muted-foreground px-4 py-2 text-left text-xs font-medium tracking-wider uppercase">
+                                                {t(
+                                                    'pages.exchangeRates.derivedCadCop',
+                                                )}
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-border">
+                                    <tbody className="divide-border divide-y">
                                         {rates.map((rate) => (
                                             <tr key={rate.id}>
                                                 <td className="px-4 py-3 text-sm">

@@ -95,7 +95,9 @@ test('reconciliation: computed balance reflects linked transactions', async ({
 
     await page.goto('/reconciliation');
 
-    await expect(page.getByRole('heading', { name: 'Reconciliation' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Reconciliation' }),
+    ).toBeVisible();
     await page.getByLabel('Period (YYYYMM)').fill('202501');
     await page.getByRole('button', { name: 'View Reconciliation' }).click();
 
@@ -106,15 +108,15 @@ test('reconciliation: computed balance reflects linked transactions', async ({
     await expect(accountCard.getByText('Test Bank')).toBeVisible();
 
     const cadRow = accountCard.locator('[data-testid="currency-row-CAD"]');
-    await expect(cadRow.locator('[data-testid="recorded-amount"]')).toContainText(
-        '1,000',
-    );
-    await expect(cadRow.locator('[data-testid="computed-amount"]')).toContainText(
-        '900',
-    );
-    await expect(cadRow.locator('[data-testid="variance-amount"]')).toContainText(
-        '100',
-    );
+    await expect(
+        cadRow.locator('[data-testid="recorded-amount"]'),
+    ).toContainText('1,000');
+    await expect(
+        cadRow.locator('[data-testid="computed-amount"]'),
+    ).toContainText('900');
+    await expect(
+        cadRow.locator('[data-testid="variance-amount"]'),
+    ).toContainText('100');
 
     const equationCard = page.getByTestId('accounting-equation-card');
     await expect(equationCard).toBeVisible();

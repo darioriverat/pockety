@@ -1,3 +1,4 @@
+import { requestBodyText } from '@/test/request';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Transactions from './transactions';
@@ -97,46 +98,52 @@ describe('Transactions - credit (refund / deposit)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
+        global.fetch = vi.fn(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
 
-            if (url.startsWith('/api/categories')) {
-                return jsonResponse({
-                    data: [groceries, incomeCategory],
-                });
-            }
+                if (url.startsWith('/api/categories')) {
+                    return jsonResponse({
+                        data: [groceries, incomeCategory],
+                    });
+                }
 
-            if (url.startsWith('/api/accounts')) {
-                return jsonResponse({ data: [account] });
-            }
+                if (url.startsWith('/api/accounts')) {
+                    return jsonResponse({ data: [account] });
+                }
 
-            if (url === '/api/transactions' && init?.method === 'POST') {
-                return jsonResponse(
-                    {
-                        data: { ...creditTransaction, id: 999 },
-                        message: 'Transaction created successfully',
-                    },
-                    { status: 201 },
-                );
-            }
+                if (url === '/api/transactions' && init?.method === 'POST') {
+                    return jsonResponse(
+                        {
+                            data: { ...creditTransaction, id: 999 },
+                            message: 'Transaction created successfully',
+                        },
+                        { status: 201 },
+                    );
+                }
 
-            if (url.startsWith('/api/transactions/') && init?.method === 'PUT') {
-                return jsonResponse({
-                    data: creditTransaction,
-                    message: 'Transaction updated successfully',
-                });
-            }
+                if (
+                    url.startsWith('/api/transactions/') &&
+                    init?.method === 'PUT'
+                ) {
+                    return jsonResponse({
+                        data: creditTransaction,
+                        message: 'Transaction updated successfully',
+                    });
+                }
 
-            if (url.startsWith('/api/transactions')) {
-                return jsonResponse({
-                    data: [creditTransaction],
-                    links: { self: '/api/transactions' },
-                    meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
-                });
-            }
+                if (url.startsWith('/api/transactions')) {
+                    return jsonResponse({
+                        data: [creditTransaction],
+                        links: { self: '/api/transactions' },
+                        meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
+                    });
+                }
 
-            throw new Error(`Unexpected fetch: ${url}`);
-        });
+                throw new Error(`Unexpected fetch: ${url}`);
+            },
+        );
     });
 
     it('shows a Credit badge on credit transactions', async () => {
@@ -153,13 +160,19 @@ describe('Transactions - credit (refund / deposit)', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
         });
 
         expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
@@ -172,7 +185,9 @@ describe('Transactions - credit (refund / deposit)', () => {
         });
 
         fireEvent.click(screen.getByTestId('transaction-category-field'));
-        fireEvent.click(await screen.findByRole('option', { name: /Groceries/ }));
+        fireEvent.click(
+            await screen.findByRole('option', { name: /Groceries/ }),
+        );
 
         fireEvent.change(screen.getByTestId('transaction-amount-input'), {
             target: { value: '75' },
@@ -181,14 +196,16 @@ describe('Transactions - credit (refund / deposit)', () => {
         fireEvent.click(screen.getByTestId('transaction-form-submit'));
 
         await waitFor(() => {
-            const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+            const postCall = (
+                global.fetch as ReturnType<typeof vi.fn>
+            ).mock.calls.find(
                 ([requestUrl, init]) =>
                     String(requestUrl) === '/api/transactions' &&
                     (init as RequestInit | undefined)?.method === 'POST',
             );
 
             expect(postCall).toBeDefined();
-            const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
+            const body = JSON.parse(requestBodyText(postCall?.[1]));
             expect(body.is_credit).toBe(true);
             expect(body.amount_cad).toBe(75);
         });
@@ -198,13 +215,17 @@ describe('Transactions - credit (refund / deposit)', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getAllByTestId('edit-transaction-button')[0]);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
         });
 
         expect(screen.getByTestId('is-credit-checkbox')).toHaveAttribute(
@@ -217,15 +238,17 @@ describe('Transactions - credit (refund / deposit)', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('duplicate-transaction-123'));
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-title')).toHaveTextContent(
-                'Duplicate Transaction',
-            );
+            expect(
+                screen.getByTestId('transaction-form-title'),
+            ).toHaveTextContent('Duplicate Transaction');
         });
 
         expect(screen.getByTestId('is-credit-checkbox')).toHaveAttribute(
@@ -236,14 +259,16 @@ describe('Transactions - credit (refund / deposit)', () => {
         fireEvent.click(screen.getByTestId('transaction-form-submit'));
 
         await waitFor(() => {
-            const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+            const postCall = (
+                global.fetch as ReturnType<typeof vi.fn>
+            ).mock.calls.find(
                 ([requestUrl, init]) =>
                     String(requestUrl) === '/api/transactions' &&
                     (init as RequestInit | undefined)?.method === 'POST',
             );
 
             expect(postCall).toBeDefined();
-            const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
+            const body = JSON.parse(requestBodyText(postCall?.[1]));
             expect(body.is_credit).toBe(true);
         });
     });
@@ -252,22 +277,32 @@ describe('Transactions - credit (refund / deposit)', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
         });
 
         expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('transaction-category-field'));
-        fireEvent.click(await screen.findByRole('option', { name: /I01 - Salary/ }));
+        fireEvent.click(
+            await screen.findByRole('option', { name: /I01 - Salary/ }),
+        );
 
         await waitFor(() => {
-            expect(screen.queryByTestId('is-credit-checkbox')).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId('is-credit-checkbox'),
+            ).not.toBeInTheDocument();
         });
     });
 });

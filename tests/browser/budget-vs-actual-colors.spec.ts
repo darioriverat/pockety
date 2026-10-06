@@ -63,7 +63,7 @@ test('feature 170: under-budget categories display with green colors', async ({
 
     // Set budget of $1000 for C001 (Groceries)
     await setBudget(request, '202501', 'C001', 1000);
-    
+
     // Create transaction for $800 (under budget)
     await createTransaction(request, 'C001', 800);
 
@@ -105,7 +105,7 @@ test('feature 170: over-budget categories display with red colors', async ({
 
     // Set budget of $500 for C002 (Baking)
     await setBudget(request, '202501', 'C002', 500);
-    
+
     // Create transaction for $600 (over budget)
     await createTransaction(request, 'C002', 600);
 

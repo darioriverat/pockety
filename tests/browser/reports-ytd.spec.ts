@@ -1,7 +1,4 @@
-import {
-    expect,
-    test,
-    type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -33,7 +30,10 @@ async function seedYtdData(request: APIRequestContext): Promise<void> {
         const period = `20250${month}`;
 
         // Create exchange rate
-        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
+        await ensureExchangeRateForPeriod(request, period, {
+            copPerUsd: 4400,
+            cadPerUsd: 0.75,
+        });
 
         // Create income
         const incomeResponse = await request.post('/api/income', {
@@ -53,7 +53,7 @@ async function seedYtdData(request: APIRequestContext): Promise<void> {
                 period,
                 category_id: groceries!.id,
                 account_id: bank.data.id,
-                amount_cad: 1000 + (month * 100),
+                amount_cad: 1000 + month * 100,
                 comments: `YTD Test Month ${month}`,
             },
         });
@@ -102,7 +102,9 @@ test('feature 105: user can view year-to-date totals for income and expenses', a
     // Step 3: Verify YTD income total is displayed
     await expect(page.getByTestId('ytd-income-card')).toBeVisible();
     await expect(page.getByTestId('ytd-income-total')).toBeVisible();
-    await expect(page.getByTestId('ytd-income-total')).toContainText('$15,000.00');
+    await expect(page.getByTestId('ytd-income-total')).toContainText(
+        '$15,000.00',
+    );
 
     await page.getByTestId('ytd-income-card').screenshot({
         path: 'verification/test-105-ytd-reports/03-income-card.png',
@@ -111,7 +113,9 @@ test('feature 105: user can view year-to-date totals for income and expenses', a
     // Step 4: Verify YTD expense total is displayed
     await expect(page.getByTestId('ytd-expenses-card')).toBeVisible();
     await expect(page.getByTestId('ytd-expenses-total')).toBeVisible();
-    await expect(page.getByTestId('ytd-expenses-total')).toContainText('$3,600.00');
+    await expect(page.getByTestId('ytd-expenses-total')).toContainText(
+        '$3,600.00',
+    );
 
     await page.getByTestId('ytd-expenses-card').screenshot({
         path: 'verification/test-105-ytd-reports/04-expenses-card.png',
@@ -135,7 +139,9 @@ test('feature 105: user can view year-to-date totals for income and expenses', a
     await page.waitForTimeout(500);
 
     // Verify the year has changed in the summary
-    await expect(page.getByTestId('ytd-summary-card')).toContainText('Year-to-Date Summary for 2024');
+    await expect(page.getByTestId('ytd-summary-card')).toContainText(
+        'Year-to-Date Summary for 2024',
+    );
 
     await page.screenshot({
         path: 'verification/test-105-ytd-reports/06-year-changed.png',

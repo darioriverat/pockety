@@ -28,9 +28,11 @@ describe('PageContainer', () => {
             'p-4',
             'sm:p-6',
         );
-        expect(PAGE_CONTAINER_CLASS.split(' ').every((c) =>
-            container.className.includes(c),
-        )).toBe(true);
+        expect(
+            PAGE_CONTAINER_CLASS.split(' ').every((c) =>
+                container.className.includes(c),
+            ),
+        ).toBe(true);
         expect(container).toHaveTextContent('Header');
         expect(container).toHaveTextContent('Body');
     });

@@ -2,8 +2,10 @@ import {
     expect,
     test,
     type APIRequestContext,
-    type Page } from '@playwright/test';
-import { loginAsBrowserTestUser,
+    type Page,
+} from '@playwright/test';
+import {
+    loginAsBrowserTestUser,
     trackConsoleErrors,
     ensureExchangeRateForPeriod,
 } from './helpers';
@@ -38,10 +40,14 @@ test.describe('two-user ownership isolation', () => {
 
         await loginAsBrowserTestUser(page, request);
         await page.goto('/categories');
-        await expect(page.getByRole('heading', { name: /categories/i })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: /categories/i }),
+        ).toBeVisible();
 
         await page.getByTestId('create-category-button').click();
-        await page.getByTestId('category-name-input').fill('A Isolation Category');
+        await page
+            .getByTestId('category-name-input')
+            .fill('A Isolation Category');
         await page.getByTestId('kind-expense').click();
         await page.getByTestId('create-category-submit').click();
         await expect(page.getByText('A Isolation Category')).toBeVisible({
@@ -81,11 +87,15 @@ test.describe('two-user ownership isolation', () => {
         await loginAsSecondBrowserUser(page, request);
 
         await page.goto('/categories');
-        await expect(page.getByRole('heading', { name: /categories/i })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: /categories/i }),
+        ).toBeVisible();
         await expect(page.getByText('A Isolation Category')).toHaveCount(0);
 
         await page.getByTestId('create-category-button').click();
-        await page.getByTestId('category-name-input').fill('B Isolation Category');
+        await page
+            .getByTestId('category-name-input')
+            .fill('B Isolation Category');
         await page.getByTestId('kind-expense').click();
         await page.getByTestId('create-category-submit').click();
         await expect(page.getByText('B Isolation Category')).toBeVisible({
@@ -230,7 +240,10 @@ test.describe('two-user ownership isolation', () => {
     }) => {
         await loginAsBrowserTestUser(page, request);
 
-        const rateA = await ensureExchangeRateForPeriod(request, '202601', { copPerUsd: 4100, cadPerUsd: 0.71 });
+        const rateA = await ensureExchangeRateForPeriod(request, '202601', {
+            copPerUsd: 4100,
+            cadPerUsd: 0.71,
+        });
         expect(rateA.ok()).toBeTruthy();
 
         await page.goto('/exchange-rates');
@@ -245,7 +258,10 @@ test.describe('two-user ownership isolation', () => {
         await logout(page);
         await loginAsSecondBrowserUser(page, request);
 
-        const rateB = await ensureExchangeRateForPeriod(request, '202601', { copPerUsd: 4600, cadPerUsd: 0.82 });
+        const rateB = await ensureExchangeRateForPeriod(request, '202601', {
+            copPerUsd: 4600,
+            cadPerUsd: 0.82,
+        });
         expect(rateB.ok()).toBeTruthy();
 
         const ratesB = await request.get('/api/exchange-rates');

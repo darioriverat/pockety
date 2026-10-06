@@ -20,9 +20,7 @@ export function contrastRatio(foreground: Rgb, background: Rgb): number {
         relativeLuminance(foreground),
         relativeLuminance(background),
     ];
-    return (
-        (Math.max(...luminances) + 0.05) / (Math.min(...luminances) + 0.05)
-    );
+    return (Math.max(...luminances) + 0.05) / (Math.min(...luminances) + 0.05);
 }
 
 /** WCAG AA minimum for normal text (< 18pt / < 14pt bold). */

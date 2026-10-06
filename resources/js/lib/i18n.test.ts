@@ -17,10 +17,19 @@ describe('i18n', () => {
     it('falls back to English when a Spanish key is missing', async () => {
         await i18n.changeLanguage('es');
         // Intentionally absent from the Spanish catalog
-        i18n.addResource('en', 'translation', 'test.missingSpanishOnly', 'English fallback value');
+        i18n.addResource(
+            'en',
+            'translation',
+            'test.missingSpanishOnly',
+            'English fallback value',
+        );
 
-        expect(i18n.t('test.missingSpanishOnly')).toBe('English fallback value');
-        expect(i18n.t('test.missingSpanishOnly')).not.toBe('test.missingSpanishOnly');
+        expect(i18n.t('test.missingSpanishOnly')).toBe(
+            'English fallback value',
+        );
+        expect(i18n.t('test.missingSpanishOnly')).not.toBe(
+            'test.missingSpanishOnly',
+        );
     });
 
     it('sets documentElement lang to en or es', async () => {

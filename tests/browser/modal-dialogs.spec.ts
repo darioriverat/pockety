@@ -83,9 +83,7 @@ async function openDeleteDialog(
         .getByTestId(`transaction-row-${txnId}`)
         .getByTestId('delete-transaction-button')
         .click();
-    await expect(
-        page.getByTestId('delete-confirmation-dialog'),
-    ).toBeVisible();
+    await expect(page.getByTestId('delete-confirmation-dialog')).toBeVisible();
 
     return txnId;
 }
@@ -182,9 +180,7 @@ test('clicking backdrop closes the modal', async ({ page }) => {
     expect(box).not.toBeNull();
     await page.mouse.click(box!.x + 12, box!.y + 12);
 
-    await expect(
-        page.getByTestId('delete-confirmation-dialog'),
-    ).toHaveCount(0);
+    await expect(page.getByTestId('delete-confirmation-dialog')).toHaveCount(0);
     await expect(page.getByTestId('dialog-overlay')).toHaveCount(0);
 
     // Transaction still present after dismiss via backdrop.

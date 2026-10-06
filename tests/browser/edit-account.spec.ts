@@ -33,7 +33,9 @@ test('Edit button is visible on each account card', async ({ page }) => {
     await expect(page.getByText('Test Bank Account')).toBeVisible();
 
     // Verify Edit button is visible
-    await expect(page.getByRole('button', { name: 'Edit' }).first()).toBeVisible();
+    await expect(
+        page.getByRole('button', { name: 'Edit' }).first(),
+    ).toBeVisible();
 
     expect(consoleErrors).toEqual([]);
 });
@@ -69,8 +71,12 @@ test('Edit dialog loads account values and updates name successfully', async ({
 
     // Verify Edit dialog opens and is prefilled
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Edit Account' })).toBeVisible();
-    await expect(page.getByLabel('Account Name')).toHaveValue('Original Account Name');
+    await expect(
+        page.getByRole('heading', { name: 'Edit Account' }),
+    ).toBeVisible();
+    await expect(page.getByLabel('Account Name')).toHaveValue(
+        'Original Account Name',
+    );
     await expect(page.getByLabel('Notes')).toHaveValue('Original notes');
 
     // Change the name
@@ -152,7 +158,9 @@ test('Edit dialog disables type field when account has transactions', async ({
 
     // Verify Edit dialog opens
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Edit Account' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Edit Account' }),
+    ).toBeVisible();
 
     // Verify type field is disabled
     const typeSelect = page.getByLabel('Account Type');
@@ -160,7 +168,9 @@ test('Edit dialog disables type field when account has transactions', async ({
 
     // Verify explanation message is shown
     await expect(
-        page.getByText(/The account type cannot be changed because transactions are registered/i)
+        page.getByText(
+            /The account type cannot be changed because transactions are registered/i,
+        ),
     ).toBeVisible();
 
     // Verify other fields are still editable
@@ -171,11 +181,15 @@ test('Edit dialog disables type field when account has transactions', async ({
 
     // Update name and verify it succeeds
     await page.getByLabel('Account Name').clear();
-    await page.getByLabel('Account Name').fill('Updated Name With Transactions');
+    await page
+        .getByLabel('Account Name')
+        .fill('Updated Name With Transactions');
     await page.getByRole('button', { name: 'Save Changes' }).click();
 
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
-    await expect(page.getByText('Updated Name With Transactions')).toBeVisible();
+    await expect(
+        page.getByText('Updated Name With Transactions'),
+    ).toBeVisible();
 
     // Reopen Edit dialog to verify type is still 'bank'
     await page.getByTestId(`edit-account-${accountId}`).click();
@@ -216,7 +230,9 @@ test('Edit dialog allows type change when account has no transactions', async ({
 
     // Verify Edit dialog opens and type field is enabled
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Edit Account' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Edit Account' }),
+    ).toBeVisible();
 
     const typeSelect = page.getByLabel('Account Type');
     await expect(typeSelect).not.toBeDisabled();
@@ -302,7 +318,9 @@ test('Edit dialog can toggle Active checkbox and update other fields', async ({
     // We can't verify visually since inactive accounts don't show in the default list,
     // but we can verify the save was successful - the dialog closed without errors
     // and no error message appeared
-    await expect(page.getByText(/An account with this name already exists/i)).not.toBeVisible();
+    await expect(
+        page.getByText(/An account with this name already exists/i),
+    ).not.toBeVisible();
     await expect(page.getByText(/Failed to update/i)).not.toBeVisible();
 
     expect(consoleErrors).toEqual([]);
@@ -385,4 +403,3 @@ test('Edit dialog shows the 422 message when a type change is submitted anyway',
 
     expect(consoleErrors).toEqual([]);
 });
-

@@ -46,15 +46,17 @@ describe('Categories Page', () => {
         vi.mocked(fetch).mockResolvedValueOnce({
             ok: true,
             json: async () => ({
-                data: [{
-                    id: 40,
-                    code: 'C040',
-                    name: "Kids' Allowance",
-                    is_debt_category: false,
-                    is_income_category: false,
-                    is_active: false,
-                    status: 'retired_merged_into_C031',
-                }],
+                data: [
+                    {
+                        id: 40,
+                        code: 'C040',
+                        name: "Kids' Allowance",
+                        is_debt_category: false,
+                        is_income_category: false,
+                        is_active: false,
+                        status: 'retired_merged_into_C031',
+                    },
+                ],
             }),
         } as Response);
 
@@ -63,7 +65,9 @@ describe('Categories Page', () => {
         const card = await screen.findByTestId('category-card-C040');
         expect(card).toHaveTextContent('Retired');
         expect(card).toHaveTextContent('retired_merged_into_C031');
-        expect(fetch).toHaveBeenCalledWith('/api/categories?include_inactive=1');
+        expect(fetch).toHaveBeenCalledWith(
+            '/api/categories?include_inactive=1',
+        );
     });
 
     it('displays an Income badge for income categories', async () => {
@@ -185,7 +189,8 @@ describe('Categories Page', () => {
             status: 422,
             json: async () => ({
                 error: 'Cannot delete category',
-                message: 'This category has associated transactions and cannot be deleted',
+                message:
+                    'This category has associated transactions and cannot be deleted',
                 has_transactions: true,
             }),
         });
@@ -202,18 +207,20 @@ describe('Categories Page', () => {
         });
 
         // Find and click delete button by aria-label
-        const deleteButton = screen.getByRole('button', { name: /Delete C001/i });
+        const deleteButton = screen.getByRole('button', {
+            name: /Delete C001/i,
+        });
         fireEvent.click(deleteButton);
 
         await waitFor(() => {
             expect(window.confirm).toHaveBeenCalledWith(
-                expect.stringContaining('C001')
+                expect.stringContaining('C001'),
             );
         });
 
         await waitFor(() => {
             expect(window.alert).toHaveBeenCalledWith(
-                expect.stringContaining('transactions')
+                expect.stringContaining('transactions'),
             );
         });
 
@@ -271,7 +278,9 @@ describe('Categories Page', () => {
         });
 
         // Find and click the first delete button by aria-label
-        const deleteButton = screen.getByRole('button', { name: /Delete C001/i });
+        const deleteButton = screen.getByRole('button', {
+            name: /Delete C001/i,
+        });
         fireEvent.click(deleteButton);
 
         await waitFor(() => {
@@ -284,7 +293,7 @@ describe('Categories Page', () => {
             // Note: This assumes the component removes it from state
             expect(global.fetch).toHaveBeenCalledWith(
                 expect.stringContaining('/api/categories/C001'),
-                expect.objectContaining({ method: 'DELETE' })
+                expect.objectContaining({ method: 'DELETE' }),
             );
         });
     });
@@ -330,7 +339,9 @@ describe('Categories Page', () => {
         });
 
         // Find and click delete button by aria-label
-        const deleteButton = screen.getByRole('button', { name: /Delete C001/i });
+        const deleteButton = screen.getByRole('button', {
+            name: /Delete C001/i,
+        });
         fireEvent.click(deleteButton);
 
         await waitFor(() => {
@@ -343,20 +354,30 @@ describe('Categories Page', () => {
         });
     });
     it('shows server validation inside the create dialog and preserves input', async () => {
-        vi.mocked(fetch).mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ data: [] }),
-        } as Response).mockResolvedValueOnce({
-            ok: false,
-            json: async () => ({ error: 'A category cannot be both debt and income' }),
-        } as Response);
+        vi.mocked(fetch)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ data: [] }),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: false,
+                json: async () => ({
+                    error: 'A category cannot be both debt and income',
+                }),
+            } as Response);
         render(<Categories />);
         await screen.findByText('Total categories: 0');
         fireEvent.click(screen.getByTestId('create-category-button'));
-        fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Invalid' } });
+        fireEvent.change(screen.getByLabelText('Name'), {
+            target: { value: 'Invalid' },
+        });
         fireEvent.click(screen.getByTestId('create-category-submit'));
-        expect(await screen.findByRole('alert')).toHaveTextContent('A category cannot be both debt and income');
-        expect(screen.getByTestId('create-category-dialog')).toContainElement(screen.getByRole('alert'));
+        expect(await screen.findByRole('alert')).toHaveTextContent(
+            'A category cannot be both debt and income',
+        );
+        expect(screen.getByTestId('create-category-dialog')).toContainElement(
+            screen.getByRole('alert'),
+        );
         expect(screen.getByLabelText('Name')).toHaveValue('Invalid');
         fireEvent.click(screen.getByTestId('create-category-cancel'));
         fireEvent.click(screen.getByTestId('create-category-button'));
@@ -414,7 +435,9 @@ describe('Categories Page', () => {
         fireEvent.click(screen.getByRole('button', { name: /Edit C047/i }));
 
         await waitFor(() => {
-            expect(screen.getByTestId('edit-category-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('edit-category-dialog'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.change(screen.getByTestId('edit-category-name-input'), {
@@ -438,7 +461,9 @@ describe('Categories Page', () => {
         });
 
         await waitFor(() => {
-            expect(screen.queryByTestId('edit-category-dialog')).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId('edit-category-dialog'),
+            ).not.toBeInTheDocument();
             expect(screen.getByTestId('category-name-C047')).toHaveTextContent(
                 'Updated Name',
             );
@@ -480,7 +505,9 @@ describe('Categories Page', () => {
         fireEvent.click(screen.getByRole('button', { name: /Edit C001/i }));
 
         await waitFor(() => {
-            expect(screen.getByTestId('edit-kind-locked-message')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('edit-kind-locked-message'),
+            ).toBeInTheDocument();
             expect(screen.getByTestId('edit-kind-expense')).toBeDisabled();
             expect(screen.getByTestId('edit-kind-debt')).toBeDisabled();
             expect(screen.getByTestId('edit-kind-income')).toBeDisabled();
@@ -538,7 +565,9 @@ describe('Categories Page', () => {
         fireEvent.click(screen.getByRole('button', { name: /Edit C048/i }));
 
         await waitFor(() => {
-            expect(screen.getByTestId('edit-category-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('edit-category-dialog'),
+            ).toBeInTheDocument();
             expect(screen.getByTestId('edit-kind-debt')).not.toBeDisabled();
             expect(
                 screen.queryByTestId('edit-kind-locked-message'),
@@ -564,9 +593,12 @@ describe('Categories Page', () => {
         });
 
         await waitFor(() => {
-            expect(screen.queryByTestId('edit-category-dialog')).not.toBeInTheDocument();
-            expect(screen.getByTestId('debt-badge-C048')).toHaveTextContent('Debt');
+            expect(
+                screen.queryByTestId('edit-category-dialog'),
+            ).not.toBeInTheDocument();
+            expect(screen.getByTestId('debt-badge-C048')).toHaveTextContent(
+                'Debt',
+            );
         });
     });
-
 });

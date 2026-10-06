@@ -54,12 +54,14 @@ describe('PeriodsHistory page', () => {
         render(<PeriodsHistory />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('periods-history-count')).toHaveTextContent(
-                '21',
-            );
+            expect(
+                screen.getByTestId('periods-history-count'),
+            ).toHaveTextContent('21');
         });
 
-        expect(screen.getByTestId('periods-history-heading')).toBeInTheDocument();
+        expect(
+            screen.getByTestId('periods-history-heading'),
+        ).toBeInTheDocument();
         expect(screen.getByTestId('period-row-202501')).toBeInTheDocument();
         expect(screen.getByTestId('period-row-202609')).toBeInTheDocument();
         expect(screen.getByTestId('period-tx-count-202501')).toHaveTextContent(

@@ -654,10 +654,9 @@ export default function Reconciliation() {
                                     <CardDescription>
                                         Confirms the month&apos;s records close.
                                         Spends marked as paying a debt are
-                                        omitted from net operating expenses so
-                                        a missing cash source shows up. The
-                                        result should be $0.00 when nothing is
-                                        missing.
+                                        omitted from net operating expenses so a
+                                        missing cash source shows up. The result
+                                        should be $0.00 when nothing is missing.
                                     </CardDescription>
                                 </div>
                                 <Badge

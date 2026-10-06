@@ -27,9 +27,7 @@ export function Breadcrumbs({
             <BreadcrumbList data-testid="breadcrumb-list">
                 {breadcrumbs.map((item, index) => {
                     const isLast = index === breadcrumbs.length - 1;
-                    const label = item.titleKey
-                        ? t(item.titleKey)
-                        : item.title;
+                    const label = item.titleKey ? t(item.titleKey) : item.title;
                     const href =
                         typeof item.href === 'string'
                             ? item.href

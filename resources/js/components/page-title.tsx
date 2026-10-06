@@ -41,7 +41,10 @@ export function PageTitle({
             </div>
             {description ? (
                 <p
-                    className={cn(TYPOGRAPHY.bodyMuted, 'mt-1 text-sm sm:text-base')}
+                    className={cn(
+                        TYPOGRAPHY.bodyMuted,
+                        'mt-1 text-sm sm:text-base',
+                    )}
                     data-testid="page-title-description"
                 >
                     {description}

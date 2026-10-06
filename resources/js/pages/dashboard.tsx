@@ -15,7 +15,12 @@ import {
     PieChartIcon,
     ActivityIcon,
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DashboardSummaryCard } from '@/components/dashboard-summary-card';
 import { PageContainer } from '@/components/page-container';
@@ -24,10 +29,7 @@ import { SubsectionHeading } from '@/components/section-heading';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { ChartAxisLabels } from '@/components/charts/chart-axis-labels';
 import { CHART_COLORS } from '@/lib/chart-colors';
-import {
-    getChartLayout,
-    shouldShowXLabel,
-} from '@/lib/chart-layout';
+import { getChartLayout, shouldShowXLabel } from '@/lib/chart-layout';
 import {
     amountForCurrency,
     formatDisplayCurrency,
@@ -162,19 +164,22 @@ function formatPeriodShort(period: string): string {
     const year = period.substring(0, 4);
     const month = period.substring(4, 6);
     const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1);
-    return date.toLocaleDateString('en-US', { year: '2-digit', month: 'short' });
+    return date.toLocaleDateString('en-US', {
+        year: '2-digit',
+        month: 'short',
+    });
 }
 
-function formatCadCompact(amount: number, currency: DisplayCurrency = 'CAD'): string {
-    return new Intl.NumberFormat(
-        currency === 'USD' ? 'en-US' : 'en-CA',
-        {
-            style: 'currency',
-            currency,
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        },
-    ).format(amount);
+function formatCadCompact(
+    amount: number,
+    currency: DisplayCurrency = 'CAD',
+): string {
+    return new Intl.NumberFormat(currency === 'USD' ? 'en-US' : 'en-CA', {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(amount);
 }
 
 function IncomeExpenseTrendChart({
@@ -200,7 +205,8 @@ function IncomeExpenseTrendChart({
     const minValue = 0;
     const range = maxValue - minValue || 1;
 
-    const groupWidth = periods.length > 0 ? innerWidth / periods.length : innerWidth;
+    const groupWidth =
+        periods.length > 0 ? innerWidth / periods.length : innerWidth;
     const barWidth = Math.max(
         isMobile ? 5 : 4,
         Math.min(isMobile ? 12 : 18, groupWidth * 0.32),
@@ -230,7 +236,13 @@ function IncomeExpenseTrendChart({
                 className="h-auto w-full max-w-full"
                 preserveAspectRatio="xMidYMid meet"
             >
-                <rect x={0} y={0} width={width} height={height} fill="transparent" />
+                <rect
+                    x={0}
+                    y={0}
+                    width={width}
+                    height={height}
+                    fill="transparent"
+                />
                 {yTicks.map((tick) => {
                     const y = yFor(tick);
                     return (
@@ -262,7 +274,11 @@ function IncomeExpenseTrendChart({
                     const centerX = xForGroup(index);
                     const incomeX = centerX - barWidth - gap / 2;
                     const expenseX = centerX + gap / 2;
-                    const incomeValue = amountForCurrency(period, 'income', currency);
+                    const incomeValue = amountForCurrency(
+                        period,
+                        'income',
+                        currency,
+                    );
                     const expenseValue = amountForCurrency(
                         period,
                         'expenses',
@@ -292,7 +308,10 @@ function IncomeExpenseTrendChart({
                             >
                                 <title>
                                     {formatPeriodShort(period.period)} Income:{' '}
-                                    {formatDisplayCurrency(incomeValue, currency)}
+                                    {formatDisplayCurrency(
+                                        incomeValue,
+                                        currency,
+                                    )}
                                 </title>
                             </rect>
                             <rect
@@ -306,7 +325,10 @@ function IncomeExpenseTrendChart({
                             >
                                 <title>
                                     {formatPeriodShort(period.period)} Expenses:{' '}
-                                    {formatDisplayCurrency(expenseValue, currency)}
+                                    {formatDisplayCurrency(
+                                        expenseValue,
+                                        currency,
+                                    )}
                                 </title>
                             </rect>
                             {showLabel && (
@@ -408,7 +430,8 @@ function AssetsLiabilitiesTrendChart({
     const minValue = Math.min(0, ...values);
     const range = maxValue - minValue || 1;
 
-    const groupWidth = periods.length > 0 ? innerWidth / periods.length : innerWidth;
+    const groupWidth =
+        periods.length > 0 ? innerWidth / periods.length : innerWidth;
     const xFor = (index: number) =>
         padding.left + index * groupWidth + groupWidth / 2;
     const yFor = (value: number) =>
@@ -434,7 +457,7 @@ function AssetsLiabilitiesTrendChart({
         >
             {hovered && hoveredIndex !== null && (
                 <div
-                    className="pointer-events-none absolute z-10 max-w-[min(100%,14rem)] rounded-md border bg-background px-3 py-2 text-xs shadow-md"
+                    className="bg-background pointer-events-none absolute z-10 max-w-[min(100%,14rem)] rounded-md border px-3 py-2 text-xs shadow-md"
                     data-testid="assets-liabilities-hover-tooltip"
                     style={{
                         left: `${Math.min(88, Math.max(12, (xFor(hoveredIndex) / width) * 100))}%`,
@@ -478,11 +501,20 @@ function AssetsLiabilitiesTrendChart({
                 onMouseLeave={() => setHoveredIndex(null)}
                 onPointerLeave={() => setHoveredIndex(null)}
             >
-                <rect x={0} y={0} width={width} height={height} fill="transparent" />
+                <rect
+                    x={0}
+                    y={0}
+                    width={width}
+                    height={height}
+                    fill="transparent"
+                />
                 {yTicks.map((tick) => {
                     const y = yFor(tick);
                     return (
-                        <g key={tick} data-testid="assets-liabilities-chart-y-tick">
+                        <g
+                            key={tick}
+                            data-testid="assets-liabilities-chart-y-tick"
+                        >
                             <line
                                 x1={padding.left}
                                 x2={width - padding.right}
@@ -507,7 +539,9 @@ function AssetsLiabilitiesTrendChart({
                     );
                 })}
                 <path
-                    d={buildPath((p) => amountForCurrency(p, 'assets', currency))}
+                    d={buildPath((p) =>
+                        amountForCurrency(p, 'assets', currency),
+                    )}
                     fill="none"
                     stroke={CHART_COLORS.assets}
                     strokeWidth="2.5"
@@ -523,7 +557,9 @@ function AssetsLiabilitiesTrendChart({
                     data-testid="al-chart-line-liabilities"
                 />
                 <path
-                    d={buildPath((p) => amountForCurrency(p, 'equity', currency))}
+                    d={buildPath((p) =>
+                        amountForCurrency(p, 'equity', currency),
+                    )}
                     fill="none"
                     stroke={CHART_COLORS.equity}
                     strokeWidth="2.5"
@@ -532,13 +568,21 @@ function AssetsLiabilitiesTrendChart({
                 {periods.map((period, index) => {
                     const x = xFor(index);
                     const isHovered = hoveredIndex === index;
-                    const assetsValue = amountForCurrency(period, 'assets', currency);
+                    const assetsValue = amountForCurrency(
+                        period,
+                        'assets',
+                        currency,
+                    );
                     const liabilitiesValue = amountForCurrency(
                         period,
                         'liabilities',
                         currency,
                     );
-                    const equityValue = amountForCurrency(period, 'equity', currency);
+                    const equityValue = amountForCurrency(
+                        period,
+                        'equity',
+                        currency,
+                    );
                     const showLabel = shouldShowXLabel(
                         index,
                         periods.length,
@@ -588,11 +632,20 @@ function AssetsLiabilitiesTrendChart({
                             >
                                 <title>
                                     {formatPeriodShort(period.period)} — Assets:{' '}
-                                    {formatDisplayCurrency(assetsValue, currency)},
-                                    Liabilities:{' '}
-                                    {formatDisplayCurrency(liabilitiesValue, currency)},
-                                    Equity:{' '}
-                                    {formatDisplayCurrency(equityValue, currency)}
+                                    {formatDisplayCurrency(
+                                        assetsValue,
+                                        currency,
+                                    )}
+                                    , Liabilities:{' '}
+                                    {formatDisplayCurrency(
+                                        liabilitiesValue,
+                                        currency,
+                                    )}
+                                    , Equity:{' '}
+                                    {formatDisplayCurrency(
+                                        equityValue,
+                                        currency,
+                                    )}
                                 </title>
                             </rect>
                             {showLabel && (
@@ -673,8 +726,8 @@ function TopSpendingCategoriesWidget({
                     Top Spending Categories
                 </SubsectionHeading>
                 <CardDescription data-testid="top-spending-categories-subtitle">
-                    Top {data.categories.length} categories for the selected period ·{' '}
-                    {currency}
+                    Top {data.categories.length} categories for the selected
+                    period · {currency}
                     {totalExpenses > 0
                         ? ` · Total ${formatCurrency(totalExpenses)}`
                         : ''}
@@ -701,7 +754,10 @@ function TopSpendingCategoriesWidget({
                                 'amount',
                                 currency,
                             );
-                            const barWidth = Math.max(4, (amount / maxAmount) * 100);
+                            const barWidth = Math.max(
+                                4,
+                                (amount / maxAmount) * 100,
+                            );
                             const color =
                                 TOP_SPENDING_BAR_COLORS[
                                     index % TOP_SPENDING_BAR_COLORS.length
@@ -734,7 +790,8 @@ function TopSpendingCategoriesWidget({
                                                 className="text-muted-foreground text-xs tabular-nums"
                                                 data-testid={`top-spending-pct-${category.category_code}`}
                                             >
-                                                {category.percentage.toFixed(1)}%
+                                                {category.percentage.toFixed(1)}
+                                                %
                                             </p>
                                         </div>
                                     </div>
@@ -778,7 +835,9 @@ function formatActivityDate(date: string): string {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return date;
     }
-    const [year, month, day] = date.split('-').map((part) => parseInt(part, 10));
+    const [year, month, day] = date
+        .split('-')
+        .map((part) => parseInt(part, 10));
     return new Date(year, month - 1, day).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -804,8 +863,8 @@ function RecentActivityWidget({ data }: { data: RecentActivity }) {
                         className="text-muted-foreground text-sm"
                         data-testid="recent-activity-empty"
                     >
-                        No recent activity yet. Add a transaction or income
-                        line to see it here.
+                        No recent activity yet. Add a transaction or income line
+                        to see it here.
                     </p>
                 ) : (
                     <div
@@ -820,7 +879,7 @@ function RecentActivityWidget({ data }: { data: RecentActivity }) {
                                 role="listitem"
                                 data-testid={`recent-activity-item-${item.type}-${item.id}`}
                                 data-activity-type={item.type}
-                                className="hover:bg-muted/50 flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0 transition-colors"
+                                className="hover:bg-muted/50 flex items-start justify-between gap-4 py-3 transition-colors first:pt-0 last:pb-0"
                             >
                                 <div className="min-w-0 flex-1 space-y-1">
                                     <div className="flex flex-wrap items-center gap-2">
@@ -875,7 +934,6 @@ function RecentActivityWidget({ data }: { data: RecentActivity }) {
 }
 
 export default function Dashboard({
-
     summary,
     income_expense_chart,
     assets_liabilities_chart,
@@ -900,7 +958,10 @@ export default function Dashboard({
         const year = period.substring(0, 4);
         const month = period.substring(4, 6);
         const date = new Date(parseInt(year), parseInt(month) - 1);
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+        });
     };
 
     const netIsPositive = amountForCurrency(summary, 'net', currency) >= 0;
@@ -920,7 +981,7 @@ export default function Dashboard({
                             className="flex items-center gap-2"
                             data-testid="currency-toggle"
                         >
-                            <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                            <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                                 Currency
                             </span>
                             <ToggleGroup
@@ -960,7 +1021,9 @@ export default function Dashboard({
                             ) : (
                                 <AlertCircleIcon className="size-3 shrink-0 fill-none" />
                             )}
-                            {summary.reconciliation_status.charAt(0).toUpperCase() +
+                            {summary.reconciliation_status
+                                .charAt(0)
+                                .toUpperCase() +
                                 summary.reconciliation_status.slice(1)}
                         </Badge>
                     </div>
@@ -974,7 +1037,11 @@ export default function Dashboard({
                     <DashboardSummaryCard
                         title="Total Income"
                         value={formatCurrency(
-                            amountForCurrency(summary, 'total_income', currency),
+                            amountForCurrency(
+                                summary,
+                                'total_income',
+                                currency,
+                            ),
                         )}
                         description={`All income sources · ${currency}`}
                         icon={TrendingUpIcon}
@@ -985,7 +1052,11 @@ export default function Dashboard({
                     <DashboardSummaryCard
                         title="Total Expenses"
                         value={formatCurrency(
-                            amountForCurrency(summary, 'total_expenses', currency),
+                            amountForCurrency(
+                                summary,
+                                'total_expenses',
+                                currency,
+                            ),
                         )}
                         description={`All expense categories · ${currency}`}
                         icon={TrendingDownIcon}
@@ -1017,7 +1088,8 @@ export default function Dashboard({
                         <CardDescription data-testid="income-expense-chart-range">
                             Last {income_expense_chart.months} months (
                             {formatPeriodShort(income_expense_chart.from)} →{' '}
-                            {formatPeriodShort(income_expense_chart.to)}) · {currency}
+                            {formatPeriodShort(income_expense_chart.to)}) ·{' '}
+                            {currency}
                         </CardDescription>
                         <div
                             className="mt-2 flex flex-wrap gap-4 text-sm"
@@ -1032,7 +1104,9 @@ export default function Dashboard({
                             >
                                 <span
                                     className="inline-block h-2.5 w-2.5 rounded-sm"
-                                    style={{ backgroundColor: CHART_COLORS.income }}
+                                    style={{
+                                        backgroundColor: CHART_COLORS.income,
+                                    }}
                                     data-testid="legend-swatch-income"
                                 />
                                 Income
@@ -1044,7 +1118,9 @@ export default function Dashboard({
                             >
                                 <span
                                     className="inline-block h-2.5 w-2.5 rounded-sm"
-                                    style={{ backgroundColor: CHART_COLORS.expenses }}
+                                    style={{
+                                        backgroundColor: CHART_COLORS.expenses,
+                                    }}
                                     data-testid="legend-swatch-expenses"
                                 />
                                 Expenses
@@ -1073,7 +1149,11 @@ export default function Dashboard({
                     <DashboardSummaryCard
                         title="Total Assets"
                         value={formatCurrency(
-                            amountForCurrency(summary, 'total_assets', currency),
+                            amountForCurrency(
+                                summary,
+                                'total_assets',
+                                currency,
+                            ),
                         )}
                         description={`All bank accounts & investments · ${currency}`}
                         icon={WalletIcon}
@@ -1120,7 +1200,8 @@ export default function Dashboard({
                         <CardDescription data-testid="assets-liabilities-chart-range">
                             Last {assets_liabilities_chart.months} months (
                             {formatPeriodShort(assets_liabilities_chart.from)} →{' '}
-                            {formatPeriodShort(assets_liabilities_chart.to)}) · {currency}
+                            {formatPeriodShort(assets_liabilities_chart.to)}) ·{' '}
+                            {currency}
                         </CardDescription>
                         <div
                             className="mt-2 flex flex-wrap gap-4 text-sm"
@@ -1135,7 +1216,9 @@ export default function Dashboard({
                             >
                                 <span
                                     className="inline-block h-2.5 w-2.5 rounded-sm"
-                                    style={{ backgroundColor: CHART_COLORS.assets }}
+                                    style={{
+                                        backgroundColor: CHART_COLORS.assets,
+                                    }}
                                     data-testid="legend-swatch-assets"
                                 />
                                 Assets
@@ -1148,7 +1231,8 @@ export default function Dashboard({
                                 <span
                                     className="inline-block h-2.5 w-2.5 rounded-sm"
                                     style={{
-                                        backgroundColor: CHART_COLORS.liabilities,
+                                        backgroundColor:
+                                            CHART_COLORS.liabilities,
                                     }}
                                     data-testid="legend-swatch-liabilities"
                                 />
@@ -1161,7 +1245,9 @@ export default function Dashboard({
                             >
                                 <span
                                     className="inline-block h-2.5 w-2.5 rounded-sm"
-                                    style={{ backgroundColor: CHART_COLORS.equity }}
+                                    style={{
+                                        backgroundColor: CHART_COLORS.equity,
+                                    }}
                                     data-testid="legend-swatch-equity"
                                 />
                                 Equity
@@ -1203,15 +1289,33 @@ export default function Dashboard({
                     <CardContent>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-muted-foreground">
-                                    {summary.reconciliation_summary.balanced_count} of{' '}
-                                    {summary.reconciliation_summary.total_count} accounts balanced
+                                <p className="text-muted-foreground text-sm">
+                                    {
+                                        summary.reconciliation_summary
+                                            .balanced_count
+                                    }{' '}
+                                    of{' '}
+                                    {summary.reconciliation_summary.total_count}{' '}
+                                    accounts balanced
                                 </p>
-                                {summary.reconciliation_summary.unbalanced_count > 0 && (
-                                    <p className="text-sm text-red-600 mt-1">
-                                        {summary.reconciliation_summary.unbalanced_count} account
-                                        {summary.reconciliation_summary.unbalanced_count !== 1 ? 's' : ''} need
-                                        {summary.reconciliation_summary.unbalanced_count === 1 ? 's' : ''} attention
+                                {summary.reconciliation_summary
+                                    .unbalanced_count > 0 && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {
+                                            summary.reconciliation_summary
+                                                .unbalanced_count
+                                        }{' '}
+                                        account
+                                        {summary.reconciliation_summary
+                                            .unbalanced_count !== 1
+                                            ? 's'
+                                            : ''}{' '}
+                                        need
+                                        {summary.reconciliation_summary
+                                            .unbalanced_count === 1
+                                            ? 's'
+                                            : ''}{' '}
+                                        attention
                                     </p>
                                 )}
                             </div>

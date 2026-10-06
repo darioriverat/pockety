@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -28,7 +26,10 @@ test('feature 116: user can generate PDF report of income statement for a period
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     await request.post('/api/income', {
         data: {
@@ -78,7 +79,10 @@ test('feature 116: user can generate PDF report of income statement for a period
     await expect(page.getByTestId('income-statement-net')).toBeVisible();
 
     await page.screenshot({
-        path: path.join(verificationDir, '01-income-statement-before-export.png'),
+        path: path.join(
+            verificationDir,
+            '01-income-statement-before-export.png',
+        ),
         fullPage: true,
     });
 
@@ -111,7 +115,10 @@ test('feature 116: user can generate PDF report of income statement for a period
     expect(pdfText).toContain('Net Operating Expenses');
 
     await page.screenshot({
-        path: path.join(verificationDir, '02-income-statement-after-export.png'),
+        path: path.join(
+            verificationDir,
+            '02-income-statement-after-export.png',
+        ),
         fullPage: true,
     });
 

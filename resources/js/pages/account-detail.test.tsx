@@ -5,16 +5,10 @@ import AccountDetail from './account-detail';
 global.fetch = vi.fn();
 
 vi.mock('@inertiajs/react', () => ({
-    Head: ({ title }: { title: string }) => (
-        <title>{title}</title>
+    Head: ({ title }: { title: string }) => <title>{title}</title>,
+    Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
+        <a href={href}>{children}</a>
     ),
-    Link: ({
-        href,
-        children,
-    }: {
-        href: string;
-        children: React.ReactNode;
-    }) => <a href={href}>{children}</a>,
 }));
 
 const accountResponse = {
@@ -144,7 +138,9 @@ describe('Account Detail Page — running balance', () => {
         render(<AccountDetail />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('account-detail-page')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('account-detail-page'),
+            ).toBeInTheDocument();
             expect(screen.getByText('RBC Checking')).toBeInTheDocument();
         });
 
@@ -275,7 +271,9 @@ describe('Account Detail Page — running balance', () => {
         render(<AccountDetail />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('account-tx-amount-9')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('account-tx-amount-9'),
+            ).toBeInTheDocument();
         });
 
         const deposit = screen.getByTestId('account-tx-amount-9');
@@ -352,7 +350,9 @@ describe('Account Detail Page — running balance', () => {
         render(<AccountDetail />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('account-tx-amount-20')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('account-tx-amount-20'),
+            ).toBeInTheDocument();
         });
 
         const charge = screen.getByTestId('account-tx-amount-20');

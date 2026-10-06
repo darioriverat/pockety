@@ -15,7 +15,11 @@ vi.mock('@inertiajs/react', () => ({
         href: string;
         [key: string]: unknown;
     }) => (
-        <a href={typeof href === 'string' ? href : '/'} className={className} {...props}>
+        <a
+            href={typeof href === 'string' ? href : '/'}
+            className={className}
+            {...props}
+        >
             {children}
         </a>
     ),
@@ -45,7 +49,7 @@ describe('TextLink', () => {
 
     it('merges custom className', () => {
         render(
-            <TextLink href="/categories" className="text-sm font-mono">
+            <TextLink href="/categories" className="font-mono text-sm">
                 C001
             </TextLink>,
         );

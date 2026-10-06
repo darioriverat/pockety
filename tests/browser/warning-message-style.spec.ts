@@ -10,9 +10,7 @@ function relativeLuminance(rgb: number[]): number {
             ? channel / 12.92
             : ((channel + 0.055) / 1.055) ** 2.4;
     });
-    return (
-        channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
-    );
+    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
 }
 
 function contrastRatio(a: number[], b: number[]): number {
@@ -126,9 +124,10 @@ for (const theme of ['light', 'dark'] as const) {
             const rgb = (color: string) => {
                 context.fillStyle = color;
                 context.fillRect(0, 0, 1, 1);
-                return Array.from(
-                    context.getImageData(0, 0, 1, 1).data,
-                ).slice(0, 3);
+                return Array.from(context.getImageData(0, 0, 1, 1).data).slice(
+                    0,
+                    3,
+                );
             };
             const style = getComputedStyle(element);
             const title = element.querySelector(

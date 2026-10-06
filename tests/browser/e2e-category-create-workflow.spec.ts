@@ -20,9 +20,7 @@ test.describe('Browser test for category create workflow', () => {
         await page
             .getByLabel('Password', { exact: true })
             .fill('Create-workflow-102!');
-        await page
-            .getByLabel('Confirm password')
-            .fill('Create-workflow-102!');
+        await page.getByLabel('Confirm password').fill('Create-workflow-102!');
         await page
             .getByRole('button', { name: 'Create account', exact: true })
             .click();
@@ -74,9 +72,7 @@ test.describe('Browser test for category create workflow', () => {
         });
 
         // Step 7: Wait for new category card to appear
-        await expect(page.getByTestId('create-category-dialog')).toHaveCount(
-            0,
-        );
+        await expect(page.getByTestId('create-category-dialog')).toHaveCount(0);
 
         // Step 8: Verify category visible on page
         await expect(

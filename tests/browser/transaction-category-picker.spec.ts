@@ -71,9 +71,7 @@ test.describe('Transaction category picker active-only', () => {
 
         // Step 4: Open category picker/dropdown.
         await page.getByRole('button', { name: 'Add Transaction' }).click();
-        await expect(
-            page.getByTestId('transaction-form-dialog'),
-        ).toBeVisible();
+        await expect(page.getByTestId('transaction-form-dialog')).toBeVisible();
 
         const categoryTrigger = page.getByTestId('transaction-category-field');
         await expect(categoryTrigger).toBeVisible();
@@ -90,9 +88,7 @@ test.describe('Transaction category picker active-only', () => {
         ).toBeVisible();
 
         // Step 6: Verify C040 does not appear in picker.
-        await expect(
-            page.getByRole('option', { name: /C040/ }),
-        ).toHaveCount(0);
+        await expect(page.getByRole('option', { name: /C040/ })).toHaveCount(0);
 
         const optionTexts = await options.allTextContents();
         expect(optionTexts.some((text) => text.includes('C047'))).toBe(true);

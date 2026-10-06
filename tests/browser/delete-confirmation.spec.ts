@@ -17,7 +17,9 @@ test.describe('Delete transaction confirmation dialog', () => {
         const categoriesPayload = (await categoriesResponse.json()) as {
             data: Array<{ id: number; code: string }>;
         };
-        const c001 = categoriesPayload.data.find((item) => item.code === 'C001');
+        const c001 = categoriesPayload.data.find(
+            (item) => item.code === 'C001',
+        );
         expect(c001).toBeTruthy();
 
         const createResponse = await request.post('/api/transactions', {
@@ -37,7 +39,9 @@ test.describe('Delete transaction confirmation dialog', () => {
 
         await page.goto('/transactions');
         await page.getByTestId('page-period-selector').click();
-        await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+        await page
+            .getByRole('option', { name: 'January 2025', exact: true })
+            .click();
         await expect(page.getByTestId(`transaction-row-${txnId}`)).toBeVisible({
             timeout: 10000,
         });
@@ -64,7 +68,9 @@ test.describe('Delete transaction confirmation dialog', () => {
         await expect(
             page.getByTestId('delete-confirmation-dialog'),
         ).toHaveCount(0);
-        await expect(page.getByTestId(`transaction-row-${txnId}`)).toBeVisible();
+        await expect(
+            page.getByTestId(`transaction-row-${txnId}`),
+        ).toBeVisible();
 
         await page.screenshot({
             path: 'verification/test-119-delete-confirm/02-after-cancel.png',
@@ -81,20 +87,20 @@ test.describe('Delete transaction confirmation dialog', () => {
         ).toBeVisible();
         await page.getByTestId('delete-confirm-button').click();
 
-    await expect(
-        page.getByText('Transaction deleted successfully'),
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-        page.getByTestId(`transaction-row-${txnId}`),
-    ).toHaveCount(0);
-    await expect(
-        page.getByTestId('delete-confirmation-dialog'),
-    ).toHaveCount(0);
+        await expect(
+            page.getByText('Transaction deleted successfully'),
+        ).toBeVisible({ timeout: 10000 });
+        await expect(page.getByTestId(`transaction-row-${txnId}`)).toHaveCount(
+            0,
+        );
+        await expect(
+            page.getByTestId('delete-confirmation-dialog'),
+        ).toHaveCount(0);
 
-    await page.screenshot({
-        path: 'verification/test-119-delete-confirm/03-after-confirm.png',
-        fullPage: true,
-    });
+        await page.screenshot({
+            path: 'verification/test-119-delete-confirm/03-after-confirm.png',
+            fullPage: true,
+        });
 
         expect(consoleErrors).toEqual([]);
     });

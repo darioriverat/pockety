@@ -5,16 +5,10 @@ import CategoryDetail from './category-detail';
 global.fetch = vi.fn();
 
 vi.mock('@inertiajs/react', () => ({
-    Head: ({ title }: { title: string }) => (
-        <title>{title}</title>
+    Head: ({ title }: { title: string }) => <title>{title}</title>,
+    Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
+        <a href={href}>{children}</a>
     ),
-    Link: ({
-        href,
-        children,
-    }: {
-        href: string;
-        children: React.ReactNode;
-    }) => <a href={href}>{children}</a>,
 }));
 
 const unfilteredResponse = {
@@ -93,20 +87,22 @@ describe('Category Detail Page — transaction history', () => {
         render(<CategoryDetail />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('category-detail-heading')).toHaveTextContent(
-                'C001 — Groceries'
-            );
+            expect(
+                screen.getByTestId('category-detail-heading'),
+            ).toHaveTextContent('C001 — Groceries');
         });
 
         expect(screen.getByTestId('category-total-spending')).toHaveTextContent(
-            /\$350\.50/
+            /\$350\.50/,
         );
-        expect(screen.getByTestId('category-transaction-count')).toHaveTextContent(
-            '2'
-        );
+        expect(
+            screen.getByTestId('category-transaction-count'),
+        ).toHaveTextContent('2');
         expect(screen.getByText('jan-groceries')).toBeInTheDocument();
         expect(screen.getByText('feb-groceries')).toBeInTheDocument();
-        expect(screen.getByTestId('category-transactions-table')).toBeInTheDocument();
+        expect(
+            screen.getByTestId('category-transactions-table'),
+        ).toBeInTheDocument();
     });
 
     it('filters transactions by period', async () => {
@@ -133,17 +129,19 @@ describe('Category Detail Page — transaction history', () => {
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith(
-                '/api/categories/C001/transactions?period=202501'
+                '/api/categories/C001/transactions?period=202501',
             );
         });
 
         await waitFor(() => {
             expect(screen.getByText('jan-groceries')).toBeInTheDocument();
             expect(screen.queryByText('feb-groceries')).not.toBeInTheDocument();
-            expect(screen.getByTestId('category-total-spending')).toHaveTextContent(
-                /\$100\.00/
-            );
-            expect(screen.getByTestId('active-period-filter')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('category-total-spending'),
+            ).toHaveTextContent(/\$100\.00/);
+            expect(
+                screen.getByTestId('active-period-filter'),
+            ).toBeInTheDocument();
         });
     });
 });

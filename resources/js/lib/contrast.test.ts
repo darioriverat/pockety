@@ -19,16 +19,12 @@ describe('contrast helpers', () => {
 
     it('passes WCAG AA for near-black body text on white', () => {
         // Matches --foreground oklch(0.145) ≈ rgb(10,10,10)
-        expect(meetsWcagAaNormalText([10, 10, 10], [255, 255, 255])).toBe(
-            true,
-        );
+        expect(meetsWcagAaNormalText([10, 10, 10], [255, 255, 255])).toBe(true);
     });
 
     it('passes WCAG AA for darkened muted foreground on white', () => {
         // --muted-foreground oklch(0.45) ≈ rgb(85,85,85) → ~7.5:1
-        expect(meetsWcagAaNormalText([85, 85, 85], [255, 255, 255])).toBe(
-            true,
-        );
+        expect(meetsWcagAaNormalText([85, 85, 85], [255, 255, 255])).toBe(true);
         expect(contrastRatio([85, 85, 85], [255, 255, 255])).toBeGreaterThan(
             WCAG_AA_NORMAL_TEXT,
         );

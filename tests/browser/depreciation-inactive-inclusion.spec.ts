@@ -14,7 +14,9 @@ test.beforeEach(() => {
     mkdirSync(SHOT_DIR, { recursive: true });
 });
 
-test('inactive C045 depreciation remains in financial summary', async ({ page }) => {
+test('inactive C045 depreciation remains in financial summary', async ({
+    page,
+}) => {
     test.setTimeout(90_000);
     const errors = trackConsoleErrors(page);
     page.on('pageerror', (error) => errors.push(error.message));
@@ -23,8 +25,13 @@ test('inactive C045 depreciation remains in financial summary', async ({ page })
 
     // Seed a C045 transaction while the category is still active.
     await page.goto('/transactions');
-    await page.getByRole('button', { name: 'Add Transaction', exact: true }).click();
-    await page.getByTestId('transaction-date').locator('input').fill('2026-01-20');
+    await page
+        .getByRole('button', { name: 'Add Transaction', exact: true })
+        .click();
+    await page
+        .getByTestId('transaction-date')
+        .locator('input')
+        .fill('2026-01-20');
     await page.getByTestId('transaction-date').locator('input').press('Tab');
     await page.getByTestId('transaction-period-input').fill(PERIOD);
     await page.getByTestId('transaction-category-field').click();
@@ -32,7 +39,9 @@ test('inactive C045 depreciation remains in financial summary', async ({ page })
     await page.getByTestId('transaction-amount-input').fill('75');
     await page.getByLabel('Comments').fill('inactive-c045-depreciation');
     const saved = page.waitForResponse(
-        (r) => r.request().method() === 'POST' && r.url().endsWith('/api/transactions'),
+        (r) =>
+            r.request().method() === 'POST' &&
+            r.url().endsWith('/api/transactions'),
     );
     await page.getByTestId('transaction-form-submit').click();
     expect((await saved).status()).toBe(201);
@@ -40,8 +49,12 @@ test('inactive C045 depreciation remains in financial summary', async ({ page })
 
     await page.goto('/financial-summary');
     await page.getByTestId('page-period-selector').click();
-    await page.getByRole('option', { name: 'January 2026', exact: true }).click();
-    await expect(page.getByTestId('depreciation-excluded')).toContainText('75.00');
+    await page
+        .getByRole('option', { name: 'January 2026', exact: true })
+        .click();
+    await expect(page.getByTestId('depreciation-excluded')).toContainText(
+        '75.00',
+    );
     await expect(page.getByTestId('summary-row-C045')).toBeVisible();
     await expect(page.getByTestId('total-C045')).toContainText('75.00');
     await page.screenshot({
@@ -61,13 +74,17 @@ test('inactive C045 depreciation remains in financial summary', async ({ page })
     });
 
     await page.goto('/financial-summary');
-    await expect(page.getByTestId('depreciation-excluded')).toContainText('75.00');
-    await expect(page.getByTestId('summary-row-C045')).toBeVisible();
-    await expect(page.getByTestId('total-C045')).toContainText('75.00');
-    await expect(page.getByTestId('total-recorded-disbursements')).toContainText(
+    await expect(page.getByTestId('depreciation-excluded')).toContainText(
         '75.00',
     );
-    await expect(page.getByTestId('net-operating-expenses')).toContainText('0.00');
+    await expect(page.getByTestId('summary-row-C045')).toBeVisible();
+    await expect(page.getByTestId('total-C045')).toContainText('75.00');
+    await expect(
+        page.getByTestId('total-recorded-disbursements'),
+    ).toContainText('75.00');
+    await expect(page.getByTestId('net-operating-expenses')).toContainText(
+        '0.00',
+    );
     await page.getByTestId('summary-row-C045').scrollIntoViewIfNeeded();
     await page.screenshot({
         animations: 'disabled',

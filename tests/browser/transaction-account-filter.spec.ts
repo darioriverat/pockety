@@ -176,7 +176,13 @@ test('account query parameter applies on load and the account filter counts as a
     const beta = await createAccount(request, 'Beta Query Bank');
     const period = previousPeriod();
     await ensureTransactionInPeriod(request, period);
-    await createTransaction(request, alpha.id, categoryId, 'alpha-query', period);
+    await createTransaction(
+        request,
+        alpha.id,
+        categoryId,
+        'alpha-query',
+        period,
+    );
     await createTransaction(request, beta.id, categoryId, 'beta-query', period);
 
     await page.goto(`/transactions?account=${alpha.id}&period=${period}`);

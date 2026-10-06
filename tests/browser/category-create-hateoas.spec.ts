@@ -30,7 +30,9 @@ test.describe('HATEOAS links on category create response', () => {
 
         await page.getByTestId('create-category-button').click();
         await expect(page.getByTestId('create-category-dialog')).toBeVisible();
-        await page.getByLabel('Name', { exact: true }).fill('HATEOAS Create Link');
+        await page
+            .getByLabel('Name', { exact: true })
+            .fill('HATEOAS Create Link');
         await page.getByRole('radio', { name: 'Expense', exact: true }).check();
         await page.screenshot({
             path: `${SHOT_DIR}/02-create-dialog.png`,

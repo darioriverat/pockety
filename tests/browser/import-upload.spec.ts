@@ -15,10 +15,7 @@ const fixtures = {
         dirname,
         '../fixtures/transactions_sample.json',
     ),
-    transactionsCsv: path.join(
-        dirname,
-        '../fixtures/transactions_sample.csv',
-    ),
+    transactionsCsv: path.join(dirname, '../fixtures/transactions_sample.csv'),
     monthSheetA: path.join(
         dirname,
         '../fixtures/month_sheets/202501_sample.json',
@@ -27,10 +24,7 @@ const fixtures = {
         dirname,
         '../fixtures/month_sheets/202502_sample.json',
     ),
-    balanceSheet: path.join(
-        dirname,
-        '../fixtures/balance_sheet_sample.json',
-    ),
+    balanceSheet: path.join(dirname, '../fixtures/balance_sheet_sample.json'),
 };
 
 test.beforeEach(() => {

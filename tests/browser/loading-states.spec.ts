@@ -47,9 +47,9 @@ for (const theme of ['light', 'dark'] as const) {
         await navigation;
 
         await expect(loading).toHaveCount(0, { timeout: 15000 });
-        await expect(
-            page.getByTestId('transactions-total'),
-        ).toBeVisible({ timeout: 15000 });
+        await expect(page.getByTestId('transactions-total')).toBeVisible({
+            timeout: 15000,
+        });
 
         await page.screenshot({
             path: `${evidence}/${theme}-transactions-loaded.png`,

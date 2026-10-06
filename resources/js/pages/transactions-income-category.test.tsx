@@ -1,3 +1,4 @@
+import { requestBodyText } from '@/test/request';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Transactions from './transactions';
@@ -77,99 +78,114 @@ describe('Transactions - income categories', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
+        global.fetch = vi.fn(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
 
-            if (url.startsWith('/api/categories')) {
-                return jsonResponse({ data: [groceries, incomeCategory] });
-            }
+                if (url.startsWith('/api/categories')) {
+                    return jsonResponse({ data: [groceries, incomeCategory] });
+                }
 
-            if (url.startsWith('/api/accounts')) {
-                return jsonResponse({ data: [account] });
-            }
+                if (url.startsWith('/api/accounts')) {
+                    return jsonResponse({ data: [account] });
+                }
 
-            if (url === '/api/transactions' && init?.method === 'POST') {
-                const body = JSON.parse(String(init.body)) as {
-                    category_id: number;
-                    account_id: number | null;
-                };
+                if (url === '/api/transactions' && init?.method === 'POST') {
+                    const body = JSON.parse(requestBodyText(init)) as {
+                        category_id: number;
+                        account_id: number | null;
+                    };
 
-                return jsonResponse(
-                    {
-                        data: {
-                            id: 999,
-                            date: '2025-01-15',
-                            period: '202501',
-                            category_id: body.category_id,
-                            account_id: body.account_id,
-                            account: body.account_id ? account : null,
-                            amount_cad: 500,
-                            amount_usd: null,
-                            amount_cop: null,
-                            currency: 'CAD',
-                            amount: 500,
-                            comments: 'salary-deposit',
-                            is_recurring: false,
-                            debt_component: null,
-                            category: incomeCategory,
-                        },
-                        message: 'Transaction created successfully',
-                    },
-                    { status: 201 },
-                );
-            }
-
-            if (url.startsWith('/api/transactions')) {
-                return jsonResponse({
-                    data: [
+                    return jsonResponse(
                         {
-                            id: 123,
-                            date: '2025-01-15',
-                            period: '202501',
-                            category_id: incomeCategory.id,
-                            account_id: account.id,
-                            account,
-                            amount_cad: 500,
-                            amount_usd: null,
-                            amount_cop: null,
-                            currency: 'CAD',
-                            amount: 500,
-                            comments: 'existing-income',
-                            is_recurring: false,
-                            debt_component: null,
-                            category: incomeCategory,
+                            data: {
+                                id: 999,
+                                date: '2025-01-15',
+                                period: '202501',
+                                category_id: body.category_id,
+                                account_id: body.account_id,
+                                account: body.account_id ? account : null,
+                                amount_cad: 500,
+                                amount_usd: null,
+                                amount_cop: null,
+                                currency: 'CAD',
+                                amount: 500,
+                                comments: 'salary-deposit',
+                                is_recurring: false,
+                                debt_component: null,
+                                category: incomeCategory,
+                            },
+                            message: 'Transaction created successfully',
                         },
-                    ],
-                    links: { self: '/api/transactions' },
-                    meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
-                });
-            }
+                        { status: 201 },
+                    );
+                }
 
-            throw new Error(`Unexpected fetch: ${url}`);
-        });
+                if (url.startsWith('/api/transactions')) {
+                    return jsonResponse({
+                        data: [
+                            {
+                                id: 123,
+                                date: '2025-01-15',
+                                period: '202501',
+                                category_id: incomeCategory.id,
+                                account_id: account.id,
+                                account,
+                                amount_cad: 500,
+                                amount_usd: null,
+                                amount_cop: null,
+                                currency: 'CAD',
+                                amount: 500,
+                                comments: 'existing-income',
+                                is_recurring: false,
+                                debt_component: null,
+                                category: incomeCategory,
+                            },
+                        ],
+                        links: { self: '/api/transactions' },
+                        meta: { total: 1, page: 1, per_page: 50, last_page: 1 },
+                    });
+                }
+
+                throw new Error(`Unexpected fetch: ${url}`);
+            },
+        );
     });
 
     it('requires a deposit account for income categories', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('transaction-category-field'));
-        fireEvent.click(await screen.findByRole('option', { name: /I01 - Salary/ }));
+        fireEvent.click(
+            await screen.findByRole('option', { name: /I01 - Salary/ }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('income-account-hint')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('income-account-hint'),
+            ).toBeInTheDocument();
         });
 
-        expect(screen.queryByTestId('account-none-option')).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId('account-none-option'),
+        ).not.toBeInTheDocument();
         expect(screen.getByLabelText('Deposit account')).toBeInTheDocument();
 
         fireEvent.change(screen.getByTestId('transaction-amount-input'), {
@@ -183,7 +199,9 @@ describe('Transactions - income categories', () => {
             );
         });
 
-        const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+        const postCall = (
+            global.fetch as ReturnType<typeof vi.fn>
+        ).mock.calls.find(
             ([url, init]) =>
                 String(url) === '/api/transactions' &&
                 (init as RequestInit | undefined)?.method === 'POST',
@@ -195,24 +213,36 @@ describe('Transactions - income categories', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('transaction-category-field'));
-        fireEvent.click(await screen.findByRole('option', { name: /I01 - Salary/ }));
+        fireEvent.click(
+            await screen.findByRole('option', { name: /I01 - Salary/ }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('income-account-hint')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('income-account-hint'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('account-field'));
-        fireEvent.click(await screen.findByRole('option', { name: /RBC Checking/ }));
+        fireEvent.click(
+            await screen.findByRole('option', { name: /RBC Checking/ }),
+        );
 
         fireEvent.change(screen.getByTestId('transaction-amount-input'), {
             target: { value: '500' },
@@ -220,14 +250,16 @@ describe('Transactions - income categories', () => {
         fireEvent.click(screen.getByTestId('transaction-form-submit'));
 
         await waitFor(() => {
-            const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+            const postCall = (
+                global.fetch as ReturnType<typeof vi.fn>
+            ).mock.calls.find(
                 ([url, init]) =>
                     String(url) === '/api/transactions' &&
                     (init as RequestInit | undefined)?.method === 'POST',
             );
 
             expect(postCall).toBeDefined();
-            const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
+            const body = JSON.parse(requestBodyText(postCall?.[1]));
             expect(body.category_id).toBe(incomeCategory.id);
             expect(body.account_id).toBe(account.id);
         });

@@ -1,7 +1,4 @@
-import {
-    expect,
-    test,
-    type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -39,7 +36,10 @@ async function seedComparisonData(request: APIRequestContext): Promise<void> {
     const loan = (await loanResponse.json()) as { data: { id: number } };
 
     for (const period of ['202501', '202502']) {
-        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
+        await ensureExchangeRateForPeriod(request, period, {
+            copPerUsd: 4400,
+            cadPerUsd: 0.75,
+        });
     }
 
     const incomeJan = await request.post('/api/income', {
@@ -146,9 +146,7 @@ test('feature 104: user can compare two periods side-by-side', async ({
     // Step 1: Navigate to period comparison page
     await page.goto('/periods/compare?period_a=202501&period_b=202502');
 
-    await expect(
-        page.getByTestId('period-comparison-heading'),
-    ).toBeVisible();
+    await expect(page.getByTestId('period-comparison-heading')).toBeVisible();
     await expect(page.getByTestId('period-comparison-heading')).toHaveText(
         'Period Comparison',
     );
@@ -165,12 +163,18 @@ test('feature 104: user can compare two periods side-by-side', async ({
     await expect(page.getByTestId('period-b-select')).toBeVisible();
 
     // Step 4: Income, expenses, and balances side-by-side
-    await expect(page.getByTestId('period-a-income')).toContainText('$5,000.00');
-    await expect(page.getByTestId('period-b-income')).toContainText('$5,500.00');
+    await expect(page.getByTestId('period-a-income')).toContainText(
+        '$5,000.00',
+    );
+    await expect(page.getByTestId('period-b-income')).toContainText(
+        '$5,500.00',
+    );
     await expect(page.getByTestId('period-a-expenses')).toContainText(
         '$1,000.00',
     );
-    await expect(page.getByTestId('period-b-expenses')).toContainText('$800.00');
+    await expect(page.getByTestId('period-b-expenses')).toContainText(
+        '$800.00',
+    );
     await expect(page.getByTestId('period-a-assets')).toContainText(
         '$10,000.00',
     );
@@ -191,15 +195,15 @@ test('feature 104: user can compare two periods side-by-side', async ({
 
     // Step 5: Differences/changes calculated and highlighted
     await expect(page.getByTestId('comparison-row-income')).toBeVisible();
-    await expect(page.getByTestId('comparison-income-difference')).toContainText(
-        '+$500.00',
-    );
-    await expect(page.getByTestId('comparison-expenses-difference')).toContainText(
-        '-$200.00',
-    );
-    await expect(page.getByTestId('comparison-assets-difference')).toContainText(
-        '+$2,000.00',
-    );
+    await expect(
+        page.getByTestId('comparison-income-difference'),
+    ).toContainText('+$500.00');
+    await expect(
+        page.getByTestId('comparison-expenses-difference'),
+    ).toContainText('-$200.00');
+    await expect(
+        page.getByTestId('comparison-assets-difference'),
+    ).toContainText('+$2,000.00');
     await expect(
         page.getByTestId('comparison-liabilities-difference'),
     ).toContainText('-$500.00');

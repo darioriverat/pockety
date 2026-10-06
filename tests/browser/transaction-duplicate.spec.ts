@@ -17,7 +17,9 @@ test.describe('Duplicate transaction', () => {
         const categoriesPayload = (await categoriesResponse.json()) as {
             data: Array<{ id: number; code: string; name: string }>;
         };
-        const c001 = categoriesPayload.data.find((item) => item.code === 'C001');
+        const c001 = categoriesPayload.data.find(
+            (item) => item.code === 'C001',
+        );
         expect(c001).toBeTruthy();
 
         const createResponse = await request.post('/api/transactions', {
@@ -38,9 +40,13 @@ test.describe('Duplicate transaction', () => {
         await page.goto('/transactions');
         await expect(page.getByTestId('transactions-heading')).toBeVisible();
         await page.getByTestId('page-period-selector').click();
-        await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+        await page
+            .getByRole('option', { name: 'January 2025', exact: true })
+            .click();
 
-        await expect(page.getByTestId(`transaction-row-${sourceId}`)).toBeVisible({
+        await expect(
+            page.getByTestId(`transaction-row-${sourceId}`),
+        ).toBeVisible({
             timeout: 10000,
         });
 
@@ -79,7 +85,9 @@ test.describe('Duplicate transaction', () => {
         });
 
         await page.getByTestId('transaction-form-submit').click();
-        await expect(page.getByTestId('transaction-form-dialog')).toHaveCount(0);
+        await expect(page.getByTestId('transaction-form-dialog')).toHaveCount(
+            0,
+        );
 
         // Switch to current period to find the new duplicate
         await page.getByTestId('page-period-selector').click();

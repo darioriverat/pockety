@@ -83,7 +83,9 @@ test.describe('currency symbols', () => {
 
         // Step 1–2: dashboard screenshot (symbols appear on summary cards)
         await page.goto('/dashboard');
-        await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible({
+        await expect(
+            page.getByRole('heading', { name: /dashboard/i }),
+        ).toBeVisible({
             timeout: 15000,
         });
         await page.screenshot({
@@ -145,9 +147,15 @@ test.describe('currency symbols', () => {
             timeout: 15000,
         });
 
-        const assetsCad = await page.getByTestId('total-assets-cad').innerText();
-        const assetsUsd = await page.getByTestId('total-assets-usd').innerText();
-        const assetsCop = await page.getByTestId('total-assets-cop').innerText();
+        const assetsCad = await page
+            .getByTestId('total-assets-cad')
+            .innerText();
+        const assetsUsd = await page
+            .getByTestId('total-assets-usd')
+            .innerText();
+        const assetsCop = await page
+            .getByTestId('total-assets-cop')
+            .innerText();
 
         expect(assetsCad).toMatch(/^\$/);
         expect(assetsUsd).toMatch(/^US\$/);

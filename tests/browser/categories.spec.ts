@@ -21,9 +21,13 @@ test('feature 2: categories page shows active and retired categories', async ({
     await page.goto('/categories');
 
     await expect(page).toHaveURL(/\/categories$/);
-    await expect(page.getByRole('heading', { name: 'Categories' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Categories' }),
+    ).toBeVisible();
     await expect(page.getByText('Total categories: 47')).toBeVisible();
-    await expect(page.getByTestId('category-card-C040')).toContainText('Retired');
+    await expect(page.getByTestId('category-card-C040')).toContainText(
+        'Retired',
+    );
     await expect(page.getByText('C031', { exact: true })).toHaveCount(1);
     await expect(page.getByTestId('income-badge-I01')).toBeVisible();
 
@@ -35,7 +39,9 @@ test('feature 3: categories show English names', async ({ page }) => {
 
     await page.goto('/categories');
 
-    await expect(page.getByTestId('category-name-C001')).toContainText('Groceries');
+    await expect(page.getByTestId('category-name-C001')).toContainText(
+        'Groceries',
+    );
     await expect(page.getByTestId('category-name-C004')).toContainText(
         'Transportation',
     );
@@ -93,7 +99,9 @@ test('feature 89: system prevents deletion of category that has associated trans
     await expect(page).toHaveURL(/\/categories$/);
 
     // Step 3 & 4: Attempt to delete category C001 and verify prevention
-    const c001Card = page.locator('[data-slot="card"]').filter({ hasText: 'C001' });
+    const c001Card = page
+        .locator('[data-slot="card"]')
+        .filter({ hasText: 'C001' });
     const dialogMessages: string[] = [];
 
     page.on('dialog', async (dialog) => {
@@ -106,7 +114,9 @@ test('feature 89: system prevents deletion of category that has associated trans
     // confirm() then alert() — wait until both have been handled
     await expect.poll(() => dialogMessages.length).toBeGreaterThanOrEqual(2);
     expect(dialogMessages[0]).toContain('C001');
-    expect(dialogMessages[1].toLowerCase()).toMatch(/transaction|cannot be deleted/);
+    expect(dialogMessages[1].toLowerCase()).toMatch(
+        /transaction|cannot be deleted/,
+    );
 
     // Step 5: Verify C001 still exists on the page
     await expect(page.getByText('C001')).toBeVisible();

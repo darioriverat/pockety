@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -21,7 +19,10 @@ test('feature 85: user can view list of all periods with data', async ({
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const categoriesResponse = await request.get('/api/categories');
     const categoriesPayload = await categoriesResponse.json();
@@ -51,9 +52,7 @@ test('feature 85: user can view list of all periods with data', async ({
     });
 
     await page.goto('/periods/history');
-    await expect(
-        page.getByTestId('periods-history-heading'),
-    ).toBeVisible();
+    await expect(page.getByTestId('periods-history-heading')).toBeVisible();
     await expect(page.getByTestId('periods-history-count')).toHaveText('21');
     await expect(page.getByTestId('periods-history-table')).toBeVisible();
 

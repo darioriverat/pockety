@@ -1,7 +1,4 @@
-import {
-    expect,
-    test,
-    type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -49,7 +46,10 @@ async function seedIncomeExpenseData(
         const year = period.slice(0, 4);
         const month = period.slice(4, 6);
 
-        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
+        await ensureExchangeRateForPeriod(request, period, {
+            copPerUsd: 4400,
+            cadPerUsd: 0.75,
+        });
 
         const incomeResponse = await request.post('/api/income', {
             data: {
@@ -90,7 +90,9 @@ test('feature 101: dashboard shows income vs expenses chart over time', async ({
 
     await page.goto('/dashboard?period=202606');
 
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Dashboard' }),
+    ).toBeVisible();
     await expect(page.getByTestId('income-expense-chart-card')).toBeVisible();
     await expect(page.getByText('Income vs Expenses')).toBeVisible();
 

@@ -102,9 +102,7 @@ export default function Import() {
     const [result, setResult] = useState<ImportResult | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [transactionFile, setTransactionFile] = useState<File | null>(null);
-    const [statistics, setStatistics] = useState<ImportStatistics | null>(
-        null,
-    );
+    const [statistics, setStatistics] = useState<ImportStatistics | null>(null);
     const [loadingStats, setLoadingStats] = useState(false);
     const transactionInputRef = useRef<HTMLInputElement>(null);
 
@@ -160,11 +158,9 @@ export default function Import() {
             }
 
             setResult(data.data);
-            fetchStatistics();
+            void fetchStatistics();
         } catch (err) {
-            setError(
-                err instanceof Error ? err.message : 'An error occurred',
-            );
+            setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setImporting(false);
         }
@@ -251,7 +247,7 @@ export default function Import() {
             }
 
             setAccountResult(data.data);
-            fetchAccountStatistics();
+            void fetchAccountStatistics();
         } catch (err) {
             setAccountError(
                 err instanceof Error ? err.message : 'An error occurred',
@@ -312,7 +308,7 @@ export default function Import() {
             }
 
             setBalanceSheetResult(data.data);
-            fetchBalanceSheetStatistics();
+            void fetchBalanceSheetStatistics();
         } catch (err) {
             setBalanceSheetError(
                 err instanceof Error ? err.message : 'An error occurred',
@@ -344,9 +340,9 @@ export default function Import() {
     };
 
     useEffect(() => {
-        fetchStatistics();
-        fetchAccountStatistics();
-        fetchBalanceSheetStatistics();
+        void fetchStatistics();
+        void fetchAccountStatistics();
+        void fetchBalanceSheetStatistics();
     }, []);
 
     const balanceSheetSnapshots =
@@ -369,13 +365,13 @@ export default function Import() {
                         <CardTitle>{t('pages.import.transactions')}</CardTitle>
                         <CardDescription>
                             Upload one .json or .csv file. JSON rows use fecha,
-                            periodo, concepto_code, nested cad/usd/cop values, and
-                            comentarios. CSV uses the same columns as a flat
+                            periodo, concepto_code, nested cad/usd/cop values,
+                            and comentarios. CSV uses the same columns as a flat
                             header.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="space-y-2 max-w-lg">
+                        <div className="max-w-lg space-y-2">
                             <Label htmlFor="transaction-file-input">
                                 Transaction file
                             </Label>
@@ -475,10 +471,10 @@ export default function Import() {
                                         </div>
                                         {result.errors.length > 0 && (
                                             <div className="mt-4">
-                                                <p className="font-semibold text-sm">
+                                                <p className="text-sm font-semibold">
                                                     Errors:
                                                 </p>
-                                                <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+                                                <ul className="mt-2 list-inside list-disc space-y-1 text-sm">
                                                     {result.errors
                                                         .slice(0, 10)
                                                         .map((err, idx) => (
@@ -491,7 +487,8 @@ export default function Import() {
                                                         <li>
                                                             ... and{' '}
                                                             {result.errors
-                                                                .length - 10}{' '}
+                                                                .length -
+                                                                10}{' '}
                                                             more errors
                                                         </li>
                                                     )}
@@ -519,13 +516,13 @@ export default function Import() {
                     <CardHeader>
                         <CardTitle>{t('pages.import.accounts')}</CardTitle>
                         <CardDescription>
-                            Upload one or more month-sheet .json files. Each file
-                            needs header.period.value and
+                            Upload one or more month-sheet .json files. Each
+                            file needs header.period.value and
                             sections.Cuentas.items with recorded balances.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="space-y-2 max-w-lg">
+                        <div className="max-w-lg space-y-2">
                             <Label htmlFor="account-file-input">
                                 Month-sheet files
                             </Label>
@@ -543,7 +540,7 @@ export default function Import() {
                                     setAccountError(null);
                                 }}
                             />
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                                 You can select multiple .json files at once.
                             </p>
                         </div>
@@ -620,7 +617,7 @@ export default function Import() {
                                                 }
                                             </Badge>
                                         </div>
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-muted-foreground text-sm">
                                             {accountResult.accounts.length}{' '}
                                             accounts available
                                         </p>
@@ -646,7 +643,7 @@ export default function Import() {
                                 <p className="text-2xl font-bold">
                                     {accountStatistics.total}
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Active Accounts
                                 </p>
                                 <div className="mt-2 flex flex-wrap gap-2">
@@ -673,7 +670,7 @@ export default function Import() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="space-y-2 max-w-lg">
+                        <div className="max-w-lg space-y-2">
                             <Label htmlFor="balance-sheet-file-input">
                                 Balance sheet file
                             </Label>
@@ -754,8 +751,8 @@ export default function Import() {
                                                     balanceSheetResult.periods_imported
                                                 }
                                             </Badge>
-                                            {balanceSheetResult.errors
-                                                .length > 0 && (
+                                            {balanceSheetResult.errors.length >
+                                                0 && (
                                                 <Badge variant="destructive">
                                                     Errors:{' '}
                                                     {
@@ -793,7 +790,7 @@ export default function Import() {
                                 >
                                     {balanceSheetStatistics.total}
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Historical Balance Sheet Periods
                                     {balanceSheetStatistics.periods_covered
                                         .min &&
@@ -898,13 +895,13 @@ export default function Import() {
                                 <p className="text-2xl font-bold">
                                     {statistics.total.toLocaleString()}
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Total Transactions
                                 </p>
                             </div>
 
                             <div>
-                                <h3 className="font-semibold mb-2">
+                                <h3 className="mb-2 font-semibold">
                                     By Currency
                                 </h3>
                                 <div className="flex gap-4">
@@ -921,7 +918,7 @@ export default function Import() {
                             </div>
 
                             <div>
-                                <h3 className="font-semibold mb-2">
+                                <h3 className="mb-2 font-semibold">
                                     By Period
                                 </h3>
                                 <div className="grid grid-cols-3 gap-2">

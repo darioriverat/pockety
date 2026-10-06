@@ -15,16 +15,18 @@ vi.mock('@inertiajs/react', () => ({
 describe('AppFooter', () => {
     it('renders app name and version', () => {
         render(<AppFooter />);
-        
+
         expect(screen.getByText(/Pockety/i)).toBeInTheDocument();
         expect(screen.getByText(/v1\.0\.0/i)).toBeInTheDocument();
     });
 
     it('renders current year in copyright', () => {
         render(<AppFooter />);
-        
+
         const currentYear = new Date().getFullYear();
-        expect(screen.getByText(new RegExp(`© ${currentYear}`, 'i'))).toBeInTheDocument();
+        expect(
+            screen.getByText(new RegExp(`© ${currentYear}`, 'i')),
+        ).toBeInTheDocument();
     });
 
     it('does not render repository or documentation links', () => {
@@ -43,7 +45,7 @@ describe('AppFooter', () => {
 
     it('has consistent styling with footer semantic element', () => {
         const { container } = render(<AppFooter />);
-        
+
         const footer = container.querySelector('footer');
         expect(footer).toBeInTheDocument();
         expect(footer).toHaveClass('border-t', 'border-border');

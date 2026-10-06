@@ -1,7 +1,4 @@
-import {
-    expect,
-    test,
-    type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -11,18 +8,17 @@ import {
     ensureExchangeRateForPeriod,
 } from './helpers';
 
-const verificationDir = path.join(
-    process.cwd(),
-    'verification',
-    'session-63',
-);
+const verificationDir = path.join(process.cwd(), 'verification', 'session-63');
 
 async function seedCurrencyPreferenceData(
     request: APIRequestContext,
 ): Promise<void> {
     const period = '202601';
 
-    await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, period, {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const incomeResponse = await request.post('/api/income', {
         data: {
@@ -100,7 +96,9 @@ test('feature 112: user can set default currency preference for views', async ({
 
     // Steps 4-5: Dashboard shows amounts in CAD by default
     await page.goto('/dashboard?period=202601');
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Dashboard' }),
+    ).toBeVisible();
     await expect(page.getByTestId('currency-toggle')).toBeVisible();
     await expect(page.getByTestId('currency-toggle-cad')).toHaveAttribute(
         'data-state',
@@ -117,7 +115,9 @@ test('feature 112: user can set default currency preference for views', async ({
         fullPage: true,
     });
 
-    const cadIncome = await page.getByTestId('dashboard-total-income').innerText();
+    const cadIncome = await page
+        .getByTestId('dashboard-total-income')
+        .innerText();
 
     // Step 6: Toggle to see other currencies
     await page.getByTestId('currency-toggle-usd').click();
@@ -131,7 +131,9 @@ test('feature 112: user can set default currency preference for views', async ({
     await expect(page.getByTestId('dashboard-total-income')).toContainText(
         '6,666.67',
     );
-    const usdIncome = await page.getByTestId('dashboard-total-income').innerText();
+    const usdIncome = await page
+        .getByTestId('dashboard-total-income')
+        .innerText();
     expect(usdIncome).not.toEqual(cadIncome);
     await page.screenshot({
         path: path.join(verificationDir, '04-dashboard-usd-toggle.png'),
@@ -146,7 +148,9 @@ test('feature 112: user can set default currency preference for views', async ({
     await expect(page.getByTestId('income-expense-chart-range')).toContainText(
         'COP',
     );
-    const copIncome = await page.getByTestId('dashboard-total-income').innerText();
+    const copIncome = await page
+        .getByTestId('dashboard-total-income')
+        .innerText();
     expect(copIncome.replace(/\s/g, '')).toMatch(/15[.,]000[.,]000/);
     expect(copIncome).not.toEqual(usdIncome);
     await page.screenshot({

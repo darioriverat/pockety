@@ -30,12 +30,19 @@ async function addTransaction(
         debtComponent?: 'principal' | 'interest';
     },
 ): Promise<void> {
-    await page.getByRole('button', { name: 'Add Transaction', exact: true }).click();
-    await page.getByTestId('transaction-date').locator('input').fill('2026-01-15');
+    await page
+        .getByRole('button', { name: 'Add Transaction', exact: true })
+        .click();
+    await page
+        .getByTestId('transaction-date')
+        .locator('input')
+        .fill('2026-01-15');
     await page.getByTestId('transaction-date').locator('input').press('Tab');
     await page.getByTestId('transaction-period-input').fill(PERIOD);
     await page.getByTestId('transaction-category-field').click();
-    await page.getByRole('option', { name: new RegExp(`^${values.code} -`) }).click();
+    await page
+        .getByRole('option', { name: new RegExp(`^${values.code} -`) })
+        .click();
     await page.getByTestId('transaction-amount-input').fill(values.amount);
     await page.getByLabel('Comments').fill(values.comments);
 
@@ -47,7 +54,9 @@ async function addTransaction(
     }
 
     const saved = page.waitForResponse(
-        (r) => r.request().method() === 'POST' && r.url().endsWith('/api/transactions'),
+        (r) =>
+            r.request().method() === 'POST' &&
+            r.url().endsWith('/api/transactions'),
     );
     await page.getByTestId('transaction-form-submit').click();
     expect((await saved).status()).toBe(201);
@@ -56,7 +65,9 @@ async function addTransaction(
 
 async function loadReconciliation(page: Page): Promise<void> {
     await page.goto('/reconciliation');
-    await expect(page.getByRole('heading', { name: 'Reconciliation' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Reconciliation' }),
+    ).toBeVisible();
     await page.getByLabel('Period (YYYYMM)').fill(PERIOD);
     await page.getByRole('button', { name: 'View Reconciliation' }).click();
     await expect(page.getByTestId('accounting-equation-card')).toBeVisible();
@@ -113,7 +124,9 @@ test('reconciliation totals include inactive expense and debt categories', async
 
     // Income line for 202601 (income_total_cad comes from income records).
     await page.goto('/income');
-    await page.getByRole('textbox', { name: 'Period', exact: true }).fill(PERIOD);
+    await page
+        .getByRole('textbox', { name: 'Period', exact: true })
+        .fill(PERIOD);
     await page.getByRole('button', { name: 'Load Period' }).click();
     await expect(
         page.getByText('Total income (CAD equivalent) — January 2026'),
@@ -134,7 +147,9 @@ test('reconciliation totals include inactive expense and debt categories', async
     await expect(page.getByTestId('income-total')).toHaveText('$1,000.00');
     await expect(page.getByTestId('expenses-total')).toHaveText('$750.00');
     await expect(page.getByTestId('net-expenses')).toHaveText('$250.00');
-    await expect(page.getByTestId('records-check-interest')).toContainText('50.00');
+    await expect(page.getByTestId('records-check-interest')).toContainText(
+        '50.00',
+    );
     await expect(page.getByTestId('records-check-debt-payments')).toContainText(
         '550.00',
     );
@@ -163,7 +178,9 @@ test('reconciliation totals include inactive expense and debt categories', async
     await expect(page.getByTestId('income-total')).toHaveText('$1,000.00');
     await expect(page.getByTestId('expenses-total')).toHaveText('$750.00');
     await expect(page.getByTestId('net-expenses')).toHaveText('$250.00');
-    await expect(page.getByTestId('records-check-interest')).toContainText('50.00');
+    await expect(page.getByTestId('records-check-interest')).toContainText(
+        '50.00',
+    );
     await expect(page.getByTestId('records-check-debt-payments')).toContainText(
         '550.00',
     );

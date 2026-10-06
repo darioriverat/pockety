@@ -1,10 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 
@@ -54,7 +49,7 @@ export function DashboardSummaryCard({
             data-testid={testId}
             className={cn(
                 // Explicit, uniform chrome for every summary metric card
-                'gap-4 border border-border/80 py-5 shadow-sm transition-shadow hover:shadow-md',
+                'border-border/80 gap-4 border py-5 shadow-sm transition-shadow hover:shadow-md',
                 className,
             )}
         >
@@ -71,7 +66,7 @@ export function DashboardSummaryCard({
             <CardContent className="space-y-1 px-5">
                 <div
                     className={cn(
-                        'text-2xl font-bold tabular-nums tracking-tight',
+                        'text-2xl font-bold tracking-tight tabular-nums',
                         valueToneClasses[tone],
                     )}
                     data-testid={valueTestId}

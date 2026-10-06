@@ -102,7 +102,9 @@ test('feature 8: update category flags when no transactions exist', async ({
         fullPage: true,
     });
 
-    const stillEmpty = await request.get(`/api/categories/${code}/transactions`);
+    const stillEmpty = await request.get(
+        `/api/categories/${code}/transactions`,
+    );
     expect(stillEmpty.ok()).toBeTruthy();
     const stillEmptyBody = (await stillEmpty.json()) as { data: unknown[] };
     expect(stillEmptyBody.data).toEqual([]);

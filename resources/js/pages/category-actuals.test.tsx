@@ -98,11 +98,15 @@ describe('CategoryActuals page', () => {
         expect(screen.getByTestId('category-actuals-count')).toHaveTextContent(
             '1',
         );
+        expect(screen.getByTestId('category-actual-tx-C001')).toHaveTextContent(
+            '2',
+        );
         expect(
-            screen.getByTestId('category-actual-tx-C001'),
-        ).toHaveTextContent('2');
-        expect(screen.queryByTestId('category-actual-row-C004')).not.toBeInTheDocument();
-        expect(screen.getByText('Categories with transactions this period')).toBeInTheDocument();
+            screen.queryByTestId('category-actual-row-C004'),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.getByText('Categories with transactions this period'),
+        ).toBeInTheDocument();
 
         screen.getByTestId('category-actuals-refresh').click();
 
@@ -112,24 +116,36 @@ describe('CategoryActuals page', () => {
             ).toHaveTextContent(/192\.75/);
         });
 
-        expect(
-            screen.getByTestId('category-actual-tx-C001'),
-        ).toHaveTextContent('3');
+        expect(screen.getByTestId('category-actual-tx-C001')).toHaveTextContent(
+            '3',
+        );
         expect(fetchMock).toHaveBeenCalledTimes(2);
     });
 
     it('shows an empty month and keeps the selected period readable', async () => {
-        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => ({
-                data: { period: '202501', categories: [] },
-                meta: { category_count: 0, total_actual_cad: 0, total_transactions: 0 },
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: true,
+                json: async () => ({
+                    data: { period: '202501', categories: [] },
+                    meta: {
+                        category_count: 0,
+                        total_actual_cad: 0,
+                        total_transactions: 0,
+                    },
+                }),
             }),
-        }));
+        );
         render(<CategoryActuals />);
-        expect(await screen.findByText('No transactions in this period.')).toBeInTheDocument();
-        expect(screen.getByTestId('page-period-selector')).toHaveTextContent('January 2025');
-        expect(screen.getByTestId('category-actuals-count')).toHaveTextContent('0');
+        expect(
+            await screen.findByText('No transactions in this period.'),
+        ).toBeInTheDocument();
+        expect(screen.getByTestId('page-period-selector')).toHaveTextContent(
+            'January 2025',
+        );
+        expect(screen.getByTestId('category-actuals-count')).toHaveTextContent(
+            '0',
+        );
     });
-
 });

@@ -17,9 +17,9 @@ test.describe('Session 57 live verification', () => {
         });
 
         await page.goto('/reports/year-to-date?year=2025');
-        await expect(
-            page.getByTestId('reports-ytd-heading'),
-        ).toContainText('Year-to-Date Reports');
+        await expect(page.getByTestId('reports-ytd-heading')).toContainText(
+            'Year-to-Date Reports',
+        );
         await expect(page.getByTestId('ytd-income-card')).toBeVisible();
         await expect(page.getByTestId('ytd-expenses-card')).toBeVisible();
         await expect(page.getByTestId('ytd-net-card')).toBeVisible();
@@ -92,9 +92,7 @@ test.describe('Session 57 live verification', () => {
         await page.locator('#period-input').fill('202501');
         await page.getByRole('button', { name: 'View Reconciliation' }).click();
 
-        await expect(
-            page.getByTestId('reconciliation-status'),
-        ).toBeVisible();
+        await expect(page.getByTestId('reconciliation-status')).toBeVisible();
 
         const warning = page
             .locator('[data-account-name="Session 57 Variance Account"]')

@@ -406,3 +406,44 @@ Then final sweep (forbidden strings, dependency check, full suites).
 - Optional: run `npx vp check --fix` on a dedicated branch to clear the 178-file
   formatting drift, then address the 74 test lint warnings.
 - Optional: gate the `/dev/*` routes (already limited to `APP_ENV=local`) before production.
+
+
+## Session: 2026-10-06 (account action overflow + clean frontend quality gate)
+
+### Accomplished
+- Started from 87/87 passing features and a clean working tree.
+- Ran init.sh; its Docker check failed because the sandbox denied the socket.
+  Approved Docker execution worked; the existing app was already serving requests.
+- Puppeteer navigation and screenshots worked in this session.
+- Found account action buttons overflowing adjacent cards at desktop width.
+- Temporarily reopened feature #20 while correcting the accounts visual issue.
+- Wrapped card actions so Edit, View Transactions, and Manage Balances stay inside.
+- Fixed the mobile header period selector extending beyond its allocated width.
+  The mobile brand retains its accessible name while showing only its icon.
+- Darkened the account type-lock explanation in light mode for readable contrast.
+- Added a browser regression measuring button bounds at 1440, 1024, and 390px.
+  It creates an account through the UI and opens both account dialogs at each width.
+- Added frontend unit coverage for account action links and matching dialogs.
+
+### Quality checks
+- Cleared the existing 178-file formatting drift using the configured formatter.
+- Fixed all 74 lint warnings without disabling lint rules.
+- Explicitly marked handled asynchronous calls; corrected request URL/body mocks,
+  unsafe optional chaining, unused bindings, redundant types, and diagnostic text.
+- Removed the empty legacy JS entry and its unused Blade asset reference.
+- Backend: composer test passed (Pint, PHPStan, 402 tests / 2622 assertions).
+- Frontend: existing 253 unit tests passed after lint repairs; new account test passed.
+- TypeScript and production asset build passed.
+- npm run check passed with zero lint warnings and no formatting differences.
+- Browser baseline: both transaction-account-filter tests passed.
+- Account layout and all six existing account-edit browser cases passed.
+- Final layout + style sweep passed, including desktop/mobile screenshots.
+- Screenshots: verification/account-actions-layout/ and verification/style-sweep/.
+- No backend behavior changed; no new backend test was needed for these UI fixes.
+
+### Progress / next session
+- Feature #20 restored only after browser assertions and screenshot review.
+- Completion remains 87/87; feature descriptions and steps are unchanged.
+- No outstanding specification feature. Continue regression checks if requested.
+- Broad source changes in this commit are mostly mechanical formatting needed
+  to make the configured npm run check gate pass; dependencies are unchanged.

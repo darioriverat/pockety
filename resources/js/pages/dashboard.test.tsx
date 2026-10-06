@@ -118,23 +118,23 @@ const mockPage: MockPage = {
         sidebarOpen: true,
         summary: {
             period: '202601',
-            total_income_cad: 5000.00,
+            total_income_cad: 5000.0,
             total_income_usd: 6666.67,
             total_income_cop: 15000000,
-            total_expenses_cad: 1900.00,
+            total_expenses_cad: 1900.0,
             total_expenses_usd: 2666.67,
             total_expenses_cop: 6000000,
-            net_cad: 3100.00,
-            net_usd: 4000.00,
+            net_cad: 3100.0,
+            net_usd: 4000.0,
             net_cop: 9000000,
-            total_assets_cad: 15000.00,
-            total_assets_usd: 20000.00,
+            total_assets_cad: 15000.0,
+            total_assets_usd: 20000.0,
             total_assets_cop: 45000000,
-            total_liabilities_cad: 3100.00,
-            total_liabilities_usd: 4000.00,
+            total_liabilities_cad: 3100.0,
+            total_liabilities_usd: 4000.0,
             total_liabilities_cop: 9000000,
-            equity_cad: 11900.00,
-            equity_usd: 16000.00,
+            equity_cad: 11900.0,
+            equity_usd: 16000.0,
             equity_cop: 36000000,
             reconciliation_status: 'balanced',
             reconciliation_summary: {
@@ -167,18 +167,78 @@ const mockPage: MockPage = {
             from: '202502',
             to: '202601',
             periods: [
-                { period: '202502', assets_cad: 12000, liabilities_cad: 2500, equity_cad: 9500 },
-                { period: '202503', assets_cad: 12500, liabilities_cad: 2600, equity_cad: 9900 },
-                { period: '202504', assets_cad: 13000, liabilities_cad: 2700, equity_cad: 10300 },
-                { period: '202505', assets_cad: 13200, liabilities_cad: 2800, equity_cad: 10400 },
-                { period: '202506', assets_cad: 13500, liabilities_cad: 2750, equity_cad: 10750 },
-                { period: '202507', assets_cad: 14000, liabilities_cad: 2900, equity_cad: 11100 },
-                { period: '202508', assets_cad: 14200, liabilities_cad: 3050, equity_cad: 11150 },
-                { period: '202509', assets_cad: 14500, liabilities_cad: 3100, equity_cad: 11400 },
-                { period: '202510', assets_cad: 14700, liabilities_cad: 3050, equity_cad: 11650 },
-                { period: '202511', assets_cad: 14800, liabilities_cad: 3200, equity_cad: 11600 },
-                { period: '202512', assets_cad: 14900, liabilities_cad: 3100, equity_cad: 11800 },
-                { period: '202601', assets_cad: 15000, liabilities_cad: 3100, equity_cad: 11900 },
+                {
+                    period: '202502',
+                    assets_cad: 12000,
+                    liabilities_cad: 2500,
+                    equity_cad: 9500,
+                },
+                {
+                    period: '202503',
+                    assets_cad: 12500,
+                    liabilities_cad: 2600,
+                    equity_cad: 9900,
+                },
+                {
+                    period: '202504',
+                    assets_cad: 13000,
+                    liabilities_cad: 2700,
+                    equity_cad: 10300,
+                },
+                {
+                    period: '202505',
+                    assets_cad: 13200,
+                    liabilities_cad: 2800,
+                    equity_cad: 10400,
+                },
+                {
+                    period: '202506',
+                    assets_cad: 13500,
+                    liabilities_cad: 2750,
+                    equity_cad: 10750,
+                },
+                {
+                    period: '202507',
+                    assets_cad: 14000,
+                    liabilities_cad: 2900,
+                    equity_cad: 11100,
+                },
+                {
+                    period: '202508',
+                    assets_cad: 14200,
+                    liabilities_cad: 3050,
+                    equity_cad: 11150,
+                },
+                {
+                    period: '202509',
+                    assets_cad: 14500,
+                    liabilities_cad: 3100,
+                    equity_cad: 11400,
+                },
+                {
+                    period: '202510',
+                    assets_cad: 14700,
+                    liabilities_cad: 3050,
+                    equity_cad: 11650,
+                },
+                {
+                    period: '202511',
+                    assets_cad: 14800,
+                    liabilities_cad: 3200,
+                    equity_cad: 11600,
+                },
+                {
+                    period: '202512',
+                    assets_cad: 14900,
+                    liabilities_cad: 3100,
+                    equity_cad: 11800,
+                },
+                {
+                    period: '202601',
+                    assets_cad: 15000,
+                    liabilities_cad: 3100,
+                    equity_cad: 11900,
+                },
             ],
         },
         top_spending_categories: {
@@ -346,7 +406,11 @@ function renderDashboard(
                     top_spending_categories={topSpendingCategories as never}
                     recent_activity={recentActivity}
                     default_currency={options.defaultCurrency ?? 'CAD'}
-                    display_currency={options.displayCurrency ?? options.defaultCurrency ?? 'CAD'}
+                    display_currency={
+                        options.displayCurrency ??
+                        options.defaultCurrency ??
+                        'CAD'
+                    }
                     available_currencies={['CAD', 'USD', 'COP']}
                 />
             </AppLayout>
@@ -475,9 +539,9 @@ describe('Dashboard feature', () => {
         expect(screen.getByTestId('income-expense-chart-legend')).toBeDefined();
         expect(screen.getByTestId('chart-line-income')).toBeDefined();
         expect(screen.getByTestId('chart-line-expenses')).toBeDefined();
-        expect(screen.getByTestId('income-expense-chart-range').textContent).toMatch(
-            /Last 12 months/i,
-        );
+        expect(
+            screen.getByTestId('income-expense-chart-range').textContent,
+        ).toMatch(/Last 12 months/i);
         expect(screen.getByTestId('chart-bar-income-202601')).toBeDefined();
         expect(screen.getByTestId('chart-bar-expenses-202601')).toBeDefined();
         expect(
@@ -499,7 +563,9 @@ describe('Dashboard feature', () => {
 
         expect(screen.getByText('Assets vs Liabilities')).toBeDefined();
         expect(screen.getByTestId('assets-liabilities-chart')).toBeDefined();
-        expect(screen.getByTestId('assets-liabilities-chart-legend')).toBeDefined();
+        expect(
+            screen.getByTestId('assets-liabilities-chart-legend'),
+        ).toBeDefined();
         expect(screen.getByTestId('al-chart-line-assets')).toBeDefined();
         expect(screen.getByTestId('al-chart-line-liabilities')).toBeDefined();
         expect(screen.getByTestId('al-chart-line-equity')).toBeDefined();
@@ -507,16 +573,22 @@ describe('Dashboard feature', () => {
             screen.getByTestId('assets-liabilities-chart-range').textContent,
         ).toMatch(/Last 12 months/i);
         expect(screen.getByTestId('al-chart-period-202601')).toBeDefined();
-        expect(screen.getByTestId('al-chart-point-equity-202601')).toBeDefined();
         expect(
-            screen.getByTestId('assets-liabilities-chart-y-axis-label').textContent,
+            screen.getByTestId('al-chart-point-equity-202601'),
+        ).toBeDefined();
+        expect(
+            screen.getByTestId('assets-liabilities-chart-y-axis-label')
+                .textContent,
         ).toMatch(/Amount \(CAD\)/);
         expect(
-            screen.getByTestId('assets-liabilities-chart-x-axis-label').textContent,
+            screen.getByTestId('assets-liabilities-chart-x-axis-label')
+                .textContent,
         ).toBe('Period');
 
         fireEvent.mouseEnter(screen.getByTestId('al-chart-hit-202601'));
-        expect(screen.getByTestId('assets-liabilities-hover-tooltip')).toBeDefined();
+        expect(
+            screen.getByTestId('assets-liabilities-hover-tooltip'),
+        ).toBeDefined();
         expect(
             screen.getByTestId('assets-liabilities-hover-tooltip').textContent,
         ).toMatch(/Assets/i);
@@ -542,7 +614,9 @@ describe('Dashboard feature', () => {
         const incomeChart = screen.getByTestId('income-expense-chart');
         expect(incomeChart.getAttribute('viewBox')).toBe('0 0 360 260');
 
-        const incomeTicks = screen.getAllByTestId('income-expense-chart-x-tick');
+        const incomeTicks = screen.getAllByTestId(
+            'income-expense-chart-x-tick',
+        );
         expect(incomeTicks.length).toBeGreaterThanOrEqual(2);
         expect(incomeTicks.length).toBeLessThanOrEqual(5);
         expect(incomeTicks[0].getAttribute('transform')).toMatch(/rotate\(-40/);
@@ -560,12 +634,16 @@ describe('Dashboard feature', () => {
         renderDashboard();
 
         expect(screen.getByText('Top Spending Categories')).toBeDefined();
-        expect(screen.getByTestId('top-spending-categories-card')).toBeDefined();
-        expect(screen.getByTestId('top-spending-categories-list')).toBeDefined();
+        expect(
+            screen.getByTestId('top-spending-categories-card'),
+        ).toBeDefined();
+        expect(
+            screen.getByTestId('top-spending-categories-list'),
+        ).toBeDefined();
         expect(screen.getByTestId('top-spending-row-C001')).toBeDefined();
-        expect(screen.getByTestId('top-spending-amount-C001').textContent).toMatch(
-            /\$800\.00/,
-        );
+        expect(
+            screen.getByTestId('top-spending-amount-C001').textContent,
+        ).toMatch(/\$800\.00/);
         expect(screen.getByTestId('top-spending-pct-C001').textContent).toMatch(
             /40\.0%/,
         );
@@ -588,7 +666,9 @@ describe('Dashboard feature', () => {
             },
         );
 
-        expect(screen.getByTestId('top-spending-categories-empty')).toBeDefined();
+        expect(
+            screen.getByTestId('top-spending-categories-empty'),
+        ).toBeDefined();
         expect(screen.getByText(/No spending recorded/i)).toBeDefined();
     });
 
@@ -598,23 +678,29 @@ describe('Dashboard feature', () => {
         expect(screen.getByText('Recent Activity')).toBeDefined();
         expect(screen.getByTestId('recent-activity-card')).toBeDefined();
         expect(screen.getByTestId('recent-activity-list')).toBeDefined();
-        expect(screen.getByTestId('recent-activity-item-expense-101')).toBeDefined();
-        expect(screen.getByTestId('recent-activity-type-expense-101').textContent).toMatch(
-            /Expense/i,
-        );
-        expect(screen.getByTestId('recent-activity-date-expense-101').textContent).toMatch(
-            /Jan/i,
-        );
         expect(
-            screen.getByTestId('recent-activity-summary-expense-101').textContent,
+            screen.getByTestId('recent-activity-item-expense-101'),
+        ).toBeDefined();
+        expect(
+            screen.getByTestId('recent-activity-type-expense-101').textContent,
+        ).toMatch(/Expense/i);
+        expect(
+            screen.getByTestId('recent-activity-date-expense-101').textContent,
+        ).toMatch(/Jan/i);
+        expect(
+            screen.getByTestId('recent-activity-summary-expense-101')
+                .textContent,
         ).toMatch(/Weekly shop/);
         expect(
-            screen.getByTestId('recent-activity-amount-expense-101').textContent,
+            screen.getByTestId('recent-activity-amount-expense-101')
+                .textContent,
         ).toMatch(/\$85\.50/);
-        expect(screen.getByTestId('recent-activity-item-income-12')).toBeDefined();
-        expect(screen.getByTestId('recent-activity-type-income-12').textContent).toMatch(
-            /Income/i,
-        );
+        expect(
+            screen.getByTestId('recent-activity-item-income-12'),
+        ).toBeDefined();
+        expect(
+            screen.getByTestId('recent-activity-type-income-12').textContent,
+        ).toMatch(/Income/i);
 
         const expenseLink = screen
             .getByTestId('recent-activity-item-expense-101')
@@ -649,19 +735,19 @@ describe('Dashboard feature', () => {
         );
 
         expect(screen.getByTestId('currency-toggle')).toBeDefined();
-        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
-            /\$5,000\.00/,
-        );
+        expect(
+            screen.getByTestId('dashboard-total-income').textContent,
+        ).toMatch(/\$5,000\.00/);
 
         fireEvent.click(screen.getByTestId('currency-toggle-usd'));
-        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
-            /US\$6,666\.67|\$6,666\.67/,
-        );
+        expect(
+            screen.getByTestId('dashboard-total-income').textContent,
+        ).toMatch(/US\$6,666\.67|\$6,666\.67/);
 
         fireEvent.click(screen.getByTestId('currency-toggle-cop'));
-        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
-            /15[,.]000[,.]000|\$15,000,000/,
-        );
+        expect(
+            screen.getByTestId('dashboard-total-income').textContent,
+        ).toMatch(/15[,.]000[,.]000|\$15,000,000/);
     });
 
     it('initializes from user default currency preference', () => {
@@ -674,11 +760,11 @@ describe('Dashboard feature', () => {
             { defaultCurrency: 'USD', displayCurrency: 'USD' },
         );
 
-        expect(screen.getByTestId('dashboard-total-income').textContent).toMatch(
-            /US\$6,666\.67|\$6,666\.67/,
-        );
-        expect(screen.getByTestId('income-expense-chart-range').textContent).toMatch(
-            /USD/,
-        );
+        expect(
+            screen.getByTestId('dashboard-total-income').textContent,
+        ).toMatch(/US\$6,666\.67|\$6,666\.67/);
+        expect(
+            screen.getByTestId('income-expense-chart-range').textContent,
+        ).toMatch(/USD/);
     });
 });

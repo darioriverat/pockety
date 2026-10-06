@@ -72,7 +72,6 @@ describe('BalanceSheet PDF export', () => {
         const locationSpy = vi
             .spyOn(window, 'location', 'get')
             .mockReturnValue({
-                ...window.location,
                 href: '',
             } as Location);
         let hrefValue = '';

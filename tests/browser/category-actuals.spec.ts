@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -22,7 +20,10 @@ test('feature 86: category actuals aggregates by category and period', async ({
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const categoriesResponse = await request.get('/api/categories');
     const categoriesPayload = await categoriesResponse.json();
@@ -51,9 +52,7 @@ test('feature 86: category actuals aggregates by category and period', async ({
     });
 
     await page.goto('/category-actuals');
-    await expect(
-        page.getByTestId('category-actuals-heading'),
-    ).toBeVisible();
+    await expect(page.getByTestId('category-actuals-heading')).toBeVisible();
     await selectDisplayedPeriod(page, 'January 2025');
     await expect(page.getByTestId('category-actuals-table')).toBeVisible();
 

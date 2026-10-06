@@ -33,7 +33,7 @@ describe('Transactions with inactive category', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(fetch).mockImplementation((input: RequestInfo | URL) => {
-            const url = String(input);
+            const url = input instanceof Request ? input.url : String(input);
 
             if (url === '/api/categories') {
                 return Promise.resolve({
@@ -113,7 +113,9 @@ describe('Transactions with inactive category', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-74')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-74'),
+            ).toBeInTheDocument();
         });
 
         expect(screen.getByTestId('transaction-category-74')).toHaveTextContent(

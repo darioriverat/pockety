@@ -31,7 +31,9 @@ test.describe('HATEOAS links on category delete response', () => {
         // Create a category without dependencies to delete
         await page.getByTestId('create-category-button').click();
         await expect(page.getByTestId('create-category-dialog')).toBeVisible();
-        await page.getByLabel('Name', { exact: true }).fill('HATEOAS Delete Test');
+        await page
+            .getByLabel('Name', { exact: true })
+            .fill('HATEOAS Delete Test');
         await page.getByRole('radio', { name: 'Expense', exact: true }).check();
 
         const createdWait = page.waitForResponse(
@@ -74,7 +76,9 @@ test.describe('HATEOAS links on category delete response', () => {
         );
         await page
             .getByTestId(`category-card-${categoryCode}`)
-            .getByRole('button', { name: new RegExp(`delete ${categoryCode}`, 'i') })
+            .getByRole('button', {
+                name: new RegExp(`delete ${categoryCode}`, 'i'),
+            })
             .click();
         const deleteResponse = await deleteWait;
         await expect.poll(() => dialogMessages.length).toBe(1);

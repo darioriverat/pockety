@@ -67,7 +67,9 @@ export default function TwoFactorChallenge() {
                                     <Input
                                         name="recovery_code"
                                         type="text"
-                                        placeholder={t('auth.twoFactor.recoveryCode')}
+                                        placeholder={t(
+                                            'auth.twoFactor.recoveryCode',
+                                        )}
                                         autoFocus={showRecoveryInput}
                                         required
                                     />

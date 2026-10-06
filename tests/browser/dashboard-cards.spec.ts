@@ -130,7 +130,9 @@ test('feature 142: dashboard layout is responsive across screen sizes', async ({
     const incomeGrid = page.getByTestId('dashboard-summary-cards-income');
     let layout = await incomeGrid.evaluate((el) => {
         const children = Array.from(el.children) as HTMLElement[];
-        const tops = children.map((c) => Math.round(c.getBoundingClientRect().top));
+        const tops = children.map((c) =>
+            Math.round(c.getBoundingClientRect().top),
+        );
         const uniqueRows = new Set(tops).size;
         return {
             uniqueRows,
@@ -151,9 +153,13 @@ test('feature 142: dashboard layout is responsive across screen sizes', async ({
     await page.waitForTimeout(200);
     layout = await incomeGrid.evaluate((el) => {
         const children = Array.from(el.children) as HTMLElement[];
-        const tops = children.map((c) => Math.round(c.getBoundingClientRect().top));
+        const tops = children.map((c) =>
+            Math.round(c.getBoundingClientRect().top),
+        );
         const uniqueRows = new Set(tops).size;
-        const widths = children.map((c) => Math.round(c.getBoundingClientRect().width));
+        const widths = children.map((c) =>
+            Math.round(c.getBoundingClientRect().width),
+        );
         return {
             uniqueRows,
             childCount: children.length,
@@ -173,12 +179,19 @@ test('feature 142: dashboard layout is responsive across screen sizes', async ({
     await page.waitForTimeout(200);
     layout = await incomeGrid.evaluate((el) => {
         const children = Array.from(el.children) as HTMLElement[];
-        const tops = children.map((c) => Math.round(c.getBoundingClientRect().top));
+        const tops = children.map((c) =>
+            Math.round(c.getBoundingClientRect().top),
+        );
         const uniqueRows = new Set(tops).size;
-        const widths = children.map((c) => Math.round(c.getBoundingClientRect().width));
+        const widths = children.map((c) =>
+            Math.round(c.getBoundingClientRect().width),
+        );
         const readable = children.every((c) => {
             const cs = window.getComputedStyle(c);
-            return parseFloat(cs.fontSize) >= 12 && c.getBoundingClientRect().height > 40;
+            return (
+                parseFloat(cs.fontSize) >= 12 &&
+                c.getBoundingClientRect().height > 40
+            );
         });
         return {
             uniqueRows,

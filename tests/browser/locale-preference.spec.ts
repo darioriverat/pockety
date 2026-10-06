@@ -46,7 +46,9 @@ test('switching language to Spanish updates navigation and persists', async ({
     );
 
     await page.goto('/dashboard');
-    await expect(page.getByTestId('nav-link-accounts')).toContainText('Cuentas');
+    await expect(page.getByTestId('nav-link-accounts')).toContainText(
+        'Cuentas',
+    );
     await expect(page.getByTestId('nav-link-transactions')).toContainText(
         'Transacciones',
     );
@@ -56,7 +58,9 @@ test('switching language to Spanish updates navigation and persists', async ({
     });
 
     await page.goto('/accounts');
-    await expect(page.getByTestId('nav-link-accounts')).toContainText('Cuentas');
+    await expect(page.getByTestId('nav-link-accounts')).toContainText(
+        'Cuentas',
+    );
     await page.screenshot({
         path: path.join(verificationDir, 'spanish-accounts.png'),
         fullPage: true,

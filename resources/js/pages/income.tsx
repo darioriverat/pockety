@@ -101,7 +101,7 @@ export default function Income() {
 
         try {
             const response = await fetch(
-                `/api/income?period=${encodeURIComponent(targetPeriod)}`
+                `/api/income?period=${encodeURIComponent(targetPeriod)}`,
             );
 
             if (!response.ok) {
@@ -123,7 +123,7 @@ export default function Income() {
 
     useEffect(() => {
         setPeriodInput(period);
-        fetchIncome(period);
+        void fetchIncome(period);
     }, [period]);
 
     const handlePeriodSubmit = (e: React.FormEvent) => {
@@ -133,11 +133,13 @@ export default function Income() {
             const last = formatPeriod(
                 selectablePeriods[selectablePeriods.length - 1],
             );
-            setError(`Select a supported period from ${first} through ${last}.`);
+            setError(
+                `Select a supported period from ${first} through ${last}.`,
+            );
             return;
         }
         if (periodInput === period) {
-            fetchIncome(period);
+            void fetchIncome(period);
         } else {
             setPeriod(periodInput);
         }
@@ -202,7 +204,7 @@ export default function Income() {
             resetForm();
         } catch (err) {
             setFormError(
-                err instanceof Error ? err.message : 'An error occurred'
+                err instanceof Error ? err.message : 'An error occurred',
             );
         } finally {
             setSubmitting(false);
@@ -370,7 +372,7 @@ export default function Income() {
 
                                     {formError && (
                                         <p
-                                            className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
+                                            className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
                                             role="alert"
                                         >
                                             <AlertCircle className="h-4 w-4 shrink-0" />
@@ -414,7 +416,9 @@ export default function Income() {
                                 <Input
                                     id="period"
                                     value={periodInput}
-                                    onChange={(e) => setPeriodInput(e.target.value)}
+                                    onChange={(e) =>
+                                        setPeriodInput(e.target.value)
+                                    }
                                     placeholder="202501"
                                     maxLength={6}
                                     aria-label="Period"
@@ -442,7 +446,8 @@ export default function Income() {
                     </CardHeader>
                     <CardContent className="text-muted-foreground text-sm">
                         Converted with the exchange-rate snapshot assigned to
-                        this period. Periods without a rate omit converted totals.
+                        this period. Periods without a rate omit converted
+                        totals.
                     </CardContent>
                 </Card>
 
@@ -486,27 +491,27 @@ export default function Income() {
                         data-responsive="scroll"
                     >
                         <table className="w-full min-w-[640px] text-left text-sm">
-                            <thead className="border-b bg-muted/70">
+                            <thead className="bg-muted/70 border-b">
                                 <tr>
-                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                    <th className="text-foreground px-4 py-3 font-semibold">
                                         #
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                    <th className="text-foreground px-4 py-3 font-semibold">
                                         Description
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                    <th className="text-foreground px-4 py-3 font-semibold">
                                         CAD
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                    <th className="text-foreground px-4 py-3 font-semibold">
                                         USD
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                    <th className="text-foreground px-4 py-3 font-semibold">
                                         COP
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                    <th className="text-foreground px-4 py-3 font-semibold">
                                         CAD equiv.
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-foreground">
+                                    <th className="text-foreground px-4 py-3 font-semibold">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
@@ -516,7 +521,7 @@ export default function Income() {
                                     <tr
                                         key={line.id}
                                         className={cn(
-                                            'border-b last:border-0 transition-colors hover:bg-accent/70',
+                                            'hover:bg-accent/70 border-b transition-colors last:border-0',
                                             index % 2 === 1 && 'bg-muted/35',
                                         )}
                                         data-testid={`income-line-${line.id}`}
@@ -539,7 +544,7 @@ export default function Income() {
                                             {line.amount_cad
                                                 ? formatCurrency(
                                                       line.amount_cad,
-                                                      'CAD'
+                                                      'CAD',
                                                   )
                                                 : '—'}
                                         </td>
@@ -547,7 +552,7 @@ export default function Income() {
                                             {line.amount_usd
                                                 ? formatCurrency(
                                                       line.amount_usd,
-                                                      'USD'
+                                                      'USD',
                                                   )
                                                 : '—'}
                                         </td>
@@ -555,14 +560,14 @@ export default function Income() {
                                             {line.amount_cop
                                                 ? formatCurrency(
                                                       line.amount_cop,
-                                                      'COP'
+                                                      'COP',
                                                   )
                                                 : '—'}
                                         </td>
                                         <td className="px-4 py-3 font-medium tabular-nums">
                                             {formatCurrency(
                                                 line.total_cad_equivalent ?? 0,
-                                                'CAD'
+                                                'CAD',
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-right">

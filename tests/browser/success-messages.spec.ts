@@ -35,7 +35,9 @@ test('success messages after create, update, and delete', async ({
 
     await page.goto('/transactions');
     await page.getByTestId('page-period-selector').click();
-    await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+    await page
+        .getByRole('option', { name: 'January 2025', exact: true })
+        .click();
     await expect(page.getByTestId('transactions-heading')).toBeVisible();
 
     // CREATE via UI

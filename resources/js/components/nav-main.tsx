@@ -20,9 +20,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
             <SidebarGroupLabel>{t('nav.label')}</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => {
-                    const label = item.titleKey
-                        ? t(item.titleKey)
-                        : item.title;
+                    const label = item.titleKey ? t(item.titleKey) : item.title;
 
                     return (
                         <SidebarMenuItem key={item.title}>

@@ -35,12 +35,7 @@ import { usePeriod } from '@/hooks/use-period';
 import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { formatPeriod } from '@/lib/periods';
-import {
-    AlertTriangle,
-    BookMarked,
-    CheckCircle2,
-    XCircle,
-} from 'lucide-react';
+import { AlertTriangle, BookMarked, CheckCircle2, XCircle } from 'lucide-react';
 
 interface BalanceFigures {
     period: string;
@@ -50,7 +45,7 @@ interface BalanceFigures {
     income_cad: number;
     net_operating_expenses_cad: number;
     records_check_result_cad: number;
-    reconciliation_status: 'balanced' | 'unbalanced' | string;
+    reconciliation_status: string;
 }
 
 interface RegisteredBalance extends BalanceFigures {
@@ -132,8 +127,13 @@ function FigureGrid({
             }
         >
             {rows.map((row) => (
-                <div key={row.key} className="flex items-baseline justify-between gap-4">
-                    <dt className="text-sm text-muted-foreground">{row.label}</dt>
+                <div
+                    key={row.key}
+                    className="flex items-baseline justify-between gap-4"
+                >
+                    <dt className="text-muted-foreground text-sm">
+                        {row.label}
+                    </dt>
                     <dd
                         className="text-sm font-medium tabular-nums"
                         data-testid={`${testIdPrefix}-${row.key}`}
@@ -291,7 +291,7 @@ export default function PeriodBalances() {
                     </div>
                 </div>
 
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                     Check that every record matches in the{' '}
                     <TextLink
                         href="/reconciliation"
@@ -365,9 +365,8 @@ export default function PeriodBalances() {
                                             <AlertDescription>
                                                 Reconciliation is still
                                                 unbalanced for this period. You
-                                                can register anyway once you
-                                                are comfortable with the
-                                                figures.
+                                                can register anyway once you are
+                                                comfortable with the figures.
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -399,7 +398,7 @@ export default function PeriodBalances() {
                                 {registered ? (
                                     <div className="space-y-4">
                                         <p
-                                            className="text-sm text-muted-foreground"
+                                            className="text-muted-foreground text-sm"
                                             data-testid="registered-balance-updated"
                                         >
                                             Last saved{' '}
@@ -414,7 +413,7 @@ export default function PeriodBalances() {
                                     </div>
                                 ) : (
                                     <p
-                                        className="text-sm text-muted-foreground"
+                                        className="text-muted-foreground text-sm"
                                         data-testid="registered-balance-empty"
                                     >
                                         No balance has been registered for this
@@ -435,7 +434,7 @@ export default function PeriodBalances() {
                             <CardContent>
                                 {history.length === 0 ? (
                                     <p
-                                        className="text-sm text-muted-foreground"
+                                        className="text-muted-foreground text-sm"
                                         data-testid="balance-history-empty"
                                     >
                                         No previous balances for this period.

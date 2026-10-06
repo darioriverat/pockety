@@ -109,10 +109,13 @@ test('feature 169: zero variance displays in green', async ({
     // Check that variance is displayed in green
     const cadRow = accountCard.locator('[data-testid="currency-row-CAD"]');
     const varianceAmount = cadRow.locator('[data-testid="variance-amount"]');
-    
+
     // Verify the variance state attribute
-    await expect(varianceAmount).toHaveAttribute('data-variance-state', 'balanced');
-    
+    await expect(varianceAmount).toHaveAttribute(
+        'data-variance-state',
+        'balanced',
+    );
+
     // Take screenshot
     await page.screenshot({
         path: 'verification/test-169-variance-colors/zero-variance-green.png',
@@ -142,7 +145,7 @@ test('feature 169: significant positive variance displays in yellow/amber', asyn
     // Want variance = 20 (significant positive)
     // Recorded: 1000, Transaction: 980 => Computed: 20, Variance: 1000 - 20 = 980
     // That's still wrong. Let me try: Recorded: 1020, Transaction: 1000 => Computed: 20, Variance: 1020 - 20 = 1000
-    // 
+    //
     // Looking at original test again: Recorded: 1000, Tx: 100 => Computed: 900, Variance: 100
     // So the formula seems to be: Computed = Recorded - Transaction, Variance = Transaction
     // For variance = 20: Recorded: 1020, Transaction: 20
@@ -168,10 +171,13 @@ test('feature 169: significant positive variance displays in yellow/amber', asyn
     // Check that variance is displayed in amber/yellow
     const cadRow = accountCard.locator('[data-testid="currency-row-CAD"]');
     const varianceAmount = cadRow.locator('[data-testid="variance-amount"]');
-    
+
     // Verify the variance state attribute indicates positive significant variance
-    await expect(varianceAmount).toHaveAttribute('data-variance-state', 'positive-significant');
-    
+    await expect(varianceAmount).toHaveAttribute(
+        'data-variance-state',
+        'positive-significant',
+    );
+
     // Take screenshot
     await page.screenshot({
         path: 'verification/test-169-variance-colors/positive-variance-amber.png',
@@ -220,10 +226,13 @@ test('feature 169: minor variance displays in neutral/muted color', async ({
     // Check that variance is displayed in muted color
     const cadRow = accountCard.locator('[data-testid="currency-row-CAD"]');
     const varianceAmount = cadRow.locator('[data-testid="variance-amount"]');
-    
+
     // Verify the variance state attribute indicates minor variance
-    await expect(varianceAmount).toHaveAttribute('data-variance-state', 'minor');
-    
+    await expect(varianceAmount).toHaveAttribute(
+        'data-variance-state',
+        'minor',
+    );
+
     // Take screenshot
     await page.screenshot({
         path: 'verification/test-169-variance-colors/minor-variance-neutral.png',

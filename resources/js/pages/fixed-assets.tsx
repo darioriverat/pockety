@@ -99,13 +99,13 @@ export default function FixedAssets() {
     const [valuationsLoading, setValuationsLoading] = useState(false);
     const [valuationForm, setValuationForm] =
         useState<ValuationFormData>(emptyValuationForm);
-    const [valuationFormError, setValuationFormError] = useState<
-        string | null
-    >(null);
+    const [valuationFormError, setValuationFormError] = useState<string | null>(
+        null,
+    );
     const [valuationSubmitting, setValuationSubmitting] = useState(false);
 
     useEffect(() => {
-        fetchAssets();
+        void fetchAssets();
     }, []);
 
     const fetchAssets = async () => {
@@ -169,7 +169,7 @@ export default function FixedAssets() {
             resetForm();
         } catch (err) {
             setFormError(
-                err instanceof Error ? err.message : 'Failed to create asset'
+                err instanceof Error ? err.message : 'Failed to create asset',
             );
         } finally {
             setSubmitting(false);
@@ -187,7 +187,7 @@ export default function FixedAssets() {
         try {
             setValuationsLoading(true);
             const response = await fetch(
-                `/api/fixed-assets/${assetId}/valuations`
+                `/api/fixed-assets/${assetId}/valuations`,
             );
 
             if (!response.ok) {
@@ -232,21 +232,19 @@ export default function FixedAssets() {
                                 ?.getAttribute('content') ?? '',
                     },
                     body: JSON.stringify(payload),
-                }
+                },
             );
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(
-                    errorData.error || 'Failed to save valuation'
-                );
+                throw new Error(errorData.error || 'Failed to save valuation');
             }
 
             await fetchValuations(valuationDialogAsset.id);
             setValuationForm(emptyValuationForm);
         } catch (err) {
             setValuationFormError(
-                err instanceof Error ? err.message : 'Failed to save valuation'
+                err instanceof Error ? err.message : 'Failed to save valuation',
             );
         } finally {
             setValuationSubmitting(false);
@@ -283,7 +281,8 @@ export default function FixedAssets() {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="name">
-                                        Name <span className="text-red-500">*</span>
+                                        Name{' '}
+                                        <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="name"
@@ -328,7 +327,8 @@ export default function FixedAssets() {
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                acquisition_date: e.target.value,
+                                                acquisition_date:
+                                                    e.target.value,
                                             })
                                         }
                                     />
@@ -347,7 +347,8 @@ export default function FixedAssets() {
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                initial_value_cad: e.target.value,
+                                                initial_value_cad:
+                                                    e.target.value,
                                             })
                                         }
                                         placeholder="25000.00"
@@ -370,7 +371,9 @@ export default function FixedAssets() {
                                         Cancel
                                     </Button>
                                     <Button type="submit" disabled={submitting}>
-                                        {submitting ? 'Creating...' : 'Create Asset'}
+                                        {submitting
+                                            ? 'Creating...'
+                                            : 'Create Asset'}
                                     </Button>
                                 </DialogFooter>
                             </form>
@@ -397,11 +400,11 @@ export default function FixedAssets() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="text-center">
-                                <Car className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                                <Car className="text-muted-foreground/50 mx-auto h-12 w-12" />
                                 <h3 className="mt-2 text-sm font-semibold">
                                     No fixed assets
                                 </h3>
-                                <p className="mt-1 text-sm text-muted-foreground">
+                                <p className="text-muted-foreground mt-1 text-sm">
                                     Get started by creating a new fixed asset.
                                 </p>
                             </div>
@@ -415,7 +418,7 @@ export default function FixedAssets() {
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
                                             <CardTitle className="flex items-center gap-2">
-                                                <Car className="h-5 w-5 text-muted-foreground" />
+                                                <Car className="text-muted-foreground h-5 w-5" />
                                                 {asset.name}
                                             </CardTitle>
                                             {asset.description && (
@@ -425,11 +428,17 @@ export default function FixedAssets() {
                                             )}
                                         </div>
                                         {asset.is_active ? (
-                                            <Badge variant="outline" className="ml-2">
+                                            <Badge
+                                                variant="outline"
+                                                className="ml-2"
+                                            >
                                                 Active
                                             </Badge>
                                         ) : (
-                                            <Badge variant="secondary" className="ml-2">
+                                            <Badge
+                                                variant="secondary"
+                                                className="ml-2"
+                                            >
                                                 Inactive
                                             </Badge>
                                         )}
@@ -437,12 +446,12 @@ export default function FixedAssets() {
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     {asset.acquisition_date && (
-                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
                                             <Calendar className="h-4 w-4" />
                                             <span>
                                                 Acquired:{' '}
                                                 {new Date(
-                                                    asset.acquisition_date
+                                                    asset.acquisition_date,
                                                 ).toLocaleDateString('en-CA')}
                                             </span>
                                         </div>
@@ -454,7 +463,7 @@ export default function FixedAssets() {
                                             </span>
                                             <span className="font-semibold">
                                                 {formatCurrency(
-                                                    asset.initial_value_cad
+                                                    asset.initial_value_cad,
                                                 )}
                                             </span>
                                         </div>
@@ -462,7 +471,9 @@ export default function FixedAssets() {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => openValuationDialog(asset)}
+                                        onClick={() =>
+                                            openValuationDialog(asset)
+                                        }
                                         className="w-full"
                                     >
                                         Manage Book Values
@@ -486,8 +497,9 @@ export default function FixedAssets() {
                                 Book Values - {valuationDialogAsset?.name}
                             </DialogTitle>
                             <DialogDescription>
-                                Set the book value for this asset in different periods.
-                                Each period can have a different book value.
+                                Set the book value for this asset in different
+                                periods. Each period can have a different book
+                                value.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -499,7 +511,10 @@ export default function FixedAssets() {
                                 <div className="grid grid-cols-3 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="period">
-                                            Period <span className="text-red-500">*</span>
+                                            Period{' '}
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <Input
                                             id="period"
@@ -518,7 +533,10 @@ export default function FixedAssets() {
 
                                     <div className="space-y-2">
                                         <Label htmlFor="book_value_cad">
-                                            Book Value (CAD) <span className="text-red-500">*</span>
+                                            Book Value (CAD){' '}
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <Input
                                             id="book_value_cad"
@@ -529,7 +547,8 @@ export default function FixedAssets() {
                                             onChange={(e) =>
                                                 setValuationForm({
                                                     ...valuationForm,
-                                                    book_value_cad: e.target.value,
+                                                    book_value_cad:
+                                                        e.target.value,
                                                 })
                                             }
                                             placeholder="25000.00"
@@ -546,11 +565,14 @@ export default function FixedAssets() {
                                             type="number"
                                             step="0.01"
                                             min="0"
-                                            value={valuationForm.depreciation_cad}
+                                            value={
+                                                valuationForm.depreciation_cad
+                                            }
                                             onChange={(e) =>
                                                 setValuationForm({
                                                     ...valuationForm,
-                                                    depreciation_cad: e.target.value,
+                                                    depreciation_cad:
+                                                        e.target.value,
                                                 })
                                             }
                                             placeholder="0.00"
@@ -569,7 +591,9 @@ export default function FixedAssets() {
                                     disabled={valuationSubmitting}
                                     className="w-full"
                                 >
-                                    {valuationSubmitting ? 'Saving...' : 'Save Book Value'}
+                                    {valuationSubmitting
+                                        ? 'Saving...'
+                                        : 'Save Book Value'}
                                 </Button>
                             </form>
 
@@ -578,18 +602,22 @@ export default function FixedAssets() {
                                     Existing Book Values
                                 </h4>
                                 {valuationsLoading ? (
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         Loading...
                                     </p>
                                 ) : valuations.length === 0 ? (
-                                    <p className="text-sm text-muted-foreground">
-                                        No book values set yet. Add one above to get
-                                        started.
+                                    <p className="text-muted-foreground text-sm">
+                                        No book values set yet. Add one above to
+                                        get started.
                                     </p>
                                 ) : (
                                     <div className="max-h-60 space-y-2 overflow-y-auto">
                                         {valuations
-                                            .sort((a, b) => b.period.localeCompare(a.period))
+                                            .sort((a, b) =>
+                                                b.period.localeCompare(
+                                                    a.period,
+                                                ),
+                                            )
                                             .map((val) => (
                                                 <div
                                                     key={val.id}
@@ -597,23 +625,26 @@ export default function FixedAssets() {
                                                 >
                                                     <div>
                                                         <div className="text-sm font-medium">
-                                                            {formatPeriod(val.period)}
+                                                            {formatPeriod(
+                                                                val.period,
+                                                            )}
                                                         </div>
-                                                        <div className="text-xs text-muted-foreground">
+                                                        <div className="text-muted-foreground text-xs">
                                                             Period: {val.period}
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-sm font-semibold">
                                                             {formatCurrency(
-                                                                val.book_value_cad
+                                                                val.book_value_cad,
                                                             )}
                                                         </div>
-                                                        {val.depreciation_cad > 0 && (
-                                                            <div className="text-xs text-muted-foreground">
+                                                        {val.depreciation_cad >
+                                                            0 && (
+                                                            <div className="text-muted-foreground text-xs">
                                                                 Depreciation:{' '}
                                                                 {formatCurrency(
-                                                                    val.depreciation_cad
+                                                                    val.depreciation_cad,
                                                                 )}
                                                             </div>
                                                         )}

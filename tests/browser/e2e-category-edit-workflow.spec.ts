@@ -20,9 +20,7 @@ test.describe('Browser test for category edit workflow', () => {
         await page
             .getByLabel('Password', { exact: true })
             .fill('Edit-workflow-103!');
-        await page
-            .getByLabel('Confirm password')
-            .fill('Edit-workflow-103!');
+        await page.getByLabel('Confirm password').fill('Edit-workflow-103!');
         await page
             .getByRole('button', { name: 'Create account', exact: true })
             .click();
@@ -49,9 +47,7 @@ test.describe('Browser test for category edit workflow', () => {
             data: { code: string; name: string };
         };
         expect(created.code).toMatch(/^C\d{3,}$/);
-        await expect(page.getByTestId('create-category-dialog')).toHaveCount(
-            0,
-        );
+        await expect(page.getByTestId('create-category-dialog')).toHaveCount(0);
         await expect(
             page.getByTestId(`category-card-${created.code}`),
         ).toBeVisible();
@@ -72,9 +68,9 @@ test.describe('Browser test for category edit workflow', () => {
         // Step 3: Click edit on test category
         await page.getByTestId(`edit-category-${created.code}`).click();
         await expect(page.getByTestId('edit-category-dialog')).toBeVisible();
-        await expect(
-            page.getByTestId('edit-category-name-input'),
-        ).toHaveValue('Edit Workflow Test');
+        await expect(page.getByTestId('edit-category-name-input')).toHaveValue(
+            'Edit Workflow Test',
+        );
 
         // Step 4: Modify name in dialog
         await page.getByTestId('edit-category-name-input').fill('');

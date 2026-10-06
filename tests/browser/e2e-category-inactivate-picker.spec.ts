@@ -52,14 +52,10 @@ test.describe('Browser test for category inactivate and picker exclusion', () =>
         };
         expect(created.code).toMatch(/^C\d{3,}$/);
         expect(created.is_active).toBe(true);
-        await expect(page.getByTestId('create-category-dialog')).toHaveCount(
-            0,
-        );
+        await expect(page.getByTestId('create-category-dialog')).toHaveCount(0);
 
         // Step 2: Navigate to categories (already on page) and confirm card.
-        const categoryCard = page.getByTestId(
-            `category-card-${created.code}`,
-        );
+        const categoryCard = page.getByTestId(`category-card-${created.code}`);
         await expect(categoryCard).toBeVisible();
         await expect(
             page.getByTestId(`category-name-${created.code}`),
@@ -123,9 +119,7 @@ test.describe('Browser test for category inactivate and picker exclusion', () =>
         await page
             .getByRole('button', { name: 'Add Transaction', exact: true })
             .click();
-        await expect(
-            page.getByTestId('transaction-form-dialog'),
-        ).toBeVisible();
+        await expect(page.getByTestId('transaction-form-dialog')).toBeVisible();
 
         await page.getByTestId('transaction-category-field').click();
         const options = page.getByRole('option');
@@ -139,20 +133,16 @@ test.describe('Browser test for category inactivate and picker exclusion', () =>
         // Step 7: Verify inactivated category is not in picker options.
         await expect(
             page.getByRole('option', {
-                name: new RegExp(
-                    `${created.code}|Inactivate Picker Test`,
-                ),
+                name: new RegExp(`${created.code}|Inactivate Picker Test`),
             }),
         ).toHaveCount(0);
         const optionTexts = await options.allTextContents();
         expect(
-            optionTexts.some((text) =>
-                text.includes('Inactivate Picker Test'),
-            ),
+            optionTexts.some((text) => text.includes('Inactivate Picker Test')),
         ).toBe(false);
-        expect(
-            optionTexts.some((text) => text.includes(created.code)),
-        ).toBe(false);
+        expect(optionTexts.some((text) => text.includes(created.code))).toBe(
+            false,
+        );
 
         // Step 8: Verify test passes with no console errors.
         expect(consoleErrors).toEqual([]);

@@ -39,7 +39,7 @@ export function AppSidebarHeader({
                     <span className="bg-sidebar-primary text-sidebar-primary-foreground flex size-7 shrink-0 items-center justify-center rounded-md shadow-sm">
                         <AppLogoIcon className="size-4 fill-current text-white dark:text-black" />
                     </span>
-                    <span className="truncate text-sm font-semibold tracking-tight">
+                    <span className="sr-only truncate text-sm font-semibold tracking-tight sm:not-sr-only">
                         {brandName}
                     </span>
                 </Link>
@@ -47,7 +47,7 @@ export function AppSidebarHeader({
                     <>
                         <div className="bg-border mx-1 hidden h-4 w-px sm:block" />
                         <div
-                            className="min-w-0 max-w-[40vw] truncate sm:max-w-none sm:overflow-visible"
+                            className="max-w-[40vw] min-w-0 truncate sm:max-w-none sm:overflow-visible"
                             data-testid="breadcrumb-trail"
                         >
                             <Breadcrumbs breadcrumbs={breadcrumbs} />
@@ -74,7 +74,7 @@ export function AppSidebarHeader({
                     label="Global period"
                     showLabel={false}
                     testId="period-selector"
-                    className="w-[7.5rem] max-w-none space-y-0 sm:w-40 md:w-48"
+                    className="w-40 max-w-none space-y-0 md:w-48"
                 />
             </div>
         </header>

@@ -16,7 +16,9 @@ test.describe('style sweep for pending visual features', () => {
         // Feature #6 — footer / header
         await page.setViewportSize({ width: 1440, height: 900 });
         await page.goto('/dashboard');
-        await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: /dashboard/i }),
+        ).toBeVisible();
         await page.locator('footer').scrollIntoViewIfNeeded();
         await page.screenshot({
             path: path.join(out, 'footer-desktop.png'),
@@ -87,7 +89,9 @@ test.describe('style sweep for pending visual features', () => {
         expect(tx.ok()).toBeTruthy();
 
         await page.goto('/accounts');
-        await expect(page.getByText(/Style Lock/)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/Style Lock/)).toBeVisible({
+            timeout: 15000,
+        });
         await page.getByTestId(`edit-account-${lockedId}`).click();
         await expect(page.getByRole('dialog')).toBeVisible();
         await expect(page.getByLabel('Account Type')).toBeDisabled();
@@ -96,25 +100,27 @@ test.describe('style sweep for pending visual features', () => {
                 /The account type cannot be changed because transactions are registered/i,
             ),
         ).toBeVisible();
-        await page
-            .getByRole('dialog')
-            .screenshot({ path: path.join(out, 'account-edit-type-locked.png') });
+        await page.getByRole('dialog').screenshot({
+            path: path.join(out, 'account-edit-type-locked.png'),
+        });
         await page.setViewportSize({ width: 390, height: 844 });
-        await page
-            .getByRole('dialog')
-            .screenshot({ path: path.join(out, 'account-edit-type-locked-mobile.png') });
+        await page.getByRole('dialog').screenshot({
+            path: path.join(out, 'account-edit-type-locked-mobile.png'),
+        });
         await page.getByRole('button', { name: /cancel/i }).click();
 
         // Feature #10 — Manage Balances dialog
         await page.setViewportSize({ width: 1440, height: 900 });
         await page.goto('/accounts');
-        const manage = page.getByRole('button', { name: /manage balances/i }).first();
+        const manage = page
+            .getByRole('button', { name: /manage balances/i })
+            .first();
         await expect(manage).toBeVisible({ timeout: 15000 });
         await manage.click();
         await expect(page.getByRole('dialog')).toBeVisible();
-        await page
-            .getByRole('dialog')
-            .screenshot({ path: path.join(out, 'manage-balances-desktop.png') });
+        await page.getByRole('dialog').screenshot({
+            path: path.join(out, 'manage-balances-desktop.png'),
+        });
         await page.setViewportSize({ width: 390, height: 844 });
         await page
             .getByRole('dialog')

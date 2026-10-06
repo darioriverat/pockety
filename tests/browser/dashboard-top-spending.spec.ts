@@ -1,7 +1,4 @@
-import {
-    expect,
-    test,
-    type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -9,9 +6,7 @@ import {
     ensureExchangeRateForPeriod,
 } from './helpers';
 
-async function seedTopSpendingData(
-    request: APIRequestContext,
-): Promise<void> {
+async function seedTopSpendingData(request: APIRequestContext): Promise<void> {
     const categoryResponse = await request.get('/api/categories');
     expect(categoryResponse.ok()).toBeTruthy();
     const categories = (await categoryResponse.json()) as {
@@ -81,7 +76,9 @@ test('feature 103: dashboard shows top spending categories for current period', 
     // Step 1: Navigate to dashboard
     await page.goto('/dashboard?period=202601');
 
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Dashboard' }),
+    ).toBeVisible();
 
     // Step 2: Verify 'Top Spending Categories' widget is displayed
     const card = page.getByTestId('top-spending-categories-card');

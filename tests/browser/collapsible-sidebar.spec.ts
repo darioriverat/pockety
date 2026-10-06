@@ -23,7 +23,7 @@ test('feature 171: sidebar collapses to icons and expands back', async ({
 
     // Verify sidebar is initially expanded
     await expect(sidebarGroup).toHaveAttribute('data-state', 'expanded');
-    
+
     // Check that navigation items show both icon and text
     const dashboardLink = page.getByRole('link', { name: /Dashboard/i });
     await expect(dashboardLink).toBeVisible();

@@ -1,7 +1,4 @@
-import {
-    expect,
-    test,
-    type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -50,7 +47,10 @@ async function seedAssetsLiabilitiesData(
     ];
 
     for (const [index, period] of periods.entries()) {
-        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
+        await ensureExchangeRateForPeriod(request, period, {
+            copPerUsd: 4400,
+            cadPerUsd: 0.75,
+        });
 
         const assetBalance = await request.post(
             `/api/accounts/${bank.data.id}/balances`,
@@ -94,8 +94,12 @@ test('feature 102: dashboard shows assets vs liabilities chart over time', async
 
     await page.goto('/dashboard?period=202606');
 
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-    await expect(page.getByTestId('assets-liabilities-chart-card')).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Dashboard' }),
+    ).toBeVisible();
+    await expect(
+        page.getByTestId('assets-liabilities-chart-card'),
+    ).toBeVisible();
     await expect(page.getByText('Assets vs Liabilities')).toBeVisible();
 
     await page.screenshot({
@@ -120,7 +124,9 @@ test('feature 102: dashboard shows assets vs liabilities chart over time', async
     await expect(page.getByTestId('al-chart-line-equity')).toBeVisible();
     await expect(page.getByTestId('al-chart-period-202606')).toBeVisible();
     await expect(page.getByTestId('al-chart-period-202507')).toBeVisible();
-    await expect(page.getByTestId('al-chart-point-equity-202606')).toBeVisible();
+    await expect(
+        page.getByTestId('al-chart-point-equity-202606'),
+    ).toBeVisible();
 
     await page.getByTestId('al-chart-hit-202606').hover();
     await expect(

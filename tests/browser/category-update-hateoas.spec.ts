@@ -31,7 +31,9 @@ test.describe('HATEOAS links on category update response', () => {
         // Create a category first
         await page.getByTestId('create-category-button').click();
         await expect(page.getByTestId('create-category-dialog')).toBeVisible();
-        await page.getByLabel('Name', { exact: true }).fill('HATEOAS Update Test');
+        await page
+            .getByLabel('Name', { exact: true })
+            .fill('HATEOAS Update Test');
         await page.getByRole('radio', { name: 'Expense', exact: true }).check();
 
         const createdWait = page.waitForResponse(
@@ -61,7 +63,9 @@ test.describe('HATEOAS links on category update response', () => {
         await page.getByTestId(`edit-category-${categoryCode}`).click();
         await expect(page.getByTestId('edit-category-dialog')).toBeVisible();
         await page.getByLabel('Name', { exact: true }).clear();
-        await page.getByLabel('Name', { exact: true }).fill('HATEOAS Updated Name');
+        await page
+            .getByLabel('Name', { exact: true })
+            .fill('HATEOAS Updated Name');
         await page.screenshot({
             path: `${SHOT_DIR}/03-edit-dialog.png`,
         });
@@ -95,7 +99,9 @@ test.describe('HATEOAS links on category update response', () => {
         // Verify links.self
         expect(updateBody.links.self).toBeTruthy();
         expect(updateBody.links.self).toContain(categoryCode);
-        expect(updateBody.links.self).toContain(`/api/categories/${categoryCode}`);
+        expect(updateBody.links.self).toContain(
+            `/api/categories/${categoryCode}`,
+        );
 
         // Verify links.index
         expect(updateBody.links.index).toBeTruthy();

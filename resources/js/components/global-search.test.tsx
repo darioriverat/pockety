@@ -70,13 +70,21 @@ describe('GlobalSearch', () => {
         });
 
         await waitFor(() => {
-            expect(screen.getByTestId('global-search-accounts')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('global-search-accounts'),
+            ).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('global-search-transactions')).toBeInTheDocument();
-        expect(screen.getByTestId('global-search-categories')).toBeInTheDocument();
+        expect(
+            screen.getByTestId('global-search-transactions'),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByTestId('global-search-categories'),
+        ).toBeInTheDocument();
         expect(screen.getByText('RBC Chequing')).toBeInTheDocument();
-        expect(screen.getByText('Transfer from RBC online')).toBeInTheDocument();
+        expect(
+            screen.getByText('Transfer from RBC online'),
+        ).toBeInTheDocument();
         expect(screen.getByText('C050 — RBC Fees')).toBeInTheDocument();
         expect(global.fetch).toHaveBeenCalledWith(
             '/api/search?q=RBC&limit=8',

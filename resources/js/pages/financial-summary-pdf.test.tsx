@@ -94,8 +94,6 @@ describe('FinancialSummary income statement PDF export', () => {
 
         fireEvent.click(exportButton);
 
-        expect(hrefValue).toBe(
-            '/api/financial-summary/export?period=202501',
-        );
+        expect(hrefValue).toBe('/api/financial-summary/export?period=202501');
     });
 });

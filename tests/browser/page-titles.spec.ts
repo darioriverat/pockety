@@ -81,7 +81,7 @@ test('feature 163: page titles are prominent and descriptive', async ({
             path: path.join(verificationDir, entry.screenshot),
             fullPage: false,
         });
-    };
+    }
 
     // Step 5: title styling consistent across pages
     const baseline = titleStyles[0];

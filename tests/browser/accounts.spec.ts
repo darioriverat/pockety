@@ -52,7 +52,9 @@ test('feature 40: imported accounts list shows Canadian and Colombian institutio
     await page.goto('/accounts');
     await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Assets' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Liabilities' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Liabilities' }),
+    ).toBeVisible();
 
     // Canadian institutions. Several imported accounts share these names.
     await expect(page.getByText(/RBC/).first()).toBeVisible();
@@ -90,8 +92,13 @@ test('feature 41: Personal LOAN CIBC is correctly named as liability', async ({
     await expect(page.getByText('Crédito Móvil **6174')).toHaveCount(0);
 
     // Liability section should contain the loan
-    const loanCard = page.locator('text=Personal LOAN CIBC').locator('..').locator('..');
-    await expect(loanCard.getByText(/Credit Card\/Loan|liability/i)).toBeVisible();
+    const loanCard = page
+        .locator('text=Personal LOAN CIBC')
+        .locator('..')
+        .locator('..');
+    await expect(
+        loanCard.getByText(/Credit Card\/Loan|liability/i),
+    ).toBeVisible();
     await expect(page.getByText(/Ford Escape/)).toBeVisible();
 
     expect(consoleErrors).toEqual([]);
@@ -112,7 +119,9 @@ test('feature 95: Account form validates that account name is unique', async ({
     // Step 1: Create account with name 'RBC Checking'
     await page.getByRole('button', { name: /Add Account/i }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Add Account' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Add Account' }),
+    ).toBeVisible();
 
     await page.getByLabel('Account Name').fill('RBC Checking');
     await page.getByLabel('Account Type').click();
@@ -140,7 +149,7 @@ test('feature 95: Account form validates that account name is unique', async ({
 
     // Step 3: Verify validation error is shown
     await expect(
-        page.getByText(/An account with this name already exists/i)
+        page.getByText(/An account with this name already exists/i),
     ).toBeVisible();
 
     // Dialog should still be open

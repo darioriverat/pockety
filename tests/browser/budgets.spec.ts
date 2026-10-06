@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     ensureTransactionInPeriod,
     loginAsBrowserTestUser,
@@ -24,7 +22,10 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
     await loginAsBrowserTestUser(page, request);
 
     // Ensure exchange rates exist for multi-currency conversion
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const categoriesResponse = await request.get('/api/categories');
     const categoriesPayload = await categoriesResponse.json();
@@ -126,9 +127,7 @@ test('feature 97: Budget form validates that budget amount is a positive number'
     await page.getByTestId('save-budget').click();
 
     // Step 3: Verify validation error is shown
-    await expect(
-        page.getByText(/must be a positive number/i)
-    ).toBeVisible();
+    await expect(page.getByText(/must be a positive number/i)).toBeVisible();
 
     // Error should remain visible
     await expect(page.getByText(/must be a positive number/i)).toBeVisible();
@@ -140,9 +139,7 @@ test('feature 97: Budget form validates that budget amount is a positive number'
     await page.getByTestId('save-budget').click();
 
     // Verify zero is also rejected
-    await expect(
-        page.getByText(/must be a positive number/i)
-    ).toBeVisible();
+    await expect(page.getByText(/must be a positive number/i)).toBeVisible();
 
     // Step 4: Enter positive amount
     await page.getByLabel('Budget Amount (CAD)').clear();
@@ -154,7 +151,9 @@ test('feature 97: Budget form validates that budget amount is a positive number'
     await expect(page.getByTestId('budget-save-success')).toBeVisible();
 
     // Verify no error messages
-    await expect(page.getByText(/must be a positive number/i)).not.toBeVisible();
+    await expect(
+        page.getByText(/must be a positive number/i),
+    ).not.toBeVisible();
 
     expect(consoleErrors).toEqual([]);
 });

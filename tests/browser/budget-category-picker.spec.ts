@@ -56,7 +56,9 @@ test.describe('Budget category picker active-only', () => {
 
         await page.goto('/budgets');
         await expect(page).toHaveURL(/\/budgets$/);
-        await expect(page.getByRole('heading', { name: 'Budgets' })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: 'Budgets' }),
+        ).toBeVisible();
 
         const categoriesRequest = await categoriesRequestPromise;
         expect(categoriesRequest.url()).not.toContain('include_inactive');
@@ -91,14 +93,18 @@ test.describe('Budget category picker active-only', () => {
         });
 
         // Create budget with active category successfully.
-        await page.getByRole('option', {
-            name: /C047 — Budget Picker Active Category/,
-        }).click();
+        await page
+            .getByRole('option', {
+                name: /C047 — Budget Picker Active Category/,
+            })
+            .click();
         await page.getByLabel('Budget Amount (CAD)').fill('125.50');
         await page.getByTestId('save-budget').click();
         await expect(page.getByTestId('budget-save-success')).toBeVisible();
         await expect(page.getByTestId('budget-row-C047')).toBeVisible();
-        await expect(page.getByTestId('budget-row-C047')).toContainText('125.5');
+        await expect(page.getByTestId('budget-row-C047')).toContainText(
+            '125.5',
+        );
 
         await page.screenshot({
             path: 'verification/budget-category-picker/budget-saved.png',

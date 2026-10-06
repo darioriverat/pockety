@@ -4,7 +4,9 @@ import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
 const evidence = 'verification/test-145-table-styles';
 
 async function backgroundOf(locator: Locator): Promise<string> {
-    return locator.evaluate((element) => getComputedStyle(element).backgroundColor);
+    return locator.evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+    );
 }
 
 test.describe('data table presentation', () => {
@@ -41,20 +43,34 @@ test.describe('data table presentation', () => {
 
             await page.goto('/transactions');
             await page.getByTestId('page-period-selector').click();
-            await page.getByRole('option', { name: 'September 2026', exact: true }).click();
-            await expect(page.getByTestId('transactions-data-table')).toBeVisible();
+            await page
+                .getByRole('option', { name: 'September 2026', exact: true })
+                .click();
+            await expect(
+                page.getByTestId('transactions-data-table'),
+            ).toBeVisible();
 
             const headers = page.getByTestId('transactions-sort-headers');
             await expect(headers).toBeVisible();
             expect(await backgroundOf(headers)).not.toBe('rgba(0, 0, 0, 0)');
-            await expect(headers.getByText('Date', { exact: true })).toBeVisible();
-            await expect(headers.getByText('Amount', { exact: true })).toBeVisible();
-            await expect(headers.getByText('Category', { exact: true })).toBeVisible();
-            await expect(headers.getByText('Actions', { exact: true })).toBeVisible();
+            await expect(
+                headers.getByText('Date', { exact: true }),
+            ).toBeVisible();
+            await expect(
+                headers.getByText('Amount', { exact: true }),
+            ).toBeVisible();
+            await expect(
+                headers.getByText('Category', { exact: true }),
+            ).toBeVisible();
+            await expect(
+                headers.getByText('Actions', { exact: true }),
+            ).toBeVisible();
 
             const rows = page.locator('[data-testid^="transaction-row-"]');
             await expect(rows.first()).toBeVisible();
-            await expect.poll(async () => rows.count()).toBeGreaterThanOrEqual(2);
+            await expect
+                .poll(async () => rows.count())
+                .toBeGreaterThanOrEqual(2);
 
             const first = rows.nth(0);
             const second = rows.nth(1);

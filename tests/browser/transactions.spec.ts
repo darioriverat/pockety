@@ -1,4 +1,9 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext,
+    type Page,
+} from '@playwright/test';
 import {
     type ApiCategory,
     type ApiTransaction,
@@ -14,11 +19,15 @@ async function openTransactionsPage(page: Page): Promise<void> {
     await page.goto('/transactions');
 
     await expect(page).toHaveURL(/\/transactions$/);
-    await expect(page.getByRole('heading', { name: 'Transactions' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Transactions' }),
+    ).toBeVisible();
 
     // Shared period defaults to January 2025; these tests use January 2026 fixtures.
     await page.getByTestId('page-period-selector').click();
-    await page.getByRole('option', { name: 'January 2026', exact: true }).click();
+    await page
+        .getByRole('option', { name: 'January 2026', exact: true })
+        .click();
     await expect(page.getByTestId('page-period-selector')).toContainText(
         'January 2026',
     );
@@ -27,7 +36,9 @@ async function openTransactionsPage(page: Page): Promise<void> {
 async function openAddTransactionDialog(page: Page): Promise<void> {
     await page.getByRole('button', { name: 'Add Transaction' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Add Transaction' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Add Transaction' }),
+    ).toBeVisible();
 }
 
 function getDialogCombobox(page: Page, label: string) {
@@ -41,7 +52,12 @@ function getDialogCombobox(page: Page, label: string) {
 
 async function selectOption(
     page: Page,
-    label: 'Category' | 'Account' | 'Deposit account' | 'Currency' | 'Debt Component',
+    label:
+        | 'Category'
+        | 'Account'
+        | 'Deposit account'
+        | 'Currency'
+        | 'Debt Component',
     option: string,
 ): Promise<void> {
     const dialog = page.getByTestId('transaction-form-dialog');
@@ -119,12 +135,17 @@ async function fillTransactionForm(
     }
 }
 
-async function submitTransactionForm(page: Page, buttonName: 'Create' | 'Update'): Promise<void> {
+async function submitTransactionForm(
+    page: Page,
+    buttonName: 'Create' | 'Update',
+): Promise<void> {
     await page.getByRole('button', { name: buttonName }).click();
     await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(0);
 }
 
-async function getCategories(request: APIRequestContext): Promise<ApiCategory[]> {
+async function getCategories(
+    request: APIRequestContext,
+): Promise<ApiCategory[]> {
     const response = await request.get('/api/categories');
     expect(response.ok()).toBeTruthy();
 
@@ -140,13 +161,17 @@ async function getCategoryByCode(
     const category = categories.find((item) => item.code === code);
 
     if (!category) {
-        throw new Error(`Category ${code} was not found in the seeded catalog.`);
+        throw new Error(
+            `Category ${code} was not found in the seeded catalog.`,
+        );
     }
 
     return category;
 }
 
-async function getTransactions(request: APIRequestContext): Promise<ApiTransaction[]> {
+async function getTransactions(
+    request: APIRequestContext,
+): Promise<ApiTransaction[]> {
     const response = await request.get('/api/transactions');
     expect(response.ok()).toBeTruthy();
 
@@ -162,7 +187,9 @@ async function getTransactionByComments(
     const transaction = transactions.find((item) => item.comments === comments);
 
     if (!transaction) {
-        throw new Error(`Transaction with comments "${comments}" was not found.`);
+        throw new Error(
+            `Transaction with comments "${comments}" was not found.`,
+        );
     }
 
     return transaction;
@@ -192,7 +219,9 @@ async function createAccount(
     });
     expect(response.ok()).toBeTruthy();
 
-    const body = (await response.json()) as { data: { id: number; name: string } };
+    const body = (await response.json()) as {
+        data: { id: number; name: string };
+    };
     return body.data;
 }
 
@@ -671,7 +700,9 @@ test('feature 15: users can edit an existing transaction', async ({
         .filter({ hasText: originalComments });
 
     await transactionCard.getByTestId('edit-transaction-button').click();
-    await expect(page.getByRole('heading', { name: 'Edit Transaction' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Edit Transaction' }),
+    ).toBeVisible();
     await page.getByTestId('transaction-amount-input').fill('125.75');
     await page.getByLabel('Comments').fill(updatedComments);
     await submitTransactionForm(page, 'Update');
@@ -683,7 +714,10 @@ test('feature 15: users can edit an existing transaction', async ({
     await expect(updatedCard).toContainText('$125.75');
     await expect(page.getByText(originalComments)).toHaveCount(0);
 
-    const transaction = await getTransactionByComments(request, updatedComments);
+    const transaction = await getTransactionByComments(
+        request,
+        updatedComments,
+    );
 
     expect(transaction.amount_cad).toBe(125.75);
 
@@ -722,7 +756,9 @@ test('feature 16: users can delete an existing transaction', async ({
 
     const transactions = await getTransactions(request);
 
-    expect(transactions.find((transaction) => transaction.comments === comments)).toBeUndefined();
+    expect(
+        transactions.find((transaction) => transaction.comments === comments),
+    ).toBeUndefined();
 
     expect(consoleErrors).toEqual([]);
 });
@@ -902,7 +938,9 @@ test('users can unset and reassign the account on a transaction', async ({
     ).toContainText(account.name);
 
     await transactionCard.getByTestId('edit-transaction-button').click();
-    await expect(page.getByRole('heading', { name: 'Edit Transaction' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Edit Transaction' }),
+    ).toBeVisible();
     await expect(page.getByTestId('account-field')).toContainText(account.name);
 
     await selectOption(page, 'Account', 'None');
@@ -916,7 +954,9 @@ test('users can unset and reassign the account on a transaction', async ({
     expect(cleared.account_id).toBeNull();
 
     await transactionCard.getByTestId('edit-transaction-button').click();
-    await expect(page.getByRole('heading', { name: 'Edit Transaction' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Edit Transaction' }),
+    ).toBeVisible();
     await expect(page.getByTestId('account-field')).toContainText('None');
 
     await selectOption(page, 'Account', account.name);

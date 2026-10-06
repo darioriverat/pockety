@@ -7,13 +7,9 @@ import '@testing-library/jest-dom/vitest';
 vi.mock('@inertiajs/react', () => ({
     usePage: () => ({ props: { auth: { user: { currency: 'CAD' } } } }),
     Head: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-    Link: ({
-        children,
-        href,
-    }: {
-        children: React.ReactNode;
-        href: string;
-    }) => <a href={href}>{children}</a>,
+    Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+        <a href={href}>{children}</a>
+    ),
 }));
 
 vi.mock('@/hooks/use-period', () => ({

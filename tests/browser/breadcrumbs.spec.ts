@@ -80,7 +80,9 @@ test('feature 162: breadcrumbs show current page location in navigation hierarch
     // Also verify category nested trail
     await page.goto('/categories/C001');
     await expect(page.getByTestId('breadcrumb-link-0')).toHaveText('Home');
-    await expect(page.getByTestId('breadcrumb-link-1')).toHaveText('Categories');
+    await expect(page.getByTestId('breadcrumb-link-1')).toHaveText(
+        'Categories',
+    );
     await expect(page.getByTestId('breadcrumb-current')).toHaveText('Details');
     await page.screenshot({
         animations: 'disabled',

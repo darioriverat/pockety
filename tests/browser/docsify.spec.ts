@@ -35,12 +35,11 @@ test.describe('docsify guides', () => {
         const page = await context.newPage();
 
         await page.goto(`${docsBase}/`, { waitUntil: 'networkidle' });
-        await page.waitForFunction(
-            () =>
-                Boolean(
-                    (window as Window & { $docsify?: { name?: string } }).$docsify
-                        ?.name,
-                ),
+        await page.waitForFunction(() =>
+            Boolean(
+                (window as Window & { $docsify?: { name?: string } }).$docsify
+                    ?.name,
+            ),
         );
 
         // Docsify mutates loadSidebar from true to "_sidebar.md" after boot.
@@ -53,14 +52,16 @@ test.describe('docsify guides', () => {
                 subMaxLevel: d.subMaxLevel,
             };
         });
-        const bootSource = await page.locator('script').evaluateAll((nodes) =>
-            nodes.map((n) => n.textContent || '').join('\n'),
-        );
+        const bootSource = await page
+            .locator('script')
+            .evaluateAll((nodes) =>
+                nodes.map((n) => n.textContent || '').join('\n'),
+            );
         expect(config.name).toBe('Pockety');
         expect(bootSource).toMatch(/loadSidebar:\s*true/);
-        expect(config.loadSidebar === true || config.loadSidebar === '_sidebar.md').toBe(
-            true,
-        );
+        expect(
+            config.loadSidebar === true || config.loadSidebar === '_sidebar.md',
+        ).toBe(true);
         expect(config.subMaxLevel).toBe(2);
 
         await page.waitForSelector('.sidebar-nav', { timeout: 15000 });
@@ -78,9 +79,9 @@ test.describe('docsify guides', () => {
             await page.waitForSelector('.markdown-section h1', {
                 timeout: 15000,
             });
-            await expect(page.locator('.markdown-section h1').first()).toHaveText(
-                entry.title,
-            );
+            await expect(
+                page.locator('.markdown-section h1').first(),
+            ).toHaveText(entry.title);
             const body = await page.locator('.markdown-section').innerText();
             expect(body.length).toBeGreaterThan(80);
             expect(body.includes('* [Home]')).toBeFalsy();

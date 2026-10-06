@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -21,7 +19,10 @@ test('user can register a period balance from reconciliation figures and overwri
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {
@@ -64,13 +65,17 @@ test('user can register a period balance from reconciliation figures and overwri
     expect(transactionResponse.ok()).toBeTruthy();
 
     await page.goto('/reconciliation');
-    await expect(page.getByRole('heading', { name: 'Reconciliation' })).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: 'Reconciliation' }),
+    ).toBeVisible();
     await expect(page.getByTestId('register-period-balance')).toHaveCount(0);
 
     await page.goto('/period-balances');
     await expect(page.getByTestId('period-balances-heading')).toBeVisible();
     await page.getByTestId('page-period-selector').click();
-    await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+    await page
+        .getByRole('option', { name: 'January 2025', exact: true })
+        .click();
     await expect(page.getByTestId('page-period-selector')).toContainText(
         'January 2025',
     );

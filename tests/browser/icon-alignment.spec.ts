@@ -45,8 +45,9 @@ async function measureIconWithText(
             throw new Error(`No svg in ${sel}`);
         }
         const textEl =
-            (root.querySelector('span, h1, h2, h3, p, a') as HTMLElement | null) ||
-            root;
+            (root.querySelector(
+                'span, h1, h2, h3, p, a',
+            ) as HTMLElement | null) || root;
         const svgRect = svg.getBoundingClientRect();
         const textRect = textEl.getBoundingClientRect();
         const svgMid = svgRect.top + svgRect.height / 2;
@@ -87,9 +88,9 @@ for (const theme of ['light', 'dark'] as const) {
         expect(navIcon.width).toBeLessThanOrEqual(20);
         expect(navIcon.height).toBe(navIcon.width);
         expect(navIcon.aligned).toBe(true);
-        expect(navIcon.fill === 'none' || navIcon.fill === 'rgba(0, 0, 0, 0)').toBe(
-            true,
-        );
+        expect(
+            navIcon.fill === 'none' || navIcon.fill === 'rgba(0, 0, 0, 0)',
+        ).toBe(true);
 
         const card = page.getByTestId('dashboard-card-income');
         await expect(card).toBeVisible();
@@ -129,9 +130,13 @@ test('accounts page icons align with titles and button labels', async ({
     await applyTheme(page, 'light');
 
     await page.goto('/accounts');
-    await expect(page.getByTestId('page-title')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('page-title')).toBeVisible({
+        timeout: 15000,
+    });
 
-    const addButton = page.getByRole('button', { name: /add account/i }).first();
+    const addButton = page
+        .getByRole('button', { name: /add account/i })
+        .first();
     await expect(addButton).toBeVisible();
     const buttonIcon = await addButton.evaluate((btn) => {
         const svg = btn.querySelector('svg');
@@ -213,9 +218,9 @@ test('accounts page icons align with titles and button labels', async ({
     });
     expect(titleRow.width).toBe(16);
     expect(titleRow.midDelta).toBeLessThanOrEqual(4);
-    expect(titleRow.fill === 'none' || titleRow.fill === 'rgba(0, 0, 0, 0)').toBe(
-        true,
-    );
+    expect(
+        titleRow.fill === 'none' || titleRow.fill === 'rgba(0, 0, 0, 0)',
+    ).toBe(true);
 
     await page.screenshot({
         path: path.join(verificationDir, 'accounts-icons.png'),
@@ -233,7 +238,9 @@ test('reconciliation page title leading icon uses consistent size', async ({
     await applyTheme(page, 'light');
 
     await page.goto('/reconciliation');
-    await expect(page.getByTestId('page-title')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('page-title')).toBeVisible({
+        timeout: 15000,
+    });
 
     const leading = await page.evaluate(() => {
         const wrap = document.querySelector(

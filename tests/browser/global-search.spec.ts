@@ -76,7 +76,9 @@ test.describe('Global search', () => {
         await expect(page.getByTestId('global-search-accounts')).toBeVisible({
             timeout: 10000,
         });
-        await expect(page.getByTestId('global-search-transactions')).toBeVisible({
+        await expect(
+            page.getByTestId('global-search-transactions'),
+        ).toBeVisible({
             timeout: 10000,
         });
 

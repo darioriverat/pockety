@@ -38,7 +38,13 @@ import {
     SubsectionHeading,
 } from '@/components/section-heading';
 import { formatCurrencyAmount } from '@/lib/currency';
-import { PlusIcon, Building2, Wallet, AlertCircle, PencilIcon } from 'lucide-react';
+import {
+    PlusIcon,
+    Building2,
+    Wallet,
+    AlertCircle,
+    PencilIcon,
+} from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface Account {
@@ -108,9 +114,9 @@ export default function Accounts() {
     const [submitting, setSubmitting] = useState(false);
 
     const [editAccount, setEditAccount] = useState<Account | null>(null);
-    const [editFormData, setEditFormData] = useState<AccountFormData & { is_active: boolean }>(
-        { ...emptyForm, is_active: true }
-    );
+    const [editFormData, setEditFormData] = useState<
+        AccountFormData & { is_active: boolean }
+    >({ ...emptyForm, is_active: true });
     const [editFormError, setEditFormError] = useState<string | null>(null);
     const [editSubmitting, setEditSubmitting] = useState(false);
     const [accountHasTransactions, setAccountHasTransactions] = useState(false);
@@ -122,12 +128,12 @@ export default function Accounts() {
     const [balanceForm, setBalanceForm] =
         useState<BalanceFormData>(emptyBalanceForm);
     const [balanceFormError, setBalanceFormError] = useState<string | null>(
-        null
+        null,
     );
     const [balanceSubmitting, setBalanceSubmitting] = useState(false);
 
     useEffect(() => {
-        fetchAccounts();
+        void fetchAccounts();
     }, []);
 
     const fetchAccounts = async () => {
@@ -178,10 +184,9 @@ export default function Accounts() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                const message =
-                    errorData.messages
-                        ? Object.values(errorData.messages).flat().join(' ')
-                        : errorData.error || 'Failed to create account';
+                const message = errorData.messages
+                    ? Object.values(errorData.messages).flat().join(' ')
+                    : errorData.error || 'Failed to create account';
                 throw new Error(message);
             }
 
@@ -190,7 +195,7 @@ export default function Accounts() {
             resetForm();
         } catch (err) {
             setFormError(
-                err instanceof Error ? err.message : 'An error occurred'
+                err instanceof Error ? err.message : 'An error occurred',
             );
         } finally {
             setSubmitting(false);
@@ -201,12 +206,14 @@ export default function Accounts() {
         // Check if account has transactions FIRST
         let hasTransactions = false;
         try {
-            const response = await fetch(`/api/accounts/${account.id}/transactions`);
+            const response = await fetch(
+                `/api/accounts/${account.id}/transactions`,
+            );
             if (response.ok) {
                 const data: any = await response.json();
                 hasTransactions = data.meta.total_count > 0;
             }
-        } catch (err) {
+        } catch {
             // If we can't fetch transactions, assume no transactions
             hasTransactions = false;
         }
@@ -216,7 +223,8 @@ export default function Accounts() {
         setEditFormData({
             name: account.name,
             type: account.type,
-            primary_currency: (account.primary_currency as 'CAD' | 'USD' | 'COP') || 'none',
+            primary_currency:
+                (account.primary_currency as 'CAD' | 'USD' | 'COP') || 'none',
             notes: account.notes || '',
             is_active: account.is_active,
         });
@@ -258,10 +266,9 @@ export default function Accounts() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                const message =
-                    errorData.messages
-                        ? Object.values(errorData.messages).flat().join(' ')
-                        : errorData.error || 'Failed to update account';
+                const message = errorData.messages
+                    ? Object.values(errorData.messages).flat().join(' ')
+                    : errorData.error || 'Failed to update account';
                 throw new Error(message);
             }
 
@@ -269,7 +276,7 @@ export default function Accounts() {
             closeEditDialog();
         } catch (err) {
             setEditFormError(
-                err instanceof Error ? err.message : 'An error occurred'
+                err instanceof Error ? err.message : 'An error occurred',
             );
         } finally {
             setEditSubmitting(false);
@@ -289,7 +296,7 @@ export default function Accounts() {
             setBalances(data.data || []);
         } catch (err) {
             setBalanceFormError(
-                err instanceof Error ? err.message : 'An error occurred'
+                err instanceof Error ? err.message : 'An error occurred',
             );
         } finally {
             setBalancesLoading(false);
@@ -300,7 +307,7 @@ export default function Accounts() {
         setBalanceDialogAccount(account);
         setBalanceForm(emptyBalanceForm);
         setBalanceFormError(null);
-        fetchBalances(account.id);
+        void fetchBalances(account.id);
     };
 
     const closeBalanceDialog = (open: boolean) => {
@@ -319,7 +326,9 @@ export default function Accounts() {
         if (!balanceDialogAccount) return;
 
         if (!/^\d{6}$/.test(balanceForm.period)) {
-            setBalanceFormError('Period must be in YYYYMM format (e.g. 202501).');
+            setBalanceFormError(
+                'Period must be in YYYYMM format (e.g. 202501).',
+            );
             return;
         }
 
@@ -345,7 +354,7 @@ export default function Accounts() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
-                }
+                },
             );
 
             if (!response.ok) {
@@ -360,7 +369,7 @@ export default function Accounts() {
             setBalanceForm(emptyBalanceForm);
         } catch (err) {
             setBalanceFormError(
-                err instanceof Error ? err.message : 'An error occurred'
+                err instanceof Error ? err.message : 'An error occurred',
             );
         } finally {
             setBalanceSubmitting(false);
@@ -373,7 +382,7 @@ export default function Accounts() {
         try {
             const response = await fetch(
                 `/api/accounts/${balanceDialogAccount.id}/balances/${balanceId}`,
-                { method: 'DELETE' }
+                { method: 'DELETE' },
             );
 
             if (!response.ok) {
@@ -383,7 +392,7 @@ export default function Accounts() {
             await fetchBalances(balanceDialogAccount.id);
         } catch (err) {
             setBalanceFormError(
-                err instanceof Error ? err.message : 'An error occurred'
+                err instanceof Error ? err.message : 'An error occurred',
             );
         }
     };
@@ -422,15 +431,14 @@ export default function Accounts() {
                         ).length > 0 && (
                             <div>
                                 <span className="font-medium">Currencies:</span>{' '}
-                                {(
-                                    account.currencies?.length
-                                        ? account.currencies
-                                        : [account.primary_currency as string]
+                                {(account.currencies?.length
+                                    ? account.currencies
+                                    : [account.primary_currency as string]
                                 ).join(', ')}
                             </div>
                         )}
                         {account.notes && (
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-muted-foreground text-xs">
                                 {account.notes}
                             </div>
                         )}
@@ -438,7 +446,7 @@ export default function Accounts() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     <Button
                         variant="outline"
                         size="sm"
@@ -468,7 +476,7 @@ export default function Accounts() {
 
     const assetAccounts = accounts.filter((account) => account.is_asset);
     const liabilityAccounts = accounts.filter(
-        (account) => account.is_liability
+        (account) => account.is_liability,
     );
 
     return (
@@ -607,7 +615,7 @@ export default function Accounts() {
                                     </div>
 
                                     {formError && (
-                                        <p className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400">
+                                        <p className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400">
                                             <AlertCircle className="h-4 w-4 shrink-0" />
                                             <span>{formError}</span>
                                         </p>
@@ -623,7 +631,9 @@ export default function Accounts() {
                                         Cancel
                                     </Button>
                                     <Button type="submit" disabled={submitting}>
-                                        {submitting ? 'Saving...' : 'Save Account'}
+                                        {submitting
+                                            ? 'Saving...'
+                                            : 'Save Account'}
                                     </Button>
                                 </DialogFooter>
                             </form>
@@ -647,7 +657,7 @@ export default function Accounts() {
                                 <DialogDescription>
                                     Update account details.
                                     {accountHasTransactions && (
-                                        <span className="mt-2 block text-amber-600 dark:text-amber-400">
+                                        <span className="mt-2 block text-amber-700 dark:text-amber-400">
                                             {t('pages.accounts.typeLocked')}
                                         </span>
                                     )}
@@ -778,7 +788,7 @@ export default function Accounts() {
                                 </div>
 
                                 {editFormError && (
-                                    <p className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400">
+                                    <p className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400">
                                         <AlertCircle className="h-4 w-4 shrink-0" />
                                         <span>{editFormError}</span>
                                     </p>
@@ -794,7 +804,9 @@ export default function Accounts() {
                                     Cancel
                                 </Button>
                                 <Button type="submit" disabled={editSubmitting}>
-                                    {editSubmitting ? 'Saving...' : 'Save Changes'}
+                                    {editSubmitting
+                                        ? 'Saving...'
+                                        : 'Save Changes'}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -804,10 +816,14 @@ export default function Accounts() {
                 {error && (
                     <Card className="border-destructive">
                         <CardHeader>
-                            <CardTitle className="text-destructive">Error</CardTitle>
+                            <CardTitle className="text-destructive">
+                                Error
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{error}</p>
+                            <p className="text-muted-foreground text-sm">
+                                {error}
+                            </p>
                         </CardContent>
                     </Card>
                 )}
@@ -837,7 +853,7 @@ export default function Accounts() {
                             </SectionHeading>
                             {assetAccounts.length === 0 ? (
                                 <Card>
-                                    <CardContent className="py-8 text-center text-muted-foreground">
+                                    <CardContent className="text-muted-foreground py-8 text-center">
                                         No asset accounts yet.
                                     </CardContent>
                                 </Card>
@@ -854,7 +870,7 @@ export default function Accounts() {
                             </SectionHeading>
                             {liabilityAccounts.length === 0 ? (
                                 <Card>
-                                    <CardContent className="py-8 text-center text-muted-foreground">
+                                    <CardContent className="text-muted-foreground py-8 text-center">
                                         No liability accounts yet.
                                     </CardContent>
                                 </Card>
@@ -880,8 +896,8 @@ export default function Accounts() {
                                     : ''}
                             </DialogTitle>
                             <DialogDescription>
-                                Enter the recorded balance for a specific
-                                period (YYYYMM), in one or more currencies.
+                                Enter the recorded balance for a specific period
+                                (YYYYMM), in one or more currencies.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -911,9 +927,7 @@ export default function Accounts() {
 
                                 <div className="grid grid-cols-3 gap-2">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="balance-cad">
-                                            CAD
-                                        </Label>
+                                        <Label htmlFor="balance-cad">CAD</Label>
                                         <Input
                                             id="balance-cad"
                                             type="number"
@@ -932,9 +946,7 @@ export default function Accounts() {
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="balance-usd">
-                                            USD
-                                        </Label>
+                                        <Label htmlFor="balance-usd">USD</Label>
                                         <Input
                                             id="balance-usd"
                                             type="number"
@@ -953,9 +965,7 @@ export default function Accounts() {
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="balance-cop">
-                                            COP
-                                        </Label>
+                                        <Label htmlFor="balance-cop">COP</Label>
                                         <Input
                                             id="balance-cop"
                                             type="number"
@@ -976,9 +986,7 @@ export default function Accounts() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="balance-notes">
-                                        Notes
-                                    </Label>
+                                    <Label htmlFor="balance-notes">Notes</Label>
                                     <Textarea
                                         id="balance-notes"
                                         value={balanceForm.notes}
@@ -993,7 +1001,7 @@ export default function Accounts() {
                                 </div>
 
                                 {balanceFormError && (
-                                    <p className="flex items-center gap-1.5 text-sm text-destructive dark:text-red-400">
+                                    <p className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400">
                                         <AlertCircle className="h-4 w-4 shrink-0" />
                                         <span>{balanceFormError}</span>
                                     </p>
@@ -1017,11 +1025,11 @@ export default function Accounts() {
                                 Recorded Balances
                             </h3>
                             {balancesLoading ? (
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Loading...
                                 </p>
                             ) : balances.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     No balances recorded yet.
                                 </p>
                             ) : (
@@ -1038,17 +1046,17 @@ export default function Accounts() {
                                                 <div className="text-muted-foreground">
                                                     {formatCurrency(
                                                         balance.recorded_balance_cad,
-                                                        'CAD'
+                                                        'CAD',
                                                     )}{' '}
                                                     ·{' '}
                                                     {formatCurrency(
                                                         balance.recorded_balance_usd,
-                                                        'USD'
+                                                        'USD',
                                                     )}{' '}
                                                     ·{' '}
                                                     {formatCurrency(
                                                         balance.recorded_balance_cop,
-                                                        'COP'
+                                                        'COP',
                                                     )}
                                                 </div>
                                             </div>
@@ -1058,7 +1066,7 @@ export default function Accounts() {
                                                 size="sm"
                                                 onClick={() =>
                                                     handleBalanceDelete(
-                                                        balance.id
+                                                        balance.id,
                                                     )
                                                 }
                                             >

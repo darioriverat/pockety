@@ -1,8 +1,6 @@
 import path from 'node:path';
-import {
-    fileURLToPath } from 'node:url';
-import { expect,
-    test } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
+import { expect, test } from '@playwright/test';
 import {
     ensureTransactionInPeriod,
     loginAsBrowserTestUser,
@@ -26,7 +24,10 @@ test('feature 65-70: balance sheet shows assets liabilities equity in CAD USD CO
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {
@@ -160,9 +161,18 @@ test('feature 71: balance sheet time series shows historical trend across period
 
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
-    await ensureExchangeRateForPeriod(request, '202502', { copPerUsd: 4400, cadPerUsd: 0.75 });
-    await ensureExchangeRateForPeriod(request, '202609', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
+    await ensureExchangeRateForPeriod(request, '202502', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
+    await ensureExchangeRateForPeriod(request, '202609', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {
@@ -266,7 +276,9 @@ test('feature 72: import historical balance sheet from uploaded fixture', async 
     ).toBeVisible();
     await expect(page.getByTestId('balance-sheet-import-card')).toBeVisible();
     await expect(
-        page.getByTestId('balance-sheet-import-card').locator('[data-slot="card-title"]'),
+        page
+            .getByTestId('balance-sheet-import-card')
+            .locator('[data-slot="card-title"]'),
     ).toHaveText('Balance Sheet');
 
     await page
@@ -290,9 +302,7 @@ test('feature 72: import historical balance sheet from uploaded fixture', async 
     await expect(page.getByTestId('liabilities-202501')).toContainText(
         '4,000.25',
     );
-    await expect(page.getByTestId('equity-202501')).toContainText(
-        '$6,000.25',
-    );
+    await expect(page.getByTestId('equity-202501')).toContainText('$6,000.25');
 
     await expect(page.getByTestId('balance-sheet-row-202502')).toBeVisible();
     await expect(page.getByTestId('assets-202502')).toContainText('11,000.00');

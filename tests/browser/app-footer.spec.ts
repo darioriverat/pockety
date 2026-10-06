@@ -41,12 +41,14 @@ test('feature 173: footer contains useful links and app version information', as
 
     // Verify copyright is present
     const currentYear = new Date().getFullYear();
-    await expect(footer.getByText(new RegExp(`© ${currentYear}`, 'i'))).toBeVisible();
+    await expect(
+        footer.getByText(new RegExp(`© ${currentYear}`, 'i')),
+    ).toBeVisible();
 
     // Verify the removed repository/documentation links are gone
-    await expect(
-        footer.getByRole('link', { name: /repository/i }),
-    ).toHaveCount(0);
+    await expect(footer.getByRole('link', { name: /repository/i })).toHaveCount(
+        0,
+    );
     await expect(
         footer.getByRole('link', { name: /documentation/i }),
     ).toHaveCount(0);
@@ -77,7 +79,9 @@ test('feature 173: footer appears consistently across different pages', async ({
 
     for (const pageInfo of pagesToTest) {
         await page.goto(pageInfo.path);
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await page.evaluate(() =>
+            window.scrollTo(0, document.body.scrollHeight),
+        );
 
         const footer = page.locator('footer');
         await expect(footer).toBeVisible();

@@ -26,7 +26,13 @@ test('feature 7: update category name through edit dialog', async ({
     });
     expect(createResponse.status()).toBe(201);
     const created = (await createResponse.json()) as {
-        data: { code: string; name: string; is_debt_category: boolean; is_income_category: boolean; is_active: boolean };
+        data: {
+            code: string;
+            name: string;
+            is_debt_category: boolean;
+            is_income_category: boolean;
+            is_active: boolean;
+        };
     };
     const code = created.data.code;
 

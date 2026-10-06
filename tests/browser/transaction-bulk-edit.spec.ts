@@ -17,8 +17,12 @@ test.describe('Bulk edit transactions', () => {
         const categoriesPayload = (await categoriesResponse.json()) as {
             data: Array<{ id: number; code: string; name: string }>;
         };
-        const c001 = categoriesPayload.data.find((item) => item.code === 'C001');
-        const c002 = categoriesPayload.data.find((item) => item.code === 'C002');
+        const c001 = categoriesPayload.data.find(
+            (item) => item.code === 'C001',
+        );
+        const c002 = categoriesPayload.data.find(
+            (item) => item.code === 'C002',
+        );
         expect(c001).toBeTruthy();
         expect(c002).toBeTruthy();
 
@@ -43,12 +47,18 @@ test.describe('Bulk edit transactions', () => {
         await page.goto('/transactions');
         await expect(page.getByTestId('transactions-heading')).toBeVisible();
         await page.getByTestId('page-period-selector').click();
-        await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+        await page
+            .getByRole('option', { name: 'January 2025', exact: true })
+            .click();
 
-        await expect(page.getByTestId(`transaction-row-${createdIds[0]}`)).toBeVisible({
+        await expect(
+            page.getByTestId(`transaction-row-${createdIds[0]}`),
+        ).toBeVisible({
             timeout: 10000,
         });
-        await expect(page.getByTestId(`transaction-row-${createdIds[1]}`)).toBeVisible();
+        await expect(
+            page.getByTestId(`transaction-row-${createdIds[1]}`),
+        ).toBeVisible();
 
         await page.screenshot({
             path: 'verification/session-59/03-transactions-before-bulk.png',
@@ -57,7 +67,9 @@ test.describe('Bulk edit transactions', () => {
 
         await page.getByTestId(`select-transaction-${createdIds[0]}`).click();
         await page.getByTestId(`select-transaction-${createdIds[1]}`).click();
-        await expect(page.getByTestId('selected-count')).toContainText('2 selected');
+        await expect(page.getByTestId('selected-count')).toContainText(
+            '2 selected',
+        );
 
         await page.getByTestId('bulk-edit-button').click();
         await expect(page.getByTestId('bulk-edit-dialog')).toBeVisible();

@@ -23,8 +23,10 @@ export function ChartAxisLabels({
     testIdPrefix = 'chart',
     fontSize = 12,
 }: ChartAxisLabelsProps) {
-    const plotCenterY = padding.top + (height - padding.top - padding.bottom) / 2;
-    const plotCenterX = padding.left + (width - padding.left - padding.right) / 2;
+    const plotCenterY =
+        padding.top + (height - padding.top - padding.bottom) / 2;
+    const plotCenterX =
+        padding.left + (width - padding.left - padding.right) / 2;
     const yAxisX = Math.max(10, Math.min(14, padding.left * 0.22));
 
     return (

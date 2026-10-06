@@ -41,7 +41,7 @@ describe('Transactions period auto-fill', () => {
         vi.clearAllMocks();
 
         global.fetch = vi.fn(async (input: RequestInfo | URL) => {
-            const url = String(input);
+            const url = input instanceof Request ? input.url : String(input);
 
             if (url.startsWith('/api/categories')) {
                 return {
@@ -95,12 +95,14 @@ describe('Transactions period auto-fill', () => {
             ).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Add Transaction' }));
+        fireEvent.click(
+            screen.getByRole('button', { name: 'Add Transaction' }),
+        );
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-form-title')).toHaveTextContent(
-                'Add Transaction',
-            );
+            expect(
+                screen.getByTestId('transaction-form-title'),
+            ).toHaveTextContent('Add Transaction');
         });
 
         expect(screen.getByTestId('transaction-period-hint')).toHaveTextContent(

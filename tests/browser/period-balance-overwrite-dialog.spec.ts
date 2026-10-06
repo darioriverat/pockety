@@ -2,7 +2,8 @@ import {
     expect,
     test,
     type APIRequestContext,
-    type Page } from '@playwright/test';
+    type Page,
+} from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -14,7 +15,10 @@ import {
 async function seedOverwriteScenario(page: Page, request: APIRequestContext) {
     await loginAsBrowserTestUser(page, request);
 
-    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202501', {
+        copPerUsd: 4400,
+        cadPerUsd: 0.75,
+    });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {
@@ -59,7 +63,9 @@ async function seedOverwriteScenario(page: Page, request: APIRequestContext) {
     await page.goto('/period-balances');
     await expect(page.getByTestId('period-balances-heading')).toBeVisible();
     await page.getByTestId('page-period-selector').click();
-    await page.getByRole('option', { name: 'January 2025', exact: true }).click();
+    await page
+        .getByRole('option', { name: 'January 2025', exact: true })
+        .click();
     await expect(page.getByTestId('page-period-selector')).toContainText(
         'January 2025',
     );
@@ -128,12 +134,12 @@ test('overwrite dialog layout is wide, side-by-side, and readable on desktop', a
         const proposedCol = document.querySelector(
             '[data-testid="overwrite-proposed-column"]',
         ) as HTMLElement | null;
-        const existingGrid = document.querySelector(
-            '[data-testid="overwrite-existing-assets-cad"]',
-        )?.closest('dl') as HTMLElement | null;
-        const proposedGrid = document.querySelector(
-            '[data-testid="overwrite-proposed-assets-cad"]',
-        )?.closest('dl') as HTMLElement | null;
+        const existingGrid = document
+            .querySelector('[data-testid="overwrite-existing-assets-cad"]')
+            ?.closest('dl') as HTMLElement | null;
+        const proposedGrid = document
+            .querySelector('[data-testid="overwrite-proposed-assets-cad"]')
+            ?.closest('dl') as HTMLElement | null;
         const title = document.querySelector(
             '[data-testid="overwrite-balance-title"]',
         ) as HTMLElement | null;
@@ -175,8 +181,10 @@ test('overwrite dialog layout is wide, side-by-side, and readable on desktop', a
             sideBySide,
             noOverlap,
             titleNotCovered,
-            existingGridCols: getComputedStyle(existingGrid).gridTemplateColumns,
-            proposedGridCols: getComputedStyle(proposedGrid).gridTemplateColumns,
+            existingGridCols:
+                getComputedStyle(existingGrid).gridTemplateColumns,
+            proposedGridCols:
+                getComputedStyle(proposedGrid).gridTemplateColumns,
             comparisonCols: getComputedStyle(comparison).gridTemplateColumns,
         };
     });

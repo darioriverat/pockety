@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -48,7 +46,10 @@ async function seedChartData(page: import('@playwright/test').Page) {
         const year = period.slice(0, 4);
         const month = period.slice(4, 6);
 
-        await ensureExchangeRateForPeriod(page.request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
+        await ensureExchangeRateForPeriod(page.request, period, {
+            copPerUsd: 4400,
+            cadPerUsd: 0.75,
+        });
 
         const incomeResponse = await page.request.post('/api/income', {
             data: {
@@ -103,7 +104,9 @@ for (const theme of ['light', 'dark'] as const) {
         await seedChartData(page);
 
         await page.goto('/dashboard?period=202606');
-        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: 'Dashboard' }),
+        ).toBeVisible();
 
         const incomeWrap = page.getByTestId('income-expense-chart-responsive');
         const incomeChart = page.getByTestId('income-expense-chart');
@@ -188,7 +191,9 @@ for (const theme of ['light', 'dark'] as const) {
         });
 
         // Touch/pointer interaction still shows period values
-        await page.getByTestId('al-chart-hit-202606').dispatchEvent('pointerdown');
+        await page
+            .getByTestId('al-chart-hit-202606')
+            .dispatchEvent('pointerdown');
         const tooltip = page.getByTestId('assets-liabilities-hover-tooltip');
         await expect(tooltip).toBeVisible();
         await expect(tooltip).toContainText('Jun');
@@ -205,7 +210,9 @@ for (const theme of ['light', 'dark'] as const) {
     });
 }
 
-test('dashboard charts use desktop layout at wide viewport', async ({ page }) => {
+test('dashboard charts use desktop layout at wide viewport', async ({
+    page,
+}) => {
     const consoleErrors = trackConsoleErrors(page);
     await page.setViewportSize({ width: 1280, height: 900 });
     await seedChartData(page);

@@ -166,7 +166,7 @@
      * and SubsectionHeading / CardTitle (H3).
      */
     body {
-        @apply bg-background text-foreground text-base font-normal leading-relaxed;
+        @apply bg-background text-foreground text-base leading-relaxed font-normal;
     }
 
     /*

@@ -7,7 +7,9 @@ test.describe('per-user ownership foundation', () => {
     }) => {
         await loginAsBrowserTestUser(page);
         await page.goto('/categories');
-        await expect(page.getByRole('heading', { name: /categories/i })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: /categories/i }),
+        ).toBeVisible();
 
         const api = await page.request.get('/api/categories');
         expect(api.status()).toBe(200);
@@ -21,7 +23,10 @@ test.describe('per-user ownership foundation', () => {
         });
     });
 
-    test('unauthenticated API calls receive 401', async ({ playwright, baseURL }) => {
+    test('unauthenticated API calls receive 401', async ({
+        playwright,
+        baseURL,
+    }) => {
         const context = await playwright.request.newContext({
             baseURL,
             storageState: { cookies: [], origins: [] },
@@ -42,7 +47,9 @@ test.describe('per-user ownership foundation', () => {
         await page.getByTestId('kind-expense').click();
         await page.getByTestId('create-category-submit').click();
 
-        await expect(page.getByText('Ownership Probe')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText('Ownership Probe')).toBeVisible({
+            timeout: 10000,
+        });
         await page.screenshot({
             path: 'verification/user-ownership/create-category.png',
             fullPage: true,

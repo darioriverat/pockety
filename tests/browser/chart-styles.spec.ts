@@ -1,6 +1,4 @@
-import {
-    expect,
-    test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
@@ -69,7 +67,10 @@ async function seedChartData(page: import('@playwright/test').Page) {
         const year = period.slice(0, 4);
         const month = period.slice(4, 6);
 
-        await ensureExchangeRateForPeriod(page.request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
+        await ensureExchangeRateForPeriod(page.request, period, {
+            copPerUsd: 4400,
+            cadPerUsd: 0.75,
+        });
 
         const incomeResponse = await page.request.post('/api/income', {
             data: {
@@ -111,13 +112,19 @@ for (const theme of ['light', 'dark'] as const) {
         await seedChartData(page);
 
         await page.goto('/dashboard?period=202606');
-        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: 'Dashboard' }),
+        ).toBeVisible();
 
         const incomeChart = page.getByTestId('income-expense-chart');
         await expect(incomeChart).toBeVisible();
-        await expect(page.getByTestId('income-expense-chart-legend')).toBeVisible();
+        await expect(
+            page.getByTestId('income-expense-chart-legend'),
+        ).toBeVisible();
         await expect(page.getByTestId('legend-income')).toContainText('Income');
-        await expect(page.getByTestId('legend-expenses')).toContainText('Expenses');
+        await expect(page.getByTestId('legend-expenses')).toContainText(
+            'Expenses',
+        );
 
         await expect(
             page.getByTestId('income-expense-chart-y-axis-label'),
@@ -125,8 +132,12 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(
             page.getByTestId('income-expense-chart-x-axis-label'),
         ).toHaveText('Period');
-        await expect(page.getByTestId('income-expense-chart-y-tick').first()).toBeVisible();
-        await expect(page.getByTestId('income-expense-chart-x-tick').first()).toBeVisible();
+        await expect(
+            page.getByTestId('income-expense-chart-y-tick').first(),
+        ).toBeVisible();
+        await expect(
+            page.getByTestId('income-expense-chart-x-tick').first(),
+        ).toBeVisible();
 
         const incomeSwatch = page.getByTestId('legend-swatch-income');
         const expenseSwatch = page.getByTestId('legend-swatch-expenses');
@@ -197,9 +208,9 @@ for (const theme of ['light', 'dark'] as const) {
         expect(normalizeColor(equityStroke ?? '')).toBe(
             normalizeColor(CHART_COLORS.equity),
         );
-        expect(new Set([assetsStroke, liabilitiesStroke, equityStroke]).size).toBe(
-            3,
-        );
+        expect(
+            new Set([assetsStroke, liabilitiesStroke, equityStroke]).size,
+        ).toBe(3);
 
         await assetsChart.screenshot({
             path: `${evidence}/${theme}-assets-liabilities-chart-closeup.png`,

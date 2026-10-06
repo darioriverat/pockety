@@ -28,8 +28,8 @@ void createInertiaApp({
     strictMode: true,
     withApp(app, { page }) {
         const initialLocale = normalizeLocale(
-            (page.props as { auth?: { user?: { locale?: string } } })?.auth?.user
-                ?.locale,
+            (page.props as { auth?: { user?: { locale?: string } } })?.auth
+                ?.user?.locale,
         );
         void i18n.changeLanguage(initialLocale);
         applyDocumentLang(initialLocale);

@@ -29,7 +29,8 @@ test.describe('Reconciliation - Variance Warnings', () => {
             const accountsResponse = await fetch('/api/accounts');
             const accounts = await accountsResponse.json();
             let account = accounts.data.find(
-                (item: { name: string }) => item.name === 'Test Variance Account',
+                (item: { name: string }) =>
+                    item.name === 'Test Variance Account',
             );
 
             if (!account) {
@@ -80,7 +81,9 @@ test.describe('Reconciliation - Variance Warnings', () => {
         });
     });
 
-    test('shows warning icon when variance exceeds $10 threshold', async ({ page }) => {
+    test('shows warning icon when variance exceeds $10 threshold', async ({
+        page,
+    }) => {
         const consoleErrors = trackConsoleErrors(page);
         // Step 1: Navigate to account reconciliation
         await page.goto('/reconciliation');
@@ -91,11 +94,15 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await page.click('button[type="submit"]');
 
         // Wait for data to load
-        await page.waitForSelector('[data-testid^="account-reconciliation-"]', { timeout: 5000 });
+        await page.waitForSelector('[data-testid^="account-reconciliation-"]', {
+            timeout: 5000,
+        });
 
         // Step 2: Verify variance exists (should be > $10)
         // Find the Test Variance Account card
-        const accountCard = page.locator('[data-account-name="Test Variance Account"]');
+        const accountCard = page.locator(
+            '[data-account-name="Test Variance Account"]',
+        );
         await expect(accountCard).toBeVisible();
 
         // Step 3: Verify warning icon is shown
@@ -103,7 +110,10 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await expect(warningIcon).toBeVisible();
 
         // Take screenshot of variance warning
-        await page.screenshot({ path: 'verification/test-106-variance-warning.png', fullPage: true });
+        await page.screenshot({
+            path: 'verification/test-106-variance-warning.png',
+            fullPage: true,
+        });
 
         // Step 4: Verify tooltip message explains the variance
         // Hover over warning icon to show tooltip
@@ -116,10 +126,15 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await expect(tooltip).toContainText('$10.00 threshold');
 
         // Take screenshot of tooltip
-        await page.screenshot({ path: 'verification/test-106-variance-tooltip.png', fullPage: true });
+        await page.screenshot({
+            path: 'verification/test-106-variance-tooltip.png',
+            fullPage: true,
+        });
 
         // Step 5: Verify user can click to investigate transactions
-        const investigateLink = accountCard.locator('[data-testid^="investigate-link-"]');
+        const investigateLink = accountCard.locator(
+            '[data-testid^="investigate-link-"]',
+        );
         await expect(investigateLink).toBeVisible();
         await expect(investigateLink).toContainText('Investigate Transactions');
 
@@ -130,12 +145,17 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await expect(page).toHaveURL(/\/accounts\/\d+\?period=202501/);
 
         // Take screenshot of account details page
-        await page.screenshot({ path: 'verification/test-106-investigate-transactions.png', fullPage: true });
+        await page.screenshot({
+            path: 'verification/test-106-investigate-transactions.png',
+            fullPage: true,
+        });
 
         expect(consoleErrors).toEqual([]);
     });
 
-    test('does not show warning for accounts with variance below threshold', async ({ page }) => {
+    test('does not show warning for accounts with variance below threshold', async ({
+        page,
+    }) => {
         const consoleErrors = trackConsoleErrors(page);
         // Create an account with small variance (< $10)
         await page.evaluate(async () => {
@@ -184,15 +204,21 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await page.fill('input#period-input', '202501');
         await page.click('button[type="submit"]');
 
-        await page.waitForSelector('[data-testid^="account-reconciliation-"]', { timeout: 5000 });
+        await page.waitForSelector('[data-testid^="account-reconciliation-"]', {
+            timeout: 5000,
+        });
 
-        const accountCard = page.locator('[data-account-name="Small Variance Account"]');
+        const accountCard = page.locator(
+            '[data-account-name="Small Variance Account"]',
+        );
         await expect(accountCard).toBeVisible();
 
         // Should show "Variance" badge but NO warning icon.
         // The account name and the currency column also contain "Variance".
         await expect(
-            accountCard.locator('[data-slot="badge"]').filter({ hasText: /^Variance$/ }),
+            accountCard
+                .locator('[data-slot="badge"]')
+                .filter({ hasText: /^Variance$/ }),
         ).toBeVisible();
 
         // Warning icon should NOT be present
@@ -200,7 +226,10 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await expect(warningIcon).toHaveCount(0);
 
         // Take screenshot
-        await page.screenshot({ path: 'verification/test-106-no-warning-small-variance.png', fullPage: true });
+        await page.screenshot({
+            path: 'verification/test-106-no-warning-small-variance.png',
+            fullPage: true,
+        });
 
         expect(consoleErrors).toEqual([]);
     });
@@ -238,14 +267,20 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await page.fill('input#period-input', '202501');
         await page.click('button[type="submit"]');
 
-        await page.waitForSelector('[data-testid^="account-reconciliation-"]', { timeout: 5000 });
+        await page.waitForSelector('[data-testid^="account-reconciliation-"]', {
+            timeout: 5000,
+        });
 
-        const accountCard = page.locator('[data-account-name="Balanced Account"]');
+        const accountCard = page.locator(
+            '[data-account-name="Balanced Account"]',
+        );
         await expect(accountCard).toBeVisible();
 
         // Should show "Balanced" badge. The account name also contains "Balanced".
         await expect(
-            accountCard.locator('[data-slot="badge"]').filter({ hasText: /^Balanced$/ }),
+            accountCard
+                .locator('[data-slot="badge"]')
+                .filter({ hasText: /^Balanced$/ }),
         ).toBeVisible();
 
         // Warning icon should NOT be present
@@ -253,11 +288,16 @@ test.describe('Reconciliation - Variance Warnings', () => {
         await expect(warningIcon).toHaveCount(0);
 
         // Investigate link should NOT be present for balanced accounts
-        const investigateLink = accountCard.locator('[data-testid^="investigate-link-"]');
+        const investigateLink = accountCard.locator(
+            '[data-testid^="investigate-link-"]',
+        );
         await expect(investigateLink).not.toBeVisible();
 
         // Take screenshot
-        await page.screenshot({ path: 'verification/test-106-no-warning-balanced.png', fullPage: true });
+        await page.screenshot({
+            path: 'verification/test-106-no-warning-balanced.png',
+            fullPage: true,
+        });
 
         expect(consoleErrors).toEqual([]);
     });

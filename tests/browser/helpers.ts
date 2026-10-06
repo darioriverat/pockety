@@ -61,13 +61,16 @@ export async function ensureExchangeRateForPeriod(
     const month = Number(period.slice(4, 6));
     const rateDate = new Date(year, month, 0).toISOString().slice(0, 10);
 
-    const snapshotResponse = await request.post('/api/exchange-rate-snapshots', {
-        data: {
-            rate_date: rateDate,
-            cad_per_usd: cadPerUsd,
-            cop_per_usd: copPerUsd,
+    const snapshotResponse = await request.post(
+        '/api/exchange-rate-snapshots',
+        {
+            data: {
+                rate_date: rateDate,
+                cad_per_usd: cadPerUsd,
+                cop_per_usd: copPerUsd,
+            },
         },
-    });
+    );
     expect(snapshotResponse.ok()).toBeTruthy();
     const snapshotBody = (await snapshotResponse.json()) as {
         data: { id: number };
@@ -181,7 +184,9 @@ export async function loginAsBrowserTestUser(
     // Playwright's request fixture does not share the page cookie jar. Financial
     // APIs require session auth, so mirror login into the API context when given.
     if (request) {
-        const response = await request.get('/dev/login-as-test-user?redirect=/dashboard');
+        const response = await request.get(
+            '/dev/login-as-test-user?redirect=/dashboard',
+        );
         expect(response.status()).toBeLessThan(400);
     }
 }

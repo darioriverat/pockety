@@ -63,7 +63,10 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+            if (
+                (event.metaKey || event.ctrlKey) &&
+                event.key.toLowerCase() === 'k'
+            ) {
                 event.preventDefault();
                 setOpen(true);
             }
@@ -178,7 +181,9 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
                                 data-testid="global-search-input"
                                 placeholder="Search accounts, comments, categories…"
                                 value={query}
-                                onChange={(event) => setQuery(event.target.value)}
+                                onChange={(event) =>
+                                    setQuery(event.target.value)
+                                }
                                 className="pl-9"
                                 autoComplete="off"
                             />
@@ -191,8 +196,8 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
                     >
                         {!hasQuery && (
                             <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-                                Type to search across accounts, transactions, and
-                                categories.
+                                Type to search across accounts, transactions,
+                                and categories.
                             </p>
                         )}
 
@@ -224,31 +229,35 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
                             </p>
                         )}
 
-                        {hasQuery && !loading && !error && results && total > 0 && (
-                            <div className="space-y-4 py-1">
-                                <SearchSection
-                                    title="Accounts"
-                                    testId="global-search-accounts"
-                                    icon={<Building2 className="size-4" />}
-                                    hits={results.accounts}
-                                    onSelect={navigateTo}
-                                />
-                                <SearchSection
-                                    title="Transactions"
-                                    testId="global-search-transactions"
-                                    icon={<Receipt className="size-4" />}
-                                    hits={results.transactions}
-                                    onSelect={navigateTo}
-                                />
-                                <SearchSection
-                                    title="Categories"
-                                    testId="global-search-categories"
-                                    icon={<Tags className="size-4" />}
-                                    hits={results.categories}
-                                    onSelect={navigateTo}
-                                />
-                            </div>
-                        )}
+                        {hasQuery &&
+                            !loading &&
+                            !error &&
+                            results &&
+                            total > 0 && (
+                                <div className="space-y-4 py-1">
+                                    <SearchSection
+                                        title="Accounts"
+                                        testId="global-search-accounts"
+                                        icon={<Building2 className="size-4" />}
+                                        hits={results.accounts}
+                                        onSelect={navigateTo}
+                                    />
+                                    <SearchSection
+                                        title="Transactions"
+                                        testId="global-search-transactions"
+                                        icon={<Receipt className="size-4" />}
+                                        hits={results.transactions}
+                                        onSelect={navigateTo}
+                                    />
+                                    <SearchSection
+                                        title="Categories"
+                                        testId="global-search-categories"
+                                        icon={<Tags className="size-4" />}
+                                        hits={results.categories}
+                                        onSelect={navigateTo}
+                                    />
+                                </div>
+                            )}
                     </div>
                 </DialogContent>
             </Dialog>
@@ -290,7 +299,9 @@ function SearchSection({
                             className="hover:bg-accent hover:text-accent-foreground flex w-full flex-col items-start rounded-md px-3 py-2 text-left transition-colors"
                             onClick={() => onSelect(hit.url)}
                         >
-                            <span className="text-sm font-medium">{hit.title}</span>
+                            <span className="text-sm font-medium">
+                                {hit.title}
+                            </span>
                             {hit.subtitle && (
                                 <span className="text-muted-foreground text-xs">
                                     {hit.subtitle}

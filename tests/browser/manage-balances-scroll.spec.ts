@@ -47,9 +47,7 @@ test('Manage Balances dialog scrolls a long recorded-balances list without scrol
     await expect(dialog).toBeVisible();
 
     // Title, description and the new-balance form stay visible.
-    await expect(
-        dialog.getByText(/Manage Balances/).first(),
-    ).toBeVisible();
+    await expect(dialog.getByText(/Manage Balances/).first()).toBeVisible();
     await expect(
         dialog.getByText(/Enter the recorded balance for a specific period/),
     ).toBeVisible();
@@ -144,7 +142,9 @@ test('Manage Balances dialog with a short list fits content and does not scroll 
 
     const dialog = page.locator('[data-slot="dialog-content"]');
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole('button', { name: 'Save Balance' })).toBeVisible();
+    await expect(
+        dialog.getByRole('button', { name: 'Save Balance' }),
+    ).toBeVisible();
     await expect(dialog.locator('ul li')).toHaveCount(1);
 
     // A short list fits its content: the dialog is not stretched to the 85vh cap.

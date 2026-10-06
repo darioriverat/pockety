@@ -83,12 +83,12 @@ export default function Budgets() {
     const [reportError, setReportError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchCategories();
+        void fetchCategories();
     }, []);
 
     useEffect(() => {
         if (selectedPeriod) {
-            fetchReport(selectedPeriod);
+            void fetchReport(selectedPeriod);
         }
     }, [selectedPeriod]);
 
@@ -194,365 +194,380 @@ export default function Budgets() {
     };
 
     const rowsWithBudget = reportRows.filter((row) => row.budget_cad !== null);
-    const overBudgetCount = reportRows.filter((row) => row.is_over_budget).length;
+    const overBudgetCount = reportRows.filter(
+        (row) => row.is_over_budget,
+    ).length;
 
     return (
         <>
             <Head title={t('pages.budgets.title')} />
 
             <PageContainer>
-                    <div className="mb-8">
-                        <PageTitle
-                            title={t('pages.budgets.title')}
-                            description="Set monthly category budgets and compare against actual spending (CAD equivalent)"
-                        />
-                    </div>
+                <div className="mb-8">
+                    <PageTitle
+                        title={t('pages.budgets.title')}
+                        description="Set monthly category budgets and compare against actual spending (CAD equivalent)"
+                    />
+                </div>
 
-                    <div className="mb-6 grid gap-4 sm:grid-cols-3">
-                        <Card>
-                            <CardHeader className="pb-2">
-                                <CardDescription>Total Budget</CardDescription>
-                                <CardTitle
-                                    className="text-2xl"
-                                    data-testid="budget-total"
-                                >
-                                    {formatCad(totals?.budget_cad ?? 0)}
-                                </CardTitle>
-                            </CardHeader>
-                        </Card>
-                        <Card>
-                            <CardHeader className="pb-2">
-                                <CardDescription>Total Actual</CardDescription>
-                                <CardTitle
-                                    className="text-2xl"
-                                    data-testid="actual-total"
-                                >
-                                    {formatCad(totals?.actual_cad ?? 0)}
-                                </CardTitle>
-                            </CardHeader>
-                        </Card>
-                        <Card>
-                            <CardHeader className="pb-2">
-                                <CardDescription>Over Budget</CardDescription>
-                                <CardTitle
-                                    className="text-2xl"
-                                    data-testid="over-budget-count"
-                                >
-                                    {overBudgetCount}
-                                </CardTitle>
-                            </CardHeader>
-                        </Card>
-                    </div>
-
-                    <div className="grid gap-6 md:grid-cols-2">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <PiggyBank className="h-5 w-5" />
-                                    Set Monthly Budget
-                                </CardTitle>
-                                <CardDescription>
-                                    Enter a CAD budget amount for a category and
-                                    period
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="period">Period</Label>
-                                    <Select
-                                        value={selectedPeriod}
-                                        onValueChange={setSelectedPeriod}
-                                    >
-                                        <SelectTrigger
-                                            id="period"
-                                            data-testid="page-period-selector"
-                                        >
-                                            <SelectValue placeholder="Select period" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {periods.map((period) => (
-                                                <SelectItem
-                                                    key={period}
-                                                    value={period}
-                                                >
-                                                    {formatPeriod(period)}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="category">Category</Label>
-                                    <Select
-                                        value={selectedCategoryCode}
-                                        onValueChange={setSelectedCategoryCode}
-                                    >
-                                        <SelectTrigger
-                                            id="category"
-                                            data-testid="budget-category-field"
-                                        >
-                                            <SelectValue placeholder="Select category" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map((category) => (
-                                                <SelectItem
-                                                    key={category.code}
-                                                    value={category.code}
-                                                    data-testid={`budget-category-option-${category.code}`}
-                                                >
-                                                    {category.code} — {category.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="amount_cad">
-                                        Budget Amount (CAD)
-                                    </Label>
-                                    <Input
-                                        id="amount_cad"
-                                        type="number"
-                                        step="0.01"
-                                        min="0.01"
-                                        value={amountCad}
-                                        onChange={(e) =>
-                                            setAmountCad(e.target.value)
-                                        }
-                                        placeholder="800.00"
-                                    />
-                                </div>
-
-                                <Button
-                                    onClick={handleSave}
-                                    disabled={saving}
-                                    className="w-full"
-                                    data-testid="save-budget"
-                                >
-                                    {saving && <Spinner className="mr-2" />}
-                                    Save Budget
-                                </Button>
-
-                                {saveSuccess && (
-                                    <Alert data-testid="budget-save-success">
-                                        <CheckCircle className="h-4 w-4" />
-                                        <AlertDescription>
-                                            Budget saved for{' '}
-                                            {selectedCategoryCode} in{' '}
-                                            {formatPeriod(selectedPeriod)}
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-
-                                {saveError && (
-                                    <Alert variant="destructive">
-                                        <XCircle className="h-4 w-4" />
-                                        <AlertDescription>
-                                            {saveError}
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <TrendingUp className="h-5 w-5" />
-                                    Period Summary
-                                </CardTitle>
-                                <CardDescription>
-                                    {formatPeriod(selectedPeriod)} — budgets set
-                                    for {rowsWithBudget.length} categories
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-3 text-sm">
-                                <p>
-                                    <strong>Variance:</strong>{' '}
-                                    <span
-                                        data-testid="variance-total"
-                                        className={
-                                            (totals?.variance_cad ?? 0) > 0
-                                                ? 'text-red-600 dark:text-red-400'
-                                                : 'text-green-700 dark:text-green-400'
-                                        }
-                                    >
-                                        {formatCad(totals?.variance_cad ?? 0)}
-                                    </span>
-                                </p>
-                                <p className="text-gray-600 dark:text-gray-400">
-                                    Actual spending is computed live from
-                                    transactions and converted to CAD using the
-                                    period exchange rates. Positive variance
-                                    means over budget.
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    <Card className="mt-6">
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <CardTitle>Budget vs Actual Report</CardTitle>
-                                    <CardDescription>
-                                        Compare budgeted amounts against computed
-                                        actual spend for {formatPeriod(selectedPeriod)}
-                                    </CardDescription>
-                                </div>
-                                <Button
-                                    onClick={handleExport}
-                                    variant="outline"
-                                    size="sm"
-                                    className="gap-2"
-                                    data-testid="export-budget-report"
-                                >
-                                    <Download className="h-4 w-4" />
-                                    Export to CSV
-                                </Button>
-                            </div>
+                <div className="mb-6 grid gap-4 sm:grid-cols-3">
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Total Budget</CardDescription>
+                            <CardTitle
+                                className="text-2xl"
+                                data-testid="budget-total"
+                            >
+                                {formatCad(totals?.budget_cad ?? 0)}
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            {loadingReport ? (
-                                <div className="flex justify-center py-8">
-                                    <Spinner />
-                                </div>
-                            ) : reportError ? (
+                    </Card>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Total Actual</CardDescription>
+                            <CardTitle
+                                className="text-2xl"
+                                data-testid="actual-total"
+                            >
+                                {formatCad(totals?.actual_cad ?? 0)}
+                            </CardTitle>
+                        </CardHeader>
+                    </Card>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Over Budget</CardDescription>
+                            <CardTitle
+                                className="text-2xl"
+                                data-testid="over-budget-count"
+                            >
+                                {overBudgetCount}
+                            </CardTitle>
+                        </CardHeader>
+                    </Card>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <PiggyBank className="h-5 w-5" />
+                                Set Monthly Budget
+                            </CardTitle>
+                            <CardDescription>
+                                Enter a CAD budget amount for a category and
+                                period
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="period">Period</Label>
+                                <Select
+                                    value={selectedPeriod}
+                                    onValueChange={setSelectedPeriod}
+                                >
+                                    <SelectTrigger
+                                        id="period"
+                                        data-testid="page-period-selector"
+                                    >
+                                        <SelectValue placeholder="Select period" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {periods.map((period) => (
+                                            <SelectItem
+                                                key={period}
+                                                value={period}
+                                            >
+                                                {formatPeriod(period)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="category">Category</Label>
+                                <Select
+                                    value={selectedCategoryCode}
+                                    onValueChange={setSelectedCategoryCode}
+                                >
+                                    <SelectTrigger
+                                        id="category"
+                                        data-testid="budget-category-field"
+                                    >
+                                        <SelectValue placeholder="Select category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((category) => (
+                                            <SelectItem
+                                                key={category.code}
+                                                value={category.code}
+                                                data-testid={`budget-category-option-${category.code}`}
+                                            >
+                                                {category.code} —{' '}
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="amount_cad">
+                                    Budget Amount (CAD)
+                                </Label>
+                                <Input
+                                    id="amount_cad"
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    value={amountCad}
+                                    onChange={(e) =>
+                                        setAmountCad(e.target.value)
+                                    }
+                                    placeholder="800.00"
+                                />
+                            </div>
+
+                            <Button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="w-full"
+                                data-testid="save-budget"
+                            >
+                                {saving && <Spinner className="mr-2" />}
+                                Save Budget
+                            </Button>
+
+                            {saveSuccess && (
+                                <Alert data-testid="budget-save-success">
+                                    <CheckCircle className="h-4 w-4" />
+                                    <AlertDescription>
+                                        Budget saved for {selectedCategoryCode}{' '}
+                                        in {formatPeriod(selectedPeriod)}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+
+                            {saveError && (
                                 <Alert variant="destructive">
                                     <XCircle className="h-4 w-4" />
                                     <AlertDescription>
-                                        {reportError}
+                                        {saveError}
                                     </AlertDescription>
                                 </Alert>
-                            ) : reportRows.length === 0 ? (
-                                <p className="py-8 text-center text-gray-500">
-                                    No categories found. Seed categories to get
-                                    started.
-                                </p>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table
-                                        className="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
-                                        data-testid="budget-vs-actual-table"
-                                    >
-                                        <thead className="bg-gray-50 dark:bg-gray-800">
-                                            <tr>
-                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    Category
-                                                </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    Budget
-                                                </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    Actual
-                                                </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    Variance
-                                                </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    Progress
-                                                </th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    Status
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
-                                            {reportRows.map((row) => (
-                                                <tr
-                                                    key={row.category_code}
-                                                    data-testid={`budget-row-${row.category_code}`}
-                                                    data-over-budget={
-                                                        row.is_over_budget
-                                                            ? 'true'
-                                                            : 'false'
-                                                    }
-                                                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                >
-                                                    <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {row.category_code}{' '}
-                                                        <span className="font-normal text-gray-500">
-                                                            {row.category_name}
-                                                        </span>
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300">
-                                                        {formatCad(row.budget_cad)}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300">
-                                                        {formatCad(row.actual_cad)}
-                                                    </td>
-                                                    <td
-                                                        className={`whitespace-nowrap px-4 py-3 text-right text-sm font-medium ${
-                                                            (row.variance_cad ?? 0) > 0
-                                                                ? 'text-red-600 dark:text-red-400'
-                                                                : row.variance_cad === null || row.variance_cad === 0
-                                                                  ? 'text-gray-700 dark:text-gray-300'
-                                                                  : 'text-green-600 dark:text-green-400'
-                                                        }`}
-                                                        data-testid={`variance-${row.category_code}`}
-                                                    >
-                                                        {formatCad(row.variance_cad)}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right">
-                                                        {/* Progress bar visualization */}
-                                                        {row.budget_cad !== null && row.percentage !== null ? (
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                                    <div
-                                                                        className={`h-full transition-all ${
-                                                                            row.is_over_budget
-                                                                                ? 'bg-red-500 dark:bg-red-400'
-                                                                                : 'bg-green-500 dark:bg-green-400'
-                                                                        }`}
-                                                                        style={{
-                                                                            width: `${Math.min(row.percentage, 100)}%`,
-                                                                        }}
-                                                                        data-testid={`progress-bar-${row.category_code}`}
-                                                                    />
-                                                                </div>
-                                                                <span className="text-sm text-gray-700 dark:text-gray-300 w-16 text-right">
-                                                                    {row.percentage.toFixed(0)}%
-                                                                </span>
-                                                            </div>
-                                                        ) : (
-                                                            <span className="text-sm text-gray-500">—</span>
-                                                        )}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-sm">
-                                                        {row.budget_cad === null ? (
-                                                            <Badge variant="outline">
-                                                                No budget
-                                                            </Badge>
-                                                        ) : row.is_over_budget ? (
-                                                            <Badge
-                                                                variant="destructive"
-                                                                className="gap-1"
-                                                                data-testid={`status-badge-${row.category_code}`}
-                                                            >
-                                                                <AlertTriangle className="h-3 w-3" />
-                                                                Over
-                                                            </Badge>
-                                                        ) : (
-                                                            <Badge
-                                                                variant="secondary"
-                                                                className="gap-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                                                                data-testid={`status-badge-${row.category_code}`}
-                                                            >
-                                                                <CheckCircle className="h-3 w-3" />
-                                                                Under
-                                                            </Badge>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
                             )}
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <TrendingUp className="h-5 w-5" />
+                                Period Summary
+                            </CardTitle>
+                            <CardDescription>
+                                {formatPeriod(selectedPeriod)} — budgets set for{' '}
+                                {rowsWithBudget.length} categories
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3 text-sm">
+                            <p>
+                                <strong>Variance:</strong>{' '}
+                                <span
+                                    data-testid="variance-total"
+                                    className={
+                                        (totals?.variance_cad ?? 0) > 0
+                                            ? 'text-red-600 dark:text-red-400'
+                                            : 'text-green-700 dark:text-green-400'
+                                    }
+                                >
+                                    {formatCad(totals?.variance_cad ?? 0)}
+                                </span>
+                            </p>
+                            <p className="text-gray-600 dark:text-gray-400">
+                                Actual spending is computed live from
+                                transactions and converted to CAD using the
+                                period exchange rates. Positive variance means
+                                over budget.
+                            </p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <Card className="mt-6">
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle>Budget vs Actual Report</CardTitle>
+                                <CardDescription>
+                                    Compare budgeted amounts against computed
+                                    actual spend for{' '}
+                                    {formatPeriod(selectedPeriod)}
+                                </CardDescription>
+                            </div>
+                            <Button
+                                onClick={handleExport}
+                                variant="outline"
+                                size="sm"
+                                className="gap-2"
+                                data-testid="export-budget-report"
+                            >
+                                <Download className="h-4 w-4" />
+                                Export to CSV
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {loadingReport ? (
+                            <div className="flex justify-center py-8">
+                                <Spinner />
+                            </div>
+                        ) : reportError ? (
+                            <Alert variant="destructive">
+                                <XCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    {reportError}
+                                </AlertDescription>
+                            </Alert>
+                        ) : reportRows.length === 0 ? (
+                            <p className="py-8 text-center text-gray-500">
+                                No categories found. Seed categories to get
+                                started.
+                            </p>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table
+                                    className="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+                                    data-testid="budget-vs-actual-table"
+                                >
+                                    <thead className="bg-gray-50 dark:bg-gray-800">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Category
+                                            </th>
+                                            <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Budget
+                                            </th>
+                                            <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Actual
+                                            </th>
+                                            <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Variance
+                                            </th>
+                                            <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Progress
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Status
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+                                        {reportRows.map((row) => (
+                                            <tr
+                                                key={row.category_code}
+                                                data-testid={`budget-row-${row.category_code}`}
+                                                data-over-budget={
+                                                    row.is_over_budget
+                                                        ? 'true'
+                                                        : 'false'
+                                                }
+                                                className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                                            >
+                                                <td className="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-900 dark:text-gray-100">
+                                                    {row.category_code}{' '}
+                                                    <span className="font-normal text-gray-500">
+                                                        {row.category_name}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-right text-sm whitespace-nowrap text-gray-700 dark:text-gray-300">
+                                                    {formatCad(row.budget_cad)}
+                                                </td>
+                                                <td className="px-4 py-3 text-right text-sm whitespace-nowrap text-gray-700 dark:text-gray-300">
+                                                    {formatCad(row.actual_cad)}
+                                                </td>
+                                                <td
+                                                    className={`px-4 py-3 text-right text-sm font-medium whitespace-nowrap ${
+                                                        (row.variance_cad ??
+                                                            0) > 0
+                                                            ? 'text-red-600 dark:text-red-400'
+                                                            : row.variance_cad ===
+                                                                    null ||
+                                                                row.variance_cad ===
+                                                                    0
+                                                              ? 'text-gray-700 dark:text-gray-300'
+                                                              : 'text-green-600 dark:text-green-400'
+                                                    }`}
+                                                    data-testid={`variance-${row.category_code}`}
+                                                >
+                                                    {formatCad(
+                                                        row.variance_cad,
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3 text-right whitespace-nowrap">
+                                                    {/* Progress bar visualization */}
+                                                    {row.budget_cad !== null &&
+                                                    row.percentage !== null ? (
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <div className="h-4 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                                                <div
+                                                                    className={`h-full transition-all ${
+                                                                        row.is_over_budget
+                                                                            ? 'bg-red-500 dark:bg-red-400'
+                                                                            : 'bg-green-500 dark:bg-green-400'
+                                                                    }`}
+                                                                    style={{
+                                                                        width: `${Math.min(row.percentage, 100)}%`,
+                                                                    }}
+                                                                    data-testid={`progress-bar-${row.category_code}`}
+                                                                />
+                                                            </div>
+                                                            <span className="w-16 text-right text-sm text-gray-700 dark:text-gray-300">
+                                                                {row.percentage.toFixed(
+                                                                    0,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-sm text-gray-500">
+                                                            —
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm whitespace-nowrap">
+                                                    {row.budget_cad === null ? (
+                                                        <Badge variant="outline">
+                                                            No budget
+                                                        </Badge>
+                                                    ) : row.is_over_budget ? (
+                                                        <Badge
+                                                            variant="destructive"
+                                                            className="gap-1"
+                                                            data-testid={`status-badge-${row.category_code}`}
+                                                        >
+                                                            <AlertTriangle className="h-3 w-3" />
+                                                            Over
+                                                        </Badge>
+                                                    ) : (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="gap-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                                                            data-testid={`status-badge-${row.category_code}`}
+                                                        >
+                                                            <CheckCircle className="h-3 w-3" />
+                                                            Under
+                                                        </Badge>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </PageContainer>
         </>
     );

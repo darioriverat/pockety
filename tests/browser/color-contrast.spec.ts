@@ -260,15 +260,14 @@ for (const theme of ['light', 'dark'] as const) {
             });
 
             const samples = await sampleContrast(page, target.selectors);
-            expect(
-                samples.length,
-                `expected samples on ${target.label}`,
-            ).toBe(target.selectors.length);
+            expect(samples.length, `expected samples on ${target.label}`).toBe(
+                target.selectors.length,
+            );
 
             for (const sample of samples) {
                 expect(
                     sample.ratio,
-                    `${theme}/${target.label}/${sample.name}: text rgb(${sample.text}) on bg rgb(${sample.background}) = ${sample.ratio.toFixed(2)}`,
+                    `${theme}/${target.label}/${sample.name}: text rgb(${sample.text.join(',')}) on bg rgb(${sample.background.join(',')}) = ${sample.ratio.toFixed(2)}`,
                 ).toBeGreaterThanOrEqual(WCAG_AA_NORMAL);
             }
 
@@ -284,10 +283,7 @@ for (const theme of ['light', 'dark'] as const) {
         await page.goto('/transactions');
         await applyTheme(page, theme);
 
-        const primaryButton = await buttonContrast(
-            page,
-            /add transaction/i,
-        );
+        const primaryButton = await buttonContrast(page, /add transaction/i);
         expect(
             primaryButton.ratio,
             `${theme} add-transaction button contrast ${primaryButton.ratio.toFixed(2)}`,

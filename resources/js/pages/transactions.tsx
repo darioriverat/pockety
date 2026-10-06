@@ -299,12 +299,12 @@ export default function Transactions() {
     }, [categories, setPeriod]);
 
     useEffect(() => {
-        fetchCategories();
-        fetchAccounts();
+        void fetchCategories();
+        void fetchAccounts();
     }, []);
 
     useEffect(() => {
-        fetchTransactions();
+        void fetchTransactions();
     }, [filters, page, perPage, sortBy, sortDir]);
 
     useEffect(() => {
@@ -411,11 +411,15 @@ export default function Transactions() {
 
             const params = new URLSearchParams();
             if (filters.period) params.append('period', filters.period);
-            if (filters.account_id) params.append('account_id', filters.account_id);
-            if (filters.category_id) params.append('category_id', filters.category_id);
+            if (filters.account_id)
+                params.append('account_id', filters.account_id);
+            if (filters.category_id)
+                params.append('category_id', filters.category_id);
             if (filters.currency) params.append('currency', filters.currency);
-            if (filters.is_recurring) params.append('is_recurring', filters.is_recurring);
-            if (filters.search.trim()) params.append('search', filters.search.trim());
+            if (filters.is_recurring)
+                params.append('is_recurring', filters.is_recurring);
+            if (filters.search.trim())
+                params.append('search', filters.search.trim());
             params.append('sort_by', sortBy);
             params.append('sort_dir', sortDir);
             params.append('page', page.toString());
@@ -436,9 +440,7 @@ export default function Transactions() {
             });
             setError(null);
         } catch (err) {
-            setError(
-                err instanceof Error ? err.message : 'An error occurred'
-            );
+            setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
         }
@@ -600,7 +602,7 @@ export default function Transactions() {
             await fetchTransactions();
             setIsDialogOpen(false);
             resetForm();
-            
+
             // Show success message
             if (editingId) {
                 toast.success('Transaction updated successfully');
@@ -624,16 +626,16 @@ export default function Transactions() {
             period: transaction.period,
             category_id: transaction.category_id.toString(),
             account_id: transaction.account_id?.toString() ?? '',
-            currency: (transaction.currency ?? 'CAD') as
-                | 'CAD'
-                | 'USD'
-                | 'COP',
+            currency: (transaction.currency ?? 'CAD') as 'CAD' | 'USD' | 'COP',
             amount: (transaction.amount ?? 0).toString(),
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
             is_credit: Boolean(transaction.is_credit),
             is_debt_payment: Boolean(transaction.is_debt_payment),
-            debt_component: (transaction.debt_component || '') as 'principal' | 'interest' | '',
+            debt_component: (transaction.debt_component || '') as
+                | 'principal'
+                | 'interest'
+                | '',
         });
         setIsDialogOpen(true);
     };
@@ -648,10 +650,7 @@ export default function Transactions() {
             period: transaction.period,
             category_id: transaction.category_id.toString(),
             account_id: transaction.account_id?.toString() ?? '',
-            currency: (transaction.currency ?? 'CAD') as
-                | 'CAD'
-                | 'USD'
-                | 'COP',
+            currency: (transaction.currency ?? 'CAD') as 'CAD' | 'USD' | 'COP',
             amount: (transaction.amount ?? 0).toString(),
             comments: transaction.comments || '',
             is_recurring: transaction.is_recurring,
@@ -683,9 +682,12 @@ export default function Transactions() {
 
         setIsDeleting(true);
         try {
-            const response = await fetch(`/api/transactions/${deleteTargetId}`, {
-                method: 'DELETE',
-            });
+            const response = await fetch(
+                `/api/transactions/${deleteTargetId}`,
+                {
+                    method: 'DELETE',
+                },
+            );
             if (!response.ok) throw new Error('Failed to delete transaction');
             await fetchTransactions();
             setDeleteTargetId(null);
@@ -702,8 +704,7 @@ export default function Transactions() {
     const handleExportCSV = () => {
         const params = new URLSearchParams();
         if (filters.period) params.append('period', filters.period);
-        if (filters.account_id)
-            params.append('account_id', filters.account_id);
+        if (filters.account_id) params.append('account_id', filters.account_id);
         if (filters.category_id)
             params.append('category_id', filters.category_id);
         if (filters.currency) params.append('currency', filters.currency);
@@ -816,10 +817,8 @@ export default function Transactions() {
         }));
     };
 
-    const formatCurrency = (
-        amount: number | null,
-        currency: string | null
-    ) => formatCurrencyAmount(amount, currency);
+    const formatCurrency = (amount: number | null, currency: string | null) =>
+        formatCurrencyAmount(amount, currency);
 
     const clearFilters = () => {
         setDetailCategoryCode(null);
@@ -867,8 +866,9 @@ export default function Transactions() {
         (category) => category.id.toString() === filters.category_id,
     );
     const detailCategory = detailCategoryCode
-        ? categories.find((category) => category.code === detailCategoryCode) ??
-          selectedCategory
+        ? (categories.find(
+              (category) => category.code === detailCategoryCode,
+          ) ?? selectedCategory)
         : selectedCategory;
 
     return (
@@ -886,690 +886,767 @@ export default function Transactions() {
                     />
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            onClick={handleExportCSV}
-                        >
-                            <Download className="size-4 shrink-0 fill-none" />
-                            Export to CSV
-                        </Button>
-                        <Dialog
-                            open={isBulkDialogOpen}
-                            onOpenChange={(open) => {
-                                setIsBulkDialogOpen(open);
-                                if (!open) {
-                                    setBulkError(null);
-                                    setBulkCategoryId('');
-                                }
-                            }}
-                        >
-                            <Button
-                                variant="secondary"
-                                disabled={selectedIds.length === 0}
-                                onClick={() => setIsBulkDialogOpen(true)}
-                                data-testid="bulk-edit-button"
-                            >
-                                <PencilLine className="size-4 shrink-0 fill-none" />
-                                Bulk Edit
-                                {selectedIds.length > 0
-                                    ? ` (${selectedIds.length})`
-                                    : ''}
+                            <Button variant="outline" onClick={handleExportCSV}>
+                                <Download className="size-4 shrink-0 fill-none" />
+                                Export to CSV
                             </Button>
-                            <DialogContent
-                                className="max-w-md"
-                                data-testid="bulk-edit-dialog"
+                            <Dialog
+                                open={isBulkDialogOpen}
+                                onOpenChange={(open) => {
+                                    setIsBulkDialogOpen(open);
+                                    if (!open) {
+                                        setBulkError(null);
+                                        setBulkCategoryId('');
+                                    }
+                                }}
                             >
-                                <form onSubmit={handleBulkEdit}>
-                                    <DialogHeader>
-                                        <DialogTitle>Bulk Edit</DialogTitle>
-                                        <DialogDescription>
-                                            Update the category for{' '}
-                                            {selectedIds.length} selected
-                                            transaction
-                                            {selectedIds.length === 1
-                                                ? ''
-                                                : 's'}
-                                            .
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="grid gap-4 py-4">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="bulk-category">
-                                                Category
-                                            </Label>
-                                            <Select
-                                                value={bulkCategoryId}
-                                                onValueChange={(value) => {
-                                                    setBulkError(null);
-                                                    setBulkCategoryId(value);
-                                                }}
-                                            >
-                                                <SelectTrigger
-                                                    id="bulk-category"
-                                                    aria-label="Bulk category"
-                                                    data-testid="bulk-category-select"
-                                                >
-                                                    <SelectValue placeholder="Select category" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {categories.map((cat) => (
-                                                        <SelectItem
-                                                            key={cat.id}
-                                                            value={cat.id.toString()}
-                                                            data-testid={`bulk-category-option-${cat.code}`}
-                                                        >
-                                                            {cat.code} -{' '}
-                                                            {cat.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                    {bulkError && (
-                                        <p
-                                            className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
-                                            role="alert"
-                                            data-testid="bulk-edit-error"
-                                        >
-                                            <AlertCircle className="h-4 w-4 shrink-0" />
-                                            <span>{bulkError}</span>
-                                        </p>
-                                    )}
-                                    <DialogFooter>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() =>
-                                                setIsBulkDialogOpen(false)
-                                            }
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            disabled={bulkSubmitting}
-                                            data-testid="bulk-edit-confirm"
-                                        >
-                                            {bulkSubmitting
-                                                ? 'Saving…'
-                                                : 'Confirm changes'}
-                                        </Button>
-                                    </DialogFooter>
-                                </form>
-                            </DialogContent>
-                        </Dialog>
-                        <Dialog
-                            open={isDialogOpen}
-                            onOpenChange={(open) => {
-                                setIsDialogOpen(open);
-                                if (!open) resetForm();
-                            }}
-                        >
-                            <DialogTrigger asChild>
-                                <Button>
-                                    <Plus className="size-4 shrink-0 fill-none" />
-                                    Add Transaction
+                                <Button
+                                    variant="secondary"
+                                    disabled={selectedIds.length === 0}
+                                    onClick={() => setIsBulkDialogOpen(true)}
+                                    data-testid="bulk-edit-button"
+                                >
+                                    <PencilLine className="size-4 shrink-0 fill-none" />
+                                    Bulk Edit
+                                    {selectedIds.length > 0
+                                        ? ` (${selectedIds.length})`
+                                        : ''}
                                 </Button>
-                            </DialogTrigger>
-                        <DialogContent
-                            className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md"
-                            data-testid="transaction-form-dialog"
-                        >
-                            <form onSubmit={handleSubmit} noValidate>
-                                <DialogHeader>
-                                    <DialogTitle data-testid="transaction-form-title">
-                                        {editingId
-                                            ? 'Edit Transaction'
-                                            : isDuplicating
-                                              ? 'Duplicate Transaction'
-                                              : 'Add Transaction'}
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {isDuplicating
-                                            ? 'Review the copied values, update the date if needed, then save'
-                                            : 'Fill in the transaction details below'}
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid content-start gap-2">
-                                        <Label htmlFor="date">
-                                            Date (YYYY-MM-DD)
-                                        </Label>
-                                        <DatePicker
-                                            id="date"
-                                            placeholder="2025-01-15"
-                                            value={formData.date}
-                                            data-testid="transaction-date"
-                                            onChange={handleDateChange}
-                                            aria-invalid={!!fieldErrors.date}
-                                            aria-describedby={
-                                                fieldErrors.date
-                                                    ? 'date-error'
-                                                    : undefined
-                                            }
-                                            required
-                                        />
-                                        {fieldErrors.date && (
-                                            <p
-                                                id="date-error"
-                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
-                                                role="alert"
-                                                data-testid="date-error"
-                                            >
-                                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                                <span>{fieldErrors.date}</span>
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="grid content-start gap-2">
-                                        <Label htmlFor="period">
-                                            Period (YYYYMM)
-                                        </Label>
-                                        <Input
-                                            id="period"
-                                            value={formData.period}
-                                            data-testid="transaction-period-input"
-                                            onChange={(e) => {
-                                                setFormError(null);
-                                                setFieldErrors((prev) => ({ ...prev, period: '' }));
-                                                setFormData({
-                                                    ...formData,
-                                                    period: e.target.value,
-                                                });
-                                            }}
-                                            placeholder="202501"
-                                            aria-invalid={!!fieldErrors.period}
-                                            aria-describedby={
-                                                fieldErrors.period
-                                                    ? 'period-error transaction-period-hint'
-                                                    : 'transaction-period-hint'
-                                            }
-                                            required
-                                        />
-                                        {fieldErrors.period && (
-                                            <p
-                                                id="period-error"
-                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
-                                                role="alert"
-                                                data-testid="period-error"
-                                            >
-                                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                                <span>{fieldErrors.period}</span>
-                                            </p>
-                                        )}
-                                        <p
-                                            id="transaction-period-hint"
-                                            className="text-muted-foreground text-xs"
-                                            data-testid="transaction-period-hint"
-                                        >
-                                            Auto-filled from date
-                                        </p>
-                                    </div>
-                                    <div className="grid content-start gap-2">
-                                        <Label htmlFor="category">
-                                            Category
-                                        </Label>
-                                        <Select
-                                            value={formData.category_id}
-                                            onValueChange={(value) => {
-                                                setFieldErrors((prev) => ({
-                                                    ...prev,
-                                                    category_id: '',
-                                                    account_id: '',
-                                                }));
-                                                const nextCategory =
-                                                    categories.find(
-                                                        (category) =>
-                                                            category.id.toString() ===
+                                <DialogContent
+                                    className="max-w-md"
+                                    data-testid="bulk-edit-dialog"
+                                >
+                                    <form onSubmit={handleBulkEdit}>
+                                        <DialogHeader>
+                                            <DialogTitle>Bulk Edit</DialogTitle>
+                                            <DialogDescription>
+                                                Update the category for{' '}
+                                                {selectedIds.length} selected
+                                                transaction
+                                                {selectedIds.length === 1
+                                                    ? ''
+                                                    : 's'}
+                                                .
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="bulk-category">
+                                                    Category
+                                                </Label>
+                                                <Select
+                                                    value={bulkCategoryId}
+                                                    onValueChange={(value) => {
+                                                        setBulkError(null);
+                                                        setBulkCategoryId(
                                                             value,
-                                                    );
-                                                setFormData({
-                                                    ...formData,
-                                                    category_id: value,
-                                                    is_credit:
-                                                        nextCategory?.is_income_category
-                                                            ? false
-                                                            : formData.is_credit,
-                                                    is_debt_payment:
-                                                        nextCategory?.is_income_category ||
-                                                        nextCategory?.is_debt_category
-                                                            ? false
-                                                            : formData.is_debt_payment,
-                                                    debt_component:
-                                                        nextCategory?.is_debt_category
-                                                            ? formData.debt_component
-                                                            : '',
-                                                });
-                                            }}
-                                        >
-                                            <SelectTrigger
-                                                className="w-full"
-                                                id="category"
-                                                aria-label="Category"
-                                                data-testid="transaction-category-field"
-                                                aria-invalid={!!fieldErrors.category_id}
-                                                aria-describedby={
-                                                    fieldErrors.category_id
-                                                        ? 'category-error'
-                                                        : undefined
-                                                }
-                                            >
-                                                <SelectValue placeholder="Select category" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map((cat) => (
-                                                    <SelectItem
-                                                        key={cat.id}
-                                                        value={cat.id.toString()}
+                                                        );
+                                                    }}
+                                                >
+                                                    <SelectTrigger
+                                                        id="bulk-category"
+                                                        aria-label="Bulk category"
+                                                        data-testid="bulk-category-select"
                                                     >
-                                                        {cat.code} -{' '}
-                                                        {cat.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        {fieldErrors.category_id && (
+                                                        <SelectValue placeholder="Select category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {categories.map(
+                                                            (cat) => (
+                                                                <SelectItem
+                                                                    key={cat.id}
+                                                                    value={cat.id.toString()}
+                                                                    data-testid={`bulk-category-option-${cat.code}`}
+                                                                >
+                                                                    {cat.code} -{' '}
+                                                                    {cat.name}
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                        {bulkError && (
                                             <p
-                                                id="category-error"
-                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
+                                                className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
                                                 role="alert"
-                                                data-testid="category-error"
+                                                data-testid="bulk-edit-error"
                                             >
                                                 <AlertCircle className="h-4 w-4 shrink-0" />
-                                                <span>{fieldErrors.category_id}</span>
+                                                <span>{bulkError}</span>
                                             </p>
                                         )}
-                                    </div>
-                                    <div className="grid content-start gap-2">
-                                        <Label htmlFor="account">
-                                            {isIncomeCategorySelected
-                                                ? 'Deposit account'
-                                                : 'Account'}
-                                        </Label>
-                                        <Select
-                                            value={
-                                                formData.account_id ||
-                                                (isIncomeCategorySelected
-                                                    ? DEPOSIT_ACCOUNT_PLACEHOLDER
-                                                    : NO_ACCOUNT_VALUE)
-                                            }
-                                            onValueChange={(value) => {
-                                                setFieldErrors((prev) => ({
-                                                    ...prev,
-                                                    account_id: '',
-                                                }));
-                                                setFormData({
-                                                    ...formData,
-                                                    account_id:
-                                                        value ===
-                                                            NO_ACCOUNT_VALUE ||
-                                                        value ===
-                                                            DEPOSIT_ACCOUNT_PLACEHOLDER
-                                                            ? ''
-                                                            : value,
-                                                });
-                                            }}
-                                        >
-                                            <SelectTrigger
-                                                className="w-full"
-                                                id="account"
-                                                aria-label={
-                                                    isIncomeCategorySelected
-                                                        ? 'Deposit account'
-                                                        : 'Account'
-                                                }
-                                                data-testid="account-field"
-                                                aria-invalid={
-                                                    !!fieldErrors.account_id
-                                                }
-                                                aria-describedby={
-                                                    fieldErrors.account_id
-                                                        ? 'account-error'
-                                                        : isIncomeCategorySelected
-                                                          ? 'income-account-hint'
-                                                          : undefined
+                                        <DialogFooter>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() =>
+                                                    setIsBulkDialogOpen(false)
                                                 }
                                             >
-                                                <SelectValue placeholder="Select account" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {isIncomeCategorySelected ? (
-                                                    <SelectItem
-                                                        value={
-                                                            DEPOSIT_ACCOUNT_PLACEHOLDER
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                disabled={bulkSubmitting}
+                                                data-testid="bulk-edit-confirm"
+                                            >
+                                                {bulkSubmitting
+                                                    ? 'Saving…'
+                                                    : 'Confirm changes'}
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </DialogContent>
+                            </Dialog>
+                            <Dialog
+                                open={isDialogOpen}
+                                onOpenChange={(open) => {
+                                    setIsDialogOpen(open);
+                                    if (!open) resetForm();
+                                }}
+                            >
+                                <DialogTrigger asChild>
+                                    <Button>
+                                        <Plus className="size-4 shrink-0 fill-none" />
+                                        Add Transaction
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent
+                                    className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md"
+                                    data-testid="transaction-form-dialog"
+                                >
+                                    <form onSubmit={handleSubmit} noValidate>
+                                        <DialogHeader>
+                                            <DialogTitle data-testid="transaction-form-title">
+                                                {editingId
+                                                    ? 'Edit Transaction'
+                                                    : isDuplicating
+                                                      ? 'Duplicate Transaction'
+                                                      : 'Add Transaction'}
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                {isDuplicating
+                                                    ? 'Review the copied values, update the date if needed, then save'
+                                                    : 'Fill in the transaction details below'}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="grid content-start gap-2">
+                                                <Label htmlFor="date">
+                                                    Date (YYYY-MM-DD)
+                                                </Label>
+                                                <DatePicker
+                                                    id="date"
+                                                    placeholder="2025-01-15"
+                                                    value={formData.date}
+                                                    data-testid="transaction-date"
+                                                    onChange={handleDateChange}
+                                                    aria-invalid={
+                                                        !!fieldErrors.date
+                                                    }
+                                                    aria-describedby={
+                                                        fieldErrors.date
+                                                            ? 'date-error'
+                                                            : undefined
+                                                    }
+                                                    required
+                                                />
+                                                {fieldErrors.date && (
+                                                    <p
+                                                        id="date-error"
+                                                        className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
+                                                        role="alert"
+                                                        data-testid="date-error"
+                                                    >
+                                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                                        <span>
+                                                            {fieldErrors.date}
+                                                        </span>
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="grid content-start gap-2">
+                                                <Label htmlFor="period">
+                                                    Period (YYYYMM)
+                                                </Label>
+                                                <Input
+                                                    id="period"
+                                                    value={formData.period}
+                                                    data-testid="transaction-period-input"
+                                                    onChange={(e) => {
+                                                        setFormError(null);
+                                                        setFieldErrors(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                period: '',
+                                                            }),
+                                                        );
+                                                        setFormData({
+                                                            ...formData,
+                                                            period: e.target
+                                                                .value,
+                                                        });
+                                                    }}
+                                                    placeholder="202501"
+                                                    aria-invalid={
+                                                        !!fieldErrors.period
+                                                    }
+                                                    aria-describedby={
+                                                        fieldErrors.period
+                                                            ? 'period-error transaction-period-hint'
+                                                            : 'transaction-period-hint'
+                                                    }
+                                                    required
+                                                />
+                                                {fieldErrors.period && (
+                                                    <p
+                                                        id="period-error"
+                                                        className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
+                                                        role="alert"
+                                                        data-testid="period-error"
+                                                    >
+                                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                                        <span>
+                                                            {fieldErrors.period}
+                                                        </span>
+                                                    </p>
+                                                )}
+                                                <p
+                                                    id="transaction-period-hint"
+                                                    className="text-muted-foreground text-xs"
+                                                    data-testid="transaction-period-hint"
+                                                >
+                                                    Auto-filled from date
+                                                </p>
+                                            </div>
+                                            <div className="grid content-start gap-2">
+                                                <Label htmlFor="category">
+                                                    Category
+                                                </Label>
+                                                <Select
+                                                    value={formData.category_id}
+                                                    onValueChange={(value) => {
+                                                        setFieldErrors(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                category_id: '',
+                                                                account_id: '',
+                                                            }),
+                                                        );
+                                                        const nextCategory =
+                                                            categories.find(
+                                                                (category) =>
+                                                                    category.id.toString() ===
+                                                                    value,
+                                                            );
+                                                        setFormData({
+                                                            ...formData,
+                                                            category_id: value,
+                                                            is_credit:
+                                                                nextCategory?.is_income_category
+                                                                    ? false
+                                                                    : formData.is_credit,
+                                                            is_debt_payment:
+                                                                nextCategory?.is_income_category ||
+                                                                nextCategory?.is_debt_category
+                                                                    ? false
+                                                                    : formData.is_debt_payment,
+                                                            debt_component:
+                                                                nextCategory?.is_debt_category
+                                                                    ? formData.debt_component
+                                                                    : '',
+                                                        });
+                                                    }}
+                                                >
+                                                    <SelectTrigger
+                                                        className="w-full"
+                                                        id="category"
+                                                        aria-label="Category"
+                                                        data-testid="transaction-category-field"
+                                                        aria-invalid={
+                                                            !!fieldErrors.category_id
+                                                        }
+                                                        aria-describedby={
+                                                            fieldErrors.category_id
+                                                                ? 'category-error'
+                                                                : undefined
                                                         }
                                                     >
-                                                        Select account
-                                                    </SelectItem>
-                                                ) : (
-                                                    <SelectItem
-                                                        value={NO_ACCOUNT_VALUE}
-                                                        data-testid="account-none-option"
+                                                        <SelectValue placeholder="Select category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {categories.map(
+                                                            (cat) => (
+                                                                <SelectItem
+                                                                    key={cat.id}
+                                                                    value={cat.id.toString()}
+                                                                >
+                                                                    {cat.code} -{' '}
+                                                                    {cat.name}
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                {fieldErrors.category_id && (
+                                                    <p
+                                                        id="category-error"
+                                                        className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
+                                                        role="alert"
+                                                        data-testid="category-error"
                                                     >
-                                                        None
-                                                    </SelectItem>
+                                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                                        <span>
+                                                            {
+                                                                fieldErrors.category_id
+                                                            }
+                                                        </span>
+                                                    </p>
                                                 )}
-                                                {accounts.length > 0 && (
-                                                    <SelectSeparator />
-                                                )}
-                                                {accounts.map((account) => (
-                                                    <SelectItem
-                                                        key={account.id}
-                                                        value={account.id.toString()}
+                                            </div>
+                                            <div className="grid content-start gap-2">
+                                                <Label htmlFor="account">
+                                                    {isIncomeCategorySelected
+                                                        ? 'Deposit account'
+                                                        : 'Account'}
+                                                </Label>
+                                                <Select
+                                                    value={
+                                                        formData.account_id ||
+                                                        (isIncomeCategorySelected
+                                                            ? DEPOSIT_ACCOUNT_PLACEHOLDER
+                                                            : NO_ACCOUNT_VALUE)
+                                                    }
+                                                    onValueChange={(value) => {
+                                                        setFieldErrors(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                account_id: '',
+                                                            }),
+                                                        );
+                                                        setFormData({
+                                                            ...formData,
+                                                            account_id:
+                                                                value ===
+                                                                    NO_ACCOUNT_VALUE ||
+                                                                value ===
+                                                                    DEPOSIT_ACCOUNT_PLACEHOLDER
+                                                                    ? ''
+                                                                    : value,
+                                                        });
+                                                    }}
+                                                >
+                                                    <SelectTrigger
+                                                        className="w-full"
+                                                        id="account"
+                                                        aria-label={
+                                                            isIncomeCategorySelected
+                                                                ? 'Deposit account'
+                                                                : 'Account'
+                                                        }
+                                                        data-testid="account-field"
+                                                        aria-invalid={
+                                                            !!fieldErrors.account_id
+                                                        }
+                                                        aria-describedby={
+                                                            fieldErrors.account_id
+                                                                ? 'account-error'
+                                                                : isIncomeCategorySelected
+                                                                  ? 'income-account-hint'
+                                                                  : undefined
+                                                        }
                                                     >
-                                                        {account.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        {isIncomeCategorySelected && (
-                                            <p
-                                                id="income-account-hint"
-                                                className="text-muted-foreground text-sm"
-                                                data-testid="income-account-hint"
-                                            >
-                                                This income deposits into the
-                                                selected account.
-                                            </p>
-                                        )}
-                                        {fieldErrors.account_id && (
-                                            <p
-                                                id="account-error"
-                                                className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
-                                                role="alert"
-                                                data-testid="account-error"
-                                            >
-                                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                                <span>
-                                                    {fieldErrors.account_id}
-                                                </span>
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="grid grid-cols-2 items-start gap-4">
-                                        <div className="grid content-start gap-2">
-                                            <Label htmlFor="currency">
-                                                Currency
-                                            </Label>
-                                            <Select
-                                                value={formData.currency}
-                                                onValueChange={(value) =>
-                                                    setFormData({
-                                                        ...formData,
-                                                        currency: value as
-                                                            | 'CAD'
-                                                            | 'USD'
-                                                            | 'COP',
-                                                    })
-                                                }
-                                            >
-                                                <SelectTrigger
-                                                    className="w-full"
-                                                    id="currency"
-                                                    aria-label="Currency"
-                                                >
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="CAD">
-                                                        CAD
-                                                    </SelectItem>
-                                                    <SelectItem value="USD">
-                                                        USD
-                                                    </SelectItem>
-                                                    <SelectItem value="COP">
-                                                        COP
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="grid content-start gap-2">
-                                            <Label htmlFor="amount">
-                                                Amount
-                                            </Label>
-                                            <Input
-                                                id="amount"
-                                                type="number"
-                                                step="0.01"
-                                                value={formData.amount}
-                                                data-testid="transaction-amount-input"
-                                                onChange={(e) => {
-                                                    setFormError(null);
-                                                    setFieldErrors((prev) => ({ ...prev, amount: '' }));
-                                                    setFormData({
-                                                        ...formData,
-                                                        amount: e.target.value,
-                                                    });
-                                                }}
-                                                aria-invalid={!!fieldErrors.amount}
-                                                aria-describedby={
-                                                    fieldErrors.amount
-                                                        ? 'amount-error'
-                                                        : undefined
-                                                }
-                                                required
-                                            />
-                                            {fieldErrors.amount && (
-                                                <p
-                                                    id="amount-error"
-                                                    className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
-                                                    role="alert"
-                                                    data-testid="amount-error"
-                                                >
-                                                    <AlertCircle className="h-4 w-4 shrink-0" />
-                                                    <span>{fieldErrors.amount}</span>
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="grid content-start gap-2">
-                                        <Label htmlFor="comments">
-                                            Comments
-                                        </Label>
-                                        <Textarea
-                                            id="comments"
-                                            value={formData.comments}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    comments: e.target.value,
-                                                })
-                                            }
-                                            placeholder="Optional notes..."
-                                        />
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="is_recurring"
-                                            checked={formData.is_recurring}
-                                            onCheckedChange={(checked) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    is_recurring: checked === true,
-                                                })
-                                            }
-                                        />
-                                        <Label
-                                            htmlFor="is_recurring"
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                        >
-                                            Recurring transaction
-                                        </Label>
-                                    </div>
-                                    {!isIncomeCategorySelected && (
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id="is_credit"
-                                                checked={formData.is_credit}
-                                                onCheckedChange={(checked) =>
-                                                    setFormData({
-                                                        ...formData,
-                                                        is_credit:
-                                                            checked === true,
-                                                        is_debt_payment:
-                                                            checked === true
-                                                                ? false
-                                                                : formData.is_debt_payment,
-                                                    })
-                                                }
-                                                data-testid="is-credit-checkbox"
-                                            />
-                                            <Label
-                                                htmlFor="is_credit"
-                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                            >
-                                                Credit (refund / deposit)
-                                            </Label>
-                                        </div>
-                                    )}
-                                    {!isIncomeCategorySelected &&
-                                        !isDebtCategorySelected && (
+                                                        <SelectValue placeholder="Select account" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {isIncomeCategorySelected ? (
+                                                            <SelectItem
+                                                                value={
+                                                                    DEPOSIT_ACCOUNT_PLACEHOLDER
+                                                                }
+                                                            >
+                                                                Select account
+                                                            </SelectItem>
+                                                        ) : (
+                                                            <SelectItem
+                                                                value={
+                                                                    NO_ACCOUNT_VALUE
+                                                                }
+                                                                data-testid="account-none-option"
+                                                            >
+                                                                None
+                                                            </SelectItem>
+                                                        )}
+                                                        {accounts.length >
+                                                            0 && (
+                                                            <SelectSeparator />
+                                                        )}
+                                                        {accounts.map(
+                                                            (account) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        account.id
+                                                                    }
+                                                                    value={account.id.toString()}
+                                                                >
+                                                                    {
+                                                                        account.name
+                                                                    }
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                {isIncomeCategorySelected && (
+                                                    <p
+                                                        id="income-account-hint"
+                                                        className="text-muted-foreground text-sm"
+                                                        data-testid="income-account-hint"
+                                                    >
+                                                        This income deposits
+                                                        into the selected
+                                                        account.
+                                                    </p>
+                                                )}
+                                                {fieldErrors.account_id && (
+                                                    <p
+                                                        id="account-error"
+                                                        className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
+                                                        role="alert"
+                                                        data-testid="account-error"
+                                                    >
+                                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                                        <span>
+                                                            {
+                                                                fieldErrors.account_id
+                                                            }
+                                                        </span>
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="grid grid-cols-2 items-start gap-4">
+                                                <div className="grid content-start gap-2">
+                                                    <Label htmlFor="currency">
+                                                        Currency
+                                                    </Label>
+                                                    <Select
+                                                        value={
+                                                            formData.currency
+                                                        }
+                                                        onValueChange={(
+                                                            value,
+                                                        ) =>
+                                                            setFormData({
+                                                                ...formData,
+                                                                currency:
+                                                                    value as
+                                                                        | 'CAD'
+                                                                        | 'USD'
+                                                                        | 'COP',
+                                                            })
+                                                        }
+                                                    >
+                                                        <SelectTrigger
+                                                            className="w-full"
+                                                            id="currency"
+                                                            aria-label="Currency"
+                                                        >
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="CAD">
+                                                                CAD
+                                                            </SelectItem>
+                                                            <SelectItem value="USD">
+                                                                USD
+                                                            </SelectItem>
+                                                            <SelectItem value="COP">
+                                                                COP
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="grid content-start gap-2">
+                                                    <Label htmlFor="amount">
+                                                        Amount
+                                                    </Label>
+                                                    <Input
+                                                        id="amount"
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={formData.amount}
+                                                        data-testid="transaction-amount-input"
+                                                        onChange={(e) => {
+                                                            setFormError(null);
+                                                            setFieldErrors(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    amount: '',
+                                                                }),
+                                                            );
+                                                            setFormData({
+                                                                ...formData,
+                                                                amount: e.target
+                                                                    .value,
+                                                            });
+                                                        }}
+                                                        aria-invalid={
+                                                            !!fieldErrors.amount
+                                                        }
+                                                        aria-describedby={
+                                                            fieldErrors.amount
+                                                                ? 'amount-error'
+                                                                : undefined
+                                                        }
+                                                        required
+                                                    />
+                                                    {fieldErrors.amount && (
+                                                        <p
+                                                            id="amount-error"
+                                                            className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
+                                                            role="alert"
+                                                            data-testid="amount-error"
+                                                        >
+                                                            <AlertCircle className="h-4 w-4 shrink-0" />
+                                                            <span>
+                                                                {
+                                                                    fieldErrors.amount
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="grid content-start gap-2">
+                                                <Label htmlFor="comments">
+                                                    Comments
+                                                </Label>
+                                                <Textarea
+                                                    id="comments"
+                                                    value={formData.comments}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            comments:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    placeholder="Optional notes..."
+                                                />
+                                            </div>
                                             <div className="flex items-center space-x-2">
                                                 <Checkbox
-                                                    id="is_debt_payment"
+                                                    id="is_recurring"
                                                     checked={
-                                                        formData.is_debt_payment
+                                                        formData.is_recurring
                                                     }
                                                     onCheckedChange={(
                                                         checked,
                                                     ) =>
                                                         setFormData({
                                                             ...formData,
-                                                            is_debt_payment:
+                                                            is_recurring:
                                                                 checked ===
                                                                 true,
-                                                            is_credit:
-                                                                checked === true
-                                                                    ? false
-                                                                    : formData.is_credit,
                                                         })
                                                     }
-                                                    data-testid="is-debt-payment-checkbox"
                                                 />
                                                 <Label
-                                                    htmlFor="is_debt_payment"
-                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    htmlFor="is_recurring"
+                                                    className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                 >
-                                                    Paying a debt (cash source)
+                                                    Recurring transaction
                                                 </Label>
                                             </div>
-                                        )}
-                                    {formData.category_id &&
-                                        categories.find(
-                                            (c) =>
-                                                c.id.toString() ===
-                                                formData.category_id
-                                        )?.is_debt_category && (
-                                            <div className="grid content-start gap-2">
-                                                <Label htmlFor="debt_component">
-                                                    Debt Component
-                                                </Label>
-                                                <select
-                                                    id="debt_component"
-                                                    aria-label="Debt Component"
-                                                    data-testid="debt-component-select"
-                                                    className="border-input bg-transparent focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
-                                                    value={
-                                                        formData.debt_component ||
-                                                        'none'
-                                                    }
-                                                    onChange={(e) =>
-                                                        setFormData({
-                                                            ...formData,
-                                                            debt_component:
-                                                                (e.target
-                                                                    .value ===
+                                            {!isIncomeCategorySelected && (
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id="is_credit"
+                                                        checked={
+                                                            formData.is_credit
+                                                        }
+                                                        onCheckedChange={(
+                                                            checked,
+                                                        ) =>
+                                                            setFormData({
+                                                                ...formData,
+                                                                is_credit:
+                                                                    checked ===
+                                                                    true,
+                                                                is_debt_payment:
+                                                                    checked ===
+                                                                    true
+                                                                        ? false
+                                                                        : formData.is_debt_payment,
+                                                            })
+                                                        }
+                                                        data-testid="is-credit-checkbox"
+                                                    />
+                                                    <Label
+                                                        htmlFor="is_credit"
+                                                        className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    >
+                                                        Credit (refund /
+                                                        deposit)
+                                                    </Label>
+                                                </div>
+                                            )}
+                                            {!isIncomeCategorySelected &&
+                                                !isDebtCategorySelected && (
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox
+                                                            id="is_debt_payment"
+                                                            checked={
+                                                                formData.is_debt_payment
+                                                            }
+                                                            onCheckedChange={(
+                                                                checked,
+                                                            ) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    is_debt_payment:
+                                                                        checked ===
+                                                                        true,
+                                                                    is_credit:
+                                                                        checked ===
+                                                                        true
+                                                                            ? false
+                                                                            : formData.is_credit,
+                                                                })
+                                                            }
+                                                            data-testid="is-debt-payment-checkbox"
+                                                        />
+                                                        <Label
+                                                            htmlFor="is_debt_payment"
+                                                            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            Paying a debt (cash
+                                                            source)
+                                                        </Label>
+                                                    </div>
+                                                )}
+                                            {formData.category_id &&
+                                                categories.find(
+                                                    (c) =>
+                                                        c.id.toString() ===
+                                                        formData.category_id,
+                                                )?.is_debt_category && (
+                                                    <div className="grid content-start gap-2">
+                                                        <Label htmlFor="debt_component">
+                                                            Debt Component
+                                                        </Label>
+                                                        <select
+                                                            id="debt_component"
+                                                            aria-label="Debt Component"
+                                                            data-testid="debt-component-select"
+                                                            className="border-input focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+                                                            value={
+                                                                formData.debt_component ||
                                                                 'none'
-                                                                    ? ''
-                                                                    : e.target
-                                                                          .value) as
-                                                                    | 'principal'
-                                                                    | 'interest'
-                                                                    | '',
-                                                        })
-                                                    }
-                                                >
-                                                    <option value="none">
-                                                        None
-                                                    </option>
-                                                    <option value="principal">
-                                                        Principal
-                                                    </option>
-                                                    <option value="interest">
-                                                        Interest
-                                                    </option>
-                                                </select>
-                                            </div>
+                                                            }
+                                                            onChange={(e) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    debt_component:
+                                                                        (e
+                                                                            .target
+                                                                            .value ===
+                                                                        'none'
+                                                                            ? ''
+                                                                            : e
+                                                                                  .target
+                                                                                  .value) as
+                                                                            | 'principal'
+                                                                            | 'interest'
+                                                                            | '',
+                                                                })
+                                                            }
+                                                        >
+                                                            <option value="none">
+                                                                None
+                                                            </option>
+                                                            <option value="principal">
+                                                                Principal
+                                                            </option>
+                                                            <option value="interest">
+                                                                Interest
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                )}
+                                        </div>
+                                        {formError && (
+                                            <p
+                                                id="transaction-form-error"
+                                                className="text-destructive flex items-center gap-1.5 text-sm dark:text-red-400"
+                                                role="alert"
+                                                data-testid="transaction-form-error"
+                                            >
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                                <span>{formError}</span>
+                                            </p>
                                         )}
-                                </div>
-                                {formError && (
-                                    <p
-                                        id="transaction-form-error"
-                                        className="flex items-center gap-1.5 text-destructive text-sm dark:text-red-400"
-                                        role="alert"
-                                        data-testid="transaction-form-error"
-                                    >
-                                        <AlertCircle className="h-4 w-4 shrink-0" />
-                                        <span>{formError}</span>
-                                    </p>
-                                )}
-                                <DialogFooter>
-                                    <Button
-                                        type="submit"
-                                        data-testid="transaction-form-submit"
-                                    >
-                                        {editingId
-                                            ? 'Update'
-                                            : isDuplicating
-                                              ? 'Create Duplicate'
-                                              : 'Create'}
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                                        <DialogFooter>
+                                            <Button
+                                                type="submit"
+                                                data-testid="transaction-form-submit"
+                                            >
+                                                {editingId
+                                                    ? 'Update'
+                                                    : isDuplicating
+                                                      ? 'Create Duplicate'
+                                                      : 'Create'}
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </DialogContent>
+                            </Dialog>
 
-                    <Dialog
-                        open={deleteTargetId !== null}
-                        onOpenChange={(open) => {
-                            if (!open) {
-                                cancelDelete();
-                            }
-                        }}
-                    >
-                        <DialogContent data-testid="delete-confirmation-dialog">
-                            <DialogHeader>
-                                <DialogTitle data-testid="delete-confirmation-title">
-                                    Delete transaction?
-                                </DialogTitle>
-                                <DialogDescription data-testid="delete-confirmation-warning">
-                                    This action cannot be undone. The transaction
-                                    will be permanently deleted from your records.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter className="gap-2 sm:gap-0">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    data-testid="delete-cancel-button"
-                                    onClick={cancelDelete}
-                                    disabled={isDeleting}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    data-testid="delete-confirm-button"
-                                    onClick={confirmDelete}
-                                    disabled={isDeleting}
-                                >
-                                    {isDeleting ? 'Deleting…' : 'Delete'}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                            <Dialog
+                                open={deleteTargetId !== null}
+                                onOpenChange={(open) => {
+                                    if (!open) {
+                                        cancelDelete();
+                                    }
+                                }}
+                            >
+                                <DialogContent data-testid="delete-confirmation-dialog">
+                                    <DialogHeader>
+                                        <DialogTitle data-testid="delete-confirmation-title">
+                                            Delete transaction?
+                                        </DialogTitle>
+                                        <DialogDescription data-testid="delete-confirmation-warning">
+                                            This action cannot be undone. The
+                                            transaction will be permanently
+                                            deleted from your records.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter className="gap-2 sm:gap-0">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            data-testid="delete-cancel-button"
+                                            onClick={cancelDelete}
+                                            disabled={isDeleting}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            data-testid="delete-confirm-button"
+                                            onClick={confirmDelete}
+                                            disabled={isDeleting}
+                                        >
+                                            {isDeleting
+                                                ? 'Deleting…'
+                                                : 'Delete'}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
                 </div>
@@ -1584,8 +1661,7 @@ export default function Transactions() {
                                 className="text-lg"
                                 data-testid="category-detail-heading"
                             >
-                                {detailCategory.code} —{' '}
-                                {detailCategory.name}
+                                {detailCategory.code} — {detailCategory.name}
                             </CardTitle>
                             <CardDescription>
                                 Detailed transactions for period{' '}
@@ -1596,7 +1672,7 @@ export default function Transactions() {
                         </CardHeader>
                         <CardContent className="flex flex-wrap items-center gap-3">
                             <p
-                                className="text-sm text-muted-foreground"
+                                className="text-muted-foreground text-sm"
                                 data-testid="category-detail-count"
                             >
                                 Showing {transactions.length} of{' '}
@@ -1621,7 +1697,9 @@ export default function Transactions() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Filter className="h-5 w-5" />
-                                <CardTitle className="text-lg">Filters</CardTitle>
+                                <CardTitle className="text-lg">
+                                    Filters
+                                </CardTitle>
                             </div>
                             {hasActiveFilters && (
                                 <Button
@@ -1657,10 +1735,7 @@ export default function Transactions() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {periods.map((item) => (
-                                            <SelectItem
-                                                key={item}
-                                                value={item}
-                                            >
+                                            <SelectItem key={item} value={item}>
                                                 {formatPeriod(item)}
                                             </SelectItem>
                                         ))}
@@ -1694,7 +1769,9 @@ export default function Transactions() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">
-                                            {t('pages.transactions.allAccounts')}
+                                            {t(
+                                                'pages.transactions.allAccounts',
+                                            )}
                                         </SelectItem>
                                         {accounts.map((account) => (
                                             <SelectItem
@@ -1709,7 +1786,9 @@ export default function Transactions() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="filter-category">Category</Label>
+                                <Label htmlFor="filter-category">
+                                    Category
+                                </Label>
                                 <Select
                                     value={filters.category_id || 'all'}
                                     onValueChange={(value) => {
@@ -1740,7 +1819,9 @@ export default function Transactions() {
                                         <SelectValue placeholder="All" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Categories</SelectItem>
+                                        <SelectItem value="all">
+                                            All Categories
+                                        </SelectItem>
                                         {categories.map((cat) => (
                                             <SelectItem
                                                 key={cat.id}
@@ -1754,7 +1835,9 @@ export default function Transactions() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="filter-currency">Currency</Label>
+                                <Label htmlFor="filter-currency">
+                                    Currency
+                                </Label>
                                 <Select
                                     value={filters.currency || 'all'}
                                     onValueChange={(value) =>
@@ -1778,7 +1861,9 @@ export default function Transactions() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="filter-recurring">Recurring</Label>
+                                <Label htmlFor="filter-recurring">
+                                    Recurring
+                                </Label>
                                 <Select
                                     value={filters.is_recurring || 'all'}
                                     onValueChange={(value) =>
@@ -1794,8 +1879,12 @@ export default function Transactions() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="1">Recurring Only</SelectItem>
-                                        <SelectItem value="0">Non-recurring</SelectItem>
+                                        <SelectItem value="1">
+                                            Recurring Only
+                                        </SelectItem>
+                                        <SelectItem value="0">
+                                            Non-recurring
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -1826,7 +1915,7 @@ export default function Transactions() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                                 {error}
                             </p>
                         </CardContent>
@@ -1845,7 +1934,7 @@ export default function Transactions() {
                         <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
                             <div className="flex flex-wrap items-center gap-3">
                                 <p
-                                    className="text-sm text-muted-foreground"
+                                    className="text-muted-foreground text-sm"
                                     data-testid="transactions-total"
                                 >
                                     Total transactions: {pagination.total}
@@ -1863,7 +1952,9 @@ export default function Transactions() {
                                                     transactions.length
                                             }
                                             onCheckedChange={(checked) =>
-                                                toggleSelectAll(checked === true)
+                                                toggleSelectAll(
+                                                    checked === true,
+                                                )
                                             }
                                             data-testid="select-all-transactions"
                                             aria-label="Select all transactions"
@@ -1876,7 +1967,7 @@ export default function Transactions() {
                                         </Label>
                                         {selectedIds.length > 0 && (
                                             <span
-                                                className="text-sm text-muted-foreground"
+                                                className="text-muted-foreground text-sm"
                                                 data-testid="selected-count"
                                             >
                                                 {selectedIds.length} selected
@@ -1893,7 +1984,7 @@ export default function Transactions() {
                                     <div className="flex items-center gap-2">
                                         <Label
                                             htmlFor="page-size"
-                                            className="text-sm text-muted-foreground"
+                                            className="text-muted-foreground text-sm"
                                         >
                                             Per page
                                         </Label>
@@ -1927,7 +2018,7 @@ export default function Transactions() {
                                         </Select>
                                     </div>
                                     <p
-                                        className="text-sm text-muted-foreground"
+                                        className="text-muted-foreground text-sm"
                                         data-testid="pagination-status"
                                     >
                                         Page {pagination.page} of{' '}
@@ -1957,8 +2048,8 @@ export default function Transactions() {
                                                 pagination.last_page
                                             }
                                             onClick={() =>
-                                                setPage((current) =>
-                                                    current + 1,
+                                                setPage(
+                                                    (current) => current + 1,
                                                 )
                                             }
                                             data-testid="pagination-next"
@@ -1977,265 +2068,290 @@ export default function Transactions() {
                             data-testid="transactions-data-table"
                             data-responsive="cards"
                         >
-                        <div
-                            className="flex flex-wrap items-center gap-2 border-b bg-muted/70 px-3 py-3 sm:grid sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] sm:gap-2"
-                            data-testid="transactions-sort-headers"
-                            role="row"
-                        >
-                            <button
-                                type="button"
-                                className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
-                                onClick={() => handleSort('date')}
-                                data-testid="sort-header-date"
-                                aria-label="Sort by Date"
-                                aria-sort={
-                                    sortBy === 'date'
-                                        ? sortDir === 'asc'
-                                            ? 'ascending'
-                                            : 'descending'
-                                        : 'none'
-                                }
+                            <div
+                                className="bg-muted/70 flex flex-wrap items-center gap-2 border-b px-3 py-3 sm:grid sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] sm:gap-2"
+                                data-testid="transactions-sort-headers"
+                                role="row"
                             >
-                                Date
-                                {sortIcon('date')}
-                            </button>
-                            <button
-                                type="button"
-                                className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
-                                onClick={() => handleSort('amount')}
-                                data-testid="sort-header-amount"
-                                aria-label="Sort by Amount"
-                                aria-sort={
-                                    sortBy === 'amount'
-                                        ? sortDir === 'asc'
-                                            ? 'ascending'
-                                            : 'descending'
-                                        : 'none'
-                                }
-                            >
-                                Amount
-                                {sortIcon('amount')}
-                            </button>
-                            <button
-                                type="button"
-                                className="flex items-center text-left text-sm font-semibold text-foreground hover:text-primary"
-                                onClick={() => handleSort('category')}
-                                data-testid="sort-header-category"
-                                aria-label="Sort by Category"
-                                aria-sort={
-                                    sortBy === 'category'
-                                        ? sortDir === 'asc'
-                                            ? 'ascending'
-                                            : 'descending'
-                                        : 'none'
-                                }
-                            >
-                                Category
-                                {sortIcon('category')}
-                            </button>
-                            <span className="text-sm font-semibold text-foreground">
-                                Actions
-                            </span>
-                        </div>
-
-                        <div
-                            className="divide-y"
-                            data-testid="transactions-list"
-                        >
-                            {transactions.map((transaction, index) => (
-                                <Card
-                                    key={transaction.id}
-                                    data-testid={`transaction-row-${transaction.id}`}
-                                    data-category-code={
-                                        transaction.category.code
+                                <button
+                                    type="button"
+                                    className="text-foreground hover:text-primary flex items-center text-left text-sm font-semibold"
+                                    onClick={() => handleSort('date')}
+                                    data-testid="sort-header-date"
+                                    aria-label="Sort by Date"
+                                    aria-sort={
+                                        sortBy === 'date'
+                                            ? sortDir === 'asc'
+                                                ? 'ascending'
+                                                : 'descending'
+                                            : 'none'
                                     }
-                                    data-transaction-comments={
-                                        transaction.comments ?? ''
-                                    }
-                                    data-selected={
-                                        selectedIds.includes(transaction.id)
-                                            ? 'true'
-                                            : 'false'
-                                    }
-                                    data-row-stripe={
-                                        index % 2 === 1 ? 'odd' : 'even'
-                                    }
-                                    className={cn(
-                                        'rounded-none border-0 py-3 shadow-none transition-colors gap-3',
-                                        index % 2 === 1 && 'bg-muted/35',
-                                        'hover:bg-accent/70',
-                                        selectedIds.includes(transaction.id) &&
-                                            'bg-muted data-[state=selected]:bg-muted',
-                                    )}
                                 >
-                                    <CardHeader className="px-3">
-                                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                            <div className="flex min-w-0 flex-1 items-start gap-3">
-                                                <Checkbox
-                                                    id={`select-transaction-${transaction.id}`}
-                                                    checked={selectedIds.includes(
-                                                        transaction.id,
-                                                    )}
-                                                    onCheckedChange={(checked) =>
-                                                        toggleSelected(
+                                    Date
+                                    {sortIcon('date')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="text-foreground hover:text-primary flex items-center text-left text-sm font-semibold"
+                                    onClick={() => handleSort('amount')}
+                                    data-testid="sort-header-amount"
+                                    aria-label="Sort by Amount"
+                                    aria-sort={
+                                        sortBy === 'amount'
+                                            ? sortDir === 'asc'
+                                                ? 'ascending'
+                                                : 'descending'
+                                            : 'none'
+                                    }
+                                >
+                                    Amount
+                                    {sortIcon('amount')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="text-foreground hover:text-primary flex items-center text-left text-sm font-semibold"
+                                    onClick={() => handleSort('category')}
+                                    data-testid="sort-header-category"
+                                    aria-label="Sort by Category"
+                                    aria-sort={
+                                        sortBy === 'category'
+                                            ? sortDir === 'asc'
+                                                ? 'ascending'
+                                                : 'descending'
+                                            : 'none'
+                                    }
+                                >
+                                    Category
+                                    {sortIcon('category')}
+                                </button>
+                                <span className="text-foreground text-sm font-semibold">
+                                    Actions
+                                </span>
+                            </div>
+
+                            <div
+                                className="divide-y"
+                                data-testid="transactions-list"
+                            >
+                                {transactions.map((transaction, index) => (
+                                    <Card
+                                        key={transaction.id}
+                                        data-testid={`transaction-row-${transaction.id}`}
+                                        data-category-code={
+                                            transaction.category.code
+                                        }
+                                        data-transaction-comments={
+                                            transaction.comments ?? ''
+                                        }
+                                        data-selected={
+                                            selectedIds.includes(transaction.id)
+                                                ? 'true'
+                                                : 'false'
+                                        }
+                                        data-row-stripe={
+                                            index % 2 === 1 ? 'odd' : 'even'
+                                        }
+                                        className={cn(
+                                            'gap-3 rounded-none border-0 py-3 shadow-none transition-colors',
+                                            index % 2 === 1 && 'bg-muted/35',
+                                            'hover:bg-accent/70',
+                                            selectedIds.includes(
+                                                transaction.id,
+                                            ) &&
+                                                'bg-muted data-[state=selected]:bg-muted',
+                                        )}
+                                    >
+                                        <CardHeader className="px-3">
+                                            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                                <div className="flex min-w-0 flex-1 items-start gap-3">
+                                                    <Checkbox
+                                                        id={`select-transaction-${transaction.id}`}
+                                                        checked={selectedIds.includes(
                                                             transaction.id,
-                                                            checked === true,
-                                                        )
-                                                    }
-                                                    data-testid={`select-transaction-${transaction.id}`}
-                                                    aria-label={`Select transaction ${transaction.id}`}
-                                                    className="mt-1 shrink-0"
-                                                />
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <CardTitle
-                                                        className="text-lg"
-                                                        data-testid={`transaction-amount-${transaction.id}`}
-                                                    >
-                                                        {formatCurrency(
-                                                            transaction.amount,
-                                                            transaction.currency
                                                         )}
-                                                    </CardTitle>
-                                                    <Badge variant="outline">
-                                                        {transaction.currency}
-                                                    </Badge>
-                                                    {transaction.is_recurring && (
-                                                        <Badge variant="secondary">
-                                                            Recurring
-                                                        </Badge>
-                                                    )}
-                                                    {transaction.is_credit && (
-                                                        <Badge
-                                                            variant="secondary"
-                                                            data-testid={`transaction-credit-badge-${transaction.id}`}
-                                                        >
-                                                            Credit
-                                                        </Badge>
-                                                    )}
-                                                    {transaction.is_debt_payment && (
-                                                        <Badge
-                                                            variant="secondary"
-                                                            data-testid={`transaction-debt-payment-badge-${transaction.id}`}
-                                                        >
-                                                            Debt payment
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                                <CardDescription className="mt-1">
-                                                    <div className="space-y-1 break-words">
-                                                        <div
-                                                            data-testid={`transaction-date-${transaction.id}`}
-                                                        >
-                                                            <span className="font-medium">
-                                                                Date:
-                                                            </span>{' '}
-                                                            {transaction.date} |{' '}
-                                                            <span className="font-medium">
-                                                                Period:
-                                                            </span>{' '}
-                                                            {transaction.period}
-                                                        </div>
-                                                        <div
-                                                            data-testid={`transaction-category-${transaction.id}`}
-                                                        >
-                                                            <span className="font-medium">
-                                                                Category:
-                                                            </span>{' '}
-                                                            {
-                                                                transaction
-                                                                    .category.code
-                                                            }{' '}
-                                                            -{' '}
-                                                            {transaction.category.name}
-                                                            {transaction.category
-                                                                .is_income_category && (
+                                                        onCheckedChange={(
+                                                            checked,
+                                                        ) =>
+                                                            toggleSelected(
+                                                                transaction.id,
+                                                                checked ===
+                                                                    true,
+                                                            )
+                                                        }
+                                                        data-testid={`select-transaction-${transaction.id}`}
+                                                        aria-label={`Select transaction ${transaction.id}`}
+                                                        className="mt-1 shrink-0"
+                                                    />
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <CardTitle
+                                                                className="text-lg"
+                                                                data-testid={`transaction-amount-${transaction.id}`}
+                                                            >
+                                                                {formatCurrency(
+                                                                    transaction.amount,
+                                                                    transaction.currency,
+                                                                )}
+                                                            </CardTitle>
+                                                            <Badge variant="outline">
+                                                                {
+                                                                    transaction.currency
+                                                                }
+                                                            </Badge>
+                                                            {transaction.is_recurring && (
+                                                                <Badge variant="secondary">
+                                                                    Recurring
+                                                                </Badge>
+                                                            )}
+                                                            {transaction.is_credit && (
                                                                 <Badge
                                                                     variant="secondary"
-                                                                    className="ml-2"
-                                                                    data-testid={`income-badge-${transaction.id}`}
+                                                                    data-testid={`transaction-credit-badge-${transaction.id}`}
                                                                 >
-                                                                    Income
+                                                                    Credit
+                                                                </Badge>
+                                                            )}
+                                                            {transaction.is_debt_payment && (
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    data-testid={`transaction-debt-payment-badge-${transaction.id}`}
+                                                                >
+                                                                    Debt payment
                                                                 </Badge>
                                                             )}
                                                         </div>
-                                                        <div
-                                                            data-testid={`transaction-account-${transaction.id}`}
-                                                        >
-                                                            <span className="font-medium">
-                                                                Account:
-                                                            </span>{' '}
-                                                            {transaction.account
-                                                                ?.name ?? '—'}
-                                                        </div>
-                                                        {transaction.debt_component && (
-                                                            <div>
-                                                                <span className="font-medium">
-                                                                    Debt Component:
-                                                                </span>{' '}
-                                                                {transaction.debt_component}
+                                                        <CardDescription className="mt-1">
+                                                            <div className="space-y-1 break-words">
+                                                                <div
+                                                                    data-testid={`transaction-date-${transaction.id}`}
+                                                                >
+                                                                    <span className="font-medium">
+                                                                        Date:
+                                                                    </span>{' '}
+                                                                    {
+                                                                        transaction.date
+                                                                    }{' '}
+                                                                    |{' '}
+                                                                    <span className="font-medium">
+                                                                        Period:
+                                                                    </span>{' '}
+                                                                    {
+                                                                        transaction.period
+                                                                    }
+                                                                </div>
+                                                                <div
+                                                                    data-testid={`transaction-category-${transaction.id}`}
+                                                                >
+                                                                    <span className="font-medium">
+                                                                        Category:
+                                                                    </span>{' '}
+                                                                    {
+                                                                        transaction
+                                                                            .category
+                                                                            .code
+                                                                    }{' '}
+                                                                    -{' '}
+                                                                    {
+                                                                        transaction
+                                                                            .category
+                                                                            .name
+                                                                    }
+                                                                    {transaction
+                                                                        .category
+                                                                        .is_income_category && (
+                                                                        <Badge
+                                                                            variant="secondary"
+                                                                            className="ml-2"
+                                                                            data-testid={`income-badge-${transaction.id}`}
+                                                                        >
+                                                                            Income
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                                <div
+                                                                    data-testid={`transaction-account-${transaction.id}`}
+                                                                >
+                                                                    <span className="font-medium">
+                                                                        Account:
+                                                                    </span>{' '}
+                                                                    {transaction
+                                                                        .account
+                                                                        ?.name ??
+                                                                        '—'}
+                                                                </div>
+                                                                {transaction.debt_component && (
+                                                                    <div>
+                                                                        <span className="font-medium">
+                                                                            Debt
+                                                                            Component:
+                                                                        </span>{' '}
+                                                                        {
+                                                                            transaction.debt_component
+                                                                        }
+                                                                    </div>
+                                                                )}
+                                                                <div
+                                                                    data-testid={`transaction-comments-${transaction.id}`}
+                                                                >
+                                                                    <span className="font-medium">
+                                                                        Comments:
+                                                                    </span>{' '}
+                                                                    {transaction.comments ??
+                                                                        '—'}
+                                                                </div>
                                                             </div>
-                                                        )}
-                                                        <div
-                                                            data-testid={`transaction-comments-${transaction.id}`}
-                                                        >
-                                                            <span className="font-medium">
-                                                                Comments:
-                                                            </span>{' '}
-                                                            {transaction.comments ??
-                                                                '—'}
-                                                        </div>
+                                                        </CardDescription>
                                                     </div>
-                                                </CardDescription>
-                                            </div>
-                                            </div>
-                                            <div
-                                                className="flex shrink-0 gap-2 self-end sm:self-start"
-                                                data-testid={`transaction-actions-${transaction.id}`}
-                                            >
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    aria-label="Duplicate transaction"
-                                                    data-testid={`duplicate-transaction-${transaction.id}`}
-                                                    onClick={() =>
-                                                        handleDuplicate(
-                                                            transaction,
-                                                        )
-                                                    }
+                                                </div>
+                                                <div
+                                                    className="flex shrink-0 gap-2 self-end sm:self-start"
+                                                    data-testid={`transaction-actions-${transaction.id}`}
                                                 >
-                                                    <Copy className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    aria-label="Edit transaction"
-                                                    data-testid="edit-transaction-button"
-                                                    onClick={() =>
-                                                        handleEdit(transaction)
-                                                    }
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    aria-label="Delete transaction"
-                                                    data-testid="delete-transaction-button"
-                                                    onClick={() =>
-                                                        requestDelete(
-                                                            transaction.id,
-                                                        )
-                                                    }
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        aria-label="Duplicate transaction"
+                                                        data-testid={`duplicate-transaction-${transaction.id}`}
+                                                        onClick={() =>
+                                                            handleDuplicate(
+                                                                transaction,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Copy className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        aria-label="Edit transaction"
+                                                        data-testid="edit-transaction-button"
+                                                        onClick={() =>
+                                                            handleEdit(
+                                                                transaction,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        aria-label="Delete transaction"
+                                                        data-testid="delete-transaction-button"
+                                                        onClick={() =>
+                                                            requestDelete(
+                                                                transaction.id,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 className="text-destructive h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </CardHeader>
-                                </Card>
-                            ))}
-                        </div>
+                                        </CardHeader>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
 
                         {transactions.length === 0 && !loading && (

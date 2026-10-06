@@ -71,67 +71,72 @@ describe('Transactions - Delete Confirmation Dialog', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
+        global.fetch = vi.fn(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
 
-            if (url.startsWith('/api/categories')) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: [
-                            {
-                                id: 1,
-                                code: 'C001',
-                                name: 'Groceries',
-                                is_debt_category: false,
+                if (url.startsWith('/api/categories')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: [
+                                {
+                                    id: 1,
+                                    code: 'C001',
+                                    name: 'Groceries',
+                                    is_debt_category: false,
+                                },
+                            ],
+                        }),
+                    } as Response;
+                }
+
+                if (url.startsWith('/api/accounts')) {
+                    return {
+                        ok: true,
+                        json: async () => ({ data: [] }),
+                    } as Response;
+                }
+
+                if (
+                    url.startsWith('/api/transactions/') &&
+                    init?.method === 'DELETE'
+                ) {
+                    return {
+                        ok: true,
+                        json: async () => ({}),
+                    } as Response;
+                }
+
+                if (url.startsWith('/api/transactions')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: [baseTransaction],
+                            links: { self: '/api/transactions' },
+                            meta: {
+                                total: 1,
+                                page: 1,
+                                per_page: 50,
+                                last_page: 1,
                             },
-                        ],
-                    }),
-                } as Response;
-            }
+                        }),
+                    } as Response;
+                }
 
-            if (url.startsWith('/api/accounts')) {
-                return {
-                    ok: true,
-                    json: async () => ({ data: [] }),
-                } as Response;
-            }
-
-            if (
-                url.startsWith('/api/transactions/') &&
-                init?.method === 'DELETE'
-            ) {
-                return {
-                    ok: true,
-                    json: async () => ({}),
-                } as Response;
-            }
-
-            if (url.startsWith('/api/transactions')) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: [baseTransaction],
-                        links: { self: '/api/transactions' },
-                        meta: {
-                            total: 1,
-                            page: 1,
-                            per_page: 50,
-                            last_page: 1,
-                        },
-                    }),
-                } as Response;
-            }
-
-            throw new Error(`Unexpected fetch: ${url}`);
-        });
+                throw new Error(`Unexpected fetch: ${url}`);
+            },
+        );
     });
 
     it('shows confirmation dialog with warning when delete is clicked', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-55')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-55'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('delete-transaction-button'));
@@ -142,9 +147,9 @@ describe('Transactions - Delete Confirmation Dialog', () => {
             ).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('delete-confirmation-title')).toHaveTextContent(
-            'Delete transaction?',
-        );
+        expect(
+            screen.getByTestId('delete-confirmation-title'),
+        ).toHaveTextContent('Delete transaction?');
         expect(
             screen.getByTestId('delete-confirmation-warning'),
         ).toHaveTextContent(/cannot be undone/i);
@@ -152,8 +157,11 @@ describe('Transactions - Delete Confirmation Dialog', () => {
         expect(screen.getByTestId('delete-confirm-button')).toBeInTheDocument();
 
         // No DELETE request until confirmed
-        const deleteCalls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.filter(
-            ([, init]) => (init as RequestInit | undefined)?.method === 'DELETE',
+        const deleteCalls = (
+            global.fetch as ReturnType<typeof vi.fn>
+        ).mock.calls.filter(
+            ([, init]) =>
+                (init as RequestInit | undefined)?.method === 'DELETE',
         );
         expect(deleteCalls).toHaveLength(0);
     });
@@ -162,7 +170,9 @@ describe('Transactions - Delete Confirmation Dialog', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-55')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-55'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('delete-transaction-button'));
@@ -181,8 +191,11 @@ describe('Transactions - Delete Confirmation Dialog', () => {
         });
 
         expect(screen.getByTestId('transaction-row-55')).toBeInTheDocument();
-        const deleteCalls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.filter(
-            ([, init]) => (init as RequestInit | undefined)?.method === 'DELETE',
+        const deleteCalls = (
+            global.fetch as ReturnType<typeof vi.fn>
+        ).mock.calls.filter(
+            ([, init]) =>
+                (init as RequestInit | undefined)?.method === 'DELETE',
         );
         expect(deleteCalls).toHaveLength(0);
         expect(toast.success).not.toHaveBeenCalled();
@@ -192,7 +205,9 @@ describe('Transactions - Delete Confirmation Dialog', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-55')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-55'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('delete-transaction-button'));
@@ -210,7 +225,9 @@ describe('Transactions - Delete Confirmation Dialog', () => {
             );
         });
 
-        const deleteCalls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.filter(
+        const deleteCalls = (
+            global.fetch as ReturnType<typeof vi.fn>
+        ).mock.calls.filter(
             ([url, init]) =>
                 String(url).includes('/api/transactions/55') &&
                 (init as RequestInit | undefined)?.method === 'DELETE',

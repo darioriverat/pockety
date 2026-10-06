@@ -33,7 +33,7 @@ describe('Transactions category picker', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(fetch).mockImplementation((input: RequestInfo | URL) => {
-            const url = String(input);
+            const url = input instanceof Request ? input.url : String(input);
 
             if (url === '/api/categories') {
                 return Promise.resolve({
@@ -99,7 +99,9 @@ describe('Transactions category picker', () => {
 
         const categoryCalls = vi
             .mocked(fetch)
-            .mock.calls.map(([url]) => String(url))
+            .mock.calls.map(([url]) =>
+                url instanceof Request ? url.url : String(url),
+            )
             .filter((url) => url.includes('/api/categories'));
 
         expect(categoryCalls).toContain('/api/categories');
@@ -107,7 +109,9 @@ describe('Transactions category picker', () => {
             categoryCalls.some((url) => url.includes('include_inactive')),
         ).toBe(false);
 
-        fireEvent.click(screen.getByRole('button', { name: /Add Transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /Add Transaction/i }),
+        );
 
         await waitFor(() => {
             expect(

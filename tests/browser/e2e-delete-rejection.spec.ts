@@ -29,9 +29,7 @@ test.describe('Browser test for delete rejection with transactions', () => {
         await page
             .getByLabel('Password', { exact: true })
             .fill('Delete-rejection-105!');
-        await page
-            .getByLabel('Confirm password')
-            .fill('Delete-rejection-105!');
+        await page.getByLabel('Confirm password').fill('Delete-rejection-105!');
         await page
             .getByRole('button', { name: 'Create account', exact: true })
             .click();
@@ -57,18 +55,14 @@ test.describe('Browser test for delete rejection with transactions', () => {
             data: { id: number; code: string; name: string };
         };
         expect(created.code).toMatch(/^C\d{3,}$/);
-        await expect(page.getByTestId('create-category-dialog')).toHaveCount(
-            0,
-        );
+        await expect(page.getByTestId('create-category-dialog')).toHaveCount(0);
 
         // Create a transaction on this category through the real UI.
         await page.goto('/transactions');
         await page
             .getByRole('button', { name: 'Add Transaction', exact: true })
             .click();
-        await expect(
-            page.getByTestId('transaction-form-dialog'),
-        ).toBeVisible();
+        await expect(page.getByTestId('transaction-form-dialog')).toBeVisible();
         await page.getByTestId('transaction-date-input').fill('2026-01-15');
         await expect(page.getByTestId('transaction-period-input')).toHaveValue(
             '202601',
@@ -96,9 +90,7 @@ test.describe('Browser test for delete rejection with transactions', () => {
 
         // Step 2: Navigate to categories and confirm the card is present.
         await page.goto('/categories');
-        const categoryCard = page.getByTestId(
-            `category-card-${created.code}`,
-        );
+        const categoryCard = page.getByTestId(`category-card-${created.code}`);
         await expect(categoryCard).toBeVisible();
         await expect(
             page.getByTestId(`category-name-${created.code}`),

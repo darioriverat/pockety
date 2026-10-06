@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
+import {
+    render,
+    screen,
+    waitFor,
+    fireEvent,
+    within,
+} from '@testing-library/react';
 import Transactions from './transactions';
 
 // Mock Inertia
@@ -81,24 +87,42 @@ const mockFetch = (url: string) => {
 describe('Transactions - Required Field Validation', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(mockFetch);
+        (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+            mockFetch,
+        );
     });
 
     it('gives every transaction control a visible associated label', async () => {
         render(<Transactions />);
-        fireEvent.click(screen.getByRole('button', { name: /add transaction/i }));
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
         const dialog = await screen.findByTestId('transaction-form-dialog');
         for (const name of [
-            'Date (YYYY-MM-DD)', 'Period (YYYYMM)', 'Category',
-            'Account', 'Currency', 'Amount', 'Comments', 'Recurring transaction',
+            'Date (YYYY-MM-DD)',
+            'Period (YYYYMM)',
+            'Category',
+            'Account',
+            'Currency',
+            'Amount',
+            'Comments',
+            'Recurring transaction',
             'Credit (refund / deposit)',
         ]) {
-            const control = within(dialog).getByLabelText(name, { exact: true });
+            const control = within(dialog).getByLabelText(name, {
+                exact: true,
+            });
             expect(control).toHaveAccessibleName(name);
-            expect(dialog.querySelector(`label[for="${control.id}"]`)).toBeVisible();
+            expect(
+                dialog.querySelector(`label[for="${control.id}"]`),
+            ).toBeVisible();
         }
         fireEvent.click(within(dialog).getByText('Recurring transaction'));
-        expect(within(dialog).getByRole('checkbox', { name: 'Recurring transaction' })).toBeChecked();
+        expect(
+            within(dialog).getByRole('checkbox', {
+                name: 'Recurring transaction',
+            }),
+        ).toBeChecked();
     });
 
     it('displays error when date field is empty on submit', async () => {
@@ -110,12 +134,16 @@ describe('Transactions - Required Field Validation', () => {
         );
 
         // Open the add transaction dialog
-        const addButton = screen.getByRole('button', { name: /add transaction/i });
+        const addButton = screen.getByRole('button', {
+            name: /add transaction/i,
+        });
         fireEvent.click(addButton);
 
         // Wait for dialog to open
         await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument(),
         );
 
         // Clear the date field (it's pre-filled with today's date)
@@ -134,7 +162,9 @@ describe('Transactions - Required Field Validation', () => {
         });
 
         // Verify form did not submit (dialog should still be open)
-        expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument();
+        expect(
+            screen.getByTestId('transaction-form-dialog'),
+        ).toBeInTheDocument();
     });
 
     it('displays error when period field is empty on submit', async () => {
@@ -144,11 +174,15 @@ describe('Transactions - Required Field Validation', () => {
             expect(screen.getByTestId('transactions-page')).toBeInTheDocument(),
         );
 
-        const addButton = screen.getByRole('button', { name: /add transaction/i });
+        const addButton = screen.getByRole('button', {
+            name: /add transaction/i,
+        });
         fireEvent.click(addButton);
 
         await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument(),
         );
 
         // Clear the period field
@@ -174,11 +208,15 @@ describe('Transactions - Required Field Validation', () => {
             expect(screen.getByTestId('transactions-page')).toBeInTheDocument(),
         );
 
-        const addButton = screen.getByRole('button', { name: /add transaction/i });
+        const addButton = screen.getByRole('button', {
+            name: /add transaction/i,
+        });
         fireEvent.click(addButton);
 
         await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument(),
         );
 
         // Category is empty by default
@@ -201,11 +239,15 @@ describe('Transactions - Required Field Validation', () => {
             expect(screen.getByTestId('transactions-page')).toBeInTheDocument(),
         );
 
-        const addButton = screen.getByRole('button', { name: /add transaction/i });
+        const addButton = screen.getByRole('button', {
+            name: /add transaction/i,
+        });
         fireEvent.click(addButton);
 
         await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument(),
         );
 
         // Amount is empty by default
@@ -228,11 +270,15 @@ describe('Transactions - Required Field Validation', () => {
             expect(screen.getByTestId('transactions-page')).toBeInTheDocument(),
         );
 
-        const addButton = screen.getByRole('button', { name: /add transaction/i });
+        const addButton = screen.getByRole('button', {
+            name: /add transaction/i,
+        });
         fireEvent.click(addButton);
 
         await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument(),
         );
 
         // Clear date and submit to trigger error
@@ -263,11 +309,15 @@ describe('Transactions - Required Field Validation', () => {
             expect(screen.getByTestId('transactions-page')).toBeInTheDocument(),
         );
 
-        const addButton = screen.getByRole('button', { name: /add transaction/i });
+        const addButton = screen.getByRole('button', {
+            name: /add transaction/i,
+        });
         fireEvent.click(addButton);
 
         await waitFor(() =>
-            expect(screen.getByTestId('transaction-form-dialog')).toBeInTheDocument(),
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument(),
         );
 
         // Clear date and period

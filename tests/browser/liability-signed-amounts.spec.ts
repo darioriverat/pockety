@@ -19,7 +19,9 @@ async function createLiabilityAccount(
         },
     });
     expect(response.ok()).toBeTruthy();
-    const body = (await response.json()) as { data: { id: number; name: string } };
+    const body = (await response.json()) as {
+        data: { id: number; name: string };
+    };
 
     return body.data;
 }
@@ -31,7 +33,9 @@ async function getCategories(
     expect(response.ok()).toBeTruthy();
     const body = (await response.json()) as { data: ApiCategory[] };
 
-    const expense = body.data.find((item) => !item.is_debt_category && !item.is_income_category);
+    const expense = body.data.find(
+        (item) => !item.is_debt_category && !item.is_income_category,
+    );
     const debt = body.data.find((item) => item.is_debt_category);
 
     expect(expense).toBeTruthy();
@@ -52,17 +56,23 @@ test('liability account: charges are + red and principal is - green', async ({
     const consoleErrors = trackConsoleErrors(page);
     page.on('pageerror', (error) => consoleErrors.push(error.message));
 
-    const account = await createLiabilityAccount(request, 'CIBC Visa Signed Amounts');
+    const account = await createLiabilityAccount(
+        request,
+        'CIBC Visa Signed Amounts',
+    );
     const { expenseId, debtId } = await getCategories(request);
 
-    const balanceResponse = await request.post(`/api/accounts/${account.id}/balances`, {
-        data: {
-            period: '202501',
-            recorded_balance_cad: 900,
-            recorded_balance_usd: 0,
-            recorded_balance_cop: 0,
+    const balanceResponse = await request.post(
+        `/api/accounts/${account.id}/balances`,
+        {
+            data: {
+                period: '202501',
+                recorded_balance_cad: 900,
+                recorded_balance_usd: 0,
+                recorded_balance_cop: 0,
+            },
         },
-    });
+    );
     expect(balanceResponse.ok()).toBeTruthy();
 
     const charge = await request.post('/api/transactions', {
@@ -77,7 +87,8 @@ test('liability account: charges are + red and principal is - green', async ({
         },
     });
     expect(charge.ok()).toBeTruthy();
-    const chargeId = ((await charge.json()) as { data: { id: number } }).data.id;
+    const chargeId = ((await charge.json()) as { data: { id: number } }).data
+        .id;
 
     const principal = await request.post('/api/transactions', {
         data: {
@@ -92,7 +103,8 @@ test('liability account: charges are + red and principal is - green', async ({
         },
     });
     expect(principal.ok()).toBeTruthy();
-    const principalId = ((await principal.json()) as { data: { id: number } }).data.id;
+    const principalId = ((await principal.json()) as { data: { id: number } })
+        .data.id;
 
     await page.goto(`/accounts/${account.id}`);
     await expect(page.getByTestId('account-detail-page')).toBeVisible();
@@ -102,11 +114,15 @@ test('liability account: charges are + red and principal is - green', async ({
     const chargeCell = page.getByTestId(`account-tx-amount-${chargeId}`);
     const principalCell = page.getByTestId(`account-tx-amount-${principalId}`);
 
-    await expect(chargeCell).toHaveText(formatSignedDisplayCurrency(150, 'CAD'));
+    await expect(chargeCell).toHaveText(
+        formatSignedDisplayCurrency(150, 'CAD'),
+    );
     await expect(chargeCell).toHaveAttribute('data-amount-tone', 'negative');
     await expect(chargeCell).toHaveClass(/text-red/);
 
-    await expect(principalCell).toHaveText(formatSignedDisplayCurrency(-250, 'CAD'));
+    await expect(principalCell).toHaveText(
+        formatSignedDisplayCurrency(-250, 'CAD'),
+    );
     await expect(principalCell).toHaveAttribute('data-amount-tone', 'positive');
     await expect(principalCell).toHaveClass(/text-green/);
 

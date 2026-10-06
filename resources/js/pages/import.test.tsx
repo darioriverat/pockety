@@ -10,7 +10,7 @@ describe('Import page uploads', () => {
     beforeEach(() => {
         vi.restoreAllMocks();
         global.fetch = vi.fn(async (input: RequestInfo | URL) => {
-            const url = String(input);
+            const url = input instanceof Request ? input.url : String(input);
             if (url.includes('/statistics')) {
                 return {
                     ok: true,
@@ -68,7 +68,9 @@ describe('Import page uploads', () => {
         fireEvent.click(screen.getByTestId('import-accounts-button'));
         expect(
             await screen.findByTestId('account-import-error'),
-        ).toHaveTextContent('Please choose one or more .json month-sheet files');
+        ).toHaveTextContent(
+            'Please choose one or more .json month-sheet files',
+        );
 
         fireEvent.click(screen.getByTestId('import-balance-sheet-button'));
         expect(
@@ -80,41 +82,47 @@ describe('Import page uploads', () => {
 
     it('posts multipart FormData for a chosen transaction file', async () => {
         const fetchMock = global.fetch as ReturnType<typeof vi.fn>;
-        fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
-            if (url.includes('/statistics')) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: {
-                            total: 0,
-                            by_period: {},
-                            by_currency: { cad: 0, usd: 0, cop: 0 },
-                            by_type: {},
-                            periods_covered: { min: null, max: null },
-                            snapshots: [],
-                        },
-                    }),
-                } as Response;
-            }
+        fetchMock.mockImplementation(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
+                if (url.includes('/statistics')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: {
+                                total: 0,
+                                by_period: {},
+                                by_currency: { cad: 0, usd: 0, cop: 0 },
+                                by_type: {},
+                                periods_covered: { min: null, max: null },
+                                snapshots: [],
+                            },
+                        }),
+                    } as Response;
+                }
 
-            if (url.includes('/api/transactions/import') && init?.method === 'POST') {
-                expect(init.body).toBeInstanceOf(FormData);
-                const body = init.body as FormData;
-                expect(body.get('file')).toBeInstanceOf(File);
-                expect(body.has('file_path')).toBe(false);
-                expect(body.has('directory')).toBe(false);
+                if (
+                    url.includes('/api/transactions/import') &&
+                    init?.method === 'POST'
+                ) {
+                    expect(init.body).toBeInstanceOf(FormData);
+                    const body = init.body as FormData;
+                    expect(body.get('file')).toBeInstanceOf(File);
+                    expect(body.has('file_path')).toBe(false);
+                    expect(body.has('directory')).toBe(false);
 
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: { imported: 1, skipped: 0, errors: [] },
-                    }),
-                } as Response;
-            }
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: { imported: 1, skipped: 0, errors: [] },
+                        }),
+                    } as Response;
+                }
 
-            throw new Error(`Unexpected fetch: ${url}`);
-        });
+                throw new Error(`Unexpected fetch: ${url}`);
+            },
+        );
 
         render(<ImportPage />);
         await waitFor(() => expect(fetchMock).toHaveBeenCalled());
@@ -131,9 +139,9 @@ describe('Import page uploads', () => {
         fireEvent.click(screen.getByTestId('import-transactions-button'));
 
         await waitFor(() => {
-            expect(screen.getByTestId('transactions-imported')).toHaveTextContent(
-                'Imported: 1',
-            );
+            expect(
+                screen.getByTestId('transactions-imported'),
+            ).toHaveTextContent('Imported: 1');
         });
     });
 });

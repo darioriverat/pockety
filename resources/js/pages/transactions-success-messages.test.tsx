@@ -1,3 +1,4 @@
+import { requestBodyText } from '@/test/request';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { toast } from 'sonner';
@@ -71,89 +72,98 @@ describe('Transactions - Success Messages', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
+        global.fetch = vi.fn(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
 
-            if (url.startsWith('/api/categories')) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: [
-                            {
-                                id: 1,
-                                code: 'C001',
-                                name: 'Groceries',
-                                is_debt_category: false,
+                if (url.startsWith('/api/categories')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: [
+                                {
+                                    id: 1,
+                                    code: 'C001',
+                                    name: 'Groceries',
+                                    is_debt_category: false,
+                                },
+                            ],
+                        }),
+                    } as Response;
+                }
+
+                if (url.startsWith('/api/accounts')) {
+                    return {
+                        ok: true,
+                        json: async () => ({ data: [] }),
+                    } as Response;
+                }
+
+                if (url === '/api/transactions' && init?.method === 'POST') {
+                    return {
+                        ok: true,
+                        status: 201,
+                        json: async () => ({
+                            data: { ...baseTransaction, id: 999 },
+                        }),
+                    } as Response;
+                }
+
+                if (
+                    url.startsWith('/api/transactions/') &&
+                    init?.method === 'PUT'
+                ) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: {
+                                ...baseTransaction,
+                                amount: 75,
+                                amount_cad: 75,
                             },
-                        ],
-                    }),
-                } as Response;
-            }
+                        }),
+                    } as Response;
+                }
 
-            if (url.startsWith('/api/accounts')) {
-                return {
-                    ok: true,
-                    json: async () => ({ data: [] }),
-                } as Response;
-            }
+                if (
+                    url.startsWith('/api/transactions/') &&
+                    init?.method === 'DELETE'
+                ) {
+                    return {
+                        ok: true,
+                        json: async () => ({}),
+                    } as Response;
+                }
 
-            if (url === '/api/transactions' && init?.method === 'POST') {
-                return {
-                    ok: true,
-                    status: 201,
-                    json: async () => ({
-                        data: { ...baseTransaction, id: 999 },
-                    }),
-                } as Response;
-            }
+                if (url.startsWith('/api/transactions')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: [baseTransaction],
+                            links: { self: '/api/transactions' },
+                            meta: {
+                                total: 1,
+                                page: 1,
+                                per_page: 50,
+                                last_page: 1,
+                            },
+                        }),
+                    } as Response;
+                }
 
-            if (
-                url.startsWith('/api/transactions/') &&
-                init?.method === 'PUT'
-            ) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: { ...baseTransaction, amount: 75, amount_cad: 75 },
-                    }),
-                } as Response;
-            }
-
-            if (
-                url.startsWith('/api/transactions/') &&
-                init?.method === 'DELETE'
-            ) {
-                return {
-                    ok: true,
-                    json: async () => ({}),
-                } as Response;
-            }
-
-            if (url.startsWith('/api/transactions')) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: [baseTransaction],
-                        links: { self: '/api/transactions' },
-                        meta: {
-                            total: 1,
-                            page: 1,
-                            per_page: 50,
-                            last_page: 1,
-                        },
-                    }),
-                } as Response;
-            }
-
-            throw new Error(`Unexpected fetch: ${url}`);
-        });
+                throw new Error(`Unexpected fetch: ${url}`);
+            },
+        );
     });
 
     it('displays success message after creating a transaction', async () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(
@@ -196,7 +206,9 @@ describe('Transactions - Success Messages', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(
@@ -229,14 +241,16 @@ describe('Transactions - Success Messages', () => {
         fireEvent.click(screen.getByTestId('transaction-form-submit'));
 
         await waitFor(() => {
-            const postCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(
+            const postCall = (
+                global.fetch as ReturnType<typeof vi.fn>
+            ).mock.calls.find(
                 ([url, init]) =>
                     String(url) === '/api/transactions' &&
                     (init as RequestInit | undefined)?.method === 'POST',
             );
 
             expect(postCall).toBeDefined();
-            const body = JSON.parse(String((postCall?.[1] as RequestInit).body));
+            const body = JSON.parse(requestBodyText(postCall?.[1]));
             expect(body.amount_cad).toBe(-25.5);
         });
     });
@@ -245,7 +259,9 @@ describe('Transactions - Success Messages', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getAllByTestId('edit-transaction-button')[0]);
@@ -272,7 +288,9 @@ describe('Transactions - Success Messages', () => {
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getAllByTestId('delete-transaction-button')[0]);
@@ -293,65 +311,70 @@ describe('Transactions - Success Messages', () => {
     });
 
     it('displays error message when delete fails', async () => {
-        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = String(input);
+        global.fetch = vi.fn(
+            async (input: RequestInfo | URL, init?: RequestInit) => {
+                const url =
+                    input instanceof Request ? input.url : String(input);
 
-            if (url.startsWith('/api/categories')) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: [
-                            {
-                                id: 1,
-                                code: 'C001',
-                                name: 'Groceries',
-                                is_debt_category: false,
+                if (url.startsWith('/api/categories')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: [
+                                {
+                                    id: 1,
+                                    code: 'C001',
+                                    name: 'Groceries',
+                                    is_debt_category: false,
+                                },
+                            ],
+                        }),
+                    } as Response;
+                }
+
+                if (url.startsWith('/api/accounts')) {
+                    return {
+                        ok: true,
+                        json: async () => ({ data: [] }),
+                    } as Response;
+                }
+
+                if (
+                    url.startsWith('/api/transactions/') &&
+                    init?.method === 'DELETE'
+                ) {
+                    return {
+                        ok: false,
+                        json: async () => ({ error: 'Failed to delete' }),
+                    } as Response;
+                }
+
+                if (url.startsWith('/api/transactions')) {
+                    return {
+                        ok: true,
+                        json: async () => ({
+                            data: [baseTransaction],
+                            links: { self: '/api/transactions' },
+                            meta: {
+                                total: 1,
+                                page: 1,
+                                per_page: 50,
+                                last_page: 1,
                             },
-                        ],
-                    }),
-                } as Response;
-            }
+                        }),
+                    } as Response;
+                }
 
-            if (url.startsWith('/api/accounts')) {
-                return {
-                    ok: true,
-                    json: async () => ({ data: [] }),
-                } as Response;
-            }
-
-            if (
-                url.startsWith('/api/transactions/') &&
-                init?.method === 'DELETE'
-            ) {
-                return {
-                    ok: false,
-                    json: async () => ({ error: 'Failed to delete' }),
-                } as Response;
-            }
-
-            if (url.startsWith('/api/transactions')) {
-                return {
-                    ok: true,
-                    json: async () => ({
-                        data: [baseTransaction],
-                        links: { self: '/api/transactions' },
-                        meta: {
-                            total: 1,
-                            page: 1,
-                            per_page: 50,
-                            last_page: 1,
-                        },
-                    }),
-                } as Response;
-            }
-
-            throw new Error(`Unexpected fetch: ${url}`);
-        });
+                throw new Error(`Unexpected fetch: ${url}`);
+            },
+        );
 
         render(<Transactions />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('transaction-row-123')).toBeInTheDocument();
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getAllByTestId('delete-transaction-button')[0]);

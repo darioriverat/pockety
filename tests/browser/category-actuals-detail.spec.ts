@@ -71,9 +71,7 @@ test('feature 88: click category in actuals to see detailed transactions', async
     });
 
     await page.goto('/category-actuals');
-    await expect(
-        page.getByTestId('category-actuals-heading'),
-    ).toBeVisible();
+    await expect(page.getByTestId('category-actuals-heading')).toBeVisible();
 
     await page.getByTestId('page-period-selector').click();
     await page.getByRole('option', { name: /January 2025/i }).click();

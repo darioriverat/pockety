@@ -180,10 +180,20 @@ test('feature 175: colors are inverted and readable in dark mode', async ({
                 return { r, g, b };
             };
 
-            const luminance = ({ r, g, b }: { r: number; g: number; b: number }) => {
+            const luminance = ({
+                r,
+                g,
+                b,
+            }: {
+                r: number;
+                g: number;
+                b: number;
+            }) => {
                 const toLinear = (c: number) => {
                     const s = c / 255;
-                    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+                    return s <= 0.03928
+                        ? s / 12.92
+                        : ((s + 0.055) / 1.055) ** 2.4;
                 };
                 return (
                     0.2126 * toLinear(r) +
