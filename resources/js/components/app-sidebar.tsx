@@ -1,7 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Tags, Receipt, Upload, Landmark, ScaleIcon, Banknote, DollarSign, PiggyBank, Calculator, Sheet, LineChart, Car, CalendarRange, ChartColumn, ArrowLeftRight, FileText, BookMarked } from 'lucide-react';
+import { LayoutGrid, Tags, Receipt, Upload, Landmark, ScaleIcon, Banknote, DollarSign, PiggyBank, Calculator, Sheet, LineChart, Car, CalendarRange, ChartColumn, ArrowLeftRight, FileText, BookMarked } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -109,19 +108,6 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/dariorivera/pockety',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://github.com/dariorivera/pockety#readme',
-        icon: BookOpen,
-    },
-];
-
 export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset" data-testid="app-sidebar">
@@ -146,7 +132,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

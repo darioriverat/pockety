@@ -43,16 +43,14 @@ test('feature 173: footer contains useful links and app version information', as
     const currentYear = new Date().getFullYear();
     await expect(footer.getByText(new RegExp(`© ${currentYear}`, 'i'))).toBeVisible();
 
-    // Verify useful links are present
-    const repoLink = footer.getByRole('link', { name: /repository/i });
-    await expect(repoLink).toBeVisible();
-    await expect(repoLink).toHaveAttribute('href', 'https://github.com/dariorivera/pockety');
-    await expect(repoLink).toHaveAttribute('target', '_blank');
-
-    const docsLink = footer.getByRole('link', { name: /documentation/i });
-    await expect(docsLink).toBeVisible();
-    await expect(docsLink).toHaveAttribute('href', 'https://github.com/dariorivera/pockety#readme');
-    await expect(docsLink).toHaveAttribute('target', '_blank');
+    // Verify the removed repository/documentation links are gone
+    await expect(
+        footer.getByRole('link', { name: /repository/i }),
+    ).toHaveCount(0);
+    await expect(
+        footer.getByRole('link', { name: /documentation/i }),
+    ).toHaveCount(0);
+    await expect(footer.locator('a[href*="github.com"]')).toHaveCount(0);
 
     // Take close-up screenshot of footer
     await footer.screenshot({
@@ -84,11 +82,15 @@ test('feature 173: footer appears consistently across different pages', async ({
         const footer = page.locator('footer');
         await expect(footer).toBeVisible();
 
-        // Verify footer content is consistent
+        // Verify footer content is consistent and no removed links return
         await expect(footer.getByText(/Pockety/i)).toBeVisible();
         await expect(footer.getByText(/v1\.0\.0/i)).toBeVisible();
-        await expect(footer.getByRole('link', { name: /repository/i })).toBeVisible();
-        await expect(footer.getByRole('link', { name: /documentation/i })).toBeVisible();
+        await expect(
+            footer.getByRole('link', { name: /repository/i }),
+        ).toHaveCount(0);
+        await expect(
+            footer.getByRole('link', { name: /documentation/i }),
+        ).toHaveCount(0);
 
         await footer.screenshot({
             path: `verification/test-173-footer/03-footer-${pageInfo.name}.png`,

@@ -27,20 +27,18 @@ describe('AppFooter', () => {
         expect(screen.getByText(new RegExp(`© ${currentYear}`, 'i'))).toBeInTheDocument();
     });
 
-    it('renders useful links', () => {
+    it('does not render repository or documentation links', () => {
         render(<AppFooter />);
-        
-        const repoLink = screen.getByRole('link', { name: /repository/i });
-        expect(repoLink).toBeInTheDocument();
-        expect(repoLink).toHaveAttribute('href', 'https://github.com/dariorivera/pockety');
-        expect(repoLink).toHaveAttribute('target', '_blank');
-        expect(repoLink).toHaveAttribute('rel', 'noopener noreferrer');
-        
-        const docsLink = screen.getByRole('link', { name: /documentation/i });
-        expect(docsLink).toBeInTheDocument();
-        expect(docsLink).toHaveAttribute('href', 'https://github.com/dariorivera/pockety#readme');
-        expect(docsLink).toHaveAttribute('target', '_blank');
-        expect(docsLink).toHaveAttribute('rel', 'noopener noreferrer');
+
+        expect(
+            screen.queryByRole('link', { name: /repository/i }),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('link', { name: /documentation/i }),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('link', { name: /github/i }),
+        ).not.toBeInTheDocument();
     });
 
     it('has consistent styling with footer semantic element', () => {

@@ -1,5 +1,4 @@
 import { usePage } from '@inertiajs/react';
-import { Github, BookOpen } from 'lucide-react';
 
 export function AppFooter() {
     const { name, version } = usePage().props;
@@ -17,28 +16,6 @@ export function AppFooter() {
                         <p className="mt-1">
                             © {currentYear} All rights reserved
                         </p>
-                    </div>
-
-                    {/* Right: Useful links */}
-                    <div className="flex gap-6">
-                        <a
-                            href="https://github.com/dariorivera/pockety"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                            <Github className="h-4 w-4" />
-                            <span>Repository</span>
-                        </a>
-                        <a
-                            href="https://github.com/dariorivera/pockety#readme"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                            <BookOpen className="h-4 w-4" />
-                            <span>Documentation</span>
-                        </a>
                     </div>
                 </div>
             </div>

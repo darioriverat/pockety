@@ -8,7 +8,7 @@
       "Step 3: Assert no anchor href equals https://github.com/dariorivera/pockety or https://github.com/dariorivera/pockety#readme",
       "Step 4: Assert no visible footer text reads Repository or Documentation"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -19,7 +19,7 @@
       "Step 3: Assert no nav item titled Repository or Documentation exists",
       "Step 4: Assert the sidebar renders without an empty heading where those items used to be"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -30,7 +30,7 @@
       "Step 3: Assert no anchor href contains laravel.com/docs/starter-kits",
       "Step 4: Assert any header section that held only those links is gone rather than left blank"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -49,7 +49,7 @@
       "Step 11: Confirm the remaining footer content (app name, version, copyright) still renders",
       "Step 12: Confirm no test still asserts one of the removed hrefs"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -60,7 +60,7 @@
       "Step 3: Open tests/browser/app-footer.spec.ts and tests/browser/app-header.spec.ts",
       "Step 4: Assert neither spec expects the starter-kit or Pockety GitHub URLs"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
