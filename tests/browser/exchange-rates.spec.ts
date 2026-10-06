@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { mkdirSync } from 'node:fs';
+import path from 'node:path';
 import {
     ensureTransactionInPeriod,
     loginAsBrowserTestUser,
@@ -6,75 +8,78 @@ import {
     trackConsoleErrors,
 } from './helpers';
 
+const verificationDir = path.join(process.cwd(), 'verification', 'exchange-rates');
+mkdirSync(verificationDir, { recursive: true });
+
 test.beforeAll(() => {
     resetBrowserState();
 });
 
-test('feature 96: Exchange rate form validates that rates are positive numbers', async ({
+test('exchange rates page uses manual snapshots and period assignment without legacy inputs', async ({
     page,
+    request,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
 
-    await loginAsBrowserTestUser(page);
-    await ensureTransactionInPeriod(page.request, '202601');
+    await loginAsBrowserTestUser(page, request);
+    await ensureTransactionInPeriod(page.request, '202501');
 
-    // Step 1: Navigate to exchange rates form
     await page.goto('/exchange-rates');
-    await expect(page.getByRole('heading', { name: 'Exchange Rates' })).toBeVisible();
-    await expect(page.getByText('Set Exchange Rates')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Exchange Rates/i })).toBeVisible();
+    await expect(page.getByTestId('oxr-attribution-link')).toHaveAttribute(
+        'href',
+        'https://openexchangerates.org/',
+    );
 
-    // Select a period first
+    await expect(page.getByLabel(/USD\/COP/i)).toHaveCount(0);
+    await expect(page.getByLabel(/USD\/CAD/i)).toHaveCount(0);
+    await expect(page.getByLabel(/CAD\/COP/i)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Import from Month Sheets/i })).toHaveCount(0);
+
+    await page.getByTestId('manual-rate-date').fill('2025-01-31');
+    await page.getByTestId('manual-cad-per-usd').fill('1.36');
+    await page.getByTestId('manual-cop-per-usd').fill('4000');
+    await page.getByTestId('save-manual-snapshot').click();
+    await expect(page.getByText(/Manual snapshot saved successfully/i)).toBeVisible();
+
     const periodSelector = page.getByTestId('page-period-selector');
     await periodSelector.click();
-    await page.getByRole('option', { name: /January 2026/i }).click();
+    await page.getByRole('option', { name: /January 2025/i }).click();
 
-    // Wait for form to be ready
-    await expect(page.getByLabel(/USD\/COP/i)).toBeVisible();
+    await page.getByTestId('snapshot-picker').click();
+    await page.getByRole('option', { name: /2025-01-31/i }).first().click();
+    await page.getByTestId('assign-snapshot').click();
+    await expect(page.getByText(/Exchange rates saved successfully/i)).toBeVisible();
 
-    // Step 2: Enter negative rate
-    await page.getByLabel(/USD\/COP/).clear();
-    await page.getByLabel(/USD\/COP/).fill('-4400');
+    await expect(page.getByText(/Derived USD\/COP:\s*4000/i)).toBeVisible();
+    await expect(page.getByRole('cell', { name: '4000.0000' })).toBeVisible();
 
-    await page.getByRole('button', { name: /Save Exchange Rates/i }).click();
-
-    // Step 3: Verify validation error is shown
-    await expect(
-        page.getByText(/must be a positive number/i)
-    ).toBeVisible();
-
-    // Error should remain visible
-    await expect(page.getByText(/must be a positive number/i)).toBeVisible();
-
-    // Step 4: Enter zero rate (also invalid)
-    await page.getByLabel(/USD\/CAD/).clear();
-    await page.getByLabel(/USD\/CAD/).fill('0');
-
-    await page.getByRole('button', { name: /Save Exchange Rates/i }).click();
-
-    // Verify zero is also rejected
-    await expect(
-        page.getByText(/must be a positive number/i)
-    ).toBeVisible();
-
-    // Step 5: Enter positive rates
-    await page.getByLabel(/USD\/COP/).clear();
-    await page.getByLabel(/USD\/COP/).fill('4400');
-
-    await page.getByLabel(/USD\/CAD/).clear();
-    await page.getByLabel(/USD\/CAD/).fill('0.75');
-
-    await page.getByLabel(/CAD\/COP/).clear();
-    await page.getByLabel(/CAD\/COP/).fill('3000');
-
-    await page.getByRole('button', { name: /Save Exchange Rates/i }).click();
-
-    // Step 6: Verify form accepts positive rates
-    await expect(
-        page.getByText(/Exchange rates saved successfully/i)
-    ).toBeVisible();
-
-    // Verify no error messages
-    await expect(page.getByText(/must be a positive number/i)).not.toBeVisible();
+    await page.screenshot({
+        path: path.join(verificationDir, 'assigned-desktop.png'),
+        fullPage: true,
+        animations: 'disabled',
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({
+        path: path.join(verificationDir, 'assigned-mobile.png'),
+        fullPage: true,
+        animations: 'disabled',
+    });
 
     expect(consoleErrors).toEqual([]);
+});
+
+test('exchange rates page shows missing-rate message before assignment', async ({
+    page,
+    request,
+}) => {
+    await loginAsBrowserTestUser(page, request);
+    await ensureTransactionInPeriod(page.request, '202502');
+
+    await page.goto('/exchange-rates');
+    const periodSelector = page.getByTestId('page-period-selector');
+    await periodSelector.click();
+    await page.getByRole('option', { name: /February 2025/i }).click();
+
+    await expect(page.getByTestId('missing-exchange-rate')).toBeVisible();
 });

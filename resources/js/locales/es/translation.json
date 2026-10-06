@@ -210,7 +210,36 @@
       "noFile": "Elige un archivo antes de enviar."
     },
     "exchangeRates": {
-      "title": "Tipos de cambio"
+      "title": "Tipos de cambio",
+      "description": "Guarda cotizaciones con base USD y asigna una captura a cada periodo. Los cruces se derivan.",
+      "attribution": "Tipos de cambio por",
+      "manualTitle": "Captura manual",
+      "manualDescription": "Ingresa CAD por 1 USD y COP por 1 USD para una fecha. No sobrescribe el feed global.",
+      "date": "Fecha",
+      "cadPerUsd": "CAD por 1 USD",
+      "copPerUsd": "COP por 1 USD",
+      "saveManual": "Guardar captura manual",
+      "manualSaved": "Captura manual guardada correctamente",
+      "manualSaveFailed": "No se pudo guardar la captura manual",
+      "assignTitle": "Asignar al periodo",
+      "assignDescription": "Elige una captura obtenida o manual para el periodo seleccionado.",
+      "period": "Periodo",
+      "selectPeriod": "Seleccionar periodo",
+      "snapshot": "Captura",
+      "selectSnapshot": "Seleccionar captura",
+      "sourceManual": "Manual",
+      "sourceFetched": "Obtenida",
+      "assign": "Asignar captura",
+      "assigned": "Tipos de cambio guardados correctamente",
+      "assignFailed": "No se pudo asignar la captura",
+      "snapshotRequired": "Elige una captura antes de asignar.",
+      "missingForPeriod": "Este periodo necesita un tipo de cambio. Asigna una captura para convertir montos.",
+      "derivedUsdCop": "USD/COP derivado",
+      "derivedUsdCad": "USD/CAD derivado",
+      "derivedCadCop": "CAD/COP derivado",
+      "historyTitle": "Asignaciones por periodo",
+      "historyDescription": "Capturas asignadas a cada periodo",
+      "noRates": "Aún no hay asignaciones. Guarda una captura manual y asígnala a un periodo."
     },
     "income": {
       "title": "Ingresos"

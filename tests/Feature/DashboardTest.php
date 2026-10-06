@@ -45,7 +45,7 @@ class DashboardTest extends TestCase
         $period = '202601';
 
         // Create exchange rate
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $period,
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -94,7 +94,7 @@ class DashboardTest extends TestCase
         $period = '202601';
 
         // Create exchange rate
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $period,
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -146,7 +146,7 @@ class DashboardTest extends TestCase
         $period = '202601';
 
         // Create exchange rate
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $period,
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -208,7 +208,7 @@ class DashboardTest extends TestCase
     {
         $currentPeriod = now()->format('Ym');
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $currentPeriod,
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -241,13 +241,13 @@ class DashboardTest extends TestCase
     {
         $endPeriod = '202606';
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202601',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
             'cad_cop' => 3000,
         ]);
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202606',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -317,13 +317,13 @@ class DashboardTest extends TestCase
     {
         $endPeriod = '202606';
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202601',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
             'cad_cop' => 3000,
         ]);
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202606',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -393,7 +393,7 @@ class DashboardTest extends TestCase
     {
         $period = '202601';
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $period,
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -483,7 +483,7 @@ class DashboardTest extends TestCase
     {
         $period = '202601';
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $period,
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -587,7 +587,7 @@ class DashboardTest extends TestCase
         $period = '202601';
         $this->user->update(['default_currency' => 'USD']);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $period,
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -613,7 +613,7 @@ class DashboardTest extends TestCase
             ->where('available_currencies', ['CAD', 'USD', 'COP'])
             ->where('summary.total_income_cad', 5000)
             ->where('summary.total_income_usd', 6666.67)
-            ->where('summary.total_income_cop', 15000000)
+            ->where('summary.total_income_cop', 29333333.33)
             ->has('summary.exchange_rates')
         );
     }

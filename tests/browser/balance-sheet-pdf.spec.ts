@@ -1,4 +1,6 @@
-import { expect, test } from '@playwright/test';
+import {
+    expect,
+    test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -7,6 +9,7 @@ import {
     selectDisplayedPeriod,
     resetBrowserState,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 const verificationDir = path.join(process.cwd(), 'verification', 'session-66');
@@ -24,14 +27,7 @@ test('feature 115: user can generate PDF report of balance sheet for a period', 
 
     await loginAsBrowserTestUser(page, request);
 
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202501',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
+    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {

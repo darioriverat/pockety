@@ -1,12 +1,15 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { expect, test } from '@playwright/test';
+import {
+    fileURLToPath } from 'node:url';
+import { expect,
+    test } from '@playwright/test';
 import {
     ensureTransactionInPeriod,
     loginAsBrowserTestUser,
     resetBrowserState,
     selectDisplayedPeriod,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,14 +26,7 @@ test('feature 65-70: balance sheet shows assets liabilities equity in CAD USD CO
 
     await loginAsBrowserTestUser(page, request);
 
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202501',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
+    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {
@@ -138,14 +134,14 @@ test('feature 65-70: balance sheet shows assets liabilities equity in CAD USD CO
     );
     await expect(page.getByTestId('equity-usd')).toContainText('39,000');
 
-    // COP equivalents: CAD * 3000
+    // COP equivalents: CAD / cad_per_usd * cop_per_usd = CAD / 0.75 * 4400
     await expect(page.getByTestId('total-assets-cop')).toContainText(
-        '93,750,000',
+        '183,333,333',
     );
     await expect(page.getByTestId('total-liabilities-cop')).toContainText(
-        '6,000,000',
+        '11,733,333',
     );
-    await expect(page.getByTestId('equity-cop')).toContainText('87,750,000');
+    await expect(page.getByTestId('equity-cop')).toContainText('171,600,000');
 
     await expect(page.getByText('RBC Checking BS')).toBeVisible();
     await expect(page.getByText('TD Brokerage BS')).toBeVisible();
@@ -164,30 +160,9 @@ test('feature 71: balance sheet time series shows historical trend across period
 
     await loginAsBrowserTestUser(page, request);
 
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202501',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202502',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202609',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
+    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202502', { copPerUsd: 4400, cadPerUsd: 0.75 });
+    await ensureExchangeRateForPeriod(request, '202609', { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {

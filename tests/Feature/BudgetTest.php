@@ -30,7 +30,7 @@ class BudgetTest extends TestCase
             'is_active' => true,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -295,7 +295,7 @@ class BudgetTest extends TestCase
             'is_recurring' => false,
         ]);
 
-        // COP 500,000 → 500000 / 3000 = 166.67 CAD
+        // COP 500,000 → 500000 / 4400 * 0.75 = 85.23 CAD
         Transaction::create([
             'date' => '2025-01-07',
             'period' => '202501',
@@ -311,9 +311,9 @@ class BudgetTest extends TestCase
 
         $row = collect($response->json('data'))->firstWhere('category_code', 'C001');
 
-        // 300 + 266.67 + 166.67 = 733.34
-        $this->assertEquals(733.34, $row['actual_cad']);
-        $this->assertEquals(-66.66, $row['variance_cad']);
+        // 300 + (200 * 0.75) + 85.23 = 535.23; budget 800 → variance actual-budget
+        $this->assertEquals(535.23, $row['actual_cad']);
+        $this->assertEquals(-264.77, $row['variance_cad']);
         $this->assertFalse($row['is_over_budget']);
     }
 

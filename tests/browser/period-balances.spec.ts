@@ -1,9 +1,12 @@
-import { expect, test } from '@playwright/test';
+import {
+    expect,
+    test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
     type ApiCategory,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 test.beforeEach(() => {
@@ -18,14 +21,7 @@ test('user can register a period balance from reconciliation figures and overwri
 
     await loginAsBrowserTestUser(page, request);
 
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202501',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
+    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     const bankResponse = await request.post('/api/accounts', {
         data: {

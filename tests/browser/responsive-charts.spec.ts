@@ -1,8 +1,11 @@
-import { expect, test } from '@playwright/test';
+import {
+    expect,
+    test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 const evidence = 'verification/test-157-responsive-charts';
@@ -45,14 +48,7 @@ async function seedChartData(page: import('@playwright/test').Page) {
         const year = period.slice(0, 4);
         const month = period.slice(4, 6);
 
-        await page.request.post('/api/exchange-rates', {
-            data: {
-                period,
-                usd_cop: 4400,
-                usd_cad: 0.75,
-                cad_cop: 3000,
-            },
-        });
+        await ensureExchangeRateForPeriod(page.request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
 
         const incomeResponse = await page.request.post('/api/income', {
             data: {

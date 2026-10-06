@@ -1,10 +1,14 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 const verificationDir = path.join(
@@ -18,15 +22,7 @@ async function seedCurrencyPreferenceData(
 ): Promise<void> {
     const period = '202601';
 
-    const rateResponse = await request.post('/api/exchange-rates', {
-        data: {
-            period,
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
-    expect(rateResponse.ok()).toBeTruthy();
+    await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     const incomeResponse = await request.post('/api/income', {
         data: {

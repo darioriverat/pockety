@@ -52,7 +52,7 @@ class PeriodComparisonTest extends TestCase
         ]);
 
         foreach (['202501', '202502'] as $period) {
-            ExchangeRate::create([
+            $this->seedExchangeRate([
                 'period' => $period,
                 'usd_cop' => 4400,
                 'usd_cad' => 0.75,

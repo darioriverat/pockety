@@ -1,4 +1,6 @@
-import { expect, test } from '@playwright/test';
+import {
+    expect,
+    test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -8,6 +10,7 @@ import {
     selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 const verificationDir = path.join(process.cwd(), 'verification', 'session-67');
@@ -25,14 +28,7 @@ test('feature 116: user can generate PDF report of income statement for a period
 
     await loginAsBrowserTestUser(page, request);
 
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202501',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
+    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     await request.post('/api/income', {
         data: {

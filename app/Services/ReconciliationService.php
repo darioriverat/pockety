@@ -8,10 +8,11 @@ use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
 use App\Models\FixedAsset;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\Log;
+use App\Services\Concerns\ResolvesExchangeRate;
 
 class ReconciliationService
 {
+    use ResolvesExchangeRate;
     /**
      * Acceptable rounding tolerance (in currency units) for considering a variance "balanced".
      */
@@ -94,7 +95,7 @@ class ReconciliationService
             $exchangeRate,
         );
 
-        return [
+        $payload = [
             'period' => $period,
             'status' => $accountsBalanced && $equation['is_balanced'] ? 'balanced' : 'unbalanced',
             'accounts' => $results,
@@ -105,6 +106,12 @@ class ReconciliationService
             'expenses_total_cad' => $expensesTotalCad,
             'net_operating_expenses_cad' => $netOperatingExpensesCad,
         ];
+
+        if ($exchangeRate === null) {
+            $payload['missing_exchange_rate'] = true;
+        }
+
+        return $payload;
     }
 
     /**
@@ -133,7 +140,7 @@ class ReconciliationService
      *     variance: array{assets_cad: float, liabilities_cad: float, equity_cad: float}
      * }
      */
-    private function checkAccountingEquation(array $accountResults, ExchangeRate $exchangeRate, string $period): array
+    private function checkAccountingEquation(array $accountResults, ?ExchangeRate $exchangeRate, string $period): array
     {
         $recordedAssets = 0.0;
         $computedAssets = 0.0;
@@ -241,7 +248,7 @@ class ReconciliationService
      *     liabilities: array{initial_cad: float, computed_cad: float, difference_cad: float}
      * }
      */
-    private function buildBalanceChanges(array $accountResults, ExchangeRate $exchangeRate): array
+    private function buildBalanceChanges(array $accountResults, ?ExchangeRate $exchangeRate): array
     {
         $accounts = [];
         $assetsInitial = 0.0;
@@ -337,7 +344,7 @@ class ReconciliationService
         float $netOperatingExpensesCad,
         array $balanceChanges,
         string $period,
-        ExchangeRate $exchangeRate
+        ?ExchangeRate $exchangeRate
     ): array {
         $assetsDifference = round((float) $balanceChanges['assets']['difference_cad'], 2);
         $liabilitiesDifference = round((float) $balanceChanges['liabilities']['difference_cad'], 2);
@@ -376,7 +383,7 @@ class ReconciliationService
     /**
      * CAD equivalent of all transactions with the given debt component in the period.
      */
-    private function sumDebtComponentCad(string $period, string $component, ExchangeRate $exchangeRate): float
+    private function sumDebtComponentCad(string $period, string $component, ?ExchangeRate $exchangeRate): float
     {
         $total = 0.0;
 
@@ -400,7 +407,7 @@ class ReconciliationService
     /**
      * CAD equivalent of all transactions marked as credits in the period.
      */
-    private function sumNoAccountCredits(string $period, ExchangeRate $exchangeRate): float
+    private function sumNoAccountCredits(string $period, ?ExchangeRate $exchangeRate): float
     {
         $total = 0.0;
 
@@ -425,7 +432,7 @@ class ReconciliationService
     /**
      * @param  array{cad?: float|int, usd?: float|int, cop?: float|int}  $amounts
      */
-    private function amountsCadEquivalent(array $amounts, ExchangeRate $exchangeRate): float
+    private function amountsCadEquivalent(array $amounts, ?ExchangeRate $exchangeRate): float
     {
         $cadEquivalent = 0.0;
         $cad = (float) ($amounts['cad'] ?? 0);
@@ -434,6 +441,10 @@ class ReconciliationService
 
         if ($cad != 0.0) {
             $cadEquivalent += $cad;
+        }
+
+        if ($exchangeRate === null) {
+            return $cadEquivalent;
         }
 
         if ($usd != 0.0) {
@@ -445,24 +456,6 @@ class ReconciliationService
         }
 
         return $cadEquivalent;
-    }
-
-    private function resolveExchangeRate(string $period): ExchangeRate
-    {
-        $exchangeRate = ExchangeRate::forPeriod($period);
-
-        if (! $exchangeRate) {
-            Log::warning("No exchange rate found for period {$period}, using defaults");
-
-            return new ExchangeRate([
-                'period' => $period,
-                'usd_cop' => 4400,
-                'usd_cad' => 0.75,
-                'cad_cop' => 3000,
-            ]);
-        }
-
-        return $exchangeRate;
     }
 
     /**

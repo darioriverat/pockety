@@ -1,8 +1,12 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 async function seedIncomeExpenseData(
@@ -45,14 +49,7 @@ async function seedIncomeExpenseData(
         const year = period.slice(0, 4);
         const month = period.slice(4, 6);
 
-        await request.post('/api/exchange-rates', {
-            data: {
-                period,
-                usd_cop: 4400,
-                usd_cad: 0.75,
-                cad_cop: 3000,
-            },
-        });
+        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
 
         const incomeResponse = await request.post('/api/income', {
             data: {

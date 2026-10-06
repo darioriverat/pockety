@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
+use App\Models\ExchangeRateSnapshot;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -51,9 +52,10 @@ class ExchangeRateController extends Controller
     {
         $rate = ExchangeRate::forPeriod($period);
 
-        if (! $rate) {
+        if (! $rate || ! $rate->hasSnapshot()) {
             return response()->json([
                 'message' => 'Exchange rates not found for period '.$period,
+                'missing_exchange_rate' => true,
                 'data' => null,
             ], 404);
         }
@@ -79,20 +81,33 @@ class ExchangeRateController extends Controller
     }
 
     /**
-     * Create or update exchange rates for a period.
+     * Assign a snapshot to a period (create or replace assignment).
      */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'period' => 'required|string|size:6|regex:/^\d{6}$/',
-            'usd_cop' => 'required|numeric|gt:0',
-            'usd_cad' => 'required|numeric|gt:0',
-            'cad_cop' => 'required|numeric|gt:0',
-        ], [
-            'usd_cop.gt' => 'USD/COP rate must be a positive number.',
-            'usd_cad.gt' => 'USD/CAD rate must be a positive number.',
-            'cad_cop.gt' => 'CAD/COP rate must be a positive number.',
+            'snapshot_id' => 'required|integer|exists:exchange_rate_snapshots,id',
+            'usd_cop' => 'prohibited',
+            'usd_cad' => 'prohibited',
+            'cad_cop' => 'prohibited',
         ]);
+
+        $snapshot = ExchangeRateSnapshot::query()->findOrFail($validated['snapshot_id']);
+
+        $allowed = (
+            $snapshot->source === ExchangeRateSnapshot::SOURCE_OPEN_EXCHANGE_RATES
+            && $snapshot->user_id === null
+        ) || (
+            $snapshot->source === ExchangeRateSnapshot::SOURCE_MANUAL
+            && (int) $snapshot->user_id === (int) $this->owner->id()
+        );
+
+        if (! $allowed) {
+            return response()->json([
+                'message' => 'You cannot assign this exchange rate snapshot.',
+            ], 403);
+        }
 
         $rate = ExchangeRate::updateOrCreate(
             [
@@ -100,15 +115,13 @@ class ExchangeRateController extends Controller
                 'period' => $validated['period'],
             ],
             [
-                'usd_cop' => $validated['usd_cop'],
-                'usd_cad' => $validated['usd_cad'],
-                'cad_cop' => $validated['cad_cop'],
+                'snapshot_id' => $snapshot->id,
             ]
         );
 
         return response()->json([
             'message' => 'Exchange rates saved successfully',
-            'data' => $rate,
+            'data' => $rate->fresh()->load('snapshot'),
         ]);
     }
 }

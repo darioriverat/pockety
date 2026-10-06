@@ -46,7 +46,7 @@ class ReportsTest extends TestCase
         // Create exchange rates for the year
         for ($month = 1; $month <= 3; $month++) {
             $period = sprintf('%d%02d', $year, $month);
-            ExchangeRate::create([
+            $this->seedExchangeRate([
                 'period' => $period,
                 'usd_cop' => 4400,
                 'usd_cad' => 0.75,
@@ -168,7 +168,7 @@ class ReportsTest extends TestCase
         $period = '202501';
 
         // Create exchange rate
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => $period,
             'usd_cop' => 4400,
             'usd_cad' => 1.33,
@@ -190,7 +190,7 @@ class ReportsTest extends TestCase
             'description' => 'USD Bonus',
             'line_number' => 2,
             'amount_cad' => 0,
-            'amount_usd' => 1000.00, // Should convert to 751.88 CAD (1000 / 1.33)
+            'amount_usd' => 1000.00, // 1000 * 1.33 = 1330 CAD
             'amount_cop' => 0,
         ]);
 
@@ -206,7 +206,7 @@ class ReportsTest extends TestCase
             'account_id' => $account->id,
             'amount_cad' => 0,
             'amount_usd' => 0,
-            'amount_cop' => 1650000.00, // Should convert to 500 CAD (1650000 / 3300)
+            'amount_cop' => 1650000.00, // 1650000 / 4400 * 1.33 = 498.75 CAD
         ]);
 
         $response = $this->get(route('reports.ytd', ['year' => $year]));
@@ -215,9 +215,9 @@ class ReportsTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('reports-ytd')
             ->where('ytd_totals.year', $year)
-            ->where('ytd_totals.ytd_income_cad', 3751.88) // 3000 CAD + 751.88 CAD (from USD)
-            ->where('ytd_totals.ytd_expenses_cad', 500) // 500 CAD (from COP)
-            ->where('ytd_totals.ytd_net_cad', 3251.88)
+            ->where('ytd_totals.ytd_income_cad', 4330) // 3000 + 1330
+            ->where('ytd_totals.ytd_expenses_cad', 498.75)
+            ->where('ytd_totals.ytd_net_cad', 3831.25)
         );
     }
 

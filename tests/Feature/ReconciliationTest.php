@@ -451,7 +451,7 @@ class ReconciliationTest extends TestCase
             'is_active' => true,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 3750,
             'usd_cad' => 1.5,
@@ -490,23 +490,23 @@ class ReconciliationTest extends TestCase
 
         $equation = $response->json('data.accounting_equation');
 
-        // CAD equivalent: USD / usd_cad, COP / cad_cop (1.5 and 2500).
-        // Recorded assets: 1000 + 200/1.5 + 500000/2500 = 1333.33
-        // Recorded liabilities: abs(-500 + -50/1.5 + -100000/2500) = 573.33
-        $this->assertEquals(1333.33, $equation['recorded']['assets_cad']);
-        $this->assertEquals(573.33, $equation['recorded']['liabilities_cad']);
-        $this->assertEquals(760.0, $equation['recorded']['equity_cad']);
+        // CAD equivalent: USD * cad_per_usd, COP / cop_per_usd * cad_per_usd (1.5 and 3750).
+        // Recorded assets: 1000 + 200*1.5 + 500000/3750*1.5 = 1500
+        // Recorded liabilities: abs(-500 + -50*1.5 + -100000/3750*1.5) = 615
+        $this->assertEquals(1500.0, $equation['recorded']['assets_cad']);
+        $this->assertEquals(615.0, $equation['recorded']['liabilities_cad']);
+        $this->assertEquals(885.0, $equation['recorded']['equity_cad']);
 
-        // Computed includes operations: 900 + 180/1.5 + 450000/2500 = 1200
-        $this->assertEquals(1200, $equation['assets_cad']);
-        $this->assertEquals(573.33, $equation['liabilities_cad']);
-        $this->assertEquals(626.67, $equation['equity_cad']);
-        $this->assertEquals(1200, $equation['computed']['assets_cad']);
-        $this->assertEquals(573.33, $equation['computed']['liabilities_cad']);
-        $this->assertEquals(626.67, $equation['computed']['equity_cad']);
-        $this->assertEquals(133.33, $equation['variance']['assets_cad']);
+        // Computed includes operations: 900 + 180*1.5 + 450000/3750*1.5 = 1350
+        $this->assertEquals(1350.0, $equation['assets_cad']);
+        $this->assertEquals(615.0, $equation['liabilities_cad']);
+        $this->assertEquals(735.0, $equation['equity_cad']);
+        $this->assertEquals(1350.0, $equation['computed']['assets_cad']);
+        $this->assertEquals(615.0, $equation['computed']['liabilities_cad']);
+        $this->assertEquals(735.0, $equation['computed']['equity_cad']);
+        $this->assertEquals(150.0, $equation['variance']['assets_cad']);
         $this->assertEquals(0, $equation['variance']['liabilities_cad']);
-        $this->assertEquals(133.33, $equation['variance']['equity_cad']);
+        $this->assertEquals(150.0, $equation['variance']['equity_cad']);
         $this->assertEquals(0, $equation['residual_cad']);
         $this->assertTrue($equation['is_balanced']);
     }
@@ -622,7 +622,7 @@ class ReconciliationTest extends TestCase
             'is_active' => true,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202502',
             'usd_cop' => 3750,
             'usd_cad' => 1.5,
@@ -730,13 +730,12 @@ class ReconciliationTest extends TestCase
         $savingsChange = collect($changes['accounts'])->firstWhere('account_id', $savings->id);
         $creditChange = collect($changes['accounts'])->firstWhere('account_id', $creditCard->id);
 
-        // CAD equivalent: USD / usd_cad, COP / cad_cop (1.5 and 2500).
-        // Checking initial: 1000 + 150/1.5 + 250000/2500 = 1200
-        // Checking computed: 900 + 100 + 100 = 1100, difference 100 (initial − computed)
+        // CAD equivalent: USD * 1.5, COP / 3750 * 1.5.
+        // Checking initial: 1000 + 150*1.5 + 250000/3750*1.5 = 1325
         $this->assertNotNull($checkingChange);
         $this->assertTrue($checkingChange['is_asset']);
-        $this->assertEquals(1200.0, $checkingChange['initial_cad']);
-        $this->assertEquals(1100.0, $checkingChange['computed_cad']);
+        $this->assertEquals(1325.0, $checkingChange['initial_cad']);
+        $this->assertEquals(1225.0, $checkingChange['computed_cad']);
         $this->assertEquals(100.0, $checkingChange['difference_cad']);
 
         $this->assertNotNull($savingsChange);
@@ -744,19 +743,18 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(500.0, $savingsChange['computed_cad']);
         $this->assertEquals(0.0, $savingsChange['difference_cad']);
 
-        // Credit card initial: abs(400 + 60/1.5 + 50000/2500) = 460
-        // Charge +50 CAD → computed abs(450 + 40 + 20) = 510, difference -50
+        // Credit card initial: abs(400 + 60*1.5 + 50000/3750*1.5) = 510
         $this->assertNotNull($creditChange);
         $this->assertTrue($creditChange['is_liability']);
-        $this->assertEquals(460.0, $creditChange['initial_cad']);
-        $this->assertEquals(510.0, $creditChange['computed_cad']);
+        $this->assertEquals(510.0, $creditChange['initial_cad']);
+        $this->assertEquals(560.0, $creditChange['computed_cad']);
         $this->assertEquals(-50.0, $creditChange['difference_cad']);
 
-        $this->assertEquals(1700.0, $changes['assets']['initial_cad']);
-        $this->assertEquals(1600.0, $changes['assets']['computed_cad']);
+        $this->assertEquals(1825.0, $changes['assets']['initial_cad']);
+        $this->assertEquals(1725.0, $changes['assets']['computed_cad']);
         $this->assertEquals(100.0, $changes['assets']['difference_cad']);
-        $this->assertEquals(460.0, $changes['liabilities']['initial_cad']);
-        $this->assertEquals(510.0, $changes['liabilities']['computed_cad']);
+        $this->assertEquals(510.0, $changes['liabilities']['initial_cad']);
+        $this->assertEquals(560.0, $changes['liabilities']['computed_cad']);
         $this->assertEquals(-50.0, $changes['liabilities']['difference_cad']);
     }
 
@@ -791,7 +789,7 @@ class ReconciliationTest extends TestCase
             'name' => 'Visa Payment',
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202502',
             'usd_cop' => 3750,
             'usd_cad' => 1.5,
@@ -897,17 +895,17 @@ class ReconciliationTest extends TestCase
 
         $check = $response->json('data.records_check');
 
-        // Down payments: 100 CAD + 150 USD / 1.5 = 200
-        // Interest: 40 CAD + 90 USD / 1.5 = 100
+        // Down payments: 100 CAD + 150 USD * 1.5 = 325
+        // Interest: 40 CAD + 90 USD * 1.5 = 175
         $this->assertEquals(1000.0, $check['income_cad']);
-        $this->assertEquals(450.0, $check['net_operating_expenses_cad']);
+        $this->assertEquals(525.0, $check['net_operating_expenses_cad']);
         $this->assertEquals(300.0, $check['assets_difference_cad']);
-        $this->assertEquals(150.0, $check['liabilities_difference_cad']);
-        $this->assertEquals(200.0, $check['down_payments_cad']);
-        $this->assertEquals(100.0, $check['interest_cad']);
-        $this->assertEquals(300.0, $check['debt_payments_cad']);
-        // 1000 − 450 + 300 − 150 + 200 + 100 − 300 = 700
-        $this->assertEquals(700.0, $check['result_cad']);
+        $this->assertEquals(275.0, $check['liabilities_difference_cad']);
+        $this->assertEquals(325.0, $check['down_payments_cad']);
+        $this->assertEquals(175.0, $check['interest_cad']);
+        $this->assertEquals(500.0, $check['debt_payments_cad']);
+        // 1000 − 525 + 300 − 275 + 325 + 175 − 500 = 500
+        $this->assertEquals(500.0, $check['result_cad']);
         $this->assertFalse($check['is_balanced']);
         $this->assertStringContainsString('Down payments', $check['formula']);
         $this->assertStringContainsString('Interest', $check['formula']);

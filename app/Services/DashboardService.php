@@ -9,11 +9,12 @@ use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\Transaction;
+use App\Services\Concerns\ResolvesExchangeRate;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class DashboardService
 {
+    use ResolvesExchangeRate;
     public function __construct(
         private ReconciliationService $reconciliationService,
         private readonly OwnerResolverInterface $owner,
@@ -61,34 +62,36 @@ class DashboardService
         $reconciliation = $this->reconciliationService->reconcileForPeriod($period);
         $reconciliationSummary = $this->summarizeReconciliation($reconciliation);
 
-        return [
+        $payload = [
             'period' => $period,
             'total_income_cad' => round($totalIncome, 2),
-            'total_income_usd' => $exchangeRate->cadToUsd($totalIncome),
-            'total_income_cop' => $exchangeRate->cadToCop($totalIncome),
+            'total_income_usd' => $this->cadToUsd($exchangeRate, $totalIncome),
+            'total_income_cop' => $this->cadToCop($exchangeRate, $totalIncome),
             'total_expenses_cad' => round($totalExpenses, 2),
-            'total_expenses_usd' => $exchangeRate->cadToUsd($totalExpenses),
-            'total_expenses_cop' => $exchangeRate->cadToCop($totalExpenses),
+            'total_expenses_usd' => $this->cadToUsd($exchangeRate, $totalExpenses),
+            'total_expenses_cop' => $this->cadToCop($exchangeRate, $totalExpenses),
             'net_cad' => round($net, 2),
-            'net_usd' => $exchangeRate->cadToUsd($net),
-            'net_cop' => $exchangeRate->cadToCop($net),
+            'net_usd' => $this->cadToUsd($exchangeRate, $net),
+            'net_cop' => $this->cadToCop($exchangeRate, $net),
             'total_assets_cad' => round($totalAssets, 2),
-            'total_assets_usd' => $exchangeRate->cadToUsd($totalAssets),
-            'total_assets_cop' => $exchangeRate->cadToCop($totalAssets),
+            'total_assets_usd' => $this->cadToUsd($exchangeRate, $totalAssets),
+            'total_assets_cop' => $this->cadToCop($exchangeRate, $totalAssets),
             'total_liabilities_cad' => round($totalLiabilities, 2),
-            'total_liabilities_usd' => $exchangeRate->cadToUsd($totalLiabilities),
-            'total_liabilities_cop' => $exchangeRate->cadToCop($totalLiabilities),
+            'total_liabilities_usd' => $this->cadToUsd($exchangeRate, $totalLiabilities),
+            'total_liabilities_cop' => $this->cadToCop($exchangeRate, $totalLiabilities),
             'equity_cad' => round($equity, 2),
-            'equity_usd' => $exchangeRate->cadToUsd($equity),
-            'equity_cop' => $exchangeRate->cadToCop($equity),
-            'exchange_rates' => [
-                'usd_cop' => (float) $exchangeRate->usd_cop,
-                'usd_cad' => (float) $exchangeRate->usd_cad,
-                'cad_cop' => (float) $exchangeRate->cad_cop,
-            ],
+            'equity_usd' => $this->cadToUsd($exchangeRate, $equity),
+            'equity_cop' => $this->cadToCop($exchangeRate, $equity),
+            'exchange_rates' => $this->exchangeRatesForResponse($exchangeRate),
             'reconciliation_status' => $reconciliation['status'],
             'reconciliation_summary' => $reconciliationSummary,
         ];
+
+        if ($exchangeRate === null) {
+            $payload['missing_exchange_rate'] = true;
+        }
+
+        return $payload;
     }
 
     /**
@@ -118,11 +121,11 @@ class DashboardService
             $periodRows[] = [
                 'period' => $period,
                 'income_cad' => round($income, 2),
-                'income_usd' => $exchangeRate->cadToUsd($income),
-                'income_cop' => $exchangeRate->cadToCop($income),
+                'income_usd' => $this->cadToUsd($exchangeRate, $income),
+                'income_cop' => $this->cadToCop($exchangeRate, $income),
                 'expenses_cad' => round($expenses, 2),
-                'expenses_usd' => $exchangeRate->cadToUsd($expenses),
-                'expenses_cop' => $exchangeRate->cadToCop($expenses),
+                'expenses_usd' => $this->cadToUsd($exchangeRate, $expenses),
+                'expenses_cop' => $this->cadToCop($exchangeRate, $expenses),
             ];
         }
 
@@ -171,14 +174,14 @@ class DashboardService
             $periodRows[] = [
                 'period' => $period,
                 'assets_cad' => round($assets, 2),
-                'assets_usd' => $exchangeRate->cadToUsd($assets),
-                'assets_cop' => $exchangeRate->cadToCop($assets),
+                'assets_usd' => $this->cadToUsd($exchangeRate, $assets),
+                'assets_cop' => $this->cadToCop($exchangeRate, $assets),
                 'liabilities_cad' => round($liabilities, 2),
-                'liabilities_usd' => $exchangeRate->cadToUsd($liabilities),
-                'liabilities_cop' => $exchangeRate->cadToCop($liabilities),
+                'liabilities_usd' => $this->cadToUsd($exchangeRate, $liabilities),
+                'liabilities_cop' => $this->cadToCop($exchangeRate, $liabilities),
                 'equity_cad' => round($equity, 2),
-                'equity_usd' => $exchangeRate->cadToUsd($equity),
-                'equity_cop' => $exchangeRate->cadToCop($equity),
+                'equity_usd' => $this->cadToUsd($exchangeRate, $equity),
+                'equity_cop' => $this->cadToCop($exchangeRate, $equity),
             ];
         }
 
@@ -190,28 +193,10 @@ class DashboardService
         ];
     }
 
-    private function resolveExchangeRate(string $period): ExchangeRate
-    {
-        $exchangeRate = ExchangeRate::forPeriod($period);
-
-        if (! $exchangeRate) {
-            Log::warning("No exchange rate found for period {$period}, using defaults");
-
-            return new ExchangeRate([
-                'period' => $period,
-                'usd_cop' => 4400,
-                'usd_cad' => 0.75,
-                'cad_cop' => 3000,
-            ]);
-        }
-
-        return $exchangeRate;
-    }
-
     /**
      * Calculate total income for a period in CAD equivalent.
      */
-    private function calculateTotalIncome(string $period, ExchangeRate $exchangeRate): float
+    private function calculateTotalIncome(string $period, ?ExchangeRate $exchangeRate): float
     {
         $userId = $this->owner->id();
         $incomeLines = Income::query()->forUser($userId)->forPeriod($period)->get();
@@ -221,11 +206,11 @@ class DashboardService
         foreach ($incomeLines as $income) {
             $total += (float) $income->amount_cad;
 
-            if ($income->amount_usd > 0) {
+            if ($exchangeRate !== null && $income->amount_usd > 0) {
                 $total += $exchangeRate->usdToCad((float) $income->amount_usd);
             }
 
-            if ($income->amount_cop > 0) {
+            if ($exchangeRate !== null && $income->amount_cop > 0) {
                 $total += $exchangeRate->copToCad((float) $income->amount_cop);
             }
         }
@@ -237,7 +222,7 @@ class DashboardService
             ->get();
 
         foreach ($incomeTransactions as $transaction) {
-            $total += $transaction->cadEquivalent($exchangeRate);
+            $total += $this->transactionToCad($transaction, $exchangeRate);
         }
 
         return $total;
@@ -246,7 +231,7 @@ class DashboardService
     /**
      * Calculate total expenses for a period in CAD equivalent.
      */
-    private function calculateTotalExpenses(string $period, ExchangeRate $exchangeRate): float
+    private function calculateTotalExpenses(string $period, ?ExchangeRate $exchangeRate): float
     {
         $transactions = Transaction::query()
             ->forUser($this->owner->id())
@@ -257,17 +242,7 @@ class DashboardService
         $total = 0.0;
 
         foreach ($transactions as $transaction) {
-            if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
-                $total += (float) $transaction->amount_cad;
-            }
-
-            if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
-                $total += $exchangeRate->usdToCad((float) $transaction->amount_usd);
-            }
-
-            if ($transaction->amount_cop !== null && (float) $transaction->amount_cop != 0) {
-                $total += $exchangeRate->copToCad((float) $transaction->amount_cop);
-            }
+            $total += $this->transactionToCad($transaction, $exchangeRate);
         }
 
         return $total;
@@ -278,7 +253,7 @@ class DashboardService
      *
      * @return array{0: float, 1: float} [totalAssets, totalLiabilities]
      */
-    private function calculateAssetsAndLiabilities(string $period, ExchangeRate $exchangeRate): array
+    private function calculateAssetsAndLiabilities(string $period, ?ExchangeRate $exchangeRate): array
     {
         $totalAssets = 0.0;
         $totalLiabilities = 0.0;
@@ -303,11 +278,11 @@ class DashboardService
                 $cadEquivalent += (float) $balance->recorded_balance_cad;
             }
 
-            if ($balance->recorded_balance_usd) {
+            if ($exchangeRate !== null && $balance->recorded_balance_usd) {
                 $cadEquivalent += $exchangeRate->usdToCad((float) $balance->recorded_balance_usd);
             }
 
-            if ($balance->recorded_balance_cop) {
+            if ($exchangeRate !== null && $balance->recorded_balance_cop) {
                 $cadEquivalent += $exchangeRate->copToCad((float) $balance->recorded_balance_cop);
             }
 
@@ -402,21 +377,27 @@ class DashboardService
                 'category_code' => (string) $category->code,
                 'category_name' => (string) $category->name,
                 'amount_cad' => $amount,
-                'amount_usd' => $exchangeRate->cadToUsd($aggregates[$categoryId]['amount']),
-                'amount_cop' => $exchangeRate->cadToCop($aggregates[$categoryId]['amount']),
+                'amount_usd' => $this->cadToUsd($exchangeRate, $aggregates[$categoryId]['amount']),
+                'amount_cop' => $this->cadToCop($exchangeRate, $aggregates[$categoryId]['amount']),
                 'percentage' => $percentage,
                 'transaction_count' => $aggregates[$categoryId]['count'],
             ];
         }
 
-        return [
+        $payload = [
             'period' => $period,
             'limit' => $limit,
             'total_expenses_cad' => round($totalExpenses, 2),
-            'total_expenses_usd' => $exchangeRate->cadToUsd($totalExpenses),
-            'total_expenses_cop' => $exchangeRate->cadToCop($totalExpenses),
+            'total_expenses_usd' => $this->cadToUsd($exchangeRate, $totalExpenses),
+            'total_expenses_cop' => $this->cadToCop($exchangeRate, $totalExpenses),
             'categories' => $categories,
         ];
+
+        if ($exchangeRate === null) {
+            $payload['missing_exchange_rate'] = true;
+        }
+
+        return $payload;
     }
 
     /**
@@ -539,12 +520,16 @@ class DashboardService
         ];
     }
 
-    private function transactionToCad(Transaction $transaction, ExchangeRate $exchangeRate): float
+    private function transactionToCad(Transaction $transaction, ?ExchangeRate $exchangeRate): float
     {
         $cadEquivalent = 0.0;
 
         if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
             $cadEquivalent += (float) $transaction->amount_cad;
+        }
+
+        if ($exchangeRate === null) {
+            return $cadEquivalent;
         }
 
         if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
@@ -556,6 +541,16 @@ class DashboardService
         }
 
         return $cadEquivalent;
+    }
+
+    private function cadToUsd(?ExchangeRate $exchangeRate, float $cad): ?float
+    {
+        return $exchangeRate !== null ? $exchangeRate->cadToUsd($cad) : null;
+    }
+
+    private function cadToCop(?ExchangeRate $exchangeRate, float $cad): ?float
+    {
+        return $exchangeRate !== null ? $exchangeRate->cadToCop($cad) : null;
     }
 
     /**

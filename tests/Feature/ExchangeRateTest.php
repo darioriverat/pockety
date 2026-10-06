@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\ExchangeRate;
+use App\Models\ExchangeRateSnapshot;
 use App\Models\User;
-use App\Services\ExchangeRateImportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class ExchangeRateTest extends TestCase
@@ -21,353 +23,328 @@ class ExchangeRateTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_can_create_exchange_rate_for_period(): void
+    public function test_snapshots_table_has_expected_columns(): void
     {
-        $response = $this->postJson('/api/exchange-rates', [
-            'period' => '202501',
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'message',
-                'data' => [
-                    'id',
-                    'period',
-                    'usd_cop',
-                    'usd_cad',
-                    'cad_cop',
-                ],
-            ]);
-
-        $this->assertDatabaseHas('exchange_rates', [
-            'period' => '202501',
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-    }
-
-    public function test_can_update_existing_exchange_rate(): void
-    {
-        ExchangeRate::create([
-            'period' => '202501',
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-
-        $response = $this->postJson('/api/exchange-rates', [
-            'period' => '202501',
-            'usd_cop' => 4500,
-            'usd_cad' => 0.80,
-            'cad_cop' => 3100,
-        ]);
-
-        $response->assertStatus(200);
-
-        $this->assertDatabaseHas('exchange_rates', [
-            'period' => '202501',
-            'usd_cop' => 4500,
-            'usd_cad' => 0.80,
-            'cad_cop' => 3100,
-        ]);
-    }
-
-    public function test_can_get_exchange_rate_for_specific_period(): void
-    {
-        ExchangeRate::create([
-            'period' => '202501',
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-
-        $response = $this->getJson('/api/exchange-rates/show?period=202501');
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'data' => [
-                    'period' => '202501',
-                    'usd_cop' => '4400.0000',
-                    'usd_cad' => '0.7500',
-                    'cad_cop' => '3000.0000',
-                ],
-            ]);
-    }
-
-    public function test_returns_404_when_exchange_rate_not_found(): void
-    {
-        $response = $this->getJson('/api/exchange-rates/show?period=202599');
-
-        $response->assertStatus(404)
-            ->assertJson([
-                'message' => 'Exchange rates not found for period 202599',
-            ]);
-    }
-
-    public function test_can_list_all_exchange_rates(): void
-    {
-        ExchangeRate::create([
-            'period' => '202501',
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-
-        ExchangeRate::create([
-            'period' => '202502',
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-
-        $response = $this->getJson('/api/exchange-rates');
-
-        $response->assertStatus(200)
-            ->assertJsonCount(2, 'data')
-            ->assertJsonStructure([
-                'data' => [
-                    '*' => [
-                        'id',
-                        'period',
-                        'usd_cop',
-                        'usd_cad',
-                        'cad_cop',
-                    ],
-                ],
-            ]);
-    }
-
-    public function test_usd_cop_rate_is_fixed_at_4400_across_all_months(): void
-    {
-        // Import rates from month sheets
-        $importService = app(ExchangeRateImportService::class);
-        $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
-
-        $this->assertEquals(21, $result['rates_imported']);
-
-        // Verify USD/COP is fixed at 4400 for all periods
-        $rates = ExchangeRate::all();
-        foreach ($rates as $rate) {
-            $this->assertEquals(4400, (float) $rate->usd_cop, "USD/COP should be 4400 for period {$rate->period}");
+        $this->assertTrue(\Schema::hasTable('exchange_rate_snapshots'));
+        foreach (['id', 'rate_date', 'source', 'user_id', 'cad_per_usd', 'cop_per_usd', 'created_at', 'updated_at'] as $column) {
+            $this->assertTrue(\Schema::hasColumn('exchange_rate_snapshots', $column), $column);
         }
+        $this->assertFalse(\Schema::hasColumn('exchange_rates', 'usd_cop'));
+        $this->assertFalse(\Schema::hasColumn('exchange_rates', 'usd_cad'));
+        $this->assertFalse(\Schema::hasColumn('exchange_rates', 'cad_cop'));
+        $this->assertTrue(\Schema::hasColumn('exchange_rates', 'snapshot_id'));
     }
 
-    public function test_usd_cad_rate_is_fixed_at_0_75_across_all_months(): void
+    public function test_fetch_command_persists_global_snapshot_idempotently(): void
     {
-        // Import rates from month sheets
-        $importService = app(ExchangeRateImportService::class);
-        $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
+        config(['services.openexchangerates.app_id' => 'test-app-id']);
 
-        $this->assertEquals(21, $result['rates_imported']);
+        $timestamp = 1738281600; // 2025-01-31 00:00:00 UTC
 
-        // Verify USD/CAD is fixed at 0.75 for all periods
-        $rates = ExchangeRate::all();
-        foreach ($rates as $rate) {
-            $this->assertEquals(0.75, (float) $rate->usd_cad, "USD/CAD should be 0.75 for period {$rate->period}");
-        }
-    }
-
-    public function test_cad_cop_rate_varies_across_months(): void
-    {
-        // Import rates from month sheets
-        $importService = app(ExchangeRateImportService::class);
-        $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
-
-        $this->assertEquals(21, $result['rates_imported']);
-
-        // Verify CAD/COP varies
-        $rates = ExchangeRate::orderBy('period')->get();
-
-        // Early 2025 should be around 3000
-        $jan2025 = $rates->where('period', '202501')->first();
-        $this->assertEquals(3000, (float) $jan2025->cad_cop);
-
-        // Mid 2026 should be around 2550
-        $jun2026 = $rates->where('period', '202606')->first();
-        $this->assertEquals(2550, (float) $jun2026->cad_cop);
-
-        // Late 2026 should be around 2200
-        $sep2026 = $rates->where('period', '202609')->first();
-        $this->assertEquals(2200, (float) $sep2026->cad_cop);
-
-        // Verify not all rates are the same
-        $uniqueRates = $rates->pluck('cad_cop')->unique();
-        $this->assertGreaterThan(1, $uniqueRates->count(), 'CAD/COP rate should vary across months');
-    }
-
-    public function test_import_creates_21_exchange_rate_records(): void
-    {
-        $importService = app(ExchangeRateImportService::class);
-        $result = $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
-
-        $this->assertEquals(21, $result['rates_imported']);
-        $this->assertEquals(21, ExchangeRate::count());
-        $this->assertCount(21, $result['periods']);
-        $this->assertEmpty($result['errors']);
-    }
-
-    public function test_import_statistics_returns_correct_data(): void
-    {
-        // Import rates first
-        $importService = app(ExchangeRateImportService::class);
-        $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
-
-        $response = $this->getJson('/api/exchange-rates/import/statistics');
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'data' => [
-                    'total_rates' => 21,
-                    'periods_covered' => [
-                        'min' => '202501',
-                        'max' => '202609',
+        Http::fake([
+            'https://openexchangerates.org/api/latest.json*' => Http::sequence()
+                ->push([
+                    'timestamp' => $timestamp,
+                    'base' => 'USD',
+                    'rates' => [
+                        'CAD' => 1.36,
+                        'COP' => 4000,
+                        'EUR' => 0.92,
                     ],
-                ],
-            ])
-            ->assertJsonStructure([
-                'data' => [
-                    'total_rates',
-                    'periods_covered',
-                    'rates_by_month',
-                ],
-            ]);
-    }
-
-    public function test_three_rate_series_are_independent(): void
-    {
-        // Import rates from month sheets
-        $importService = app(ExchangeRateImportService::class);
-        $importService->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
-
-        // Get a sample rate
-        $rate = ExchangeRate::where('period', '202501')->first();
-
-        // If CAD/COP were derived from USD/COP and USD/CAD, it would be:
-        // USD/COP / USD/CAD = 4400 / 0.75 = 5866.67
-        // But the actual stored value is 3000, confirming independence
-        $derivedCadCop = (float) $rate->usd_cop / (float) $rate->usd_cad;
-        $actualCadCop = (float) $rate->cad_cop;
-
-        $this->assertNotEquals(
-            round($derivedCadCop, 2),
-            round($actualCadCop, 2),
-            'CAD/COP should NOT be derived from USD/COP and USD/CAD. The three rates must be independent.'
-        );
-    }
-
-    public function test_exchange_rate_validation_requires_all_fields(): void
-    {
-        $response = $this->postJson('/api/exchange-rates', [
-            'period' => '202501',
-            // Missing usd_cop, usd_cad, cad_cop
+                ])
+                ->push([
+                    'timestamp' => $timestamp,
+                    'base' => 'USD',
+                    'rates' => [
+                        'CAD' => 1.40,
+                        'COP' => 4100,
+                        'EUR' => 0.91,
+                    ],
+                ]),
         ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['usd_cop', 'usd_cad', 'cad_cop']);
+        $this->artisan('exchange-rates:fetch')->assertSuccessful();
+
+        $this->assertDatabaseCount('exchange_rate_snapshots', 1);
+        $row = ExchangeRateSnapshot::query()->first();
+        $this->assertSame(ExchangeRateSnapshot::SOURCE_OPEN_EXCHANGE_RATES, $row->source);
+        $this->assertNull($row->user_id);
+        $this->assertEquals(1.36, (float) $row->cad_per_usd);
+        $this->assertEquals(4000, (float) $row->cop_per_usd);
+
+        $this->artisan('exchange-rates:fetch')->assertSuccessful();
+        $this->assertDatabaseCount('exchange_rate_snapshots', 1);
+        $row->refresh();
+        $this->assertEquals(1.40, (float) $row->cad_per_usd);
+        $this->assertEquals(4100, (float) $row->cop_per_usd);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'latest.json')
+                && ! str_contains($request->url(), 'historical')
+                && ! str_contains($request->url(), 'time-series')
+                && ! str_contains($request->url(), 'convert');
+        });
     }
 
-    public function test_exchange_rate_validation_requires_valid_period_format(): void
+    public function test_fetch_command_skips_when_app_id_missing(): void
     {
-        $response = $this->postJson('/api/exchange-rates', [
-            'period' => '2025', // Invalid format (should be YYYYMM)
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
+        config(['services.openexchangerates.app_id' => null]);
+        Http::fake();
+        Log::spy();
+
+        $this->artisan('exchange-rates:fetch')->assertSuccessful();
+
+        $this->assertDatabaseCount('exchange_rate_snapshots', 0);
+        Http::assertNothingSent();
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    public function test_fetch_command_fails_on_http_or_payload_errors_without_partial_rows(): void
+    {
+        config(['services.openexchangerates.app_id' => 'test-app-id']);
+        Log::spy();
+
+        Http::fake([
+            'https://openexchangerates.org/api/latest.json*' => Http::sequence()
+                ->push('error', 500)
+                ->push([
+                    'timestamp' => 1738281600,
+                    'rates' => ['COP' => 4000],
+                ])
+                ->push([
+                    'timestamp' => 1738281600,
+                    'rates' => ['CAD' => 1.36],
+                ])
+                ->push([
+                    'timestamp' => 1738281600,
+                    'rates' => ['CAD' => 1.36, 'COP' => 4000],
+                ]),
+        ]);
+
+        $this->artisan('exchange-rates:fetch')->assertFailed();
+        $this->assertDatabaseCount('exchange_rate_snapshots', 0);
+
+        $this->artisan('exchange-rates:fetch')->assertFailed();
+        $this->assertDatabaseCount('exchange_rate_snapshots', 0);
+
+        $this->artisan('exchange-rates:fetch')->assertFailed();
+        $this->assertDatabaseCount('exchange_rate_snapshots', 0);
+
+        $this->artisan('exchange-rates:fetch')->assertSuccessful();
+        $this->assertDatabaseCount('exchange_rate_snapshots', 1);
+    }
+
+    public function test_manual_snapshot_upsert_per_user_and_date(): void
+    {
+        $response = $this->postJson('/api/exchange-rate-snapshots', [
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.36,
+            'cop_per_usd' => 4000,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.source', 'manual')
+            ->assertJsonPath('data.user_id', $this->user->id);
+
+        $id = $response->json('data.id');
+
+        $update = $this->postJson('/api/exchange-rate-snapshots', [
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.40,
+            'cop_per_usd' => 4100,
+        ]);
+        $update->assertOk()->assertJsonPath('data.id', $id);
+        $this->assertDatabaseCount('exchange_rate_snapshots', 1);
+        $this->assertEquals(1.40, (float) ExchangeRateSnapshot::find($id)->cad_per_usd);
+
+        $this->postJson('/api/exchange-rate-snapshots', [
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.36,
+        ])->assertStatus(422);
+
+        $this->postJson('/api/exchange-rate-snapshots', [
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 0,
+            'cop_per_usd' => 4000,
+        ])->assertStatus(422);
+
+        $this->postJson('/api/exchange-rate-snapshots', [
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.36,
+            'cop_per_usd' => 4000,
             'cad_cop' => 3000,
-        ]);
+        ])->assertStatus(422);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['period']);
+        $other = User::factory()->create();
+        $this->actingAs($other);
+        $this->postJson('/api/exchange-rate-snapshots', [
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.50,
+            'cop_per_usd' => 4200,
+        ])->assertOk();
+
+        $this->assertEquals(2, ExchangeRateSnapshot::query()->where('source', 'manual')->count());
     }
 
-    public function test_exchange_rate_validation_rejects_negative_rates(): void
+    public function test_manual_snapshot_does_not_overwrite_global_feed(): void
     {
-        $response = $this->postJson('/api/exchange-rates', [
-            'period' => '202501',
-            'usd_cop' => -4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
+        $global = ExchangeRateSnapshot::factory()->globalFeed()->create([
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.36,
+            'cop_per_usd' => 4000,
         ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['usd_cop'])
-            ->assertJsonFragment([
-                'usd_cop' => ['USD/COP rate must be a positive number.'],
-            ]);
+        $this->postJson('/api/exchange-rate-snapshots', [
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.50,
+            'cop_per_usd' => 4500,
+        ])->assertOk();
 
-        $this->assertDatabaseMissing('exchange_rates', [
-            'period' => '202501',
-        ]);
+        $global->refresh();
+        $this->assertEquals(1.36, (float) $global->cad_per_usd);
+        $this->assertEquals(4000, (float) $global->cop_per_usd);
+        $this->assertDatabaseCount('exchange_rate_snapshots', 2);
     }
 
-    public function test_exchange_rate_validation_rejects_zero_rates(): void
+    public function test_period_assignment_uses_snapshot(): void
     {
+        $snapshot = ExchangeRateSnapshot::factory()->manual($this->user->id)->create([
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.36,
+            'cop_per_usd' => 4000,
+        ]);
+
         $response = $this->postJson('/api/exchange-rates', [
             'period' => '202501',
-            'usd_cop' => 4400,
-            'usd_cad' => 0,
-            'cad_cop' => 3000,
+            'snapshot_id' => $snapshot->id,
         ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['usd_cad'])
-            ->assertJsonFragment([
-                'usd_cad' => ['USD/CAD rate must be a positive number.'],
-            ]);
+        $response->assertOk()
+            ->assertJsonPath('data.period', '202501')
+            ->assertJsonPath('data.snapshot_id', $snapshot->id);
 
-        $this->assertDatabaseMissing('exchange_rates', [
+        $rate = ExchangeRate::forPeriod('202501');
+        $this->assertNotNull($rate);
+        $this->assertEquals(136.0, $rate->usdToCad(100));
+        $this->assertEquals(100.0, $rate->cadToUsd(136));
+
+        $otherSnapshot = ExchangeRateSnapshot::factory()->manual($this->user->id)->create([
+            'rate_date' => '2025-01-15',
+            'cad_per_usd' => 1.40,
+            'cop_per_usd' => 4100,
+        ]);
+
+        $this->postJson('/api/exchange-rates', [
             'period' => '202501',
-        ]);
-    }
+            'snapshot_id' => $otherSnapshot->id,
+        ])->assertOk();
 
-    public function test_exchange_rate_validation_rejects_all_negative_rates(): void
-    {
-        $response = $this->postJson('/api/exchange-rates', [
-            'period' => '202501',
-            'usd_cop' => -4400,
-            'usd_cad' => -0.75,
-            'cad_cop' => -3000,
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['usd_cop', 'usd_cad', 'cad_cop']);
-    }
-
-    public function test_exchange_rate_validation_accepts_positive_rates(): void
-    {
-        $response = $this->postJson('/api/exchange-rates', [
-            'period' => '202501',
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-
-        $response->assertStatus(200);
-
+        $this->assertDatabaseCount('exchange_rates', 1);
         $this->assertDatabaseHas('exchange_rates', [
             'period' => '202501',
+            'snapshot_id' => $otherSnapshot->id,
+        ]);
+        $this->assertDatabaseHas('exchange_rate_snapshots', ['id' => $snapshot->id]);
+
+        $this->postJson('/api/exchange-rates', [
+            'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
             'cad_cop' => 3000,
-        ]);
+        ])->assertStatus(422);
     }
 
-    public function test_exchange_rate_validation_accepts_small_positive_rates(): void
+    public function test_conversion_quote_convention_and_derived_accessors(): void
     {
-        $response = $this->postJson('/api/exchange-rates', [
+        $rate = $this->seedExchangeRate([
             'period' => '202501',
-            'usd_cop' => 0.01,
-            'usd_cad' => 0.0001,
-            'cad_cop' => 0.5,
+            'cad_per_usd' => 1.36,
+            'cop_per_usd' => 4000,
         ]);
 
-        $response->assertStatus(200);
+        $this->assertEquals(136.0, $rate->usdToCad(100));
+        $this->assertEquals(100.0, $rate->cadToUsd(136));
+        $this->assertEquals(136.0, $rate->copToCad(400000));
+        $this->assertEqualsWithDelta(4000 / 1.36, (float) $rate->cad_cop, 0.0001);
+        $this->assertEquals(4000.0, (float) $rate->usd_cop);
+        $this->assertEquals(1.36, (float) $rate->usd_cad);
+    }
 
-        $this->assertDatabaseHas('exchange_rates', [
-            'period' => '202501',
+    public function test_zero_quote_returns_zero_instead_of_dividing(): void
+    {
+        $snapshot = ExchangeRateSnapshot::factory()->manual($this->user->id)->create([
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 0,
+            'cop_per_usd' => 4000,
         ]);
+        // Bypass validation used by API; persist zero quote for conversion edge case.
+        $snapshot->forceFill(['cad_per_usd' => 0])->save();
+
+        $rate = ExchangeRate::query()->create([
+            'user_id' => $this->user->id,
+            'period' => '202501',
+            'snapshot_id' => $snapshot->id,
+        ]);
+
+        $this->assertEquals(0.0, $rate->cadToUsd(100));
+        $this->assertEquals(0.0, $rate->cadToCop(100));
+    }
+
+    public function test_owner_isolation_for_assignments_and_manual_snapshots(): void
+    {
+        $other = User::factory()->create();
+        $otherSnapshot = ExchangeRateSnapshot::factory()->manual($other->id)->create([
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.10,
+            'cop_per_usd' => 3900,
+        ]);
+
+        $this->postJson('/api/exchange-rates', [
+            'period' => '202501',
+            'snapshot_id' => $otherSnapshot->id,
+        ])->assertStatus(403);
+
+        $mine = $this->seedExchangeRate([
+            'period' => '202501',
+            'cad_per_usd' => 1.36,
+            'cop_per_usd' => 4000,
+        ]);
+
+        $this->actingAs($other);
+        $this->assertNull(ExchangeRate::forPeriod('202501'));
+        $this->getJson('/api/exchange-rate-snapshots/'.$mine->snapshot_id)->assertNotFound();
+    }
+
+    public function test_can_list_and_show_period_rates(): void
+    {
+        $this->seedExchangeRate(['period' => '202501', 'cad_per_usd' => 1.36, 'cop_per_usd' => 4000]);
+        $this->seedExchangeRate(['period' => '202502', 'cad_per_usd' => 1.37, 'cop_per_usd' => 4010]);
+
+        $this->getJson('/api/exchange-rates')->assertOk()->assertJsonCount(2, 'data');
+        $this->getJson('/api/exchange-rates/show?period=202501')
+            ->assertOk()
+            ->assertJsonPath('data.period', '202501');
+        $this->getJson('/api/exchange-rates/show?period=202599')
+            ->assertStatus(404)
+            ->assertJsonPath('missing_exchange_rate', true);
+    }
+
+    public function test_snapshots_index_defaults_to_period_month_filter(): void
+    {
+        ExchangeRateSnapshot::factory()->manual($this->user->id)->create([
+            'rate_date' => '2025-01-31',
+            'cad_per_usd' => 1.36,
+            'cop_per_usd' => 4000,
+        ]);
+        ExchangeRateSnapshot::factory()->manual($this->user->id)->create([
+            'rate_date' => '2025-02-28',
+            'cad_per_usd' => 1.37,
+            'cop_per_usd' => 4010,
+        ]);
+
+        $this->getJson('/api/exchange-rate-snapshots?period=202501')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.rate_date', '2025-01-31');
     }
 }

@@ -19,7 +19,7 @@ class ExchangeRatePathApiTest extends TestCase
 
     public function test_get_exchange_rates_by_period_path(): void
     {
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4000,
             'usd_cad' => 1.35,
@@ -33,6 +33,6 @@ class ExchangeRatePathApiTest extends TestCase
 
         $this->assertEquals(4000, (float) $response->json('data.usd_cop'));
         $this->assertEquals(1.35, (float) $response->json('data.usd_cad'));
-        $this->assertEquals(2960, (float) $response->json('data.cad_cop'));
+        $this->assertEqualsWithDelta(4000 / 1.35, (float) $response->json('data.cad_cop'), 0.0001);
     }
 }

@@ -4,10 +4,12 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Laravel\Fortify\Features;
+use Tests\Concerns\CreatesExchangeRates;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
+    use CreatesExchangeRates;
 
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
     {

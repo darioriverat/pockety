@@ -1,5 +1,12 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import { loginAsBrowserTestUser, trackConsoleErrors } from './helpers';
+import {
+    expect,
+    test,
+    type APIRequestContext,
+    type Page } from '@playwright/test';
+import { loginAsBrowserTestUser,
+    trackConsoleErrors,
+    ensureExchangeRateForPeriod,
+} from './helpers';
 
 async function loginAsSecondBrowserUser(
     page: Page,
@@ -223,14 +230,7 @@ test.describe('two-user ownership isolation', () => {
     }) => {
         await loginAsBrowserTestUser(page, request);
 
-        const rateA = await request.post('/api/exchange-rates', {
-            data: {
-                period: '202601',
-                usd_cop: 4100,
-                usd_cad: 0.71,
-                cad_cop: 2900,
-            },
-        });
+        const rateA = await ensureExchangeRateForPeriod(request, '202601', { copPerUsd: 4100, cadPerUsd: 0.71 });
         expect(rateA.ok()).toBeTruthy();
 
         await page.goto('/exchange-rates');
@@ -245,14 +245,7 @@ test.describe('two-user ownership isolation', () => {
         await logout(page);
         await loginAsSecondBrowserUser(page, request);
 
-        const rateB = await request.post('/api/exchange-rates', {
-            data: {
-                period: '202601',
-                usd_cop: 4600,
-                usd_cad: 0.82,
-                cad_cop: 3300,
-            },
-        });
+        const rateB = await ensureExchangeRateForPeriod(request, '202601', { copPerUsd: 4600, cadPerUsd: 0.82 });
         expect(rateB.ok()).toBeTruthy();
 
         const ratesB = await request.get('/api/exchange-rates');

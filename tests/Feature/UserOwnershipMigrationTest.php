@@ -95,19 +95,17 @@ class UserOwnershipMigrationTest extends TestCase
         $userA = User::factory()->create();
         $userB = User::factory()->create();
 
-        ExchangeRate::query()->create([
+        $this->seedExchangeRate([
             'user_id' => $userA->id,
             'period' => '202601',
             'usd_cop' => 4000,
             'usd_cad' => 0.75,
-            'cad_cop' => 3000,
         ]);
-        ExchangeRate::query()->create([
+        $this->seedExchangeRate([
             'user_id' => $userB->id,
             'period' => '202601',
             'usd_cop' => 4100,
             'usd_cad' => 0.76,
-            'cad_cop' => 3100,
         ]);
 
         PeriodBalance::query()->create([
@@ -258,8 +256,9 @@ class UserOwnershipMigrationTest extends TestCase
      */
     private function replayMigration(callable $replay): void
     {
+        // Roll back only the ownership migration (not newer locale/snapshot migrations).
         $this->artisan('migrate:rollback', [
-            '--step' => 1,
+            '--path' => 'database/migrations/2026_10_04_060000_add_user_id_to_financial_tables.php',
             '--force' => true,
         ])->assertSuccessful();
 
@@ -273,7 +272,10 @@ class UserOwnershipMigrationTest extends TestCase
                 ->exists();
 
             if (! $applied) {
-                $this->artisan('migrate', ['--force' => true])->assertSuccessful();
+                $this->artisan('migrate', [
+                    '--path' => 'database/migrations/2026_10_04_060000_add_user_id_to_financial_tables.php',
+                    '--force' => true,
+                ])->assertSuccessful();
             }
         }
     }

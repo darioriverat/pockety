@@ -7,10 +7,12 @@ use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Transaction;
+use App\Services\Concerns\ResolvesExchangeRate;
 use Illuminate\Support\Collection;
 
 class BudgetService
 {
+    use ResolvesExchangeRate;
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
@@ -164,7 +166,7 @@ class BudgetService
             ];
         }
 
-        return [
+        $payload = [
             'period' => $period,
             'rows' => $rows,
             'totals' => [
@@ -173,6 +175,12 @@ class BudgetService
                 'variance_cad' => round($totalActual - $totalBudget, 2),
             ],
         ];
+
+        if ($exchangeRate === null) {
+            $payload['missing_exchange_rate'] = true;
+        }
+
+        return $payload;
     }
 
     /**
@@ -180,7 +188,7 @@ class BudgetService
      *
      * @return array<int, float>
      */
-    private function calculateActualsByCategory(string $period, ExchangeRate $exchangeRate): array
+    private function calculateActualsByCategory(string $period, ?ExchangeRate $exchangeRate): array
     {
         $transactions = Transaction::query()
             ->forUser($this->owner->id())
@@ -190,19 +198,7 @@ class BudgetService
 
         foreach ($transactions as $transaction) {
             $categoryId = (int) $transaction->category_id;
-            $cadEquivalent = 0.0;
-
-            if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
-                $cadEquivalent += (float) $transaction->amount_cad;
-            }
-
-            if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
-                $cadEquivalent += $exchangeRate->usdToCad((float) $transaction->amount_usd);
-            }
-
-            if ($transaction->amount_cop !== null && (float) $transaction->amount_cop != 0) {
-                $cadEquivalent += $exchangeRate->copToCad((float) $transaction->amount_cop);
-            }
+            $cadEquivalent = $this->transactionCadEquivalent($transaction, $exchangeRate);
 
             $actuals[$categoryId] = ($actuals[$categoryId] ?? 0.0) + $cadEquivalent;
         }
@@ -210,18 +206,32 @@ class BudgetService
         return $actuals;
     }
 
+    private function transactionCadEquivalent(Transaction $transaction, ?ExchangeRate $exchangeRate): float
+    {
+        $cadEquivalent = 0.0;
+
+        if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
+            $cadEquivalent += (float) $transaction->amount_cad;
+        }
+
+        if ($exchangeRate === null) {
+            return $cadEquivalent;
+        }
+
+        if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
+            $cadEquivalent += $exchangeRate->usdToCad((float) $transaction->amount_usd);
+        }
+
+        if ($transaction->amount_cop !== null && (float) $transaction->amount_cop != 0) {
+            $cadEquivalent += $exchangeRate->copToCad((float) $transaction->amount_cop);
+        }
+
+        return $cadEquivalent;
+    }
+
     private function ownedBudgets()
     {
         return Budget::query()->forUser($this->owner->id());
     }
 
-    private function resolveExchangeRate(string $period): ExchangeRate
-    {
-        return ExchangeRate::forPeriod($period) ?? new ExchangeRate([
-            'period' => $period,
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-    }
 }

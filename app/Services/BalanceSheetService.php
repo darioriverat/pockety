@@ -8,10 +8,11 @@ use App\Models\AccountBalance;
 use App\Models\ExchangeRate;
 use App\Models\FixedAsset;
 use App\Models\FixedAssetValuation;
-use Illuminate\Support\Facades\Log;
+use App\Services\Concerns\ResolvesExchangeRate;
 
 class BalanceSheetService
 {
+    use ResolvesExchangeRate;
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
@@ -48,6 +49,7 @@ class BalanceSheetService
     public function getBalanceSheet(string $period): array
     {
         $exchangeRate = $this->resolveExchangeRate($period);
+        $missingExchangeRate = $exchangeRate === null;
 
         $assetBreakdown = [];
         $liabilityBreakdown = [];
@@ -84,8 +86,8 @@ class BalanceSheetService
                 'name' => $account->name,
                 'type' => $account->type,
                 'cad' => round($cadEquivalent, 2),
-                'usd' => $exchangeRate->cadToUsd($cadEquivalent),
-                'cop' => $exchangeRate->cadToCop($cadEquivalent),
+                'usd' => $this->cadToUsd($exchangeRate, $cadEquivalent),
+                'cop' => $this->cadToCop($exchangeRate, $cadEquivalent),
                 'recorded_balance_cad' => (float) ($balance->recorded_balance_cad ?? 0),
                 'recorded_balance_usd' => (float) ($balance->recorded_balance_usd ?? 0),
                 'recorded_balance_cop' => (float) ($balance->recorded_balance_cop ?? 0),
@@ -97,8 +99,8 @@ class BalanceSheetService
             } elseif ($account->isLiability()) {
                 $liabilitiesCad += abs($cadEquivalent);
                 $row['cad'] = round(abs($cadEquivalent), 2);
-                $row['usd'] = $exchangeRate->cadToUsd(abs($cadEquivalent));
-                $row['cop'] = $exchangeRate->cadToCop(abs($cadEquivalent));
+                $row['usd'] = $this->cadToUsd($exchangeRate, abs($cadEquivalent));
+                $row['cop'] = $this->cadToCop($exchangeRate, abs($cadEquivalent));
                 $liabilityBreakdown[] = $row;
             }
         }
@@ -123,8 +125,8 @@ class BalanceSheetService
                 'name' => $fixedAsset->name,
                 'type' => 'fixed_asset',
                 'cad' => round($bookValueCad, 2),
-                'usd' => $exchangeRate->cadToUsd($bookValueCad),
-                'cop' => $exchangeRate->cadToCop($bookValueCad),
+                'usd' => $this->cadToUsd($exchangeRate, $bookValueCad),
+                'cop' => $this->cadToCop($exchangeRate, $bookValueCad),
                 'recorded_balance_cad' => round($bookValueCad, 2),
                 'recorded_balance_usd' => 0.0,
                 'recorded_balance_cop' => 0.0,
@@ -135,33 +137,35 @@ class BalanceSheetService
         $totalLiabilitiesCad = round($liabilitiesCad, 2);
         $equityCad = round($totalAssetsCad - $totalLiabilitiesCad, 2);
 
-        return [
+        $payload = [
             'period' => $period,
             'total_assets' => [
                 'cad' => $totalAssetsCad,
-                'usd' => $exchangeRate->cadToUsd($totalAssetsCad),
-                'cop' => $exchangeRate->cadToCop($totalAssetsCad),
+                'usd' => $this->cadToUsd($exchangeRate, $totalAssetsCad),
+                'cop' => $this->cadToCop($exchangeRate, $totalAssetsCad),
                 'accounts_cad' => round($accountsAssetsCad, 2),
                 'fixed_assets_cad' => round($fixedAssetsCad, 2),
                 'breakdown' => $assetBreakdown,
             ],
             'total_liabilities' => [
                 'cad' => $totalLiabilitiesCad,
-                'usd' => $exchangeRate->cadToUsd($totalLiabilitiesCad),
-                'cop' => $exchangeRate->cadToCop($totalLiabilitiesCad),
+                'usd' => $this->cadToUsd($exchangeRate, $totalLiabilitiesCad),
+                'cop' => $this->cadToCop($exchangeRate, $totalLiabilitiesCad),
                 'breakdown' => $liabilityBreakdown,
             ],
             'equity' => [
                 'cad' => $equityCad,
-                'usd' => $exchangeRate->cadToUsd($equityCad),
-                'cop' => $exchangeRate->cadToCop($equityCad),
+                'usd' => $this->cadToUsd($exchangeRate, $equityCad),
+                'cop' => $this->cadToCop($exchangeRate, $equityCad),
             ],
-            'exchange_rates' => [
-                'usd_cop' => (float) $exchangeRate->usd_cop,
-                'usd_cad' => (float) $exchangeRate->usd_cad,
-                'cad_cop' => (float) $exchangeRate->cad_cop,
-            ],
+            'exchange_rates' => $this->exchangeRatesForResponse($exchangeRate),
         ];
+
+        if ($missingExchangeRate) {
+            $payload['missing_exchange_rate'] = true;
+        }
+
+        return $payload;
     }
 
     /**
@@ -238,12 +242,16 @@ class BalanceSheetService
         return $periods;
     }
 
-    private function balanceCadEquivalent(AccountBalance $balance, ExchangeRate $exchangeRate): float
+    private function balanceCadEquivalent(AccountBalance $balance, ?ExchangeRate $exchangeRate): float
     {
         $cadEquivalent = 0.0;
 
         if ($balance->recorded_balance_cad !== null && (float) $balance->recorded_balance_cad != 0) {
             $cadEquivalent += (float) $balance->recorded_balance_cad;
+        }
+
+        if ($exchangeRate === null) {
+            return $cadEquivalent;
         }
 
         if ($balance->recorded_balance_usd !== null && (float) $balance->recorded_balance_usd != 0) {
@@ -255,6 +263,16 @@ class BalanceSheetService
         }
 
         return $cadEquivalent;
+    }
+
+    private function cadToUsd(?ExchangeRate $exchangeRate, float $cad): ?float
+    {
+        return $exchangeRate !== null ? $exchangeRate->cadToUsd($cad) : null;
+    }
+
+    private function cadToCop(?ExchangeRate $exchangeRate, float $cad): ?float
+    {
+        return $exchangeRate !== null ? $exchangeRate->cadToCop($cad) : null;
     }
 
     private function fixedAssetBookValueCad(FixedAsset $fixedAsset, string $period): float
@@ -273,21 +291,4 @@ class BalanceSheetService
         return 0.0;
     }
 
-    private function resolveExchangeRate(string $period): ExchangeRate
-    {
-        $exchangeRate = ExchangeRate::forPeriod($period);
-
-        if (! $exchangeRate) {
-            Log::warning("No exchange rate found for period {$period}, using defaults");
-
-            return new ExchangeRate([
-                'period' => $period,
-                'usd_cop' => 4400,
-                'usd_cad' => 0.75,
-                'cad_cop' => 3000,
-            ]);
-        }
-
-        return $exchangeRate;
-    }
 }

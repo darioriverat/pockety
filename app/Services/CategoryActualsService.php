@@ -9,9 +9,11 @@ use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Transaction;
+use App\Services\Concerns\ResolvesExchangeRate;
 
 class CategoryActualsService implements CategoryActualsServiceInterface
 {
+    use ResolvesExchangeRate;
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
@@ -67,12 +69,16 @@ class CategoryActualsService implements CategoryActualsServiceInterface
         return $collection;
     }
 
-    private function transactionToCad(Transaction $transaction, ExchangeRate $exchangeRate): float
+    private function transactionToCad(Transaction $transaction, ?ExchangeRate $exchangeRate): float
     {
         $cadEquivalent = 0.0;
 
         if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
             $cadEquivalent += (float) $transaction->amount_cad;
+        }
+
+        if ($exchangeRate === null) {
+            return $cadEquivalent;
         }
 
         if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
@@ -84,15 +90,5 @@ class CategoryActualsService implements CategoryActualsServiceInterface
         }
 
         return $cadEquivalent;
-    }
-
-    private function resolveExchangeRate(string $period): ExchangeRate
-    {
-        return ExchangeRate::forPeriod($period) ?? new ExchangeRate([
-            'period' => $period,
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
     }
 }

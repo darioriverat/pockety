@@ -1,8 +1,12 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 async function seedAssetsLiabilitiesData(
@@ -46,14 +50,7 @@ async function seedAssetsLiabilitiesData(
     ];
 
     for (const [index, period] of periods.entries()) {
-        await request.post('/api/exchange-rates', {
-            data: {
-                period,
-                usd_cop: 4400,
-                usd_cad: 0.75,
-                cad_cop: 3000,
-            },
-        });
+        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
 
         const assetBalance = await request.post(
             `/api/accounts/${bank.data.id}/balances`,

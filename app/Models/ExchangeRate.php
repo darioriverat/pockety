@@ -6,6 +6,7 @@ use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Concerns\BelongsToOwner;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ExchangeRate extends Model
 {
@@ -15,16 +16,25 @@ class ExchangeRate extends Model
     protected $fillable = [
         'user_id',
         'period',
+        'snapshot_id',
+    ];
+
+    protected $appends = [
         'usd_cop',
         'usd_cad',
         'cad_cop',
+        'cad_per_usd',
+        'cop_per_usd',
     ];
 
-    protected $casts = [
-        'usd_cop' => 'decimal:4',
-        'usd_cad' => 'decimal:4',
-        'cad_cop' => 'decimal:4',
+    protected $with = [
+        'snapshot',
     ];
+
+    public function snapshot(): BelongsTo
+    {
+        return $this->belongsTo(ExchangeRateSnapshot::class, 'snapshot_id');
+    }
 
     /**
      * Get exchange rate for a specific period for the authenticated owner.
@@ -39,65 +49,105 @@ class ExchangeRate extends Model
             ->first();
     }
 
-    /**
-     * Convert USD to COP.
-     */
-    public function usdToCop(float $amount): float
+    public function hasSnapshot(): bool
     {
-        return round($amount * (float) $this->usd_cop, 2);
+        return $this->snapshot !== null;
+    }
+
+    public function getCadPerUsdAttribute(): ?string
+    {
+        if (! $this->snapshot) {
+            return null;
+        }
+
+        return (string) $this->snapshot->cad_per_usd;
+    }
+
+    public function getCopPerUsdAttribute(): ?string
+    {
+        if (! $this->snapshot) {
+            return null;
+        }
+
+        return (string) $this->snapshot->cop_per_usd;
     }
 
     /**
-     * Convert USD to CAD.
-     *
-     * USD/CAD rate X is stored as USD per 1 CAD, so CAD = USD / X.
+     * Derived: COP per 1 USD.
+     */
+    public function getUsdCopAttribute(): ?string
+    {
+        return $this->cop_per_usd;
+    }
+
+    /**
+     * Derived: CAD per 1 USD.
+     */
+    public function getUsdCadAttribute(): ?string
+    {
+        return $this->cad_per_usd;
+    }
+
+    /**
+     * Derived: COP per 1 CAD.
+     */
+    public function getCadCopAttribute(): ?string
+    {
+        if (! $this->snapshot) {
+            return null;
+        }
+
+        return number_format($this->snapshot->cadCop(), 8, '.', '');
+    }
+
+    public function usdToCop(float $amount): float
+    {
+        return round($amount * $this->quote('cop_per_usd'), 2);
+    }
+
+    /**
+     * Convert USD to CAD by multiplying by cad_per_usd.
      */
     public function usdToCad(float $amount): float
     {
-        $rate = (float) $this->usd_cad;
-
-        if ($rate == 0.0) {
-            return 0.0;
-        }
-
-        return round($amount / $rate, 2);
+        return round($amount * $this->quote('cad_per_usd'), 2);
     }
 
-    /**
-     * Convert COP to CAD.
-     */
     public function copToCad(float $amount): float
     {
-        return round($amount / (float) $this->cad_cop, 2);
-    }
+        $copPerUsd = $this->quote('cop_per_usd');
+        $cadPerUsd = $this->quote('cad_per_usd');
 
-    /**
-     * Convert CAD to COP.
-     */
-    public function cadToCop(float $amount): float
-    {
-        return round($amount * (float) $this->cad_cop, 2);
-    }
-
-    /**
-     * Convert CAD to USD.
-     *
-     * Per app spec: USD/CAD rate X means 1 USD = X CAD, so CAD → USD divides by the rate.
-     */
-    public function cadToUsd(float $amount): float
-    {
-        $rate = (float) $this->usd_cad;
-
-        if ($rate == 0.0) {
+        if ($copPerUsd == 0.0) {
             return 0.0;
         }
 
-        return round($amount / $rate, 2);
+        return round($amount / $copPerUsd * $cadPerUsd, 2);
     }
 
-    /**
-     * Convert any currency to CAD equivalent.
-     */
+    public function cadToCop(float $amount): float
+    {
+        $copPerUsd = $this->quote('cop_per_usd');
+        $cadPerUsd = $this->quote('cad_per_usd');
+
+        if ($cadPerUsd == 0.0) {
+            return 0.0;
+        }
+
+        return round($amount / $cadPerUsd * $copPerUsd, 2);
+    }
+
+    public function cadToUsd(float $amount): float
+    {
+        $cadPerUsd = $this->quote('cad_per_usd');
+
+        if ($cadPerUsd == 0.0) {
+            return 0.0;
+        }
+
+        return round($amount / $cadPerUsd, 2);
+    }
+
     public function toCad(float $amount, string $currency): float
     {
         return match ($currency) {
@@ -106,5 +156,14 @@ class ExchangeRate extends Model
             'COP' => $this->copToCad($amount),
             default => 0,
         };
+    }
+
+    private function quote(string $field): float
+    {
+        if (! $this->snapshot) {
+            return 0.0;
+        }
+
+        return (float) $this->snapshot->{$field};
     }
 }

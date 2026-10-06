@@ -57,7 +57,7 @@ class FinancialSummaryTest extends TestCase
             'is_active' => true,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -283,13 +283,13 @@ class FinancialSummaryTest extends TestCase
 
         $response = $this->getJson('/api/financial-summary?period=202501');
 
-        // Income: 4000 CAD + (750 USD / 0.75) = 4000 + 1000 = 5000
+        // Income: 4000 CAD + (750 USD * 0.75) = 4000 + 562.5 = 4562.5
         // Net operating expenses: 200
-        // Net: 5000 - 200 = 4800
+        // Net: 4562.5 - 200 = 4362.5
         $response->assertOk()
-            ->assertJsonPath('data.total_income_cad', 5000)
+            ->assertJsonPath('data.total_income_cad', 4562.5)
             ->assertJsonPath('data.net_operating_expenses_cad', 200)
-            ->assertJsonPath('data.net_cad', 4800)
+            ->assertJsonPath('data.net_cad', 4362.5)
             ->assertJsonPath('links.export_pdf', route('financial-summary.export-pdf', ['period' => '202501']));
 
         $this->assertCount(2, $response->json('data.income_lines'));

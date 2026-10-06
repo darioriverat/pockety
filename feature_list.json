@@ -788,7 +788,7 @@
       "Step 4: Assert user_id is null only for the shared feed",
       "Step 5: Run the migration and verify the table exists with the expected columns"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -807,7 +807,7 @@
       "Step 11: Assert no live API call is made in tests",
       "Step 12: Confirm the command reads the app id from config services.openexchangerates.app_id"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -820,7 +820,7 @@
       "Step 5: Assert it does not throw an exception",
       "Step 6: Assert no snapshot row is written"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -839,7 +839,7 @@
       "Step 11: Assert a subsequent successful run still writes exactly one row",
       "Step 12: Confirm the command only calls latest.json and never historical, time-series, or convert endpoints"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -858,7 +858,7 @@
       "Step 11: Assert another user's manual row for the same date is separate",
       "Step 12: Confirm the cross rate is only ever derived"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -870,7 +870,7 @@
       "Step 4: Assert the user's manual row exists separately",
       "Step 5: Assert both rows are visible to that user where applicable"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -891,7 +891,7 @@
       "Step 13: Assert another user's assignment for 202501 does not affect this user",
       "Step 14: Run the feature tests for period assignment and confirm they pass"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -912,7 +912,7 @@
       "Step 13: Update the test that expected division and confirm it now expects multiplication",
       "Step 14: Confirm derived usd_cop = cop_per_usd, usd_cad = cad_per_usd, and cad_cop = cop_per_usd / cad_per_usd"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -924,7 +924,7 @@
       "Step 4: Confirm the exchange rates page has no CAD/COP input",
       "Step 5: Confirm the API does not accept cad_cop as input"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -935,7 +935,7 @@
       "Step 3: Convert CAD to COP and assert the result is 0 or otherwise does not divide by zero",
       "Step 4: Assert no exception or infinity is produced"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -948,7 +948,7 @@
       "Step 5: Assert cad_cop equals cop_per_usd / cad_per_usd",
       "Step 6: Assert the old three numbers are not accepted as user input anymore"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -967,7 +967,7 @@
       "Step 11: Assert the foreign key is enforced after the backfill",
       "Step 12: After migration, assert usd_cop, usd_cad, and cad_cop columns are dropped from exchange_rates once nothing reads them as columns"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -979,7 +979,7 @@
       "Step 4: Assert the conversion methods read the linked snapshot",
       "Step 5: Assert toCad is correct for each source currency"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -998,7 +998,7 @@
       "Step 11: Confirm missing-rate handling does not throw or return a 500",
       "Step 12: Run the services test suite and confirm all pass"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1017,7 +1017,7 @@
       "Step 11: Assign a snapshot to a period and verify the page reflects the assignment",
       "Step 12: Verify the page is translated in both English and Spanish"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1029,7 +1029,7 @@
       "Step 4: Confirm the ExchangeRateImportController and its service are removed or unreferenced",
       "Step 5: Run the test suite and confirm no test fails because of the removed route"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1041,7 +1041,7 @@
       "Step 4: Assert the foreign key is enforced only after the backfill migration runs",
       "Step 5: Assert assigning a new snapshot replaces the previous snapshot for the period without deleting the snapshot"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1055,7 +1055,7 @@
       "Step 6: Assert .env.example documents OPENEXCHANGERATES_APP_ID",
       "Step 7: Assert no real app id is committed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1069,7 +1069,7 @@
       "Step 6: Confirm one user cannot change another user's manual snapshot or period assignment",
       "Step 7: Run the owner isolation feature tests and confirm they pass"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1086,7 +1086,7 @@
       "Step 9: Resize to mobile and verify the forms and picker stack without overflow",
       "Step 10: Verify the Spanish version of the page has no clipped or overlapping labels"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -11,18 +11,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
-import { Badge } from '@/components/ui/badge';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Upload,
-    CheckCircle,
-    XCircle,
-    DollarSign,
-    TrendingUp,
-} from 'lucide-react';
+import { CheckCircle, XCircle, DollarSign, Link2 } from 'lucide-react';
 import {
     Select,
     SelectContent,
@@ -34,89 +27,95 @@ import { usePeriod } from '@/hooks/use-period';
 import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
 import { formatPeriod } from '@/lib/periods';
 
+interface ExchangeRateSnapshot {
+    id: number;
+    rate_date: string;
+    source: 'openexchangerates' | 'manual';
+    user_id: number | null;
+    cad_per_usd: string;
+    cop_per_usd: string;
+}
+
 interface ExchangeRate {
     id: number;
     period: string;
-    usd_cop: string;
-    usd_cad: string;
-    cad_cop: string;
-    created_at: string;
-    updated_at: string;
+    snapshot_id: number;
+    usd_cop: string | null;
+    usd_cad: string | null;
+    cad_cop: string | null;
+    cad_per_usd: string | null;
+    cop_per_usd: string | null;
+    snapshot?: ExchangeRateSnapshot;
 }
 
-interface ExchangeRateImportResult {
-    rates_imported: number;
-    periods: string[];
-    errors: string[];
+function lastDayOfPeriod(period: string): string {
+    const year = Number(period.slice(0, 4));
+    const month = Number(period.slice(4, 6));
+    const date = new Date(year, month, 0);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
 }
 
-interface ExchangeRateStatistics {
-    total_rates: number;
-    periods_covered: {
-        min: string | null;
-        max: string | null;
+function periodBounds(period: string): { from: string; to: string } {
+    const year = period.slice(0, 4);
+    const month = period.slice(4, 6);
+    return {
+        from: `${year}-${month}-01`,
+        to: lastDayOfPeriod(period),
     };
-    rates_by_month: Record<
-        string,
-        {
-            usd_cop: string;
-            usd_cad: string;
-            cad_cop: string;
-        }
-    >;
 }
 
 export default function ExchangeRates() {
     const { t } = useTranslation();
+    const { period: selectedPeriod, setPeriod: setSelectedPeriod } = usePeriod();
+    const periods = useSelectablePeriods();
 
     const [rates, setRates] = useState<ExchangeRate[]>([]);
-    const [loading, setLoading] = useState(true);
-    const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
-        usePeriod();
+    const [snapshots, setSnapshots] = useState<ExchangeRateSnapshot[]>([]);
     const [currentRate, setCurrentRate] = useState<ExchangeRate | null>(null);
+    const [loading, setLoading] = useState(true);
     const [loadingRate, setLoadingRate] = useState(false);
 
-    // Form state
-    const [usdCop, setUsdCop] = useState<string>('4400');
-    const [usdCad, setUsdCad] = useState<string>('0.75');
-    const [cadCop, setCadCop] = useState<string>('3000');
-    const [saving, setSaving] = useState(false);
-    const [saveError, setSaveError] = useState<string | null>(null);
-    const [saveSuccess, setSaveSuccess] = useState(false);
+    const [manualDate, setManualDate] = useState('');
+    const [cadPerUsd, setCadPerUsd] = useState('');
+    const [copPerUsd, setCopPerUsd] = useState('');
+    const [savingManual, setSavingManual] = useState(false);
+    const [manualError, setManualError] = useState<string | null>(null);
+    const [manualSuccess, setManualSuccess] = useState(false);
 
-    // Import state
-    const [importing, setImporting] = useState(false);
-    const [importResult, setImportResult] =
-        useState<ExchangeRateImportResult | null>(null);
-    const [importError, setImportError] = useState<string | null>(null);
-    const [statistics, setStatistics] =
-        useState<ExchangeRateStatistics | null>(null);
-    const [loadingStats, setLoadingStats] = useState(false);
+    const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>('');
+    const [assigning, setAssigning] = useState(false);
+    const [assignError, setAssignError] = useState<string | null>(null);
+    const [assignSuccess, setAssignSuccess] = useState(false);
 
-    const periods = useSelectablePeriods();
+    const bounds = useMemo(
+        () => (selectedPeriod ? periodBounds(selectedPeriod) : null),
+        [selectedPeriod],
+    );
 
     useEffect(() => {
         fetchAllRates();
-        fetchStatistics();
     }, []);
 
     useEffect(() => {
-        if (selectedPeriod) {
-            fetchRateForPeriod(selectedPeriod);
+        if (!selectedPeriod) {
+            return;
         }
+        setManualDate(lastDayOfPeriod(selectedPeriod));
+        fetchRateForPeriod(selectedPeriod);
+        fetchSnapshotsForPeriod(selectedPeriod);
     }, [selectedPeriod]);
 
     const fetchAllRates = async () => {
         setLoading(true);
         try {
             const response = await fetch('/api/exchange-rates', {
-                headers: {
-                    Accept: 'application/json',
-                },
+                headers: { Accept: 'application/json' },
             });
-
             const data = await response.json();
-            setRates(data.data);
+            setRates(data.data ?? []);
         } catch (err) {
             console.error('Failed to fetch exchange rates:', err);
         } finally {
@@ -129,26 +128,15 @@ export default function ExchangeRates() {
         try {
             const response = await fetch(
                 `/api/exchange-rates/show?period=${period}`,
-                {
-                    headers: {
-                        Accept: 'application/json',
-                    },
-                },
+                { headers: { Accept: 'application/json' } },
             );
-
             const data = await response.json();
-
             if (response.ok && data.data) {
                 setCurrentRate(data.data);
-                setUsdCop(data.data.usd_cop);
-                setUsdCad(data.data.usd_cad);
-                setCadCop(data.data.cad_cop);
+                setSelectedSnapshotId(String(data.data.snapshot_id));
             } else {
                 setCurrentRate(null);
-                // Set default values
-                setUsdCop('4400');
-                setUsdCad('0.75');
-                setCadCop('3000');
+                setSelectedSnapshotId('');
             }
         } catch (err) {
             console.error('Failed to fetch rate for period:', err);
@@ -158,31 +146,93 @@ export default function ExchangeRates() {
         }
     };
 
-    const fetchStatistics = async () => {
-        setLoadingStats(true);
+    const fetchSnapshotsForPeriod = async (period: string) => {
         try {
             const response = await fetch(
-                '/api/exchange-rates/import/statistics',
-                {
-                    headers: {
-                        Accept: 'application/json',
-                    },
-                },
+                `/api/exchange-rate-snapshots?period=${period}`,
+                { headers: { Accept: 'application/json' } },
             );
-
             const data = await response.json();
-            setStatistics(data.data);
+            let rows: ExchangeRateSnapshot[] = data.data ?? [];
+
+            // Allow nearby dates (e.g. last day of month) even if filter is empty.
+            if (rows.length === 0 && bounds) {
+                const nearby = await fetch(
+                    `/api/exchange-rate-snapshots?from=${bounds.from}&to=${bounds.to}`,
+                    { headers: { Accept: 'application/json' } },
+                );
+                const nearbyData = await nearby.json();
+                rows = nearbyData.data ?? [];
+            }
+
+            // Also load a wider window so nearby dates outside the month can be chosen.
+            const wide = await fetch('/api/exchange-rate-snapshots', {
+                headers: { Accept: 'application/json' },
+            });
+            const wideData = await wide.json();
+            const byId = new Map<number, ExchangeRateSnapshot>();
+            for (const row of [...rows, ...(wideData.data ?? [])]) {
+                byId.set(row.id, row);
+            }
+            setSnapshots(Array.from(byId.values()).sort((a, b) =>
+                a.rate_date < b.rate_date ? 1 : -1,
+            ));
         } catch (err) {
-            console.error('Failed to fetch statistics:', err);
-        } finally {
-            setLoadingStats(false);
+            console.error('Failed to fetch snapshots:', err);
         }
     };
 
-    const handleSave = async () => {
-        setSaving(true);
-        setSaveError(null);
-        setSaveSuccess(false);
+    const handleSaveManual = async () => {
+        setSavingManual(true);
+        setManualError(null);
+        setManualSuccess(false);
+
+        try {
+            const response = await fetch('/api/exchange-rate-snapshots', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    rate_date: manualDate,
+                    cad_per_usd: parseFloat(cadPerUsd),
+                    cop_per_usd: parseFloat(copPerUsd),
+                }),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                const message = data.errors
+                    ? Object.values(data.errors).flat().join(' ')
+                    : data.message || t('pages.exchangeRates.manualSaveFailed');
+                throw new Error(message);
+            }
+            setManualSuccess(true);
+            setSelectedSnapshotId(String(data.data.id));
+            if (selectedPeriod) {
+                await fetchSnapshotsForPeriod(selectedPeriod);
+            }
+            setTimeout(() => setManualSuccess(false), 3000);
+        } catch (err) {
+            setManualError(
+                err instanceof Error
+                    ? err.message
+                    : t('pages.exchangeRates.manualSaveFailed'),
+            );
+        } finally {
+            setSavingManual(false);
+        }
+    };
+
+    const handleAssign = async () => {
+        if (!selectedPeriod || !selectedSnapshotId) {
+            setAssignError(t('pages.exchangeRates.snapshotRequired'));
+            return;
+        }
+
+        setAssigning(true);
+        setAssignError(null);
+        setAssignSuccess(false);
 
         try {
             const response = await fetch('/api/exchange-rates', {
@@ -193,351 +243,361 @@ export default function ExchangeRates() {
                 },
                 body: JSON.stringify({
                     period: selectedPeriod,
-                    usd_cop: parseFloat(usdCop),
-                    usd_cad: parseFloat(usdCad),
-                    cad_cop: parseFloat(cadCop),
+                    snapshot_id: Number(selectedSnapshotId),
                 }),
             });
-
             const data = await response.json();
-
             if (!response.ok) {
-                const message = data.messages
-                    ? Object.values(data.messages).flat().join(' ')
-                    : data.message || 'Failed to save exchange rates';
+                const message = data.errors
+                    ? Object.values(data.errors).flat().join(' ')
+                    : data.message || t('pages.exchangeRates.assignFailed');
                 throw new Error(message);
             }
-
-            setSaveSuccess(true);
+            setAssignSuccess(true);
             setCurrentRate(data.data);
             fetchAllRates();
-            fetchStatistics();
-
-            // Clear success message after 3 seconds
-            setTimeout(() => setSaveSuccess(false), 3000);
+            setTimeout(() => setAssignSuccess(false), 3000);
         } catch (err) {
-            setSaveError(
-                err instanceof Error ? err.message : 'An error occurred',
+            setAssignError(
+                err instanceof Error
+                    ? err.message
+                    : t('pages.exchangeRates.assignFailed'),
             );
         } finally {
-            setSaving(false);
+            setAssigning(false);
         }
     };
 
-    const handleImport = async () => {
-        setImporting(true);
-        setImportError(null);
-        setImportResult(null);
-
-        try {
-            const response = await fetch('/api/exchange-rates/import', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-                body: JSON.stringify({
-                    directory: 'month_sheets',
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Import failed');
-            }
-
-            setImportResult(data.data);
-            fetchAllRates();
-            fetchStatistics();
-            if (selectedPeriod) {
-                fetchRateForPeriod(selectedPeriod);
-            }
-        } catch (err) {
-            setImportError(
-                err instanceof Error ? err.message : 'An error occurred',
-            );
-        } finally {
-            setImporting(false);
+    const periodSnapshots = useMemo(() => {
+        if (!bounds) {
+            return snapshots;
         }
-    };
+        const inMonth = snapshots.filter(
+            (s) => s.rate_date >= bounds.from && s.rate_date <= bounds.to,
+        );
+        return inMonth.length > 0 ? inMonth : snapshots;
+    }, [snapshots, bounds]);
 
     return (
         <>
             <Head title={t('pages.exchangeRates.title')} />
 
             <PageContainer>
-                    <div className="mb-8">
-                        <PageTitle
-                            title={t('pages.exchangeRates.title')}
-                            description="Manage three independent exchange rate series: USD/COP, USD/CAD, and CAD/COP (COP per 1 CAD)"
-                        />
-                    </div>
+                <div className="mb-8">
+                    <PageTitle
+                        title={t('pages.exchangeRates.title')}
+                        description={t('pages.exchangeRates.description')}
+                    />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {t('pages.exchangeRates.attribution')}{' '}
+                        <a
+                            href="https://openexchangerates.org/"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline underline-offset-2"
+                            data-testid="oxr-attribution-link"
+                        >
+                            Open Exchange Rates
+                        </a>
+                    </p>
+                </div>
 
-                    <div className="grid gap-6 md:grid-cols-2">
-                        {/* Import Card */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Upload className="h-5 w-5" />
-                                    Import Historical Rates
-                                </CardTitle>
-                                <CardDescription>
-                                    Import exchange rates from month_sheets JSON files
-                                    (Jan 2025 - Sep 2026)
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <Button
-                                    onClick={handleImport}
-                                    disabled={importing}
-                                    className="w-full"
-                                >
-                                    {importing && <Spinner className="mr-2" />}
-                                    Import from Month Sheets
-                                </Button>
-
-                                {importResult && (
-                                    <Alert>
-                                        <CheckCircle className="h-4 w-4" />
-                                        <AlertDescription>
-                                            Successfully imported{' '}
-                                            {importResult.rates_imported} exchange rate
-                                            periods
-                                            {importResult.errors.length > 0 && (
-                                                <div className="mt-2">
-                                                    <p className="font-semibold">Errors:</p>
-                                                    <ul className="list-disc pl-4">
-                                                        {importResult.errors.map(
-                                                            (error, index) => (
-                                                                <li key={index}>{error}</li>
-                                                            ),
-                                                        )}
-                                                    </ul>
-                                                </div>
-                                            )}
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-
-                                {importError && (
-                                    <Alert variant="destructive">
-                                        <XCircle className="h-4 w-4" />
-                                        <AlertDescription>
-                                            {importError}
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-
-                                {loadingStats ? (
-                                    <div className="flex justify-center">
-                                        <Spinner />
-                                    </div>
-                                ) : (
-                                    statistics && (
-                                        <div className="space-y-2 text-sm">
-                                            <p>
-                                                <strong>Total Rates:</strong>{' '}
-                                                {statistics.total_rates}
-                                            </p>
-                                            {statistics.periods_covered.min && (
-                                                <p>
-                                                    <strong>Period Coverage:</strong>{' '}
-                                                    {formatPeriod(
-                                                        statistics.periods_covered.min,
-                                                    )}{' '}
-                                                    -{' '}
-                                                    {formatPeriod(
-                                                        statistics.periods_covered.max!,
-                                                    )}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Set Exchange Rates Card */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <DollarSign className="h-5 w-5" />
-                                    Set Exchange Rates
-                                </CardTitle>
-                                <CardDescription>
-                                    Enter or update exchange rates for a specific
-                                    period
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="period">Period</Label>
-                                    <Select
-                                        value={selectedPeriod}
-                                        onValueChange={setSelectedPeriod}
-                                    >
-                                        <SelectTrigger
-                                            id="period"
-                                            data-testid="page-period-selector"
-                                        >
-                                            <SelectValue placeholder="Select period" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {periods.map((period) => (
-                                                <SelectItem key={period} value={period}>
-                                                    {formatPeriod(period)}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {loadingRate ? (
-                                    <div className="flex justify-center py-4">
-                                        <Spinner />
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="usd_cop">
-                                                USD/COP (COP per 1 USD)
-                                            </Label>
-                                            <Input
-                                                id="usd_cop"
-                                                type="number"
-                                                step="0.0001"
-                                                value={usdCop}
-                                                onChange={(e) => setUsdCop(e.target.value)}
-                                                placeholder="4400"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="usd_cad">
-                                                USD/CAD (CAD per 1 USD)
-                                            </Label>
-                                            <Input
-                                                id="usd_cad"
-                                                type="number"
-                                                step="0.0001"
-                                                value={usdCad}
-                                                onChange={(e) => setUsdCad(e.target.value)}
-                                                placeholder="0.75"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="cad_cop">
-                                                CAD/COP (COP per 1 CAD)
-                                            </Label>
-                                            <Input
-                                                id="cad_cop"
-                                                type="number"
-                                                step="0.0001"
-                                                value={cadCop}
-                                                onChange={(e) => setCadCop(e.target.value)}
-                                                placeholder="3000"
-                                            />
-                                        </div>
-
-                                        <Button
-                                            onClick={handleSave}
-                                            disabled={saving}
-                                            className="w-full"
-                                        >
-                                            {saving && <Spinner className="mr-2" />}
-                                            {currentRate ? 'Update' : 'Save'} Exchange Rates
-                                        </Button>
-
-                                        {saveSuccess && (
-                                            <Alert>
-                                                <CheckCircle className="h-4 w-4" />
-                                                <AlertDescription>
-                                                    Exchange rates saved successfully
-                                                </AlertDescription>
-                                            </Alert>
-                                        )}
-
-                                        {saveError && (
-                                            <Alert variant="destructive">
-                                                <XCircle className="h-4 w-4" />
-                                                <AlertDescription>
-                                                    {saveError}
-                                                </AlertDescription>
-                                            </Alert>
-                                        )}
-                                    </>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Historical Rates Table */}
-                    <Card className="mt-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                    <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <TrendingUp className="h-5 w-5" />
-                                Historical Exchange Rates
+                                <DollarSign className="h-5 w-5" />
+                                {t('pages.exchangeRates.manualTitle')}
                             </CardTitle>
                             <CardDescription>
-                                View all exchange rates by period
+                                {t('pages.exchangeRates.manualDescription')}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            {loading ? (
-                                <div className="flex justify-center py-8">
-                                    <Spinner />
-                                </div>
-                            ) : rates.length === 0 ? (
-                                <p className="text-center text-gray-500 py-8">
-                                    No exchange rates found. Import data to get started.
-                                </p>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                        <thead className="bg-gray-50 dark:bg-gray-800">
-                                            <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                    Period
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                    USD/COP
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                    USD/CAD
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                    CAD/COP
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                                            {rates.map((rate) => (
-                                                <tr
-                                                    key={rate.id}
-                                                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                >
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {formatPeriod(rate.period)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                        {parseFloat(rate.usd_cop).toFixed(4)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                        {parseFloat(rate.usd_cad).toFixed(4)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                        {parseFloat(rate.cad_cop).toFixed(4)}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="rate_date">
+                                    {t('pages.exchangeRates.date')}
+                                </Label>
+                                <Input
+                                    id="rate_date"
+                                    type="date"
+                                    value={manualDate}
+                                    onChange={(e) => setManualDate(e.target.value)}
+                                    data-testid="manual-rate-date"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="cad_per_usd">
+                                    {t('pages.exchangeRates.cadPerUsd')}
+                                </Label>
+                                <Input
+                                    id="cad_per_usd"
+                                    type="number"
+                                    step="0.0001"
+                                    min="0"
+                                    value={cadPerUsd}
+                                    onChange={(e) => setCadPerUsd(e.target.value)}
+                                    placeholder="1.36"
+                                    data-testid="manual-cad-per-usd"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="cop_per_usd">
+                                    {t('pages.exchangeRates.copPerUsd')}
+                                </Label>
+                                <Input
+                                    id="cop_per_usd"
+                                    type="number"
+                                    step="0.0001"
+                                    min="0"
+                                    value={copPerUsd}
+                                    onChange={(e) => setCopPerUsd(e.target.value)}
+                                    placeholder="4000"
+                                    data-testid="manual-cop-per-usd"
+                                />
+                            </div>
+                            <Button
+                                onClick={handleSaveManual}
+                                disabled={savingManual}
+                                className="w-full"
+                                data-testid="save-manual-snapshot"
+                            >
+                                {savingManual && <Spinner className="mr-2" />}
+                                {t('pages.exchangeRates.saveManual')}
+                            </Button>
+                            {manualSuccess && (
+                                <Alert>
+                                    <CheckCircle className="h-4 w-4" />
+                                    <AlertDescription>
+                                        {t('pages.exchangeRates.manualSaved')}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+                            {manualError && (
+                                <Alert variant="destructive">
+                                    <XCircle className="h-4 w-4" />
+                                    <AlertDescription>{manualError}</AlertDescription>
+                                </Alert>
                             )}
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Link2 className="h-5 w-5" />
+                                {t('pages.exchangeRates.assignTitle')}
+                            </CardTitle>
+                            <CardDescription>
+                                {t('pages.exchangeRates.assignDescription')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="period">
+                                    {t('pages.exchangeRates.period')}
+                                </Label>
+                                <Select
+                                    value={selectedPeriod}
+                                    onValueChange={setSelectedPeriod}
+                                >
+                                    <SelectTrigger
+                                        id="period"
+                                        data-testid="page-period-selector"
+                                    >
+                                        <SelectValue
+                                            placeholder={t(
+                                                'pages.exchangeRates.selectPeriod',
+                                            )}
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {periods.map((period) => (
+                                            <SelectItem key={period} value={period}>
+                                                {formatPeriod(period)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {loadingRate ? (
+                                <div className="flex justify-center py-4">
+                                    <Spinner />
+                                </div>
+                            ) : (
+                                <>
+                                    {!currentRate && (
+                                        <Alert data-testid="missing-exchange-rate">
+                                            <AlertDescription>
+                                                {t(
+                                                    'pages.exchangeRates.missingForPeriod',
+                                                )}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="snapshot_id">
+                                            {t('pages.exchangeRates.snapshot')}
+                                        </Label>
+                                        <Select
+                                            value={selectedSnapshotId}
+                                            onValueChange={setSelectedSnapshotId}
+                                        >
+                                            <SelectTrigger
+                                                id="snapshot_id"
+                                                data-testid="snapshot-picker"
+                                            >
+                                                <SelectValue
+                                                    placeholder={t(
+                                                        'pages.exchangeRates.selectSnapshot',
+                                                    )}
+                                                />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {periodSnapshots.map((snap) => (
+                                                    <SelectItem
+                                                        key={snap.id}
+                                                        value={String(snap.id)}
+                                                    >
+                                                        {snap.rate_date} ·{' '}
+                                                        {snap.source === 'manual'
+                                                            ? t(
+                                                                  'pages.exchangeRates.sourceManual',
+                                                              )
+                                                            : t(
+                                                                  'pages.exchangeRates.sourceFetched',
+                                                              )}{' '}
+                                                        · CAD {snap.cad_per_usd} / COP{' '}
+                                                        {snap.cop_per_usd}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {currentRate && (
+                                        <div className="space-y-1 text-sm text-muted-foreground">
+                                            <p>
+                                                {t('pages.exchangeRates.derivedUsdCop')}:{' '}
+                                                {currentRate.usd_cop}
+                                            </p>
+                                            <p>
+                                                {t('pages.exchangeRates.derivedUsdCad')}:{' '}
+                                                {currentRate.usd_cad}
+                                            </p>
+                                            <p>
+                                                {t('pages.exchangeRates.derivedCadCop')}:{' '}
+                                                {currentRate.cad_cop}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    <Button
+                                        onClick={handleAssign}
+                                        disabled={assigning}
+                                        className="w-full"
+                                        data-testid="assign-snapshot"
+                                    >
+                                        {assigning && <Spinner className="mr-2" />}
+                                        {t('pages.exchangeRates.assign')}
+                                    </Button>
+
+                                    {assignSuccess && (
+                                        <Alert>
+                                            <CheckCircle className="h-4 w-4" />
+                                            <AlertDescription>
+                                                {t('pages.exchangeRates.assigned')}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                    {assignError && (
+                                        <Alert variant="destructive">
+                                            <XCircle className="h-4 w-4" />
+                                            <AlertDescription>
+                                                {assignError}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                </>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <Card className="mt-6">
+                    <CardHeader>
+                        <CardTitle>
+                            {t('pages.exchangeRates.historyTitle')}
+                        </CardTitle>
+                        <CardDescription>
+                            {t('pages.exchangeRates.historyDescription')}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {loading ? (
+                            <div className="flex justify-center py-8">
+                                <Spinner />
+                            </div>
+                        ) : rates.length === 0 ? (
+                            <p className="py-8 text-center text-muted-foreground">
+                                {t('pages.exchangeRates.noRates')}
+                            </p>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-border">
+                                    <thead>
+                                        <tr>
+                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                                {t('pages.exchangeRates.period')}
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                                {t('pages.exchangeRates.cadPerUsd')}
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                                {t('pages.exchangeRates.copPerUsd')}
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                                {t('pages.exchangeRates.derivedCadCop')}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border">
+                                        {rates.map((rate) => (
+                                            <tr key={rate.id}>
+                                                <td className="px-4 py-3 text-sm">
+                                                    {formatPeriod(rate.period)}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    {rate.cad_per_usd
+                                                        ? parseFloat(
+                                                              rate.cad_per_usd,
+                                                          ).toFixed(4)
+                                                        : '—'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    {rate.cop_per_usd
+                                                        ? parseFloat(
+                                                              rate.cop_per_usd,
+                                                          ).toFixed(4)
+                                                        : '—'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    {rate.cad_cop
+                                                        ? parseFloat(
+                                                              rate.cad_cop,
+                                                          ).toFixed(4)
+                                                        : '—'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </PageContainer>
         </>
     );

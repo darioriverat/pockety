@@ -47,6 +47,41 @@ export interface TransactionPayload {
  * Insert a transaction so the period picker includes this month through the
  * current month. Call it before the page that renders the picker is loaded.
  */
+/**
+ * Create a manual snapshot and assign it to a period for browser fixtures.
+ */
+export async function ensureExchangeRateForPeriod(
+    request: APIRequestContext,
+    period: string,
+    quotes: { cadPerUsd?: number; copPerUsd?: number } = {},
+): Promise<void> {
+    const cadPerUsd = quotes.cadPerUsd ?? 1.36;
+    const copPerUsd = quotes.copPerUsd ?? 4000;
+    const year = Number(period.slice(0, 4));
+    const month = Number(period.slice(4, 6));
+    const rateDate = new Date(year, month, 0).toISOString().slice(0, 10);
+
+    const snapshotResponse = await request.post('/api/exchange-rate-snapshots', {
+        data: {
+            rate_date: rateDate,
+            cad_per_usd: cadPerUsd,
+            cop_per_usd: copPerUsd,
+        },
+    });
+    expect(snapshotResponse.ok()).toBeTruthy();
+    const snapshotBody = (await snapshotResponse.json()) as {
+        data: { id: number };
+    };
+
+    const assignResponse = await request.post('/api/exchange-rates', {
+        data: {
+            period,
+            snapshot_id: snapshotBody.data.id,
+        },
+    });
+    expect(assignResponse.ok()).toBeTruthy();
+}
+
 export async function ensureTransactionInPeriod(
     request: APIRequestContext,
     period: string,

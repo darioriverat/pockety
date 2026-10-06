@@ -16,7 +16,7 @@ import BalanceSheetController from './BalanceSheetController'
 import BalanceSheetImportController from './BalanceSheetImportController'
 import TransactionImportController from './TransactionImportController'
 import ExchangeRateController from './ExchangeRateController'
-import ExchangeRateImportController from './ExchangeRateImportController'
+import ExchangeRateSnapshotController from './ExchangeRateSnapshotController'
 import FinancialSummaryController from './FinancialSummaryController'
 import DashboardController from './DashboardController'
 import ReportsController from './ReportsController'
@@ -42,7 +42,7 @@ const Controllers = {
     BalanceSheetImportController: Object.assign(BalanceSheetImportController, BalanceSheetImportController),
     TransactionImportController: Object.assign(TransactionImportController, TransactionImportController),
     ExchangeRateController: Object.assign(ExchangeRateController, ExchangeRateController),
-    ExchangeRateImportController: Object.assign(ExchangeRateImportController, ExchangeRateImportController),
+    ExchangeRateSnapshotController: Object.assign(ExchangeRateSnapshotController, ExchangeRateSnapshotController),
     FinancialSummaryController: Object.assign(FinancialSummaryController, FinancialSummaryController),
     DashboardController: Object.assign(DashboardController, DashboardController),
     ReportsController: Object.assign(ReportsController, ReportsController),

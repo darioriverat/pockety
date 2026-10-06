@@ -61,7 +61,7 @@ class IncomeTest extends TestCase
 
     public function test_income_line_supports_multiple_currencies(): void
     {
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -78,8 +78,8 @@ class IncomeTest extends TestCase
         $response->assertCreated()
             ->assertJsonPath('data.amount_cad', 1000)
             ->assertJsonPath('data.amount_usd', 500)
-            // 1000 CAD + (500 USD / 0.75) = 1666.67 CAD
-            ->assertJsonPath('data.total_cad_equivalent', 1666.67);
+            // 1000 CAD + (500 USD * 0.75) = 1375 CAD
+            ->assertJsonPath('data.total_cad_equivalent', 1375);
 
         $this->assertDatabaseHas('income', [
             'description' => 'Mixed Income',
@@ -113,7 +113,7 @@ class IncomeTest extends TestCase
 
     public function test_income_total_is_computed_in_cad_equivalent(): void
     {
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -142,8 +142,8 @@ class IncomeTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('meta.total', 3)
-            // 3000 + (1000 / 0.75) + (2000000 / 3000) = 3000 + 1333.33 + 666.67 = 5000
-            ->assertJsonPath('meta.total_cad_equivalent', 5000);
+            // 3000 + (1000 * 0.75) + (2000000 / 4400 * 0.75) = 3000 + 750 + 340.91 = 4090.91
+            ->assertJsonPath('meta.total_cad_equivalent', 4090.91);
     }
 
     public function test_create_requires_at_least_one_amount(): void

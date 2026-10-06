@@ -7,9 +7,11 @@ use App\Models\Category;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\Transaction;
+use App\Services\Concerns\ResolvesExchangeRate;
 
 class FinancialSummaryService
 {
+    use ResolvesExchangeRate;
     public const DEPRECIATION_CATEGORY_CODE = 'C045';
 
     public const DEBT_PAYMENT_CATEGORY_CODES = [
@@ -192,7 +194,7 @@ class FinancialSummaryService
             - $debtPaymentsExcluded;
         $netOperatingExpenses = round($netOperatingExpenses, 2);
 
-        return [
+        $payload = [
             'period' => $period,
             'total_income_cad' => $totalIncome,
             'total_recorded_disbursements_cad' => round($totalRecordedDisbursements, 2),
@@ -206,6 +208,12 @@ class FinancialSummaryService
             'income_lines' => $incomeLines,
             'category_totals' => $categoryTotals,
         ];
+
+        if ($exchangeRate === null) {
+            $payload['missing_exchange_rate'] = true;
+        }
+
+        return $payload;
     }
 
     /**
@@ -220,7 +228,7 @@ class FinancialSummaryService
      *     source: string
      * }>
      */
-    private function buildIncomeLines(string $period, ExchangeRate $exchangeRate): array
+    private function buildIncomeLines(string $period, ?ExchangeRate $exchangeRate): array
     {
         $lines = [];
         $userId = $this->owner->id();
@@ -241,7 +249,7 @@ class FinancialSummaryService
                 'amount_usd' => (float) $income->amount_usd,
                 'amount_cop' => (float) $income->amount_cop,
                 'total_cad_equivalent' => round(
-                    $income->getTotalCadEquivalent($exchangeRate),
+                    $this->incomeTotalCadEquivalent($income, $exchangeRate),
                     2
                 ),
                 'source' => 'income_line',
@@ -287,12 +295,16 @@ class FinancialSummaryService
         return $lines;
     }
 
-    private function transactionCadEquivalent(Transaction $transaction, ExchangeRate $exchangeRate): float
+    private function transactionCadEquivalent(Transaction $transaction, ?ExchangeRate $exchangeRate): float
     {
         $cadEquivalent = 0.0;
 
         if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
             $cadEquivalent += (float) $transaction->amount_cad;
+        }
+
+        if ($exchangeRate === null) {
+            return $cadEquivalent;
         }
 
         if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
@@ -306,13 +318,12 @@ class FinancialSummaryService
         return $cadEquivalent;
     }
 
-    private function resolveExchangeRate(string $period): ExchangeRate
+    private function incomeTotalCadEquivalent(Income $income, ?ExchangeRate $exchangeRate): float
     {
-        return ExchangeRate::forPeriod($period) ?? new ExchangeRate([
-            'period' => $period,
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
+        if ($exchangeRate === null) {
+            return (float) $income->amount_cad;
+        }
+
+        return $income->getTotalCadEquivalent($exchangeRate);
     }
 }

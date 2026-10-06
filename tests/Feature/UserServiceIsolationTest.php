@@ -204,19 +204,17 @@ class UserServiceIsolationTest extends TestCase
 
     public function test_exchange_rates_are_scoped_and_unique_per_user_period(): void
     {
-        ExchangeRate::factory()->create([
+        $this->seedExchangeRate([
             'user_id' => $this->userA->id,
             'period' => '202601',
             'usd_cop' => 4000,
             'usd_cad' => 0.7,
-            'cad_cop' => 2800,
         ]);
-        ExchangeRate::factory()->create([
+        $this->seedExchangeRate([
             'user_id' => $this->userB->id,
             'period' => '202601',
             'usd_cop' => 4500,
             'usd_cad' => 0.8,
-            'cad_cop' => 3200,
         ]);
 
         $this->actingAs($this->userA);

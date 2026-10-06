@@ -6,10 +6,12 @@ use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\Transaction;
+use App\Services\Concerns\ResolvesExchangeRate;
 use Carbon\Carbon;
 
 class ReportsService
 {
+    use ResolvesExchangeRate;
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
@@ -76,23 +78,7 @@ class ReportsService
         ];
     }
 
-    private function resolveExchangeRate(string $period): ExchangeRate
-    {
-        $exchangeRate = ExchangeRate::forPeriod($period);
-
-        if (! $exchangeRate) {
-            return new ExchangeRate([
-                'period' => $period,
-                'usd_cop' => 4400,
-                'usd_cad' => 0.75,
-                'cad_cop' => 3000,
-            ]);
-        }
-
-        return $exchangeRate;
-    }
-
-    private function calculateTotalIncome(string $period, ExchangeRate $exchangeRate): float
+    private function calculateTotalIncome(string $period, ?ExchangeRate $exchangeRate): float
     {
         $userId = $this->owner->id();
         $incomeLines = Income::query()->forUser($userId)->forPeriod($period)->get();
@@ -102,11 +88,11 @@ class ReportsService
         foreach ($incomeLines as $income) {
             $total += (float) $income->amount_cad;
 
-            if ($income->amount_usd > 0) {
+            if ($exchangeRate !== null && $income->amount_usd > 0) {
                 $total += $exchangeRate->usdToCad((float) $income->amount_usd);
             }
 
-            if ($income->amount_cop > 0) {
+            if ($exchangeRate !== null && $income->amount_cop > 0) {
                 $total += $exchangeRate->copToCad((float) $income->amount_cop);
             }
         }
@@ -118,13 +104,13 @@ class ReportsService
             ->get();
 
         foreach ($incomeTransactions as $transaction) {
-            $total += $transaction->cadEquivalent($exchangeRate);
+            $total += $this->transactionCadEquivalent($transaction, $exchangeRate);
         }
 
         return $total;
     }
 
-    private function calculateTotalExpenses(string $period, ExchangeRate $exchangeRate): float
+    private function calculateTotalExpenses(string $period, ?ExchangeRate $exchangeRate): float
     {
         $transactions = Transaction::query()
             ->forUser($this->owner->id())
@@ -135,19 +121,32 @@ class ReportsService
         $total = 0.0;
 
         foreach ($transactions as $transaction) {
-            if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
-                $total += (float) $transaction->amount_cad;
-            }
-
-            if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
-                $total += $exchangeRate->usdToCad((float) $transaction->amount_usd);
-            }
-
-            if ($transaction->amount_cop !== null && (float) $transaction->amount_cop != 0) {
-                $total += $exchangeRate->copToCad((float) $transaction->amount_cop);
-            }
+            $total += $this->transactionCadEquivalent($transaction, $exchangeRate);
         }
 
         return $total;
+    }
+
+    private function transactionCadEquivalent(Transaction $transaction, ?ExchangeRate $exchangeRate): float
+    {
+        $cadEquivalent = 0.0;
+
+        if ($transaction->amount_cad !== null && (float) $transaction->amount_cad != 0) {
+            $cadEquivalent += (float) $transaction->amount_cad;
+        }
+
+        if ($exchangeRate === null) {
+            return $cadEquivalent;
+        }
+
+        if ($transaction->amount_usd !== null && (float) $transaction->amount_usd != 0) {
+            $cadEquivalent += $exchangeRate->usdToCad((float) $transaction->amount_usd);
+        }
+
+        if ($transaction->amount_cop !== null && (float) $transaction->amount_cop != 0) {
+            $cadEquivalent += $exchangeRate->copToCad((float) $transaction->amount_cop);
+        }
+
+        return $cadEquivalent;
     }
 }

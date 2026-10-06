@@ -46,7 +46,7 @@ class CategoryActualsTest extends TestCase
             'is_active' => false,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -213,8 +213,8 @@ class CategoryActualsTest extends TestCase
             'period' => '202501',
             'category_id' => $this->groceries->id,
             'amount_cad' => 100.00,
-            'amount_usd' => 40.00, // 40 / 0.75 = 53.33 CAD
-            'amount_cop' => 6000.00, // 6000 / 3000 = 2 CAD
+            'amount_usd' => 40.00, // 40 * 0.75 = 30 CAD
+            'amount_cop' => 6000.00, // 6000 / 4400 * 0.75 = 1.02 CAD
             'comments' => 'Multi-currency',
         ]);
 
@@ -222,7 +222,7 @@ class CategoryActualsTest extends TestCase
 
         $response->assertOk();
         $c001 = collect($response->json('data.categories'))->firstWhere('category_code', 'C001');
-        $this->assertEquals(155.33, $c001['actual_cad']);
+        $this->assertEquals(131.02, $c001['actual_cad']);
     }
 
     public function test_category_actuals_rejects_invalid_period_format(): void

@@ -441,8 +441,8 @@ export default function Income() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="text-muted-foreground text-sm">
-                        Converted with the period exchange rates (defaults:
-                        USD/CAD 0.75, CAD/COP 3,000).
+                        Converted with the exchange-rate snapshot assigned to
+                        this period. Periods without a rate omit converted totals.
                     </CardContent>
                 </Card>
 

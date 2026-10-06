@@ -23,7 +23,7 @@ class BalanceSheetTest extends TestCase
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
@@ -183,12 +183,14 @@ class BalanceSheetTest extends TestCase
         $response->assertJsonPath('data.total_assets.cad', 750);
         $response->assertJsonPath('data.total_assets.usd', 1000);
         // CAD 750 * 3000 = COP 2,250,000
-        $response->assertJsonPath('data.total_assets.cop', 2250000);
+        // 750 CAD * (4400 COP / 0.75 CAD per USD) = 4,400,000 COP
+        $response->assertJsonPath('data.total_assets.cop', 4400000);
         $response->assertJsonPath('data.equity.cad', 750);
         $response->assertJsonPath('data.equity.usd', 1000);
-        $response->assertJsonPath('data.equity.cop', 2250000);
+        $response->assertJsonPath('data.equity.cop', 4400000);
         $response->assertJsonPath('data.exchange_rates.usd_cad', 0.75);
-        $response->assertJsonPath('data.exchange_rates.cad_cop', 3000);
+        // Derived cross rate: cop_per_usd / cad_per_usd = 4400 / 0.75
+        $response->assertJsonPath('data.exchange_rates.cad_cop', 5866.66666667);
     }
 
     public function test_multi_currency_account_balances_convert_to_cad(): void
@@ -207,8 +209,8 @@ class BalanceSheetTest extends TestCase
         $response = $this->getJson('/api/balance-sheet?period=202501');
 
         $response->assertOk();
-        // 100 USD / 0.75 = 133.33 CAD
-        $response->assertJsonPath('data.total_assets.cad', 133.33);
+        // 100 USD * 0.75 cad_per_usd = 75 CAD
+        $response->assertJsonPath('data.total_assets.cad', 75);
     }
 
     public function test_period_query_is_required_for_query_string_endpoint(): void
@@ -252,7 +254,7 @@ class BalanceSheetTest extends TestCase
             'recorded_balance_cad' => 3800.00,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202502',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,

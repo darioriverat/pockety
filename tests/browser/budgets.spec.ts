@@ -1,4 +1,6 @@
-import { expect, test } from '@playwright/test';
+import {
+    expect,
+    test } from '@playwright/test';
 import {
     ensureTransactionInPeriod,
     loginAsBrowserTestUser,
@@ -6,6 +8,7 @@ import {
     selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 test.beforeAll(() => {
@@ -21,14 +24,7 @@ test('feature 57-61: budgets page supports set budget and vs-actual report', asy
     await loginAsBrowserTestUser(page, request);
 
     // Ensure exchange rates exist for multi-currency conversion
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202501',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
+    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     const categoriesResponse = await request.get('/api/categories');
     const categoriesPayload = await categoriesResponse.json();

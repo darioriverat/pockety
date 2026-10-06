@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\ExchangeRateController::index
-* @see app/Http/Controllers/ExchangeRateController.php:69
+* @see app/Http/Controllers/ExchangeRateController.php:71
 * @route '/api/exchange-rates'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::index
-* @see app/Http/Controllers/ExchangeRateController.php:69
+* @see app/Http/Controllers/ExchangeRateController.php:71
 * @route '/api/exchange-rates'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::index
-* @see app/Http/Controllers/ExchangeRateController.php:69
+* @see app/Http/Controllers/ExchangeRateController.php:71
 * @route '/api/exchange-rates'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::index
-* @see app/Http/Controllers/ExchangeRateController.php:69
+* @see app/Http/Controllers/ExchangeRateController.php:71
 * @route '/api/exchange-rates'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::index
-* @see app/Http/Controllers/ExchangeRateController.php:69
+* @see app/Http/Controllers/ExchangeRateController.php:71
 * @route '/api/exchange-rates'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::index
-* @see app/Http/Controllers/ExchangeRateController.php:69
+* @see app/Http/Controllers/ExchangeRateController.php:71
 * @route '/api/exchange-rates'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::index
-* @see app/Http/Controllers/ExchangeRateController.php:69
+* @see app/Http/Controllers/ExchangeRateController.php:71
 * @route '/api/exchange-rates'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::show
-* @see app/Http/Controllers/ExchangeRateController.php:19
+* @see app/Http/Controllers/ExchangeRateController.php:20
 * @route '/api/exchange-rates/show'
 */
 export const show = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::show
-* @see app/Http/Controllers/ExchangeRateController.php:19
+* @see app/Http/Controllers/ExchangeRateController.php:20
 * @route '/api/exchange-rates/show'
 */
 show.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ show.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::show
-* @see app/Http/Controllers/ExchangeRateController.php:19
+* @see app/Http/Controllers/ExchangeRateController.php:20
 * @route '/api/exchange-rates/show'
 */
 show.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ show.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::show
-* @see app/Http/Controllers/ExchangeRateController.php:19
+* @see app/Http/Controllers/ExchangeRateController.php:20
 * @route '/api/exchange-rates/show'
 */
 show.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ show.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::show
-* @see app/Http/Controllers/ExchangeRateController.php:19
+* @see app/Http/Controllers/ExchangeRateController.php:20
 * @route '/api/exchange-rates/show'
 */
 const showForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -136,7 +136,7 @@ const showForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::show
-* @see app/Http/Controllers/ExchangeRateController.php:19
+* @see app/Http/Controllers/ExchangeRateController.php:20
 * @route '/api/exchange-rates/show'
 */
 showForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -146,7 +146,7 @@ showForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::show
-* @see app/Http/Controllers/ExchangeRateController.php:19
+* @see app/Http/Controllers/ExchangeRateController.php:20
 * @route '/api/exchange-rates/show'
 */
 showForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -163,7 +163,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::showByPeriod
-* @see app/Http/Controllers/ExchangeRateController.php:33
+* @see app/Http/Controllers/ExchangeRateController.php:34
 * @route '/api/exchange-rates/{period}'
 */
 export const showByPeriod = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -178,7 +178,7 @@ showByPeriod.definition = {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::showByPeriod
-* @see app/Http/Controllers/ExchangeRateController.php:33
+* @see app/Http/Controllers/ExchangeRateController.php:34
 * @route '/api/exchange-rates/{period}'
 */
 showByPeriod.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -205,7 +205,7 @@ showByPeriod.url = (args: { period: string | number } | [period: string | number
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::showByPeriod
-* @see app/Http/Controllers/ExchangeRateController.php:33
+* @see app/Http/Controllers/ExchangeRateController.php:34
 * @route '/api/exchange-rates/{period}'
 */
 showByPeriod.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -215,7 +215,7 @@ showByPeriod.get = (args: { period: string | number } | [period: string | number
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::showByPeriod
-* @see app/Http/Controllers/ExchangeRateController.php:33
+* @see app/Http/Controllers/ExchangeRateController.php:34
 * @route '/api/exchange-rates/{period}'
 */
 showByPeriod.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -225,7 +225,7 @@ showByPeriod.head = (args: { period: string | number } | [period: string | numbe
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::showByPeriod
-* @see app/Http/Controllers/ExchangeRateController.php:33
+* @see app/Http/Controllers/ExchangeRateController.php:34
 * @route '/api/exchange-rates/{period}'
 */
 const showByPeriodForm = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -235,7 +235,7 @@ const showByPeriodForm = (args: { period: string | number } | [period: string | 
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::showByPeriod
-* @see app/Http/Controllers/ExchangeRateController.php:33
+* @see app/Http/Controllers/ExchangeRateController.php:34
 * @route '/api/exchange-rates/{period}'
 */
 showByPeriodForm.get = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -245,7 +245,7 @@ showByPeriodForm.get = (args: { period: string | number } | [period: string | nu
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::showByPeriod
-* @see app/Http/Controllers/ExchangeRateController.php:33
+* @see app/Http/Controllers/ExchangeRateController.php:34
 * @route '/api/exchange-rates/{period}'
 */
 showByPeriodForm.head = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -262,7 +262,7 @@ showByPeriod.form = showByPeriodForm
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::store
-* @see app/Http/Controllers/ExchangeRateController.php:84
+* @see app/Http/Controllers/ExchangeRateController.php:86
 * @route '/api/exchange-rates'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -277,7 +277,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::store
-* @see app/Http/Controllers/ExchangeRateController.php:84
+* @see app/Http/Controllers/ExchangeRateController.php:86
 * @route '/api/exchange-rates'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -286,7 +286,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::store
-* @see app/Http/Controllers/ExchangeRateController.php:84
+* @see app/Http/Controllers/ExchangeRateController.php:86
 * @route '/api/exchange-rates'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -296,7 +296,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::store
-* @see app/Http/Controllers/ExchangeRateController.php:84
+* @see app/Http/Controllers/ExchangeRateController.php:86
 * @route '/api/exchange-rates'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -306,7 +306,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\ExchangeRateController::store
-* @see app/Http/Controllers/ExchangeRateController.php:84
+* @see app/Http/Controllers/ExchangeRateController.php:86
 * @route '/api/exchange-rates'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

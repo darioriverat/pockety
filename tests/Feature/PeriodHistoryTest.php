@@ -31,14 +31,14 @@ class PeriodHistoryTest extends TestCase
             'is_active' => true,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202501',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,
             'cad_cop' => 3000,
         ]);
 
-        ExchangeRate::create([
+        $this->seedExchangeRate([
             'period' => '202502',
             'usd_cop' => 4400,
             'usd_cad' => 0.75,

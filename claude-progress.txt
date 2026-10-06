@@ -290,3 +290,39 @@ Exchange-rate snapshots (spec section 8 / features 54+):
 - `exchange_rate_snapshots` table, fetch command, manual upsert, period assignment,
   USD-base quote convention, remove 4400/0.75/3000 fallbacks.
 Then docsify guides (section 7) and final sweep.
+
+
+## Session: 2026-10-06 (Exchange-rate snapshots)
+
+### Accomplished
+1. **Section 8 — Daily exchange rates and per-period selection (features 54-73) DONE**
+   - New `exchange_rate_snapshots` table (global feed + per-user manual quotes).
+   - Migrated existing period rows into manual snapshots; dropped `usd_cop`/`usd_cad`/`cad_cop`
+     columns from `exchange_rates`; required `snapshot_id` FK after backfill.
+   - `php artisan exchange-rates:fetch` reads Open Exchange Rates `latest.json` only
+     (HTTP faked in tests); missing app id warns and exits 0; failures exit non-zero.
+   - Daily schedule registered via `bootstrap/app.php` `withSchedule`; `.env.example`
+     documents `OPENEXCHANGERATES_APP_ID` and `schedule:run`.
+   - Manual snapshot upsert + period assignment APIs; removed month-sheet import route/controller/service.
+   - USD-base quote convention: `usdToCad` multiplies by `cad_per_usd`; cross rate derived.
+   - Removed 4400/0.75/3000 fallbacks from services; missing assignment returns
+     `missing_exchange_rate` and omits invented converted totals.
+   - Exchange Rates UI: manual form (date, CAD/USD, COP/USD), snapshot picker, OXR attribution;
+     EN/ES strings updated.
+
+2. **Verification**
+   - Backend: `php artisan test` 402 passed (ExchangeRate suite 13/13).
+   - Browser: `exchange-rates.spec.ts` 2/2; `balance-sheet.spec.ts` 3/3 regression.
+   - Screenshots in `verification/exchange-rates/`.
+   - Puppeteer MCP blocked in this session (approval sandbox); Playwright used for UI.
+
+### Progress
+- **69/87 features passing** (was 49/87).
+- Flipped exchange-rate features 54-73 to true.
+- Older style features (5, 9, 19, 26) remain false pending visual review.
+
+### Next priority
+Docsify guides (spec section 7 / features 74-84):
+- `docs/index.html`, sidebar, README, and feature pages for accounts/categories/
+  transactions/reconciliation/period-balances.
+Then final sweep (forbidden strings, dependency check, full suites).

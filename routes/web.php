@@ -12,6 +12,7 @@ use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\Category;
 use App\Models\ExchangeRate;
+use App\Models\ExchangeRateSnapshot;
 use App\Models\FixedAsset;
 use App\Models\FixedAssetValuation;
 use App\Models\User;
@@ -21,6 +22,7 @@ use App\Services\BalanceSheetService;
 use App\Services\BudgetService;
 use App\Services\FinancialSummaryService;
 use App\Support\CategoryTemplate;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
@@ -737,13 +739,26 @@ HTML;
             '202609' => ['assets' => 15000, 'liabilities' => 2000],
         ];
 
+        $userId = auth()->id();
+
         foreach ($fixtures as $period => $amounts) {
+            $rateDate = Carbon::createFromFormat('Ym', $period)->endOfMonth()->toDateString();
+
+            $snapshot = ExchangeRateSnapshot::query()->create([
+                'rate_date' => $rateDate,
+                'source' => ExchangeRateSnapshot::SOURCE_MANUAL,
+                'user_id' => $userId,
+                'cad_per_usd' => 0.75,
+                'cop_per_usd' => 4400,
+            ]);
+
             ExchangeRate::query()->updateOrCreate(
-                ['period' => $period],
                 [
-                    'usd_cop' => 4400,
-                    'usd_cad' => 0.75,
-                    'cad_cop' => 3000,
+                    'period' => $period,
+                    'user_id' => $userId,
+                ],
+                [
+                    'snapshot_id' => $snapshot->id,
                 ]
             );
 

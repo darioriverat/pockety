@@ -9,7 +9,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryActualsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExchangeRateController;
-use App\Http\Controllers\ExchangeRateImportController;
+use App\Http\Controllers\ExchangeRateSnapshotController;
 use App\Http\Controllers\FinancialSummaryController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IncomeController;
@@ -125,8 +125,13 @@ Route::middleware('auth')->group(function () {
         ->name('exchange-rates.show-by-period')
         ->where('period', '\d{6}');
     Route::post('/exchange-rates', [ExchangeRateController::class, 'store'])->name('exchange-rates.store');
-    Route::post('/exchange-rates/import', [ExchangeRateImportController::class, 'import'])->name('exchange-rates.import');
-    Route::get('/exchange-rates/import/statistics', [ExchangeRateImportController::class, 'statistics'])->name('exchange-rates.import.statistics');
+
+    // Exchange rate snapshots (global feed + manual quotes)
+    Route::get('/exchange-rate-snapshots', [ExchangeRateSnapshotController::class, 'index'])->name('exchange-rate-snapshots.index');
+    Route::post('/exchange-rate-snapshots', [ExchangeRateSnapshotController::class, 'store'])->name('exchange-rate-snapshots.store');
+    Route::get('/exchange-rate-snapshots/{snapshot}', [ExchangeRateSnapshotController::class, 'show'])
+        ->name('exchange-rate-snapshots.show')
+        ->whereNumber('snapshot');
 
     // Budgets API
     Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');

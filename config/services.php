@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    /*
+    | Open Exchange Rates (https://openexchangerates.org/)
+    | Used by `php artisan exchange-rates:fetch` (latest.json only).
+    | Production should run the Laravel scheduler (`schedule:run`) daily.
+    */
+    'openexchangerates' => [
+        'app_id' => env('OPENEXCHANGERATES_APP_ID'),
+    ],
+
 ];

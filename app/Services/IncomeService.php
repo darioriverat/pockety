@@ -9,10 +9,12 @@ use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
 use App\Models\Income;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Services\Concerns\ResolvesExchangeRate;
 use Illuminate\Validation\ValidationException;
 
 class IncomeService implements IncomeServiceInterface
 {
+    use ResolvesExchangeRate;
     public const MAX_LINES_PER_PERIOD = 6;
 
     public function __construct(
@@ -154,7 +156,7 @@ class IncomeService implements IncomeServiceInterface
         $total = 0.0;
 
         foreach ($this->ownedIncome()->forPeriod($period)->get() as $income) {
-            $total += $income->getTotalCadEquivalent($exchangeRate);
+            $total += $this->incomeTotalCadEquivalent($income, $exchangeRate);
         }
 
         return round($total, 2);
@@ -183,17 +185,7 @@ class IncomeService implements IncomeServiceInterface
         }
     }
 
-    private function resolveExchangeRate(string $period): ExchangeRate
-    {
-        return ExchangeRate::forPeriod($period) ?? new ExchangeRate([
-            'period' => $period,
-            'usd_cop' => 4400,
-            'usd_cad' => 0.75,
-            'cad_cop' => 3000,
-        ]);
-    }
-
-    private function mapToEntity(Income $income, ExchangeRate $exchangeRate): IncomeEntity
+    private function mapToEntity(Income $income, ?ExchangeRate $exchangeRate): IncomeEntity
     {
         return new IncomeEntity(
             id: $income->id,
@@ -206,7 +198,16 @@ class IncomeService implements IncomeServiceInterface
             notes: $income->notes,
             createdAt: $income->created_at->toIso8601String(),
             updatedAt: $income->updated_at->toIso8601String(),
-            totalCadEquivalent: $income->getTotalCadEquivalent($exchangeRate),
+            totalCadEquivalent: $this->incomeTotalCadEquivalent($income, $exchangeRate),
         );
+    }
+
+    private function incomeTotalCadEquivalent(Income $income, ?ExchangeRate $exchangeRate): float
+    {
+        if ($exchangeRate === null) {
+            return round((float) $income->amount_cad, 2);
+        }
+
+        return $income->getTotalCadEquivalent($exchangeRate);
     }
 }

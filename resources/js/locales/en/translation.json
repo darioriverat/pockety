@@ -210,7 +210,36 @@
       "noFile": "Please choose a file before submitting."
     },
     "exchangeRates": {
-      "title": "Exchange Rates"
+      "title": "Exchange Rates",
+      "description": "Save USD-base quotes and assign a snapshot to each period. Cross rates are derived.",
+      "attribution": "Exchange rates by",
+      "manualTitle": "Manual snapshot",
+      "manualDescription": "Enter CAD per 1 USD and COP per 1 USD for a date. This does not overwrite the global feed.",
+      "date": "Date",
+      "cadPerUsd": "CAD per 1 USD",
+      "copPerUsd": "COP per 1 USD",
+      "saveManual": "Save manual snapshot",
+      "manualSaved": "Manual snapshot saved successfully",
+      "manualSaveFailed": "Failed to save manual snapshot",
+      "assignTitle": "Assign to period",
+      "assignDescription": "Pick a fetched or manual snapshot for the selected period.",
+      "period": "Period",
+      "selectPeriod": "Select period",
+      "snapshot": "Snapshot",
+      "selectSnapshot": "Select snapshot",
+      "sourceManual": "Manual",
+      "sourceFetched": "Fetched",
+      "assign": "Assign snapshot",
+      "assigned": "Exchange rates saved successfully",
+      "assignFailed": "Failed to assign snapshot",
+      "snapshotRequired": "Choose a snapshot before assigning.",
+      "missingForPeriod": "This period needs an exchange rate. Assign a snapshot to continue converting amounts.",
+      "derivedUsdCop": "Derived USD/COP",
+      "derivedUsdCad": "Derived USD/CAD",
+      "derivedCadCop": "Derived CAD/COP",
+      "historyTitle": "Period assignments",
+      "historyDescription": "Snapshots assigned to each period",
+      "noRates": "No period assignments yet. Save a manual snapshot and assign it to a period."
     },
     "income": {
       "title": "Income"

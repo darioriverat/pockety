@@ -1,8 +1,12 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 async function seedYtdData(request: APIRequestContext): Promise<void> {
@@ -29,15 +33,7 @@ async function seedYtdData(request: APIRequestContext): Promise<void> {
         const period = `20250${month}`;
 
         // Create exchange rate
-        const rateResponse = await request.post('/api/exchange-rates', {
-            data: {
-                period,
-                usd_cop: 4400,
-                usd_cad: 0.75,
-                cad_cop: 3000,
-            },
-        });
-        expect(rateResponse.ok()).toBeTruthy();
+        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
 
         // Create income
         const incomeResponse = await request.post('/api/income', {

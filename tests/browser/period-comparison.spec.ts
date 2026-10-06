@@ -1,8 +1,12 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+    expect,
+    test,
+    type APIRequestContext } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 async function seedComparisonData(request: APIRequestContext): Promise<void> {
@@ -35,15 +39,7 @@ async function seedComparisonData(request: APIRequestContext): Promise<void> {
     const loan = (await loanResponse.json()) as { data: { id: number } };
 
     for (const period of ['202501', '202502']) {
-        const rateResponse = await request.post('/api/exchange-rates', {
-            data: {
-                period,
-                usd_cop: 4400,
-                usd_cad: 0.75,
-                cad_cop: 3000,
-            },
-        });
-        expect(rateResponse.ok()).toBeTruthy();
+        await ensureExchangeRateForPeriod(request, period, { copPerUsd: 4400, cadPerUsd: 0.75 });
     }
 
     const incomeJan = await request.post('/api/income', {

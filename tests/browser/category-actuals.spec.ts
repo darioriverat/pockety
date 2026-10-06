@@ -1,10 +1,13 @@
-import { expect, test } from '@playwright/test';
+import {
+    expect,
+    test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     selectDisplayedPeriod,
     trackConsoleErrors,
     type ApiCategory,
+    ensureExchangeRateForPeriod,
 } from './helpers';
 
 test.beforeAll(() => {
@@ -19,14 +22,7 @@ test('feature 86: category actuals aggregates by category and period', async ({
 
     await loginAsBrowserTestUser(page, request);
 
-    await request.post('/api/exchange-rates', {
-        data: {
-            period: '202501',
-            usd_cop: 4400,
-            usd_cad: 0.75,
-            cad_cop: 3000,
-        },
-    });
+    await ensureExchangeRateForPeriod(request, '202501', { copPerUsd: 4400, cadPerUsd: 0.75 });
 
     const categoriesResponse = await request.get('/api/categories');
     const categoriesPayload = await categoriesResponse.json();
