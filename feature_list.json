@@ -229,7 +229,7 @@
       "Step 4: Restore or hard-delete the transaction and repeat the type change",
       "Step 5: Assert the type change now succeeds when no transactions remain"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -240,7 +240,7 @@
       "Step 3: Assert 200 and the new type persisted",
       "Step 4: Verify the response payload reflects the new type"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -251,7 +251,7 @@
       "Step 3: As user A, attempt to rename user A's account to a name already used by user A and assert a validation error",
       "Step 4: Assert the update did not collide with user B's account name"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -264,7 +264,7 @@
       "Step 5: Assert the dialog remains open so the user can correct the input",
       "Step 6: Assert the account row still shows the original type"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -293,7 +293,7 @@
       "Step 4: Confirm the select includes an empty option meaning all accounts",
       "Step 5: Confirm the transaction create and edit form's account field was not changed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -314,7 +314,7 @@
       "Step 13: Verify sorting and searching preserve the account filter",
       "Step 14: Take screenshots of the filtered and unfiltered states as evidence"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -327,7 +327,7 @@
       "Step 5: Verify the transactions list shows every account again",
       "Step 6: Verify the URL no longer carries the account query parameter"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -338,7 +338,7 @@
       "Step 3: Verify the clear-filters affordance becomes active or visible",
       "Step 4: Clear filters and verify the affordance returns to inactive or hidden"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -352,7 +352,7 @@
       "Step 6: Combine ?account={id} with ?period={YYYYMM} and verify both are applied on load",
       "Step 7: Reload the URL and verify the same filter state is restored"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -364,7 +364,7 @@
       "Step 4: Open the edit form for that transaction and verify the account field still behaves as before",
       "Step 5: Confirm the new filter select is separate from the form field"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",

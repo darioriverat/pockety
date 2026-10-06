@@ -146,8 +146,9 @@ test('Edit dialog disables type field when account has transactions', async ({
     await expect(page.getByText('Account With Transactions')).toBeVisible();
     await page.waitForTimeout(500); // Small wait for UI to settle
 
-    // Find and click Edit on the account - use first Edit button since we just created one account
-    await page.getByRole('button', { name: 'Edit' }).first().click();
+    // Find and click Edit on the account created above. Target by account id
+    // because the list is ordered by type then name and the rename below moves it.
+    await page.getByTestId(`edit-account-${accountId}`).click();
 
     // Verify Edit dialog opens
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -177,7 +178,7 @@ test('Edit dialog disables type field when account has transactions', async ({
     await expect(page.getByText('Updated Name With Transactions')).toBeVisible();
 
     // Reopen Edit dialog to verify type is still 'bank'
-    await page.getByRole('button', { name: 'Edit' }).first().click();
+    await page.getByTestId(`edit-account-${accountId}`).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByLabel('Account Type')).toBeDisabled();
 
@@ -306,3 +307,82 @@ test('Edit dialog can toggle Active checkbox and update other fields', async ({
 
     expect(consoleErrors).toEqual([]);
 });
+
+test('Edit dialog shows the 422 message when a type change is submitted anyway', async ({
+    page,
+}) => {
+    const consoleErrors = trackConsoleErrors(page);
+
+    await loginAsBrowserTestUser(page);
+
+    // Account with a registered transaction: the API must reject a type change.
+    const accountResponse = await page.request.post('/api/accounts', {
+        data: {
+            name: 'Rejected Type Change Account',
+            type: 'bank',
+            primary_currency: 'CAD',
+        },
+    });
+    expect(accountResponse.ok()).toBeTruthy();
+    const accountId = (await accountResponse.json()).data.id as number;
+
+    const categoryResponse = await page.request.post('/api/categories', {
+        data: {
+            name: 'Rejected Type Category',
+            is_debt_category: false,
+            is_income_category: false,
+        },
+    });
+    expect(categoryResponse.ok()).toBeTruthy();
+    const categoryId = (await categoryResponse.json()).data.id as number;
+
+    const transactionResponse = await page.request.post('/api/transactions', {
+        data: {
+            date: '2026-01-15',
+            period: '202601',
+            category_id: categoryId,
+            account_id: accountId,
+            amount_cad: 100,
+            comments: 'locks the account type',
+        },
+    });
+    expect(transactionResponse.ok()).toBeTruthy();
+
+    // Force the client-side transaction probe to report no transactions so the
+    // type control stays enabled and the user can submit a change the API rejects.
+    await page.route('**/api/accounts/*/transactions', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ data: [], meta: { total_count: 0 } }),
+        });
+    });
+
+    await page.goto('/accounts');
+    await expect(page.getByText('Rejected Type Change Account')).toBeVisible();
+
+    await page.getByTestId(`edit-account-${accountId}`).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByLabel('Account Type')).toBeEnabled();
+
+    await page.getByLabel('Account Type').click();
+    await page.getByRole('option', { name: 'Investment' }).click();
+    await page.getByRole('button', { name: 'Save Changes' }).click();
+
+    // The 422 message is shown inline and the dialog stays open.
+    await expect(
+        page.getByText(
+            /The account type cannot be changed because transactions are registered/i,
+        ),
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).toBeVisible();
+
+    // The account row still shows the original type.
+    const card = page
+        .locator('[data-slot="card"]')
+        .filter({ hasText: 'Rejected Type Change Account' });
+    await expect(card.getByText('Bank Account')).toBeVisible();
+
+    expect(consoleErrors).toEqual([]);
+});
+

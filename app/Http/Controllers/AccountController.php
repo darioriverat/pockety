@@ -9,6 +9,7 @@ use App\Models\Transaction;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class AccountController extends Controller
@@ -92,7 +93,7 @@ class AccountController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    \Illuminate\Validation\Rule::unique('accounts', 'name')
+                    Rule::unique('accounts', 'name')
                         ->where('user_id', $this->owner->id()),
                 ],
                 'type' => 'required|in:bank,investment,liability,receivable',
@@ -145,7 +146,7 @@ class AccountController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    \Illuminate\Validation\Rule::unique('accounts', 'name')
+                    Rule::unique('accounts', 'name')
                         ->where('user_id', $this->owner->id())
                         ->ignore($id),
                 ],

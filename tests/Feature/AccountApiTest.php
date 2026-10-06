@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Account;
-use App\Models\Transaction;
 use App\Models\Category;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -146,7 +146,87 @@ class AccountApiTest extends TestCase
             'type' => 'investment',
         ]);
 
-        $response->assertOk();
+        $response->assertOk()
+            ->assertJsonPath('data.type', 'investment');
+
+        $account->refresh();
+        $this->assertEquals('investment', $account->type);
+    }
+
+    public function test_update_account_type_succeeds_after_transactions_are_deleted(): void
+    {
+        /** @var User */
+        $user = auth()->user();
+
+        $account = Account::factory()->create([
+            'user_id' => $user->id,
+            'name' => 'Locked Account',
+            'type' => 'bank',
+        ]);
+
+        $category = Category::factory()->create([
+            'user_id' => $user->id,
+            'code' => 'test-delete',
+            'name' => 'Test Delete Category',
+        ]);
+
+        $transaction = Transaction::factory()->create([
+            'user_id' => $user->id,
+            'account_id' => $account->id,
+            'category_id' => $category->id,
+            'date' => now(),
+            'period' => now()->format('Ym'),
+            'amount_cad' => 100.00,
+        ]);
+
+        $this->putJson("/api/accounts/{$account->id}", [
+            'type' => 'investment',
+        ])->assertStatus(422);
+
+        $account->refresh();
+        $this->assertEquals('bank', $account->type);
+
+        $transaction->delete();
+
+        $this->putJson("/api/accounts/{$account->id}", [
+            'type' => 'investment',
+        ])->assertOk();
+
+        $account->refresh();
+        $this->assertEquals('investment', $account->type);
+    }
+
+    public function test_update_account_type_lock_counts_only_the_owner_transactions(): void
+    {
+        /** @var User */
+        $user = auth()->user();
+        $otherUser = User::factory()->create();
+
+        $account = Account::factory()->create([
+            'user_id' => $user->id,
+            'name' => 'Owner Account',
+            'type' => 'bank',
+        ]);
+
+        $otherCategory = Category::factory()->create([
+            'user_id' => $otherUser->id,
+            'code' => 'other-cat',
+            'name' => 'Other Category',
+        ]);
+
+        // A transaction owned by another user must not lock this account.
+        Transaction::factory()->create([
+            'user_id' => $otherUser->id,
+            'account_id' => $account->id,
+            'category_id' => $otherCategory->id,
+            'date' => now(),
+            'period' => now()->format('Ym'),
+            'amount_cad' => 50.00,
+        ]);
+
+        $this->putJson("/api/accounts/{$account->id}", [
+            'type' => 'investment',
+        ])->assertOk();
 
         $account->refresh();
         $this->assertEquals('investment', $account->type);

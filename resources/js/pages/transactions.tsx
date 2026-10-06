@@ -160,6 +160,7 @@ interface TransactionFormData {
 
 interface FilterState {
     period: string;
+    account_id: string;
     category_id: string;
     currency: string;
     is_recurring: string;
@@ -232,8 +233,10 @@ export default function Transactions() {
                 ? new URLSearchParams(window.location.search)
                 : null;
         const urlPeriod = params?.get('period') ?? '';
+        const urlAccountId = params?.get('account') ?? '';
         return {
             period: urlPeriod || period,
+            account_id: urlAccountId,
             category_id: '',
             currency: '',
             is_recurring: '',
@@ -300,6 +303,27 @@ export default function Transactions() {
     useEffect(() => {
         fetchTransactions();
     }, [filters, page, perPage, sortBy, sortDir]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        if (filters.account_id) {
+            params.set('account', filters.account_id);
+        } else {
+            params.delete('account');
+        }
+
+        const query = params.toString();
+        const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}`;
+        const currentUrl = `${window.location.pathname}${window.location.search}`;
+
+        if (nextUrl !== currentUrl) {
+            window.history.replaceState(window.history.state, '', nextUrl);
+        }
+    }, [filters.account_id]);
 
     useEffect(() => {
         if (highlightApplied.current || loading || transactions.length === 0) {
@@ -384,6 +408,7 @@ export default function Transactions() {
 
             const params = new URLSearchParams();
             if (filters.period) params.append('period', filters.period);
+            if (filters.account_id) params.append('account_id', filters.account_id);
             if (filters.category_id) params.append('category_id', filters.category_id);
             if (filters.currency) params.append('currency', filters.currency);
             if (filters.is_recurring) params.append('is_recurring', filters.is_recurring);
@@ -674,6 +699,8 @@ export default function Transactions() {
     const handleExportCSV = () => {
         const params = new URLSearchParams();
         if (filters.period) params.append('period', filters.period);
+        if (filters.account_id)
+            params.append('account_id', filters.account_id);
         if (filters.category_id)
             params.append('category_id', filters.category_id);
         if (filters.currency) params.append('currency', filters.currency);
@@ -795,6 +822,7 @@ export default function Transactions() {
         setDetailCategoryCode(null);
         updateFilters({
             period,
+            account_id: '',
             category_id: '',
             currency: '',
             is_recurring: '',
@@ -826,6 +854,7 @@ export default function Transactions() {
     const showPaginationControls = pagination.total > 50;
 
     const hasActiveFilters =
+        filters.account_id !== '' ||
         filters.category_id !== '' ||
         filters.currency !== '' ||
         filters.is_recurring !== '' ||
@@ -1604,7 +1633,7 @@ export default function Transactions() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-period">Period</Label>
                                 <Select
@@ -1630,6 +1659,40 @@ export default function Transactions() {
                                                 value={item}
                                             >
                                                 {formatPeriod(item)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter-account">Account</Label>
+                                <Select
+                                    value={filters.account_id || 'all'}
+                                    onValueChange={(value) =>
+                                        updateFilters({
+                                            ...filters,
+                                            account_id:
+                                                value === 'all' ? '' : value,
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger
+                                        id="filter-account"
+                                        data-testid="filter-account"
+                                    >
+                                        <SelectValue placeholder="All Accounts" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All Accounts
+                                        </SelectItem>
+                                        {accounts.map((account) => (
+                                            <SelectItem
+                                                key={account.id}
+                                                value={account.id.toString()}
+                                            >
+                                                {account.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
