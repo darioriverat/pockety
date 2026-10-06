@@ -63,8 +63,8 @@ database to seeded state.
      `tests/browser/app-footer.spec.ts` to assert the hrefs are gone.
    - Added `tests/browser/removed-github-links.spec.ts` for durable sidebar/header/footer
      absence coverage.
-   - Feature indices 0–4 flipped to `passes: true` (5/87 passing). Index 5 (visual style)
-     left `false` because screenshots were not captured.
+   - Feature indices 0–4 flipped to `passes: true`. Index 5 (visual style)
+     left `false` because the current model cannot read screenshots.
    - Verification run:
      - `grep` for all three forbidden URLs in `resources/js`, `app`, `tests`: **0 matches**.
      - frontend unit suite: **238 passed** (60 files).
@@ -73,18 +73,40 @@ database to seeded state.
      - Playwright: app-footer (2) + app-header (2) + removed-github-links (1) all pass.
    - Committed as `Remove GitHub and starter-kit links from footer, sidebar, and header`.
 
+3. **Spec section 3 — Manage Balances dialog scroll (DONE)**
+   - `resources/js/pages/accounts.tsx`: the Manage Balances `DialogContent` now gets
+     `flex max-h-[85vh] max-w-lg flex-col overflow-hidden` **only on this dialog**; the
+     `DialogHeader` and new-balance `<form>` are `shrink-0` so they stay visible, and the
+     recorded-balances region is the shrink/scroll area (`mt-4 min-h-0 space-y-2 overflow-y-auto`).
+   - `resources/js/components/ui/dialog.tsx` was **not** modified (confirmed with `git diff`).
+   - Added `tests/browser/manage-balances-scroll.spec.ts`: a 30-row list scrolls to the last and
+     first row with the form still visible, viewport capped at ~85vh and `window.scrollY === 0`;
+     a short (1-row) list fits content, does not hit the cap, and does not need to scroll.
+   - Feature indices 6, 7, 8, 10 flipped to `passes: true`; index 9 (visual style) left `false`
+     because screenshots cannot be read by the current model, though
+     `verification/manage-balances-scroll/*.png` were captured.
+   - Regression checks: dialog unit test passes, `modal-dialogs.spec.ts` + `accounts.spec.ts`
+     (6 browser tests) pass, `tsc --noEmit` clean.
+   - Committed as `Constrain Manage Balances dialog and make the recorded list scroll`.
+
+**Total passing: 9/87.**
+
 ## Not done (next work)
 
-Next unfinished test in priority order is **index 6 — Spec section 2/3 accordingly**:
+Next unfinished test in priority order: **index 11 — edit an account / type lock (spec section 4)**.
 
-- Next up per spec implementation order: **spec section 3, Manage Balances dialog scroll**
-  (feature indices 6–10). The dialog is inline in `resources/js/pages/accounts.tsx`.
-  Apply an ~85vh max height only to this dialog's `DialogContent`, keep title/description/new
-  balance form visible, make the recorded-balances `ul` the scrolling region (`min-h-0`,
-  `overflow-y-auto`). Do not change the shared dialog component defaults.
-- Then: account edit/type lock (indices 11–19), transaction account filter (20–26),
-  import uploads (27–39), locale/i18n (40–52), exchange-rate snapshots (53–72),
-  docsify docs (73–83), final cross-cutting verification (84–86).
+- API: `PUT|PATCH /api/accounts/{id}` already exists; add a guard in `AccountService::update`
+  (or controller) so a **changed** type returns 422 when the account has at least one transaction
+  (soft-deleted transactions still count, counted for the owner). Name, primary currency, notes,
+  and `is_active` must remain editable with transactions. Type change allowed with no transactions.
+  Keep owner-scoped name uniqueness.
+- UI: each account row gets an Edit action opening a dialog prefilled with name, type, primary
+  currency, notes, and active flag; submit PUT and refresh; disable the type control and explain
+  the lock when transactions exist; show the 422 if submitted anyway.
+- Feature tests must cover both the allowed update and the blocked type change; a browser pass must
+  open Edit, change the name, and see the new name.
+- Then: transaction account filter (20–26), import uploads (27–39), locale/i18n (40–52),
+  exchange-rate snapshots (53–72), docsify docs (73–83), final cross-cutting verification (84–86).
 
 ## Reminders / hard rules
 
