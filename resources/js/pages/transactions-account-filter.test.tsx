@@ -223,6 +223,9 @@ describe('Transactions - account filter', () => {
         expect(screen.getByTestId('filter-account')).toHaveTextContent(
             'All Accounts',
         );
+        expect(
+            screen.queryByRole('button', { name: /clear filters/i }),
+        ).not.toBeInTheDocument();
     });
 
     it('reads the account query parameter on load', async () => {
