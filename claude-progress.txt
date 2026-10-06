@@ -447,3 +447,38 @@ Then final sweep (forbidden strings, dependency check, full suites).
 - No outstanding specification feature. Continue regression checks if requested.
 - Broad source changes in this commit are mostly mechanical formatting needed
   to make the configured npm run check gate pass; dependencies are unchanged.
+
+## Session: 2026-10-06 (regression verification — all features still green)
+
+### Accomplished
+- Fresh context: feature_list.json is 87/87 passing; no "passes": false items remain.
+- App already reachable at http://dev.pockety.com:8080/login (HTTP 200). Docker socket
+  denied in this sandbox, so init.sh could not be re-run; existing stack stayed up.
+- Spec sweep: no matches for github.com/dariorivera/pockety, plan/extracted, or the
+  forbidden fallback rates 4400 / 0.75 / 3000 under resources/js and app.
+- Confirmed Edit Account only disables Account Type when transactions exist; name,
+  primary currency, notes, and active remain editable (matches app_spec).
+
+### Verification (this session)
+- Backend: PHPUnit 402 tests / 2622 assertions via /dev/run-tests — OK.
+- Frontend: vitest 64 files / 254 tests via /dev/frontend-tests — OK.
+- Playwright (sequential, via /dev/browser-tests) — all OK:
+  app-footer, transaction-account-filter, edit-account (6), import-upload (5),
+  locale-preference (3), exchange-rates (2), manage-balances-scroll (2),
+  account-actions-layout, style-sweep, removed-github-links, docsify.
+- Note: a concurrent import-upload run earlier failed at login because another suite
+  was migrate-fresh'ing the DB mid-test. Re-ran import-upload alone after seed: 5/5.
+- Puppeteer MCP navigate was blocked by session approval policy (tried 4 times).
+  UI verification used Playwright screenshots instead (verification/style-sweep/).
+- Screenshots refreshed: account-edit-type-locked.png (+ mobile). Visual review:
+  footer clean (no GitHub links), account filter present, type-lock message readable,
+  Manage Balances dialog layout intact.
+
+### Progress
+- 87/87 features passing (unchanged; no feature_list.json edits this session).
+- Definition of done from app_spec remains satisfied.
+
+### Next priority
+- No outstanding app_spec feature. Optional follow-ups only:
+  - Gate /dev/* routes more tightly before any non-local deploy (already APP_ENV=local).
+  - Prefer sequential Playwright runs when using /dev/browser-tests (each run seeds).
