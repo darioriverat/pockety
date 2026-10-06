@@ -1,0 +1,99 @@
+# Pockety — Session Progress (Initializer, Session 1)
+
+## What this project is
+
+Pockety is an existing Laravel + React (TypeScript, Inertia) personal finance app.
+`app_spec.txt` is the **change specification** for the current work: eight change areas on
+top of the already-built application. Behavior not specified there must stay as it is.
+
+Authoritative inputs:
+- `app_spec.txt` — the change spec (source of truth).
+- `feature_list.json` — 87 end-to-end test cases covering every acceptance item, ordered by
+  the spec's implementation order. **Only flip `passes` false → true. Never edit or remove.**
+- `README.md` — project overview and setup.
+- `init.sh` — environment bootstrap.
+- `AGENTS.md` — environment/stack notes.
+
+## Environment
+
+- Local stack: pleets/devbox-station. Container: `web_app`, source mount `/var/www/vhosts`.
+- App URL: http://dev.pockety.com:8080/ (host) / http://host.docker.internal:8080 (from container).
+- **The repo's local `node_modules` are Linux binaries.** Running `npx vitest` / `tsc` on the
+  macOS host fails with a rolldown native binding error. Run all JS tooling inside the container:
+
+```bash
+docker exec -u appuser -w /var/www/vhosts web_app bash -lc "npm run test:unit"
+docker exec -u appuser -w /var/www/vhosts web_app bash -lc "npm run types:check"
+docker exec -u appuser -w /var/www/vhosts web_app bash -lc "npm run build"
+docker exec -u appuser -w /var/www/vhosts web_app bash -lc "php artisan test"
+```
+
+Browser tests (Playwright chromium is installed in the container):
+
+```bash
+docker exec -u appuser -w /var/www/vhosts web_app bash -lc \
+  "PLAYWRIGHT_BASE_URL=http://host.docker.internal:8080 npx playwright test tests/browser/<spec>"
+```
+
+Note: browser helpers call `migrate:fresh --seed`, so running browser specs resets the dev
+database to seeded state.
+
+## Completed this session
+
+1. **Foundation**
+   - Created `feature_list.json`: 87 tests (79 functional, 8 style), 39 with 10+ steps,
+     30 with 2–5 steps, all initially `passes: false`. Ordered by the spec implementation order.
+   - Rewrote `init.sh` for the current stack (docker checks, composer/npm, .env, key, migrate,
+     build, OPENEXCHANGERATES_APP_ID status, command reference).
+   - Rewrote `README.md` (overview, change spec summary, roadmap, setup, testing, exchange rates,
+     docs).
+   - Added project structure placeholders: `docs/` and `resources/js/locales/{en,es}/` (`.gitkeep`).
+   - Committed as `Initial setup: feature_list.json, init.sh, and project structure`.
+
+2. **Spec section 1 — Remove GitHub links from the UI (DONE)**
+   - `resources/js/components/app-footer.tsx`: removed Repository and Documentation anchors and
+     the now-unused `Github`/`BookOpen` imports.
+   - `resources/js/components/app-sidebar.tsx`: removed `footerNavItems` (Repository,
+     Documentation), the `NavFooter` usage/import, and unused icons. No empty section remains.
+     (`nav-footer.tsx` still exists but is now unused — left in place, not deleted.)
+   - `resources/js/components/app-header.tsx`: removed `rightNavItems` (Laravel starter-kit
+     repo/docs), both render blocks (mobile sheet + desktop tools), and unused imports
+     (`Folder`, `BookOpen`, `Tooltip*`, `toUrl`).
+   - Updated `resources/js/components/app-footer.test.tsx` and
+     `tests/browser/app-footer.spec.ts` to assert the hrefs are gone.
+   - Added `tests/browser/removed-github-links.spec.ts` for durable sidebar/header/footer
+     absence coverage.
+   - Feature indices 0–4 flipped to `passes: true` (5/87 passing). Index 5 (visual style)
+     left `false` because screenshots were not captured.
+   - Verification run:
+     - `grep` for all three forbidden URLs in `resources/js`, `app`, `tests`: **0 matches**.
+     - frontend unit suite: **238 passed** (60 files).
+     - `tsc --noEmit`: clean.
+     - `npm run build`: success.
+     - Playwright: app-footer (2) + app-header (2) + removed-github-links (1) all pass.
+   - Committed as `Remove GitHub and starter-kit links from footer, sidebar, and header`.
+
+## Not done (next work)
+
+Next unfinished test in priority order is **index 6 — Spec section 2/3 accordingly**:
+
+- Next up per spec implementation order: **spec section 3, Manage Balances dialog scroll**
+  (feature indices 6–10). The dialog is inline in `resources/js/pages/accounts.tsx`.
+  Apply an ~85vh max height only to this dialog's `DialogContent`, keep title/description/new
+  balance form visible, make the recorded-balances `ul` the scrolling region (`min-h-0`,
+  `overflow-y-auto`). Do not change the shared dialog component defaults.
+- Then: account edit/type lock (indices 11–19), transaction account filter (20–26),
+  import uploads (27–39), locale/i18n (40–52), exchange-rate snapshots (53–72),
+  docsify docs (73–83), final cross-cutting verification (84–86).
+
+## Reminders / hard rules
+
+- Never read `plan/extracted` from application code or tests (out of scope; do not delete it).
+- Import must be multipart uploads only; never resolve a client-supplied path on disk.
+- Do not add currencies other than CAD, USD, COP; do not add import formats beyond the spec.
+- Do not change the shared dialog default classes; only Manage Balances gets the scroll constraint.
+- Exchange rates: store USD-base `cad_per_usd` / `cop_per_usd`; remove the 4400 / 0.75 / 3000
+  fallbacks; use latest.json only.
+- Only new allowed dependency is `react-i18next` (+ its `i18next` peer). Docsify is CDN-only.
+- `feature_list.json` may only have `passes` flipped to `true`; descriptions/steps are immutable.
+- Commit often and leave the environment clean.
