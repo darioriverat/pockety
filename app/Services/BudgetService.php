@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 class BudgetService
 {
     use ResolvesExchangeRate;
+
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
@@ -233,5 +234,4 @@ class BudgetService
     {
         return Budget::query()->forUser($this->owner->id());
     }
-
 }

@@ -771,7 +771,7 @@ HTML;
         $userId = auth()->id();
 
         foreach ($fixtures as $period => $amounts) {
-            $rateDate = Carbon::createFromFormat('Ym', $period)->endOfMonth()->toDateString();
+            $rateDate = Carbon::createFromFormat('Ym', (string) $period)->endOfMonth()->toDateString();
 
             $snapshot = ExchangeRateSnapshot::query()->create([
                 'rate_date' => $rateDate,

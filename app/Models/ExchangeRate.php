@@ -4,13 +4,23 @@ namespace App\Models;
 
 use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\Concerns\BelongsToOwner;
+use Database\Factories\ExchangeRateFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $period
+ * @property int $snapshot_id
+ * @property ExchangeRateSnapshot|null $snapshot
+ */
 class ExchangeRate extends Model
 {
     use BelongsToOwner;
+
+    /** @use HasFactory<ExchangeRateFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -31,6 +41,9 @@ class ExchangeRate extends Model
         'snapshot',
     ];
 
+    /**
+     * @return BelongsTo<ExchangeRateSnapshot, $this>
+     */
     public function snapshot(): BelongsTo
     {
         return $this->belongsTo(ExchangeRateSnapshot::class, 'snapshot_id');

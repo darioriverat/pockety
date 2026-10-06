@@ -93,7 +93,7 @@ class ExchangeRateController extends Controller
             'cad_cop' => 'prohibited',
         ]);
 
-        $snapshot = ExchangeRateSnapshot::query()->findOrFail($validated['snapshot_id']);
+        $snapshot = ExchangeRateSnapshot::query()->findOrFail((int) $validated['snapshot_id']);
 
         $allowed = (
             $snapshot->source === ExchangeRateSnapshot::SOURCE_OPEN_EXCHANGE_RATES

@@ -65,7 +65,7 @@ class TransactionImportService
 
         try {
             $header = fgetcsv($handle);
-            if ($header === false || $header === [null] || $header === []) {
+            if ($header === false || $header === [null]) {
                 throw new \InvalidArgumentException('CSV file is empty or missing a header row');
             }
 
@@ -85,7 +85,7 @@ class TransactionImportService
             $transactions = [];
 
             while (($row = fgetcsv($handle)) !== false) {
-                if ($row === [null] || $row === []) {
+                if ($row === [null]) {
                     continue;
                 }
 

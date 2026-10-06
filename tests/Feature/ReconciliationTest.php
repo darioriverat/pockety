@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\Category;
-use App\Models\ExchangeRate;
 use App\Models\FixedAsset;
 use App\Models\FixedAssetValuation;
 use App\Models\Income;

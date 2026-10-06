@@ -356,3 +356,53 @@ Then final sweep (forbidden strings, dependency check, full suites).
 ### Next priority
 - None for this feature_list. Optional: remove or gate /dev/* routes before production,
   and prefer npx --yes docsify-cli serve docs for human reading of the guides.
+
+
+## Session: 2026-10-06 (verification pass + code-quality fixes)
+
+### Accomplished
+1. **Verified all 87 features still pass** after the prior sessions.
+   - `php artisan test`: 402 passed; `npm run test:unit`: 253 passed; `npx tsc --noEmit` clean.
+   - Browser (container Chromium): removed-github-links + transaction-account-filter (3),
+     edit-account + manage-balances-scroll + locale-preference + import-upload +
+     exchange-rates (18), style-sweep + docsify (2), plus a final
+     import/accounts/exchange regression run (16). All green.
+
+2. **Fixed a real blocker: `composer test` never reached PHPUnit.**
+   - Pint: 22 style issues (unused imports in 12 test files, class-attribute
+     separation/unary spacing in services, stray `};` in `SetLocale`). Auto-fixed.
+   - PHPStan (level 7) reported 28 errors, all from the spec work:
+     `UploadedFile::store()` returns `string|false` in the 3 import controllers;
+     `findOrFail($validated['snapshot_id'])` union in ExchangeRateController;
+     `strtotime()` false in ExchangeRateSnapshotController; missing relation
+     generics/property docblocks on ExchangeRate + ExchangeRateSnapshot; loose
+     array type in AccountImportService; dead `=== []` checks after `fgetcsv`;
+     factory `user_id`/`snapshot_id`; int array key passed to Carbon in a dev route.
+   - Updated the stale baseline (VerifyCsrfToken 26→27; dropped the deleted
+     `ExchangeRateImportService` entry and the now-fixed HasFactory entry).
+   - `composer test` now exits 0: config:clear + Pint + PHPStan + 402 PHPUnit.
+
+3. **Fixed `npm run check` crash on the intentionally-invalid import fixture.**
+   Added `tests/fixtures/**` (plus generated Wayfinder dirs, `public/**`, `.dsh/**`,
+   `docs/**`, `scripts/**`, and root config files) to `vite.config.ts`
+   `lint.ignorePatterns` / `fmt.ignorePatterns`. `vp` no longer tries to parse
+   `tests/fixtures/invalid/broken.json`.
+
+4. **Cleaned the working tree.** Removed 24 untracked one-off session scripts;
+   ignored `/.dsh/` in `.gitignore`.
+
+### Known pre-existing debt (not introduced here)
+- `npm run check` still fails on global formatting drift (178 files exceed the
+  configured 80-col `fmt.printWidth`, from the starter kit) and 74 type-aware lint
+  warnings in `tests/browser/*`. `composer test`, `npm run test:unit`, and tsc are
+  the project's documented gates and are all green; a mass reformat was deliberately
+  avoided to keep the diff reviewable.
+
+### Progress
+- **87/87 features passing** (unchanged — no feature flags were touched).
+- Verification: all documented test gates pass.
+
+### Next priority
+- Optional: run `npx vp check --fix` on a dedicated branch to clear the 178-file
+  formatting drift, then address the 74 test lint warnings.
+- Optional: gate the `/dev/*` routes (already limited to `APP_ENV=local`) before production.

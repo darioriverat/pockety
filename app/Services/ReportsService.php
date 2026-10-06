@@ -12,6 +12,7 @@ use Carbon\Carbon;
 class ReportsService
 {
     use ResolvesExchangeRate;
+
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}

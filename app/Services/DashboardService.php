@@ -15,6 +15,7 @@ use Carbon\Carbon;
 class DashboardService
 {
     use ResolvesExchangeRate;
+
     public function __construct(
         private ReconciliationService $reconciliationService,
         private readonly OwnerResolverInterface $owner,

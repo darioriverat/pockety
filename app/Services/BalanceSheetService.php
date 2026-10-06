@@ -13,6 +13,7 @@ use App\Services\Concerns\ResolvesExchangeRate;
 class BalanceSheetService
 {
     use ResolvesExchangeRate;
+
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}
@@ -290,5 +291,4 @@ class BalanceSheetService
 
         return 0.0;
     }
-
 }

@@ -14,6 +14,7 @@ use App\Services\Concerns\ResolvesExchangeRate;
 class CategoryActualsService implements CategoryActualsServiceInterface
 {
     use ResolvesExchangeRate;
+
     public function __construct(
         private readonly OwnerResolverInterface $owner,
     ) {}

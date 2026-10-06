@@ -45,7 +45,7 @@ class ExchangeRateSnapshotController extends Controller
             $year = (int) substr($validated['period'], 0, 4);
             $month = (int) substr($validated['period'], 4, 2);
             $from = sprintf('%04d-%02d-01', $year, $month);
-            $to = date('Y-m-t', strtotime($from));
+            $to = date('Y-m-t', (int) strtotime($from));
             $query->whereDate('rate_date', '>=', $from)
                 ->whereDate('rate_date', '<=', $to);
         } else {

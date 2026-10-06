@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

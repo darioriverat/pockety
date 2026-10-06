@@ -132,7 +132,6 @@ class BalanceSheetImportService
         }
     }
 
-
     /**
      * @return array{
      *     total: int,

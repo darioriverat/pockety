@@ -13,6 +13,7 @@ use App\Services\Concerns\ResolvesExchangeRate;
 class ReconciliationService
 {
     use ResolvesExchangeRate;
+
     /**
      * Acceptable rounding tolerance (in currency units) for considering a variance "balanced".
      */

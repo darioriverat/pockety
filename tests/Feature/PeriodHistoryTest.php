@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
-use App\Models\ExchangeRate;
 use App\Models\Income;
 use App\Models\Transaction;
 use App\Models\User;

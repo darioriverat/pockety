@@ -33,6 +33,11 @@ class BalanceSheetImportController extends Controller
         /** @var UploadedFile $uploaded */
         $uploaded = $request->file('file');
         $storedPath = $uploaded->store('tmp/imports');
+
+        if ($storedPath === false) {
+            throw new \RuntimeException('Failed to store the uploaded file.');
+        }
+
         $absolutePath = Storage::path($storedPath);
 
         try {

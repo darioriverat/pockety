@@ -2,13 +2,24 @@
 
 namespace App\Models;
 
+use Database\Factories\ExchangeRateSnapshotFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property Carbon $rate_date
+ * @property string $source
+ * @property int|null $user_id
+ * @property string $cad_per_usd
+ * @property string $cop_per_usd
+ */
 class ExchangeRateSnapshot extends Model
 {
+    /** @use HasFactory<ExchangeRateSnapshotFactory> */
     use HasFactory;
 
     public const SOURCE_OPEN_EXCHANGE_RATES = 'openexchangerates';
@@ -29,11 +40,17 @@ class ExchangeRateSnapshot extends Model
         'cop_per_usd' => 'decimal:8',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany<ExchangeRate, $this>
+     */
     public function exchangeRates(): HasMany
     {
         return $this->hasMany(ExchangeRate::class, 'snapshot_id');

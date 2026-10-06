@@ -233,8 +233,11 @@ class AccountImportService
             throw new \InvalidArgumentException('Month sheet must include sections.Cuentas.items');
         }
 
+        /** @var list<array<string, mixed>> $cuentasItems */
+        $cuentasItems = $sections['Cuentas']['items'];
+
         $this->collectSectionItems(
-            $sections['Cuentas']['items'],
+            $cuentasItems,
             'bank',
             $period,
             $catalog,

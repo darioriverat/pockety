@@ -8,13 +8,14 @@ use App\Domain\Services\Contracts\IncomeServiceInterface;
 use App\Domain\Services\Contracts\OwnerResolverInterface;
 use App\Models\ExchangeRate;
 use App\Models\Income;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\Concerns\ResolvesExchangeRate;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 
 class IncomeService implements IncomeServiceInterface
 {
     use ResolvesExchangeRate;
+
     public const MAX_LINES_PER_PERIOD = 6;
 
     public function __construct(

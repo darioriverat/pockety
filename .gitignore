@@ -34,3 +34,4 @@ Thumbs.db
 set-test-password.php
 .last-run.json
 test-results/
+/.dsh/

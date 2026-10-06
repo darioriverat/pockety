@@ -39,6 +39,11 @@ class AccountImportController extends Controller
         try {
             foreach ($uploads as $uploaded) {
                 $storedPath = $uploaded->store('tmp/imports');
+
+                if ($storedPath === false) {
+                    throw new \RuntimeException('Failed to store an uploaded file.');
+                }
+
                 $storedPaths[] = $storedPath;
                 $absolutePaths[] = Storage::path($storedPath);
             }

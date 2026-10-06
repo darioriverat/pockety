@@ -12,6 +12,7 @@ use App\Services\Concerns\ResolvesExchangeRate;
 class FinancialSummaryService
 {
     use ResolvesExchangeRate;
+
     public const DEPRECIATION_CATEGORY_CODE = 'C045';
 
     public const DEBT_PAYMENT_CATEGORY_CODES = [
