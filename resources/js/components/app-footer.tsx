@@ -1,7 +1,9 @@
 import { usePage } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 
 export function AppFooter() {
     const { name, version } = usePage().props;
+    const { t } = useTranslation();
     const currentYear = new Date().getFullYear();
 
     return (
@@ -14,7 +16,7 @@ export function AppFooter() {
                             {name} <span className="font-normal">v{version}</span>
                         </p>
                         <p className="mt-1">
-                            © {currentYear} All rights reserved
+                            © {currentYear} {t('footer.rights')}
                         </p>
                     </div>
                 </div>

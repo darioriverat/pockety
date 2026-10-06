@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -63,6 +64,8 @@ function formatCad(value: number | null | undefined): string {
 }
 
 export default function Budgets() {
+    const { t } = useTranslation();
+
     const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
@@ -195,12 +198,12 @@ export default function Budgets() {
 
     return (
         <>
-            <Head title="Budgets" />
+            <Head title={t('pages.budgets.title')} />
 
             <PageContainer>
                     <div className="mb-8">
                         <PageTitle
-                            title="Budgets"
+                            title={t('pages.budgets.title')}
                             description="Set monthly category budgets and compare against actual spending (CAD equivalent)"
                         />
                     </div>
@@ -559,6 +562,7 @@ Budgets.layout = {
     breadcrumbs: [
         {
             title: 'Budgets',
+            titleKey: 'nav.budgets',
             href: '/budgets',
         },
     ],

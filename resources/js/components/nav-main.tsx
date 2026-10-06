@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -12,32 +13,39 @@ import type { NavItem } from '@/types';
 
 export function NavMain({ items }: { items: NavItem[] }) {
     const { isCurrentUrl } = useCurrentUrl();
+    const { t } = useTranslation();
 
     return (
         <SidebarGroup className="px-2 py-0" data-testid="main-navigation">
-            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('nav.label')}</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton
-                            asChild
-                            isActive={isCurrentUrl(item.href)}
-                            tooltip={{ children: item.title }}
-                            className="data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium"
-                        >
-                            <Link
-                                href={item.href}
-                                prefetch
-                                data-testid={`nav-link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
+                {items.map((item) => {
+                    const label = item.titleKey
+                        ? t(item.titleKey)
+                        : item.title;
+
+                    return (
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={isCurrentUrl(item.href)}
+                                tooltip={{ children: label }}
+                                className="data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium"
                             >
-                                {item.icon ? (
-                                    <Icon iconNode={item.icon} size="md" />
-                                ) : null}
-                                <span>{item.title}</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
+                                <Link
+                                    href={item.href}
+                                    prefetch
+                                    data-testid={`nav-link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
+                                >
+                                    {item.icon ? (
+                                        <Icon iconNode={item.icon} size="md" />
+                                    ) : null}
+                                    <span>{label}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    );
+                })}
             </SidebarMenu>
         </SidebarGroup>
     );

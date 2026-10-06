@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo } from 'react';
 import {
     Card,
@@ -53,7 +54,11 @@ function readQueryParam(key: string): string | null {
     return new URLSearchParams(window.location.search).get(key);
 }
 
-export default function ReportsYtd({ ytd_totals, available_years }: ReportsYtdPageProps) {
+export default function ReportsYtd({
+    ytd_totals,
+    available_years,
+}: ReportsYtdPageProps) {
+    const { t } = useTranslation();
     const currentYear = useMemo(() => {
         const queryYear = readQueryParam('year');
         return queryYear ? parseInt(queryYear) : ytd_totals.year;
@@ -72,12 +77,12 @@ export default function ReportsYtd({ ytd_totals, available_years }: ReportsYtdPa
 
     return (
         <>
-            <Head title="Year-to-Date Reports" />
+            <Head title={t('pages.reports.title')} />
 
             <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
-                            title="Year-to-Date Reports"
+                            title={t('pages.reports.title')}
                             description="View year-to-date totals for income and expenses"
                             data-testid="reports-ytd-heading"
                         />
@@ -210,6 +215,7 @@ ReportsYtd.layout = {
     breadcrumbs: [
         {
             title: 'Home',
+            titleKey: 'nav.reports',
             href: '/dashboard',
         },
         {

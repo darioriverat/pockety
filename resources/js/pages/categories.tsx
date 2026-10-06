@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -73,6 +74,8 @@ function extractErrorMessage(errorData: {
 }
 
 export default function Categories() {
+    const { t } = useTranslation();
+
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -277,11 +280,11 @@ export default function Categories() {
 
     return (
         <>
-            <Head title="Categories" />
+            <Head title={t('pages.categories.title')} />
             <PageContainer className="overflow-x-auto">
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                     <PageTitle
-                        title="Categories"
+                        title={t('pages.categories.title')}
                         description="Manage expense, debt, and income categories, including retired categories"
                     />
                     <Button
@@ -732,6 +735,7 @@ Categories.layout = {
     breadcrumbs: [
         {
             title: 'Categories',
+            titleKey: 'nav.categories',
             href: '/categories',
         },
     ],

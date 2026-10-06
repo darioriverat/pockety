@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -168,6 +169,8 @@ interface FilterState {
 }
 
 export default function Transactions() {
+    const { t } = useTranslation();
+
     const { period, setPeriod } = usePeriod();
     const periods = useSelectablePeriods();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -870,14 +873,14 @@ export default function Transactions() {
 
     return (
         <>
-            <Head title="Transactions" />
+            <Head title={t('pages.transactions.title')} />
             <PageContainer
                 className="overflow-x-auto"
                 data-testid="transactions-page"
             >
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
                     <PageTitle
-                        title="Transactions"
+                        title={t('pages.transactions.title')}
                         description="Manage your expense transactions"
                         data-testid="transactions-heading"
                     />
@@ -1666,7 +1669,9 @@ export default function Transactions() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="filter-account">Account</Label>
+                                <Label htmlFor="filter-account">
+                                    {t('pages.transactions.accountFilter')}
+                                </Label>
                                 <Select
                                     value={filters.account_id || 'all'}
                                     onValueChange={(value) =>
@@ -1681,11 +1686,15 @@ export default function Transactions() {
                                         id="filter-account"
                                         data-testid="filter-account"
                                     >
-                                        <SelectValue placeholder="All Accounts" />
+                                        <SelectValue
+                                            placeholder={t(
+                                                'pages.transactions.allAccounts',
+                                            )}
+                                        />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">
-                                            All Accounts
+                                            {t('pages.transactions.allAccounts')}
                                         </SelectItem>
                                         {accounts.map((account) => (
                                             <SelectItem
@@ -2263,6 +2272,7 @@ Transactions.layout = {
     breadcrumbs: [
         {
             title: 'Transactions',
+            titleKey: 'nav.transactions',
             href: '/transactions',
         },
     ],

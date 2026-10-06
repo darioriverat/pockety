@@ -4,6 +4,7 @@ import { formatCurrencyAmount } from '@/lib/currency';
 import { formatPeriod } from '@/lib/periods';
 import { cn } from '@/lib/utils';
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -73,6 +74,8 @@ const formatPeriodLabel = (period: string): string => {
 };
 
 export default function Income() {
+    const { t } = useTranslation();
+
     const { period, setPeriod } = usePeriod();
     const selectablePeriods = useSelectablePeriods();
     const [periodInput, setPeriodInput] = useState(period);
@@ -229,12 +232,12 @@ export default function Income() {
 
     return (
         <>
-            <Head title="Income" />
+            <Head title={t('pages.income.title')} />
 
             <PageContainer>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <PageTitle
-                        title="Income"
+                        title={t('pages.income.title')}
                         description={`Track up to ${maxLines} free-text income lines per month across CAD, USD, and COP.`}
                     />
 
@@ -593,6 +596,7 @@ Income.layout = {
     breadcrumbs: [
         {
             title: 'Income',
+            titleKey: 'nav.income',
             href: '/income',
         },
     ],

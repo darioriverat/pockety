@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { FormEvent, useEffect, useState } from 'react';
 import {
     Card,
@@ -87,6 +88,8 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function AccountDetail() {
+    const { t } = useTranslation();
+
     // Extract account ID from URL path
     const pathParts = window.location.pathname.split('/');
     const accountId = parseInt(pathParts[pathParts.length - 1]);
@@ -191,7 +194,7 @@ export default function AccountDetail() {
     if (error) {
         return (
             <>
-                <Head title="Account Details" />
+                <Head title={t('pages.accountDetail.title')} />
                 <PageContainer className="overflow-x-auto">
                     <Card className="border-destructive">
                         <CardHeader>
@@ -506,6 +509,7 @@ AccountDetail.layout = {
     breadcrumbs: [
         {
             title: 'Home',
+            titleKey: 'pages.accountDetail.title',
             href: '/dashboard',
         },
         {

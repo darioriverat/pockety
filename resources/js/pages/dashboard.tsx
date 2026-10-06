@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import TextLink from '@/components/text-link';
 import { dashboard } from '@/routes';
@@ -874,6 +875,7 @@ function RecentActivityWidget({ data }: { data: RecentActivity }) {
 }
 
 export default function Dashboard({
+
     summary,
     income_expense_chart,
     assets_liabilities_chart,
@@ -883,6 +885,7 @@ export default function Dashboard({
     display_currency,
     available_currencies = ['CAD', 'USD', 'COP'],
 }: DashboardProps) {
+    const { t } = useTranslation();
     const initialCurrency: DisplayCurrency = isDisplayCurrency(
         display_currency ?? default_currency,
     )
@@ -904,12 +907,12 @@ export default function Dashboard({
 
     return (
         <>
-            <Head title="Dashboard" />
+            <Head title={t('pages.dashboard.title')} />
             <PageContainer data-testid="dashboard-page">
                 {/* Period Header */}
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <PageTitle
-                        title="Dashboard"
+                        title={t('pages.dashboard.title')}
                         description={`Financial overview for ${formatPeriod(summary.period)}`}
                     />
                     <div className="flex flex-wrap items-center gap-3">
@@ -1231,6 +1234,7 @@ Dashboard.layout = {
     breadcrumbs: [
         {
             title: 'Dashboard',
+            titleKey: 'nav.dashboard',
             href: dashboard(),
         },
     ],

@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import {
     Card,
@@ -95,6 +96,8 @@ function apiErrorMessage(data: unknown, fallback: string): string {
 }
 
 export default function Import() {
+    const { t } = useTranslation();
+
     const [importing, setImporting] = useState(false);
     const [result, setResult] = useState<ImportResult | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -353,17 +356,17 @@ export default function Import() {
 
     return (
         <>
-            <Head title="Import Historical Data" />
+            <Head title={t('pages.import.title')} />
 
             <PageContainer>
                 <PageTitle
-                    title="Import Historical Data"
+                    title={t('pages.import.title')}
                     description="Upload your own transaction, account, and balance sheet files"
                 />
 
                 <Card data-testid="transaction-import-card">
                     <CardHeader>
-                        <CardTitle>Transactions</CardTitle>
+                        <CardTitle>{t('pages.import.transactions')}</CardTitle>
                         <CardDescription>
                             Upload one .json or .csv file. JSON rows use fecha,
                             periodo, concepto_code, nested cad/usd/cop values, and
@@ -514,7 +517,7 @@ export default function Import() {
 
                 <Card data-testid="account-import-card">
                     <CardHeader>
-                        <CardTitle>Accounts</CardTitle>
+                        <CardTitle>{t('pages.import.accounts')}</CardTitle>
                         <CardDescription>
                             Upload one or more month-sheet .json files. Each file
                             needs header.period.value and
@@ -662,7 +665,7 @@ export default function Import() {
 
                 <Card data-testid="balance-sheet-import-card">
                     <CardHeader>
-                        <CardTitle>Balance Sheet</CardTitle>
+                        <CardTitle>{t('pages.import.balanceSheet')}</CardTitle>
                         <CardDescription>
                             Upload one .json file containing an array of period
                             rows with periodo, activo_value, pasivo_value, and
@@ -946,6 +949,7 @@ Import.layout = {
     breadcrumbs: [
         {
             title: 'Import',
+            titleKey: 'nav.import',
             href: '/import',
         },
     ],

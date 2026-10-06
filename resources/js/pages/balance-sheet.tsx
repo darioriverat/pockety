@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -94,6 +95,8 @@ function typeLabel(type: string): string {
 }
 
 export default function BalanceSheet() {
+    const { t } = useTranslation();
+
     const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
@@ -138,12 +141,12 @@ export default function BalanceSheet() {
 
     return (
         <>
-            <Head title="Balance Sheet" />
+            <Head title={t('pages.balanceSheet.title')} />
 
             <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
-                            title="Balance Sheet"
+                            title={t('pages.balanceSheet.title')}
                             description="Assets, Liabilities, and Equity for the selected period — shown in CAD with USD and COP equivalents"
                         />
                         <div className="flex w-full max-w-md flex-col gap-3 sm:items-end">
@@ -596,6 +599,7 @@ BalanceSheet.layout = {
     breadcrumbs: [
         {
             title: 'Balance Sheet',
+            titleKey: 'nav.balanceSheet',
             href: '/balance-sheet',
         },
     ],

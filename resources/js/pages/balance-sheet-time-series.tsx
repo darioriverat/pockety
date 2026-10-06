@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import {
     Card,
@@ -223,6 +224,8 @@ function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
 }
 
 export default function BalanceSheetTimeSeries() {
+    const { t } = useTranslation();
+
     const [series, setSeries] = useState<TimeSeriesData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -272,12 +275,12 @@ export default function BalanceSheetTimeSeries() {
 
     return (
         <>
-            <Head title="Balance Sheet Time Series" />
+            <Head title={t('pages.bsTimeSeries.title')} />
 
             <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
-                            title="Balance Sheet Time Series"
+                            title={t('pages.bsTimeSeries.title')}
                             description="Historical Assets, Liabilities, and Equity from January 2025 through September 2026 (Estado Financiero)"
                         />
                         <Button variant="outline" asChild>
@@ -524,6 +527,7 @@ BalanceSheetTimeSeries.layout = {
     breadcrumbs: [
         {
             title: 'Home',
+            titleKey: 'nav.bsTimeSeries',
             href: '/dashboard',
         },
         {

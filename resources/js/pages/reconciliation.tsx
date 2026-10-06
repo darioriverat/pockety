@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import {
     Card,
@@ -187,6 +188,8 @@ const getVarianceSummary = (account: AccountReconciliation): string => {
 };
 
 export default function Reconciliation() {
+    const { t } = useTranslation();
+
     const { period: sharedPeriod } = usePeriod();
     const [period, setPeriod] = useState<string>(sharedPeriod);
     const [report, setReport] = useState<ReconciliationReport | null>(null);
@@ -366,11 +369,11 @@ export default function Reconciliation() {
 
     return (
         <>
-            <Head title="Reconciliation" />
+            <Head title={t('pages.reconciliation.title')} />
             <PageContainer className="overflow-x-auto">
                 <div className="mb-2 flex items-center justify-between">
                     <PageTitle
-                        title="Reconciliation"
+                        title={t('pages.reconciliation.title')}
                         description="Compare recorded vs. computed balances for every account, per period"
                         leading={
                             <ScaleIcon className="size-7 shrink-0 fill-none" />
@@ -976,6 +979,7 @@ Reconciliation.layout = {
     breadcrumbs: [
         {
             title: 'Reconciliation',
+            titleKey: 'nav.reconciliation',
             href: '/reconciliation',
         },
     ],

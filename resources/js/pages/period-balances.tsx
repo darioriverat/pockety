@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -146,6 +147,8 @@ function FigureGrid({
 }
 
 export default function PeriodBalances() {
+    const { t } = useTranslation();
+
     const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
@@ -252,12 +255,12 @@ export default function PeriodBalances() {
 
     return (
         <>
-            <Head title="Period Balances" />
+            <Head title={t('pages.periodBalances.title')} />
 
             <PageContainer>
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <PageTitle
-                        title="Period Balances"
+                        title={t('pages.periodBalances.title')}
                         description="Register the month-end balance from reconciliation figures after you have verified the records"
                         leading={<BookMarked />}
                         data-testid="period-balances-heading"
@@ -580,6 +583,7 @@ PeriodBalances.layout = {
     breadcrumbs: [
         {
             title: 'Period Balances',
+            titleKey: 'nav.periodBalances',
             href: '/period-balances',
         },
     ],

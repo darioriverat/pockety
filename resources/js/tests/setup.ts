@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom/vitest';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import i18n from '@/lib/i18n';
+
+// Ensure unit tests start from English and the i18n singleton is initialized.
+void i18n.changeLanguage('en');
 
 afterEach(async () => {
     cleanup();

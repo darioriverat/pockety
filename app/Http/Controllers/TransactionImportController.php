@@ -22,7 +22,7 @@ class TransactionImportController extends Controller
     {
         if ($request->has('file_path') || $request->has('directory')) {
             throw ValidationException::withMessages([
-                'file' => 'File path and directory imports are not supported. Upload a file instead.',
+                'file' => __('File path and directory imports are not supported. Upload a file instead.'),
             ]);
         }
 

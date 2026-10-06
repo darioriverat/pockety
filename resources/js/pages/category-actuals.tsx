@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react';
 import {
     Card,
@@ -50,6 +51,8 @@ function formatCad(value: number): string {
 }
 
 export default function CategoryActuals() {
+    const { t } = useTranslation();
+
     const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
@@ -93,12 +96,12 @@ export default function CategoryActuals() {
 
     return (
         <>
-            <Head title="Category Actuals" />
+            <Head title={t('pages.categoryActuals.title')} />
 
             <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
-                            title="Category Actuals"
+                            title={t('pages.categoryActuals.title')}
                             description="Actual spending by category for the selected period, aggregated from the transaction ledger"
                             data-testid="category-actuals-heading"
                         />
@@ -302,6 +305,7 @@ CategoryActuals.layout = {
     breadcrumbs: [
         {
             title: 'Category Actuals',
+            titleKey: 'nav.categoryActuals',
             href: '/category-actuals',
         },
     ],

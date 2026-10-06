@@ -600,7 +600,7 @@
       "Step 4: Assert every existing user now has locale en",
       "Step 5: Create a new user without specifying a locale and assert the stored locale is en"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -614,7 +614,7 @@
       "Step 6: POST an empty locale and assert a validation error",
       "Step 7: Run the feature test that rejects a locale other than en or es"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -625,7 +625,7 @@
       "Step 3: Assert auth.user.default_currency is still present next to it",
       "Step 4: Change the locale in preferences and verify the shared prop updates after the redirect"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -642,7 +642,7 @@
       "Step 9: Assert no other locale values are offered",
       "Step 10: Assert the available currencies remain CAD, USD, and COP only"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -661,7 +661,7 @@
       "Step 11: Verify no manual reload beyond Inertia's normal redirect was needed",
       "Step 12: Confirm user-entered data such as account and category names is not translated"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -674,7 +674,7 @@
       "Step 5: Verify document.documentElement.lang is en",
       "Step 6: Reload and verify the UI stays English"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -697,7 +697,7 @@
       "Step 15: Verify the login, register, password, and two-factor auth screens are Spanish",
       "Step 16: Switch back to en and spot-check several of the same pages in English"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -708,7 +708,7 @@
       "Step 3: Change back to en and assert it becomes en",
       "Step 4: Assert no other value is ever set"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -720,7 +720,7 @@
       "Step 4: Assert the raw translation key is not displayed",
       "Step 5: Assert i18n does not fall back to a different language than en"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -733,7 +733,7 @@
       "Step 5: Switch the UI back to English and assert they are still exactly as stored",
       "Step 6: Confirm no code path calls t() with user data as the key"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -747,7 +747,7 @@
       "Step 6: Assert English is used when a user has no explicit locale",
       "Step 7: Confirm the middleware applies to both web and API authenticated requests"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -759,7 +759,7 @@
       "Step 4: Trigger an import validation 422 and assert the message is Spanish",
       "Step 5: Confirm the entire Laravel framework was not hand-translated and English remains the fallback"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -776,7 +776,7 @@
       "Step 9: Verify the language and currency selects are aligned side by side",
       "Step 10: Resize to mobile and verify no horizontal scrolling is introduced by Spanish text"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

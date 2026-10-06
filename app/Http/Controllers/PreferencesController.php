@@ -17,6 +17,10 @@ class PreferencesController extends Controller
         return Inertia::render('preferences', [
             'user' => auth()->user(),
             'available_currencies' => ['CAD', 'USD', 'COP'],
+            'available_locales' => [
+                ['value' => 'en', 'label' => 'English'],
+                ['value' => 'es', 'label' => 'Spanish'],
+            ],
         ]);
     }
 
@@ -27,11 +31,12 @@ class PreferencesController extends Controller
     {
         $validated = $request->validate([
             'default_currency' => 'required|in:CAD,USD,COP',
+            'locale' => 'required|in:en,es',
         ]);
 
         $request->user()->update($validated);
 
         return redirect()->route('preferences.index')
-            ->with('success', 'Preferences updated successfully');
+            ->with('success', __('Preferences updated successfully'));
     }
 }

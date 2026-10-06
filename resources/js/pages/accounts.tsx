@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -96,6 +97,8 @@ const formatCurrency = (value: number, currency: string): string =>
     formatCurrencyAmount(value, currency);
 
 export default function Accounts() {
+    const { t } = useTranslation();
+
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -456,7 +459,7 @@ export default function Accounts() {
                         onClick={() => openBalanceDialog(account)}
                     >
                         <Wallet className="size-4 shrink-0 fill-none" />
-                        Manage Balances
+                        {t('pages.accounts.manageBalances')}
                     </Button>
                 </div>
             </CardContent>
@@ -470,11 +473,11 @@ export default function Accounts() {
 
     return (
         <>
-            <Head title="Accounts" />
+            <Head title={t('pages.accounts.title')} />
             <PageContainer className="overflow-x-auto">
                 <div className="mb-4 flex items-center justify-between">
                     <PageTitle
-                        title="Accounts"
+                        title={t('pages.accounts.title')}
                         description="Manage your bank accounts, investments, and liabilities"
                     />
                     <Dialog
@@ -638,13 +641,14 @@ export default function Accounts() {
                     <DialogContent className="max-w-md">
                         <form onSubmit={handleEditSubmit}>
                             <DialogHeader>
-                                <DialogTitle>Edit Account</DialogTitle>
+                                <DialogTitle>
+                                    {t('pages.accounts.edit')}
+                                </DialogTitle>
                                 <DialogDescription>
                                     Update account details.
                                     {accountHasTransactions && (
                                         <span className="mt-2 block text-amber-600 dark:text-amber-400">
-                                            The account type cannot be changed because
-                                            transactions are registered for this account.
+                                            {t('pages.accounts.typeLocked')}
                                         </span>
                                     )}
                                 </DialogDescription>
@@ -870,7 +874,7 @@ export default function Accounts() {
                     <DialogContent className="flex max-h-[85vh] max-w-lg flex-col overflow-hidden">
                         <DialogHeader className="shrink-0">
                             <DialogTitle>
-                                Manage Balances
+                                {t('pages.accounts.manageBalances')}
                                 {balanceDialogAccount
                                     ? ` — ${balanceDialogAccount.name}`
                                     : ''}
@@ -1076,6 +1080,7 @@ Accounts.layout = {
     breadcrumbs: [
         {
             title: 'Accounts',
+            titleKey: 'nav.accounts',
             href: '/accounts',
         },
     ],

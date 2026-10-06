@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import {
     Card,
@@ -66,6 +67,8 @@ interface ExchangeRateStatistics {
 }
 
 export default function ExchangeRates() {
+    const { t } = useTranslation();
+
     const [rates, setRates] = useState<ExchangeRate[]>([]);
     const [loading, setLoading] = useState(true);
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
@@ -261,12 +264,12 @@ export default function ExchangeRates() {
 
     return (
         <>
-            <Head title="Exchange Rates" />
+            <Head title={t('pages.exchangeRates.title')} />
 
             <PageContainer>
                     <div className="mb-8">
                         <PageTitle
-                            title="Exchange Rates"
+                            title={t('pages.exchangeRates.title')}
                             description="Manage three independent exchange rate series: USD/COP, USD/CAD, and CAD/COP (COP per 1 CAD)"
                         />
                     </div>
@@ -544,6 +547,7 @@ ExchangeRates.layout = {
     breadcrumbs: [
         {
             title: 'Exchange Rates',
+            titleKey: 'nav.exchangeRates',
             href: '/exchange-rates',
         },
     ],

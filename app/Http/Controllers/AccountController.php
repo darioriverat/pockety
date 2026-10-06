@@ -170,7 +170,7 @@ class AccountController extends Controller
                     return response()->json([
                         'error' => 'Validation failed',
                         'messages' => [
-                            'type' => ['The account type cannot be changed because transactions are registered for this account.'],
+                            'type' => [__('The account type cannot be changed because transactions are registered for this account.')],
                         ],
                     ], 422);
                 }

@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -34,6 +35,8 @@ function formatCad(value: number): string {
 }
 
 export default function PeriodsHistory() {
+    const { t } = useTranslation();
+
     const [history, setHistory] = useState<PeriodHistoryData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -67,12 +70,12 @@ export default function PeriodsHistory() {
 
     return (
         <>
-            <Head title="Periods History" />
+            <Head title={t('pages.periods.title')} />
 
             <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
-                            title="Periods History"
+                            title={t('pages.periods.title')}
                             description="Summary stats for every month from January 2025 through September 2026"
                             data-testid="periods-history-heading"
                         />
@@ -260,6 +263,7 @@ PeriodsHistory.layout = {
     breadcrumbs: [
         {
             title: 'Periods History',
+            titleKey: 'nav.periods',
             href: '/periods/history',
         },
     ],

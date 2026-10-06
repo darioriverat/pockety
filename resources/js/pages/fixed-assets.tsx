@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -82,6 +83,8 @@ const formatPeriod = (period: string): string => {
 };
 
 export default function FixedAssets() {
+    const { t } = useTranslation();
+
     const [assets, setAssets] = useState<FixedAsset[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -252,12 +255,12 @@ export default function FixedAssets() {
 
     return (
         <>
-            <Head title="Fixed Assets" />
+            <Head title={t('pages.fixedAssets.title')} />
 
             <PageContainer>
                 <div className="flex items-center justify-between">
                     <PageTitle
-                        title="Fixed Assets"
+                        title={t('pages.fixedAssets.title')}
                         description="Manage fixed assets and their book values per period"
                     />
 
@@ -632,6 +635,7 @@ FixedAssets.layout = {
     breadcrumbs: [
         {
             title: 'Fixed Assets',
+            titleKey: 'nav.fixedAssets',
             href: '/fixed-assets',
         },
     ],

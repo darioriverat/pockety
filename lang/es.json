@@ -1,0 +1,8 @@
+{
+    "Preferences updated successfully": "Preferencias actualizadas correctamente",
+    "The account type cannot be changed because transactions are registered for this account.": "No se puede cambiar el tipo de cuenta porque hay transacciones registradas para esta cuenta.",
+    "Profile updated.": "Perfil actualizado.",
+    "Password updated.": "Contraseña actualizada.",
+    "File path and directory imports are not supported. Upload a file instead.": "No se admiten importaciones por ruta o directorio. Sube un archivo.",
+    "File path and directory imports are not supported. Upload month-sheet files instead.": "No se admiten importaciones por ruta o directorio. Sube archivos de hoja mensual."
+}

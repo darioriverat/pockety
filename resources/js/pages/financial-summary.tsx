@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
     Card,
@@ -78,6 +79,8 @@ function formatCad(value: number | null | undefined): string {
 }
 
 export default function FinancialSummary() {
+    const { t } = useTranslation();
+
     const periods = useSelectablePeriods();
     const { period: selectedPeriod, setPeriod: setSelectedPeriod } =
         usePeriod();
@@ -129,12 +132,12 @@ export default function FinancialSummary() {
 
     return (
         <>
-            <Head title="Financial Summary" />
+            <Head title={t('pages.financialSummary.title')} />
 
             <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
-                            title="Financial Summary"
+                            title={t('pages.financialSummary.title')}
                             description="Income statement for the selected period — income, Total Recorded Disbursements (Gasto Total), Net Operating Expenses (Gasto Real), and net"
                         />
                         <div className="flex w-full max-w-md flex-col gap-3 sm:items-end">
@@ -624,6 +627,7 @@ FinancialSummary.layout = {
     breadcrumbs: [
         {
             title: 'Financial Summary',
+            titleKey: 'nav.financialSummary',
             href: '/financial-summary',
         },
     ],

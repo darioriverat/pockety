@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { FormEvent, useEffect, useState } from 'react';
 import {
     Card,
@@ -90,6 +91,8 @@ const formatPeriod = (period: string): string => {
 };
 
 export default function CategoryDetail() {
+    const { t } = useTranslation();
+
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     const categoryCode = pathParts[pathParts.length - 1] ?? '';
 
@@ -168,7 +171,7 @@ export default function CategoryDetail() {
     if (error) {
         return (
             <>
-                <Head title="Category Details" />
+                <Head title={t('pages.categories.title')} />
                 <PageContainer className="overflow-x-auto">
                     <Card className="border-destructive">
                         <CardHeader>
@@ -455,6 +458,7 @@ CategoryDetail.layout = {
     breadcrumbs: [
         {
             title: 'Home',
+            titleKey: 'pages.categories.title',
             href: '/dashboard',
         },
         {

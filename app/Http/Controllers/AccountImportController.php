@@ -22,7 +22,7 @@ class AccountImportController extends Controller
     {
         if ($request->has('file_path') || $request->has('directory')) {
             throw ValidationException::withMessages([
-                'files' => 'File path and directory imports are not supported. Upload month-sheet files instead.',
+                'files' => __('File path and directory imports are not supported. Upload month-sheet files instead.'),
             ]);
         }
 

@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react';
 import {
     Card,
@@ -98,6 +99,8 @@ function readQueryParam(key: string): string | null {
 }
 
 export default function PeriodComparison() {
+    const { t } = useTranslation();
+
     const periods = useSelectablePeriods();
     const [periodA, setPeriodA] = useState(
         () => readQueryParam('period_a') ?? '202501',
@@ -168,12 +171,12 @@ export default function PeriodComparison() {
 
     return (
         <>
-            <Head title="Period Comparison" />
+            <Head title={t('pages.comparePeriods.title')} />
 
             <PageContainer>
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <PageTitle
-                            title="Period Comparison"
+                            title={t('pages.comparePeriods.title')}
                             description="Compare income, expenses, and balances for two periods side-by-side"
                             data-testid="period-comparison-heading"
                         />
@@ -541,6 +544,7 @@ PeriodComparison.layout = {
     breadcrumbs: [
         {
             title: 'Period Comparison',
+            titleKey: 'nav.comparePeriods',
             href: '/periods/compare',
         },
     ],
