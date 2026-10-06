@@ -9,7 +9,7 @@ trait ResolvesExchangeRate
     /**
      * Resolve the owner's assigned rate for a period.
      * Returns null when no assignment exists or the linked snapshot is missing.
-     * Does not invent fallback quotes (4400 / 0.75 / 3000).
+     * Does not invent fallback quotes when no period assignment exists.
      */
     private function resolveExchangeRate(string $period): ?ExchangeRate
     {

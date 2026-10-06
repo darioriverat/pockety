@@ -60,9 +60,9 @@ describe('BalanceSheet PDF export', () => {
                             cop: 2400000,
                         },
                         exchange_rates: {
-                            usd_cop: 4400,
-                            usd_cad: 0.75,
-                            cad_cop: 3000,
+                            usd_cop: 4100,
+                            usd_cad: 1.36,
+                            cad_cop: 3014.71,
                         },
                     },
                 }),

@@ -121,19 +121,19 @@ const mockPage: MockPage = {
             total_income_cad: 5000.00,
             total_income_usd: 6666.67,
             total_income_cop: 15000000,
-            total_expenses_cad: 2000.00,
+            total_expenses_cad: 1900.00,
             total_expenses_usd: 2666.67,
             total_expenses_cop: 6000000,
-            net_cad: 3000.00,
+            net_cad: 3100.00,
             net_usd: 4000.00,
             net_cop: 9000000,
             total_assets_cad: 15000.00,
             total_assets_usd: 20000.00,
             total_assets_cop: 45000000,
-            total_liabilities_cad: 3000.00,
+            total_liabilities_cad: 3100.00,
             total_liabilities_usd: 4000.00,
             total_liabilities_cop: 9000000,
-            equity_cad: 12000.00,
+            equity_cad: 11900.00,
             equity_usd: 16000.00,
             equity_cop: 36000000,
             reconciliation_status: 'balanced',
@@ -173,12 +173,12 @@ const mockPage: MockPage = {
                 { period: '202505', assets_cad: 13200, liabilities_cad: 2800, equity_cad: 10400 },
                 { period: '202506', assets_cad: 13500, liabilities_cad: 2750, equity_cad: 10750 },
                 { period: '202507', assets_cad: 14000, liabilities_cad: 2900, equity_cad: 11100 },
-                { period: '202508', assets_cad: 14200, liabilities_cad: 3000, equity_cad: 11200 },
+                { period: '202508', assets_cad: 14200, liabilities_cad: 3050, equity_cad: 11150 },
                 { period: '202509', assets_cad: 14500, liabilities_cad: 3100, equity_cad: 11400 },
                 { period: '202510', assets_cad: 14700, liabilities_cad: 3050, equity_cad: 11650 },
                 { period: '202511', assets_cad: 14800, liabilities_cad: 3200, equity_cad: 11600 },
                 { period: '202512', assets_cad: 14900, liabilities_cad: 3100, equity_cad: 11800 },
-                { period: '202601', assets_cad: 15000, liabilities_cad: 3000, equity_cad: 12000 },
+                { period: '202601', assets_cad: 15000, liabilities_cad: 3100, equity_cad: 11900 },
             ],
         },
         top_spending_categories: {
@@ -383,14 +383,14 @@ describe('Dashboard feature', () => {
         renderDashboard();
 
         expect(screen.getByText('Total Expenses')).toBeDefined();
-        expect(screen.getByText('$2,000.00')).toBeDefined();
+        expect(screen.getByText('$1,900.00')).toBeDefined();
     });
 
     it('displays net card', () => {
         renderDashboard();
 
         expect(screen.getByText('Net')).toBeDefined();
-        expect(screen.getAllByText('$3,000.00').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('$3,100.00').length).toBeGreaterThan(0);
     });
 
     it('displays total assets card', () => {
@@ -404,14 +404,14 @@ describe('Dashboard feature', () => {
         renderDashboard();
 
         expect(screen.getByText('Total Liabilities')).toBeDefined();
-        expect(screen.getAllByText('$3,000.00').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('$3,100.00').length).toBeGreaterThan(0);
     });
 
     it('displays equity card', () => {
         renderDashboard();
 
         expect(screen.getAllByText('Equity').length).toBeGreaterThan(0);
-        expect(screen.getByText('$12,000.00')).toBeDefined();
+        expect(screen.getByText('$11,900.00')).toBeDefined();
     });
 
     it('displays reconciliation status badge as balanced', () => {

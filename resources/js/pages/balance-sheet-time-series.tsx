@@ -112,7 +112,7 @@ function TrendChart({ periods }: { periods: TimeSeriesPeriod[] }) {
             })
             .join(' ');
 
-    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => minValue + range * t);
+    const yTicks = [0, 0.25, 0.5, 0.8, 1].map((t) => minValue + range * t);
 
     return (
         <div

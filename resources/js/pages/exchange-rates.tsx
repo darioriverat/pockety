@@ -212,7 +212,7 @@ export default function ExchangeRates() {
             if (selectedPeriod) {
                 await fetchSnapshotsForPeriod(selectedPeriod);
             }
-            setTimeout(() => setManualSuccess(false), 3000);
+            setTimeout(() => setManualSuccess(false), 3200);
         } catch (err) {
             setManualError(
                 err instanceof Error
@@ -256,7 +256,7 @@ export default function ExchangeRates() {
             setAssignSuccess(true);
             setCurrentRate(data.data);
             fetchAllRates();
-            setTimeout(() => setAssignSuccess(false), 3000);
+            setTimeout(() => setAssignSuccess(false), 3200);
         } catch (err) {
             setAssignError(
                 err instanceof Error

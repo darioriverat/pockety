@@ -307,6 +307,35 @@ if (app()->environment('local')) {
         ], $exitCode === 0 ? 200 : 500);
     })->withoutMiddleware([VerifyCsrfToken::class]);
 
+    // Serve docsify guides for local/browser verification (not linked from the app UI).
+    Route::get('/dev/docsify/{path?}', function (?string $path = null) {
+        $relative = $path === null || $path === '' ? 'index.html' : $path;
+        $relative = str_replace('\\', '/', $relative);
+        if (str_contains($relative, '..')) {
+            abort(404);
+        }
+
+        $file = base_path('docs/'.$relative);
+        if (! is_file($file)) {
+            abort(404);
+        }
+
+        $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $types = [
+            'html' => 'text/html; charset=UTF-8',
+            'md' => 'text/markdown; charset=UTF-8',
+            'css' => 'text/css; charset=UTF-8',
+            'js' => 'application/javascript; charset=UTF-8',
+            'json' => 'application/json; charset=UTF-8',
+            'png' => 'image/png',
+            'svg' => 'image/svg+xml',
+        ];
+
+        return response()->file($file, [
+            'Content-Type' => $types[$extension] ?? 'application/octet-stream',
+        ]);
+    })->where('path', '.*')->withoutMiddleware([VerifyCsrfToken::class]);
+
     Route::get('/dev/verify-accounts-ui', function () {
         $service = app(AccountServiceInterface::class);
         $accounts = array_map(fn ($e) => $e->toArray(), $service->getAllActive());

@@ -214,7 +214,7 @@ function IncomeExpenseTrendChart({
     const barHeight = (value: number) =>
         Math.max(0, ((value - minValue) / range) * innerHeight);
 
-    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => minValue + range * t);
+    const yTicks = [0, 0.25, 0.5, 0.8, 1].map((t) => minValue + range * t);
 
     return (
         <div
@@ -414,7 +414,7 @@ function AssetsLiabilitiesTrendChart({
     const yFor = (value: number) =>
         padding.top + ((maxValue - value) / range) * innerHeight;
 
-    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => minValue + range * t);
+    const yTicks = [0, 0.25, 0.5, 0.8, 1].map((t) => minValue + range * t);
     const hovered = hoveredIndex !== null ? periods[hoveredIndex] : null;
 
     const buildPath = (selector: (p: AssetsLiabilitiesPeriod) => number) =>

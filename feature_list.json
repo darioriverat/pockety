@@ -77,7 +77,7 @@
       "Step 9: Verify no orphaned heading or separator is visible in header or footer",
       "Step 10: Verify contrast and typography of the remaining footer text are unchanged"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -140,7 +140,7 @@
       "Step 9: Verify the page behind the dialog shows no unnecessary scrollbar",
       "Step 10: Verify the dialog at a narrow mobile width still contains the list and form without horizontal overflow"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -281,7 +281,7 @@
       "Step 9: Resize to mobile and verify the dialog fields stack without horizontal overflow",
       "Step 10: Verify error messages appear in a readable inline style"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -381,7 +381,7 @@
       "Step 9: Verify no layout shift occurs when an account is selected",
       "Step 10: Verify the select does not overflow its container at narrow widths"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1099,7 +1099,7 @@
       "Step 5: Assert subMaxLevel is 2",
       "Step 6: Open package.json and assert docsify is not listed as a dependency or devDependency"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1113,7 +1113,7 @@
       "Step 6: Assert it links reconciliation.md",
       "Step 7: Assert it links period-balances.md"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1130,7 +1130,7 @@
       "Step 9: Assert it is not a stub heading only",
       "Step 10: Confirm the sidebar shows it as the home page when served"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1149,7 +1149,7 @@
       "Step 11: Assert it is written in English",
       "Step 12: Assert it is not a stub heading only"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1166,7 +1166,7 @@
       "Step 9: Assert it is not a stub heading only",
       "Step 10: Assert it matches the shipped behavior"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1184,7 +1184,7 @@
       "Step 10: Assert it is not a stub heading only",
       "Step 11: Assert it matches the shipped behavior"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1202,7 +1202,7 @@
       "Step 10: Assert it is not a stub heading only",
       "Step 11: Assert it matches the shipped behavior"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1220,7 +1220,7 @@
       "Step 10: Assert it matches the shipped behavior",
       "Step 11: Assert the sidebar link label matches the page title"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1239,7 +1239,7 @@
       "Step 11: Verify subMaxLevel 2 produces in-page headings in the sidebar",
       "Step 12: Verify no page is a stub heading only"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1252,7 +1252,7 @@
       "Step 5: Grep docs for gastos_ledger, estado_financiero, and month_sheets",
       "Step 6: Assert zero matches"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -1269,7 +1269,7 @@
       "Step 9: Verify content remains readable with no horizontal overflow",
       "Step 10: Verify no broken links in the sidebar"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1288,7 +1288,7 @@
       "Step 11: Run the Playwright browser suite for account edit, account filter, language switch, Manage Balances scroll, import upload, and exchange-rate assignment and confirm they pass",
       "Step 12: Confirm owner scoping still holds for accounts, transactions, imports, manual snapshots, and period assignments"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1300,7 +1300,7 @@
       "Step 4: Assert no removed feature left an unused dependency in package.json",
       "Step 5: Run the build and assert it succeeds with the current dependency set"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1312,6 +1312,6 @@
       "Step 4: Run php artisan test --filter=ExchangeRate and assert the exchange-rate tests pass",
       "Step 5: Confirm no test still relies on plan/extracted or month_sheets directory POSTs"
     ],
-    "passes": false
+    "passes": true
   }
 ]
