@@ -176,3 +176,52 @@ Test #20: Transaction account filter (Section 5)
 - Frontend properly disables type field when transactions exist
 - Error messages display correctly in dialog
 
+## Session: 2026-10-06 (Transaction account filter + account edit verification)
+
+### Accomplished
+1. **Section 5 — Filter the transaction list by account (features 20-25) DONE**
+   - `resources/js/pages/transactions.tsx`:
+     * `FilterState` now has `account_id`; initial value read from `?account=`.
+     * New Account select in the existing filter row (testid `filter-account`)
+       populated from the already-loaded accounts, with an empty
+       "All Accounts" option; grid widened to `lg:grid-cols-6`.
+     * `fetchTransactions` appends `account_id`; CSV export forwards it too.
+     * `clearFilters` resets `account_id`; `hasActiveFilters` counts it.
+     * Effect writes/deletes `?account=` with `history.replaceState` when the
+       filter changes, preserving other query params.
+     * Transaction create/edit form's account field untouched (separate control).
+
+2. **Account edit features verified (15-18)**
+   - Fixed the flaky edit-account browser test: it clicked the first Edit button,
+     which became a different account after the rename reordered the
+     type-then-name list. It now targets `edit-account-{id}`.
+   - Added a browser test that forces the type control open (mocking the
+     client-side transaction probe) and asserts the API 422 message is shown
+     inline, the dialog stays open, and the row keeps the original type.
+   - Added PHPUnit tests: type change succeeds after the transaction is
+     hard-deleted, and the lock counts only the owner's transactions.
+   - Ran `pint` on AccountController/AccountApiTest to clear the 2 style issues.
+
+### Test results
+- Backend: `php artisan test` 384 passed (was 382; +2 new tests).
+- Frontend: `npm run test:unit` 245 passed + 8 new account-filter tests.
+- `npx tsc --noEmit` clean; PHPStan "No errors".
+- Playwright: `edit-account.spec.ts` 6 passed; new
+  `transaction-account-filter.spec.ts` 2 passed.
+- Screenshots (gitignored) in `verification/account-filter/`.
+
+### Progress
+- **23/87 features passing** (was 13/87).
+- Flipped 15,16,17,18,20,21,22,23,24,25 to true. Style features (19, 26 and the
+  older 5, 9) stay false because this model cannot read screenshots.
+
+### Next priority
+Test #27: Import by user upload (spec section 2).
+- Replace hardcoded `plan/extracted` paths in `import.tsx` with file inputs.
+- Backend: multipart uploads only, temp-store/parse/delete, 422 on invalid
+  JSON/shape/extension (never 500), no `file_path`/`directory` accepted.
+- Add synthetic fixtures under `tests/fixtures/`; update Feature + Browser tests
+  to upload them. Then locale/i18n (40-52), exchange-rate snapshots (53-72),
+  docsify docs (73-83), final sweep (84-86).
+
+
