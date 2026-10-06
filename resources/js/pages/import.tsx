@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { formatDisplayCurrency } from '@/lib/currency';
 import { PageTitle } from '@/components/page-title';
 import { PageContainer } from '@/components/page-container';
@@ -73,22 +75,45 @@ function formatCad(value: number): string {
     return formatDisplayCurrency(value, 'CAD');
 }
 
+function apiErrorMessage(data: unknown, fallback: string): string {
+    if (!data || typeof data !== 'object') {
+        return fallback;
+    }
+
+    const payload = data as {
+        message?: string;
+        errors?: Record<string, string[]>;
+    };
+
+    if (payload.message) {
+        return payload.message;
+    }
+
+    const firstError = Object.values(payload.errors ?? {})[0]?.[0];
+
+    return firstError ?? fallback;
+}
+
 export default function Import() {
     const [importing, setImporting] = useState(false);
     const [result, setResult] = useState<ImportResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [transactionFile, setTransactionFile] = useState<File | null>(null);
     const [statistics, setStatistics] = useState<ImportStatistics | null>(
         null,
     );
     const [loadingStats, setLoadingStats] = useState(false);
+    const transactionInputRef = useRef<HTMLInputElement>(null);
 
     const [importingAccounts, setImportingAccounts] = useState(false);
     const [accountResult, setAccountResult] =
         useState<AccountImportResult | null>(null);
     const [accountError, setAccountError] = useState<string | null>(null);
+    const [accountFiles, setAccountFiles] = useState<File[]>([]);
     const [accountStatistics, setAccountStatistics] =
         useState<AccountImportStatistics | null>(null);
     const [loadingAccountStats, setLoadingAccountStats] = useState(false);
+    const accountInputRef = useRef<HTMLInputElement>(null);
 
     const [importingBalanceSheet, setImportingBalanceSheet] = useState(false);
     const [balanceSheetResult, setBalanceSheetResult] =
@@ -96,39 +121,42 @@ export default function Import() {
     const [balanceSheetError, setBalanceSheetError] = useState<string | null>(
         null,
     );
+    const [balanceSheetFile, setBalanceSheetFile] = useState<File | null>(null);
     const [balanceSheetStatistics, setBalanceSheetStatistics] =
         useState<BalanceSheetImportStatistics | null>(null);
     const [loadingBalanceSheetStats, setLoadingBalanceSheetStats] =
         useState(false);
-    const [selectedBalanceSheetFile, setSelectedBalanceSheetFile] = useState(
-        'estado_financiero_2025_2026.json',
-    );
+    const balanceSheetInputRef = useRef<HTMLInputElement>(null);
 
     const handleImport = async () => {
+        if (!transactionFile) {
+            setError('Please choose a .json or .csv file to import.');
+            return;
+        }
+
         setImporting(true);
         setError(null);
         setResult(null);
 
         try {
+            const body = new FormData();
+            body.append('file', transactionFile);
+
             const response = await fetch('/api/transactions/import', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     Accept: 'application/json',
                 },
-                body: JSON.stringify({
-                    file_path: 'gastos_ledger_2025_2026.json',
-                }),
+                body,
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Import failed');
+                throw new Error(apiErrorMessage(data, 'Import failed'));
             }
 
             setResult(data.data);
-            // Refresh statistics after import
             fetchStatistics();
         } catch (err) {
             setError(
@@ -182,32 +210,41 @@ export default function Import() {
                 setStatistics(null);
                 alert('All transactions cleared successfully');
             }
-        } catch (err) {
+        } catch {
             alert('Failed to clear transactions');
         }
     };
 
     const handleAccountImport = async () => {
+        if (accountFiles.length === 0) {
+            setAccountError(
+                'Please choose one or more .json month-sheet files to import.',
+            );
+            return;
+        }
+
         setImportingAccounts(true);
         setAccountError(null);
         setAccountResult(null);
 
         try {
+            const body = new FormData();
+            accountFiles.forEach((file) => {
+                body.append('files[]', file);
+            });
+
             const response = await fetch('/api/accounts/import', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     Accept: 'application/json',
                 },
-                body: JSON.stringify({
-                    directory: 'month_sheets',
-                }),
+                body,
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Account import failed');
+                throw new Error(apiErrorMessage(data, 'Account import failed'));
             }
 
             setAccountResult(data.data);
@@ -240,11 +277,10 @@ export default function Import() {
     };
 
     const handleBalanceSheetImport = async () => {
-        if (
-            !confirm(
-                `Import balance sheet history from ${selectedBalanceSheetFile}?`,
-            )
-        ) {
+        if (!balanceSheetFile) {
+            setBalanceSheetError(
+                'Please choose a .json balance sheet file to import.',
+            );
             return;
         }
 
@@ -253,21 +289,23 @@ export default function Import() {
         setBalanceSheetResult(null);
 
         try {
+            const body = new FormData();
+            body.append('file', balanceSheetFile);
+
             const response = await fetch('/api/balance-sheet/import', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     Accept: 'application/json',
                 },
-                body: JSON.stringify({
-                    file_path: selectedBalanceSheetFile,
-                }),
+                body,
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Balance sheet import failed');
+                throw new Error(
+                    apiErrorMessage(data, 'Balance sheet import failed'),
+                );
             }
 
             setBalanceSheetResult(data.data);
@@ -320,37 +358,194 @@ export default function Import() {
             <PageContainer>
                 <PageTitle
                     title="Import Historical Data"
-                    description="Import accounts and transactions from the extracted spreadsheet data"
+                    description="Upload your own transaction, account, and balance sheet files"
                 />
 
-                {/* Account Import Card */}
-                <Card data-testid="account-import-card">
+                <Card data-testid="transaction-import-card">
                     <CardHeader>
-                        <CardTitle>Historical Account Import</CardTitle>
+                        <CardTitle>Transactions</CardTitle>
                         <CardDescription>
-                            Import known accounts from month_sheets JSON files.
-                            This will:
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li>
-                                    Collect bank and liability accounts across
-                                    all 21 months
-                                </li>
-                                <li>
-                                    Rename stale &quot;Crédito Móvil **6174&quot;
-                                    to &quot;Personal LOAN CIBC&quot;
-                                </li>
-                                <li>
-                                    Ensure Colombian Éxito liability is present
-                                </li>
-                                <li>
-                                    Import recorded balances and link Ford
-                                    Escape payments
-                                </li>
-                            </ul>
+                            Upload one .json or .csv file. JSON rows use fecha,
+                            periodo, concepto_code, nested cad/usd/cop values, and
+                            comentarios. CSV uses the same columns as a flat
+                            header.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex gap-4">
+                        <div className="space-y-2 max-w-lg">
+                            <Label htmlFor="transaction-file-input">
+                                Transaction file
+                            </Label>
+                            <Input
+                                id="transaction-file-input"
+                                ref={transactionInputRef}
+                                type="file"
+                                accept=".json,.csv,application/json,text/csv"
+                                data-testid="transaction-file-input"
+                                onChange={(event) => {
+                                    setTransactionFile(
+                                        event.target.files?.[0] ?? null,
+                                    );
+                                    setError(null);
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex flex-wrap gap-4">
+                            <Button
+                                onClick={handleImport}
+                                disabled={importing}
+                                size="lg"
+                                data-testid="import-transactions-button"
+                            >
+                                {importing ? (
+                                    <>
+                                        <Spinner className="size-4 shrink-0 fill-none" />
+                                        Importing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="size-4 shrink-0 fill-none" />
+                                        Import Transactions
+                                    </>
+                                )}
+                            </Button>
+
+                            <Button
+                                onClick={fetchStatistics}
+                                disabled={loadingStats}
+                                variant="outline"
+                                size="lg"
+                            >
+                                {loadingStats ? (
+                                    <Spinner className="size-4 shrink-0 fill-none" />
+                                ) : (
+                                    <Database className="size-4 shrink-0 fill-none" />
+                                )}
+                                Refresh Statistics
+                            </Button>
+
+                            <Button
+                                onClick={handleClear}
+                                variant="destructive"
+                                size="lg"
+                            >
+                                <XCircle className="size-4 shrink-0 fill-none" />
+                                Clear All Transactions
+                            </Button>
+                        </div>
+
+                        {result && (
+                            <Alert
+                                className={
+                                    result.errors.length > 0
+                                        ? 'border-yellow-500'
+                                        : 'border-green-500'
+                                }
+                                data-testid="transaction-import-result"
+                            >
+                                <CheckCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    <div className="space-y-2">
+                                        <p className="font-semibold">
+                                            Import Completed
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            <Badge
+                                                variant="default"
+                                                data-testid="transactions-imported"
+                                            >
+                                                Imported: {result.imported}
+                                            </Badge>
+                                            <Badge
+                                                variant="secondary"
+                                                data-testid="transactions-skipped"
+                                            >
+                                                Skipped: {result.skipped}
+                                            </Badge>
+                                            {result.errors.length > 0 && (
+                                                <Badge variant="destructive">
+                                                    Errors:{' '}
+                                                    {result.errors.length}
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        {result.errors.length > 0 && (
+                                            <div className="mt-4">
+                                                <p className="font-semibold text-sm">
+                                                    Errors:
+                                                </p>
+                                                <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+                                                    {result.errors
+                                                        .slice(0, 10)
+                                                        .map((err, idx) => (
+                                                            <li key={idx}>
+                                                                {err}
+                                                            </li>
+                                                        ))}
+                                                    {result.errors.length >
+                                                        10 && (
+                                                        <li>
+                                                            ... and{' '}
+                                                            {result.errors
+                                                                .length - 10}{' '}
+                                                            more errors
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {error && (
+                            <Alert
+                                variant="destructive"
+                                data-testid="transaction-import-error"
+                            >
+                                <XCircle className="h-4 w-4" />
+                                <AlertDescription>{error}</AlertDescription>
+                            </Alert>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card data-testid="account-import-card">
+                    <CardHeader>
+                        <CardTitle>Accounts</CardTitle>
+                        <CardDescription>
+                            Upload one or more month-sheet .json files. Each file
+                            needs header.period.value and
+                            sections.Cuentas.items with recorded balances.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2 max-w-lg">
+                            <Label htmlFor="account-file-input">
+                                Month-sheet files
+                            </Label>
+                            <Input
+                                id="account-file-input"
+                                ref={accountInputRef}
+                                type="file"
+                                accept=".json,application/json"
+                                multiple
+                                data-testid="account-file-input"
+                                onChange={(event) => {
+                                    setAccountFiles(
+                                        Array.from(event.target.files ?? []),
+                                    );
+                                    setAccountError(null);
+                                }}
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                You can select multiple .json files at once.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-4">
                             <Button
                                 onClick={handleAccountImport}
                                 disabled={importingAccounts}
@@ -432,7 +627,10 @@ export default function Import() {
                         )}
 
                         {accountError && (
-                            <Alert variant="destructive">
+                            <Alert
+                                variant="destructive"
+                                data-testid="account-import-error"
+                            >
                                 <XCircle className="h-4 w-4" />
                                 <AlertDescription>
                                     {accountError}
@@ -462,51 +660,33 @@ export default function Import() {
                     </CardContent>
                 </Card>
 
-                {/* Balance Sheet History Import Card */}
                 <Card data-testid="balance-sheet-import-card">
                     <CardHeader>
-                        <CardTitle>Import Balance Sheet History</CardTitle>
+                        <CardTitle>Balance Sheet</CardTitle>
                         <CardDescription>
-                            Import Assets / Liabilities / Equity totals from
-                            the Estado Financiero source file. This will:
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li>
-                                    Load every period present in
-                                    estado_financiero_2025_2026.json
-                                </li>
-                                <li>
-                                    Store CAD totals for Assets, Liabilities,
-                                    and Equity
-                                </li>
-                                <li>
-                                    Normalize floating-point noise near zero
-                                </li>
-                            </ul>
+                            Upload one .json file containing an array of period
+                            rows with periodo, activo_value, pasivo_value, and
+                            patrimonio_value.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <label
-                                htmlFor="balance-sheet-file"
-                                className="text-sm font-medium"
-                            >
-                                Source file
-                            </label>
-                            <select
-                                id="balance-sheet-file"
-                                data-testid="balance-sheet-file-select"
-                                className="flex h-10 w-full max-w-lg rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                value={selectedBalanceSheetFile}
-                                onChange={(event) =>
-                                    setSelectedBalanceSheetFile(
-                                        event.target.value,
-                                    )
-                                }
-                            >
-                                <option value="estado_financiero_2025_2026.json">
-                                    estado_financiero_2025_2026.json
-                                </option>
-                            </select>
+                        <div className="space-y-2 max-w-lg">
+                            <Label htmlFor="balance-sheet-file-input">
+                                Balance sheet file
+                            </Label>
+                            <Input
+                                id="balance-sheet-file-input"
+                                ref={balanceSheetInputRef}
+                                type="file"
+                                accept=".json,application/json"
+                                data-testid="balance-sheet-file-input"
+                                onChange={(event) => {
+                                    setBalanceSheetFile(
+                                        event.target.files?.[0] ?? null,
+                                    );
+                                    setBalanceSheetError(null);
+                                }}
+                            />
                         </div>
 
                         <div className="flex flex-wrap gap-4">
@@ -524,7 +704,7 @@ export default function Import() {
                                 ) : (
                                     <>
                                         <Upload className="size-4 shrink-0 fill-none" />
-                                        Import Balance Sheet History
+                                        Import Balance Sheet
                                     </>
                                 )}
                             </Button>
@@ -588,7 +768,10 @@ export default function Import() {
                         )}
 
                         {balanceSheetError && (
-                            <Alert variant="destructive">
+                            <Alert
+                                variant="destructive"
+                                data-testid="balance-sheet-import-error"
+                            >
                                 <XCircle className="h-4 w-4" />
                                 <AlertDescription>
                                     {balanceSheetError}
@@ -699,141 +882,6 @@ export default function Import() {
                     </CardContent>
                 </Card>
 
-                {/* Import Card */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Historical Transaction Import</CardTitle>
-                        <CardDescription>
-                            Import 2,631 transactions from the historical data
-                            file. This will:
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li>Skip template rows (rows without dates)</li>
-                                <li>
-                                    Map C040 category to C031 (category merge)
-                                </li>
-                                <li>
-                                    Detect debt principal/interest from comments
-                                </li>
-                                <li>
-                                    Import transactions for periods 2025-2026
-                                </li>
-                            </ul>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex gap-4">
-                            <Button
-                                onClick={handleImport}
-                                disabled={importing}
-                                size="lg"
-                            >
-                                {importing ? (
-                                    <>
-                                        <Spinner className="size-4 shrink-0 fill-none" />
-                                        Importing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Upload className="size-4 shrink-0 fill-none" />
-                                        Start Import
-                                    </>
-                                )}
-                            </Button>
-
-                            <Button
-                                onClick={fetchStatistics}
-                                disabled={loadingStats}
-                                variant="outline"
-                                size="lg"
-                            >
-                                {loadingStats ? (
-                                    <Spinner className="size-4 shrink-0 fill-none" />
-                                ) : (
-                                    <Database className="size-4 shrink-0 fill-none" />
-                                )}
-                                Refresh Statistics
-                            </Button>
-
-                            <Button
-                                onClick={handleClear}
-                                variant="destructive"
-                                size="lg"
-                            >
-                                <XCircle className="size-4 shrink-0 fill-none" />
-                                Clear All Transactions
-                            </Button>
-                        </div>
-
-                        {/* Import Results */}
-                        {result && (
-                            <Alert
-                                className={
-                                    result.errors.length > 0
-                                        ? 'border-yellow-500'
-                                        : 'border-green-500'
-                                }
-                            >
-                                <CheckCircle className="h-4 w-4" />
-                                <AlertDescription>
-                                    <div className="space-y-2">
-                                        <p className="font-semibold">
-                                            Import Completed
-                                        </p>
-                                        <div className="flex gap-4">
-                                            <Badge variant="default">
-                                                Imported: {result.imported}
-                                            </Badge>
-                                            <Badge variant="secondary">
-                                                Skipped: {result.skipped}
-                                            </Badge>
-                                            {result.errors.length > 0 && (
-                                                <Badge variant="destructive">
-                                                    Errors:{' '}
-                                                    {result.errors.length}
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        {result.errors.length > 0 && (
-                                            <div className="mt-4">
-                                                <p className="font-semibold text-sm">
-                                                    Errors:
-                                                </p>
-                                                <ul className="list-disc list-inside text-sm mt-2 space-y-1">
-                                                    {result.errors
-                                                        .slice(0, 10)
-                                                        .map((err, idx) => (
-                                                            <li key={idx}>
-                                                                {err}
-                                                            </li>
-                                                        ))}
-                                                    {result.errors.length >
-                                                        10 && (
-                                                        <li>
-                                                            ... and{' '}
-                                                            {result.errors
-                                                                .length - 10}{' '}
-                                                            more errors
-                                                        </li>
-                                                    )}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                </AlertDescription>
-                            </Alert>
-                        )}
-
-                        {/* Error Alert */}
-                        {error && (
-                            <Alert variant="destructive">
-                                <XCircle className="h-4 w-4" />
-                                <AlertDescription>{error}</AlertDescription>
-                            </Alert>
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* Statistics Card */}
                 {statistics && (
                     <Card>
                         <CardHeader>

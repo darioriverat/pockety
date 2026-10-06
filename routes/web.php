@@ -256,7 +256,7 @@ if (app()->environment('local')) {
     Route::get('/dev/import-accounts', function () {
         try {
             $service = app(AccountImportService::class);
-            $result = $service->importFromDefaultPath();
+            $result = $service->importFromMonthSheets(base_path('tests/fixtures/month_sheets'));
 
             return response()->json([
                 'success' => true,
@@ -863,7 +863,7 @@ HTML;
 
     Route::get('/dev/import-balance-sheet-history', function () {
         $service = app(BalanceSheetImportService::class);
-        $result = $service->importFromDefaultPath();
+        $result = $service->importFromFile(base_path('tests/fixtures/balance_sheet_sample.json'));
 
         return response()->json([
             'success' => true,
@@ -915,7 +915,7 @@ HTML;
 </head>
 <body>
   <h1>Import Balance Sheet History</h1>
-  <p class="meta">Source: estado_financiero_2025_2026.json ({$min} → {$max})</p>
+  <p class="meta">Source: balance_sheet_sample.json ({$min} → {$max})</p>
   <div class="stat">
     <strong>Periods imported</strong>
     <span class="value" data-testid="balance-sheet-total-periods">{$total}</span>

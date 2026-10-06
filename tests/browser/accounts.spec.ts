@@ -1,9 +1,39 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import {
     loginAsBrowserTestUser,
     resetBrowserState,
     trackConsoleErrors,
 } from './helpers';
+
+const monthSheetFixture = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../fixtures/month_sheets/202501_sample.json',
+);
+
+async function importAccountsViaUpload(
+    request: import('@playwright/test').APIRequestContext,
+) {
+    const importResponse = await request.post('/api/accounts/import', {
+        multipart: {
+            'files[]': {
+                name: '202501_sample.json',
+                mimeType: 'application/json',
+                buffer: fs.readFileSync(monthSheetFixture),
+            },
+        },
+    });
+    expect(importResponse.ok()).toBeTruthy();
+    const importBody = await importResponse.json();
+    const createdOrUpdated =
+        (importBody.data.accounts_created ?? 0) +
+        (importBody.data.accounts_updated ?? 0);
+    expect(createdOrUpdated).toBeGreaterThan(0);
+
+    return importBody;
+}
 
 test.beforeAll(() => {
     resetBrowserState();
@@ -16,13 +46,8 @@ test('feature 40: imported accounts list shows Canadian and Colombian institutio
 
     await loginAsBrowserTestUser(page);
 
-    // Import historical accounts via API (same path the Import UI uses)
-    const importResponse = await page.request.post('/api/accounts/import', {
-        data: { directory: 'month_sheets' },
-    });
-    expect(importResponse.ok()).toBeTruthy();
-    const importBody = await importResponse.json();
-    expect(importBody.data.accounts_created).toBeGreaterThan(0);
+    // Import historical accounts via multipart upload (same path the Import UI uses)
+    await importAccountsViaUpload(page.request);
 
     await page.goto('/accounts');
     await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible();
@@ -57,9 +82,7 @@ test('feature 41: Personal LOAN CIBC is correctly named as liability', async ({
 
     await loginAsBrowserTestUser(page);
 
-    await page.request.post('/api/accounts/import', {
-        data: { directory: 'month_sheets' },
-    });
+    await importAccountsViaUpload(page.request);
 
     await page.goto('/accounts');
 

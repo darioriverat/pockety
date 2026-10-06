@@ -1,3 +1,5 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import {
     ensureTransactionInPeriod,
@@ -6,6 +8,8 @@ import {
     selectDisplayedPeriod,
     trackConsoleErrors,
 } from './helpers';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 test.beforeEach(() => {
     resetBrowserState();
@@ -270,17 +274,16 @@ test('feature 71: balance sheet time series shows historical trend across period
     expect(consoleErrors).toEqual([]);
 });
 
-test('feature 72: import historical balance sheet from estado_financiero', async ({
+test('feature 72: import historical balance sheet from uploaded fixture', async ({
     page,
 }) => {
     const consoleErrors = trackConsoleErrors(page);
+    const fixturePath = path.join(
+        dirname,
+        '../fixtures/balance_sheet_sample.json',
+    );
 
     await loginAsBrowserTestUser(page);
-
-    page.once('dialog', async (dialog) => {
-        expect(dialog.message()).toContain('estado_financiero_2025_2026.json');
-        await dialog.accept();
-    });
 
     await page.goto('/import');
     await expect(
@@ -289,12 +292,11 @@ test('feature 72: import historical balance sheet from estado_financiero', async
     await expect(page.getByTestId('balance-sheet-import-card')).toBeVisible();
     await expect(
         page.getByTestId('balance-sheet-import-card').locator('[data-slot="card-title"]'),
-    ).toHaveText('Import Balance Sheet History');
+    ).toHaveText('Balance Sheet');
 
-    await expect(page.getByTestId('balance-sheet-file-select')).toHaveValue(
-        'estado_financiero_2025_2026.json',
-    );
-
+    await page
+        .getByTestId('balance-sheet-file-input')
+        .setInputFiles(fixturePath);
     await page.getByTestId('import-balance-sheet-button').click();
 
     await expect(page.getByTestId('balance-sheet-import-result')).toBeVisible({
@@ -302,36 +304,30 @@ test('feature 72: import historical balance sheet from estado_financiero', async
     });
     await expect(
         page.getByTestId('balance-sheet-periods-imported'),
-    ).toContainText('19');
+    ).toContainText('2');
     await expect(page.getByTestId('balance-sheet-total-periods')).toHaveText(
-        '19',
+        '2',
     );
 
     await expect(page.getByTestId('balance-sheet-import-table')).toBeVisible();
     await expect(page.getByTestId('balance-sheet-row-202501')).toBeVisible();
-    await expect(page.getByTestId('assets-202501')).toContainText('24,595.73');
+    await expect(page.getByTestId('assets-202501')).toContainText('10,000.50');
     await expect(page.getByTestId('liabilities-202501')).toContainText(
-        '35,730.77',
+        '4,000.25',
     );
     await expect(page.getByTestId('equity-202501')).toContainText(
-        '-$11,135.05',
+        '$6,000.25',
     );
 
-    await expect(page.getByTestId('balance-sheet-row-202607')).toBeVisible();
-    await expect(page.getByTestId('assets-202607')).toContainText('20,542.03');
-    await expect(page.getByTestId('liabilities-202607')).toContainText(
-        '36,807.86',
-    );
-    await expect(page.getByTestId('equity-202607')).toContainText(
-        '-$16,265.83',
-    );
+    await expect(page.getByTestId('balance-sheet-row-202502')).toBeVisible();
+    await expect(page.getByTestId('assets-202502')).toContainText('11,000.00');
 
     await page.screenshot({
-        path: 'verification/session-28/balance-sheet-import-full.png',
+        path: 'verification/import-upload/balance-sheet-import-full.png',
         fullPage: true,
     });
     await page.getByTestId('balance-sheet-import-card').screenshot({
-        path: 'verification/session-28/balance-sheet-import-card.png',
+        path: 'verification/import-upload/balance-sheet-import-card.png',
     });
 
     expect(consoleErrors).toEqual([]);

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\AccountImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class AccountImportController extends Controller
 {
@@ -13,36 +16,51 @@ class AccountImportController extends Controller
     ) {}
 
     /**
-     * Import historical accounts from month_sheets JSON files.
+     * Import accounts from one or more uploaded month-sheet JSON files.
      */
     public function import(Request $request): JsonResponse
     {
-        $request->validate([
-            'directory' => 'nullable|string',
-        ]);
-
-        $directory = $request->input('directory', 'month_sheets');
-
-        $basePath = base_path('plan/extracted');
-        $fullPath = realpath($basePath.'/'.$directory);
-
-        if (! $fullPath || ! str_starts_with($fullPath, $basePath) || ! is_dir($fullPath)) {
-            return response()->json([
-                'message' => 'Invalid directory path',
-            ], 400);
+        if ($request->has('file_path') || $request->has('directory')) {
+            throw ValidationException::withMessages([
+                'files' => 'File path and directory imports are not supported. Upload month-sheet files instead.',
+            ]);
         }
 
+        $request->validate([
+            'files' => ['required', 'array', 'min:1'],
+            'files.*' => ['required', 'file', 'max:10240', 'extensions:json'],
+        ]);
+
+        /** @var list<UploadedFile> $uploads */
+        $uploads = array_values($request->file('files', []));
+        $storedPaths = [];
+        $absolutePaths = [];
+
         try {
-            $result = $this->importService->importFromMonthSheets($fullPath);
+            foreach ($uploads as $uploaded) {
+                $storedPath = $uploaded->store('tmp/imports');
+                $storedPaths[] = $storedPath;
+                $absolutePaths[] = Storage::path($storedPath);
+            }
+
+            $result = $this->importService->importFromFiles($absolutePaths);
 
             return response()->json([
                 'message' => 'Account import completed',
                 'data' => $result,
             ]);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Import failed: '.$e->getMessage(),
             ], 500);
+        } finally {
+            foreach ($storedPaths as $storedPath) {
+                Storage::delete($storedPath);
+            }
         }
     }
 

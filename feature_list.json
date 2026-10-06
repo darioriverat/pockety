@@ -393,7 +393,7 @@
       "Step 4: Assert the Balance sheet card has a file input that accepts one .json file and is empty",
       "Step 5: Assert no personal filename such as gastos_ledger_2025_2026.json, estado_financiero_2025_2026.json, or month_sheets appears anywhere on the page"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -412,7 +412,7 @@
       "Step 11: Re-submit the same fixture and confirm behavior is deterministic (no partial or duplicated writes beyond service rules)",
       "Step 12: Confirm the API returned a successful status and a readable result payload"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -431,7 +431,7 @@
       "Step 11: Verify no rows are created for the rejected CSV",
       "Step 12: Confirm the browser test never POSTs a directory or plan/extracted file_path"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -451,7 +451,7 @@
       "Step 12: Upload a month-sheet fixture with the wrong top-level shape and verify a 422 with a readable message, not a 500",
       "Step 13: Verify the rejected file created no accounts"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -470,7 +470,7 @@
       "Step 11: Upload a file with a disallowed extension and verify a 422",
       "Step 12: Confirm the rejected uploads created no historical balance sheet rows"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -482,7 +482,7 @@
       "Step 4: Verify the user sees a readable validation message asking for a file",
       "Step 5: Repeat for the Accounts card and the Balance sheet card"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -503,7 +503,7 @@
       "Step 13: Assert the HTTP client never received a client-supplied path",
       "Step 14: Run the PHPUnit import feature tests and confirm all pass"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -522,7 +522,7 @@
       "Step 11: Run the security-related import feature tests and confirm they pass",
       "Step 12: Confirm a signed-in attacker cannot read another user's data through the path parameters"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -535,7 +535,7 @@
       "Step 5: Repeat for accounts and balance sheet imports",
       "Step 6: Assert no uploaded file remains in storage after the requests complete"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -549,7 +549,7 @@
       "Step 6: Confirm no import endpoint accepts a user_id from the client",
       "Step 7: Run the owner isolation feature tests and confirm they pass"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -560,7 +560,7 @@
       "Step 3: Click it and confirm the Import page loads with all three cards",
       "Step 4: Confirm the route name is still 'import' and the page component is resources/js/pages/import.tsx"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -571,7 +571,7 @@
       "Step 3: Grep the fixtures and tests for gastos_ledger_2025_2026.json, estado_financiero_2025_2026.json, and month_sheets directory POSTs",
       "Step 4: Confirm PHPUnit and Playwright import through uploads of fixtures or through factories instead"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -588,7 +588,7 @@
       "Step 9: Verify buttons have consistent styling and adequate contrast",
       "Step 10: Verify no empty section, orphaned heading, or placeholder path remains"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

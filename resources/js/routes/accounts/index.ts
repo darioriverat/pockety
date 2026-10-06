@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\AccountController::index
-* @see app/Http/Controllers/AccountController.php:27
+* @see app/Http/Controllers/AccountController.php:28
 * @route '/api/accounts'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountController::index
-* @see app/Http/Controllers/AccountController.php:27
+* @see app/Http/Controllers/AccountController.php:28
 * @route '/api/accounts'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AccountController::index
-* @see app/Http/Controllers/AccountController.php:27
+* @see app/Http/Controllers/AccountController.php:28
 * @route '/api/accounts'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\AccountController::index
-* @see app/Http/Controllers/AccountController.php:27
+* @see app/Http/Controllers/AccountController.php:28
 * @route '/api/accounts'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\AccountController::index
-* @see app/Http/Controllers/AccountController.php:27
+* @see app/Http/Controllers/AccountController.php:28
 * @route '/api/accounts'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\AccountController::index
-* @see app/Http/Controllers/AccountController.php:27
+* @see app/Http/Controllers/AccountController.php:28
 * @route '/api/accounts'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\AccountController::index
-* @see app/Http/Controllers/AccountController.php:27
+* @see app/Http/Controllers/AccountController.php:28
 * @route '/api/accounts'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\AccountImportController::importMethod
-* @see app/Http/Controllers/AccountImportController.php:18
+* @see app/Http/Controllers/AccountImportController.php:21
 * @route '/api/accounts/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ importMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountImportController::importMethod
-* @see app/Http/Controllers/AccountImportController.php:18
+* @see app/Http/Controllers/AccountImportController.php:21
 * @route '/api/accounts/import'
 */
 importMethod.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ importMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AccountImportController::importMethod
-* @see app/Http/Controllers/AccountImportController.php:18
+* @see app/Http/Controllers/AccountImportController.php:21
 * @route '/api/accounts/import'
 */
 importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\AccountImportController::importMethod
-* @see app/Http/Controllers/AccountImportController.php:18
+* @see app/Http/Controllers/AccountImportController.php:21
 * @route '/api/accounts/import'
 */
 const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'pos
 
 /**
 * @see \App\Http\Controllers\AccountImportController::importMethod
-* @see app/Http/Controllers/AccountImportController.php:18
+* @see app/Http/Controllers/AccountImportController.php:21
 * @route '/api/accounts/import'
 */
 importMethodForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -138,7 +138,7 @@ importMethod.form = importMethodForm
 
 /**
 * @see \App\Http\Controllers\AccountController::show
-* @see app/Http/Controllers/AccountController.php:63
+* @see app/Http/Controllers/AccountController.php:64
 * @route '/api/accounts/{id}'
 */
 export const show = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -153,7 +153,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountController::show
-* @see app/Http/Controllers/AccountController.php:63
+* @see app/Http/Controllers/AccountController.php:64
 * @route '/api/accounts/{id}'
 */
 show.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -180,7 +180,7 @@ show.url = (args: { id: string | number } | [id: string | number ] | string | nu
 
 /**
 * @see \App\Http\Controllers\AccountController::show
-* @see app/Http/Controllers/AccountController.php:63
+* @see app/Http/Controllers/AccountController.php:64
 * @route '/api/accounts/{id}'
 */
 show.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -190,7 +190,7 @@ show.get = (args: { id: string | number } | [id: string | number ] | string | nu
 
 /**
 * @see \App\Http\Controllers\AccountController::show
-* @see app/Http/Controllers/AccountController.php:63
+* @see app/Http/Controllers/AccountController.php:64
 * @route '/api/accounts/{id}'
 */
 show.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -200,7 +200,7 @@ show.head = (args: { id: string | number } | [id: string | number ] | string | n
 
 /**
 * @see \App\Http\Controllers\AccountController::show
-* @see app/Http/Controllers/AccountController.php:63
+* @see app/Http/Controllers/AccountController.php:64
 * @route '/api/accounts/{id}'
 */
 const showForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -210,7 +210,7 @@ const showForm = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\AccountController::show
-* @see app/Http/Controllers/AccountController.php:63
+* @see app/Http/Controllers/AccountController.php:64
 * @route '/api/accounts/{id}'
 */
 showForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -220,7 +220,7 @@ showForm.get = (args: { id: string | number } | [id: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\AccountController::show
-* @see app/Http/Controllers/AccountController.php:63
+* @see app/Http/Controllers/AccountController.php:64
 * @route '/api/accounts/{id}'
 */
 showForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -237,7 +237,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:246
+* @see app/Http/Controllers/AccountController.php:247
 * @route '/api/accounts/{id}/transactions'
 */
 export const transactions = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -252,7 +252,7 @@ transactions.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:246
+* @see app/Http/Controllers/AccountController.php:247
 * @route '/api/accounts/{id}/transactions'
 */
 transactions.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -279,7 +279,7 @@ transactions.url = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:246
+* @see app/Http/Controllers/AccountController.php:247
 * @route '/api/accounts/{id}/transactions'
 */
 transactions.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -289,7 +289,7 @@ transactions.get = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:246
+* @see app/Http/Controllers/AccountController.php:247
 * @route '/api/accounts/{id}/transactions'
 */
 transactions.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -299,7 +299,7 @@ transactions.head = (args: { id: string | number } | [id: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:246
+* @see app/Http/Controllers/AccountController.php:247
 * @route '/api/accounts/{id}/transactions'
 */
 const transactionsForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -309,7 +309,7 @@ const transactionsForm = (args: { id: string | number } | [id: string | number ]
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:246
+* @see app/Http/Controllers/AccountController.php:247
 * @route '/api/accounts/{id}/transactions'
 */
 transactionsForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -319,7 +319,7 @@ transactionsForm.get = (args: { id: string | number } | [id: string | number ] |
 
 /**
 * @see \App\Http\Controllers\AccountController::transactions
-* @see app/Http/Controllers/AccountController.php:246
+* @see app/Http/Controllers/AccountController.php:247
 * @route '/api/accounts/{id}/transactions'
 */
 transactionsForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -336,7 +336,7 @@ transactions.form = transactionsForm
 
 /**
 * @see \App\Http\Controllers\AccountController::store
-* @see app/Http/Controllers/AccountController.php:87
+* @see app/Http/Controllers/AccountController.php:88
 * @route '/api/accounts'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -351,7 +351,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountController::store
-* @see app/Http/Controllers/AccountController.php:87
+* @see app/Http/Controllers/AccountController.php:88
 * @route '/api/accounts'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -360,7 +360,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AccountController::store
-* @see app/Http/Controllers/AccountController.php:87
+* @see app/Http/Controllers/AccountController.php:88
 * @route '/api/accounts'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -370,7 +370,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\AccountController::store
-* @see app/Http/Controllers/AccountController.php:87
+* @see app/Http/Controllers/AccountController.php:88
 * @route '/api/accounts'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -380,7 +380,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\AccountController::store
-* @see app/Http/Controllers/AccountController.php:87
+* @see app/Http/Controllers/AccountController.php:88
 * @route '/api/accounts'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -392,7 +392,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:130
+* @see app/Http/Controllers/AccountController.php:131
 * @route '/api/accounts/{id}'
 */
 export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -407,7 +407,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:130
+* @see app/Http/Controllers/AccountController.php:131
 * @route '/api/accounts/{id}'
 */
 update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -434,7 +434,7 @@ update.url = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:130
+* @see app/Http/Controllers/AccountController.php:131
 * @route '/api/accounts/{id}'
 */
 update.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -444,7 +444,7 @@ update.put = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:130
+* @see app/Http/Controllers/AccountController.php:131
 * @route '/api/accounts/{id}'
 */
 update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -454,7 +454,7 @@ update.patch = (args: { id: string | number } | [id: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:130
+* @see app/Http/Controllers/AccountController.php:131
 * @route '/api/accounts/{id}'
 */
 const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -469,7 +469,7 @@ const updateForm = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:130
+* @see app/Http/Controllers/AccountController.php:131
 * @route '/api/accounts/{id}'
 */
 updateForm.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -484,7 +484,7 @@ updateForm.put = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\AccountController::update
-* @see app/Http/Controllers/AccountController.php:130
+* @see app/Http/Controllers/AccountController.php:131
 * @route '/api/accounts/{id}'
 */
 updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -501,7 +501,7 @@ update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\AccountController::destroy
-* @see app/Http/Controllers/AccountController.php:207
+* @see app/Http/Controllers/AccountController.php:208
 * @route '/api/accounts/{id}'
 */
 export const destroy = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -516,7 +516,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountController::destroy
-* @see app/Http/Controllers/AccountController.php:207
+* @see app/Http/Controllers/AccountController.php:208
 * @route '/api/accounts/{id}'
 */
 destroy.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -543,7 +543,7 @@ destroy.url = (args: { id: string | number } | [id: string | number ] | string |
 
 /**
 * @see \App\Http\Controllers\AccountController::destroy
-* @see app/Http/Controllers/AccountController.php:207
+* @see app/Http/Controllers/AccountController.php:208
 * @route '/api/accounts/{id}'
 */
 destroy.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -553,7 +553,7 @@ destroy.delete = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\AccountController::destroy
-* @see app/Http/Controllers/AccountController.php:207
+* @see app/Http/Controllers/AccountController.php:208
 * @route '/api/accounts/{id}'
 */
 const destroyForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -568,7 +568,7 @@ const destroyForm = (args: { id: string | number } | [id: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\AccountController::destroy
-* @see app/Http/Controllers/AccountController.php:207
+* @see app/Http/Controllers/AccountController.php:208
 * @route '/api/accounts/{id}'
 */
 destroyForm.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

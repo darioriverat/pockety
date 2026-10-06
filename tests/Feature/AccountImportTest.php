@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Services\AccountImportService;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AccountImportTest extends TestCase
@@ -22,6 +24,7 @@ class AccountImportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Storage::fake('local');
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
         $this->seed(CategorySeeder::class);
@@ -146,5 +149,77 @@ class AccountImportTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page->component('accounts'));
+    }
+
+    public function test_import_api_accepts_multiple_uploaded_month_sheets(): void
+    {
+        $response = $this->post('/api/accounts/import', [
+            'files' => [
+                $this->fixtureUpload('month_sheets/202501_sample.json'),
+                $this->fixtureUpload('month_sheets/202502_sample.json'),
+            ],
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('message', 'Account import completed');
+        $this->assertGreaterThan(0, $response->json('data.accounts_created'));
+        $this->assertDatabaseHas('accounts', [
+            'user_id' => $this->user->id,
+            'name' => 'RBC Checking',
+        ]);
+        $this->assertSame([], Storage::disk('local')->allFiles('tmp/imports'));
+    }
+
+    public function test_import_api_rejects_directory_and_invalid_month_sheets(): void
+    {
+        $directory = $this->postJson('/api/accounts/import', [
+            'directory' => 'month_sheets',
+        ]);
+        $directory->assertStatus(422);
+
+        $noPeriod = $this->post('/api/accounts/import', [
+            'files' => [$this->fixtureUpload('invalid/month_sheet_no_period.json')],
+        ]);
+        $noPeriod->assertStatus(422);
+        $this->assertStringContainsString('header.period.value', (string) $noPeriod->json('message'));
+
+        $noCuentas = $this->post('/api/accounts/import', [
+            'files' => [$this->fixtureUpload('invalid/month_sheet_no_cuentas.json')],
+        ]);
+        $noCuentas->assertStatus(422);
+        $this->assertStringContainsString('sections.Cuentas.items', (string) $noCuentas->json('message'));
+
+        $this->assertDatabaseCount('accounts', 0);
+    }
+
+    public function test_import_api_is_owner_scoped(): void
+    {
+        $other = User::factory()->create();
+
+        $this->post('/api/accounts/import', [
+            'files' => [$this->fixtureUpload('month_sheets/202501_sample.json')],
+        ])->assertOk();
+
+        $this->assertGreaterThan(
+            0,
+            Account::query()->where('user_id', $this->user->id)->count()
+        );
+        $this->assertSame(
+            0,
+            Account::query()->where('user_id', $other->id)->count()
+        );
+    }
+
+    private function fixtureUpload(string $relativePath): UploadedFile
+    {
+        $absolute = base_path('tests/fixtures/'.$relativePath);
+
+        return new UploadedFile(
+            $absolute,
+            basename($relativePath),
+            'application/json',
+            null,
+            true
+        );
     }
 }

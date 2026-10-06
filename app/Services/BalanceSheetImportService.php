@@ -47,7 +47,7 @@ class BalanceSheetImportService
             throw new \InvalidArgumentException('Invalid JSON: '.$e->getMessage(), 0, $e);
         }
 
-        if (! is_array($rows)) {
+        if (! is_array($rows) || ! array_is_list($rows)) {
             throw new \InvalidArgumentException('Expected a JSON array of balance sheet rows');
         }
 
@@ -66,20 +66,25 @@ class BalanceSheetImportService
                     continue;
                 }
 
-                $period = isset($row['periodo']) ? (string) $row['periodo'] : null;
-                if ($period === null || ! preg_match('/^\d{6}$/', $period)) {
-                    $errors[] = "Row {$index}: invalid or missing periodo";
-
-                    continue;
+                if (! array_key_exists('periodo', $row)) {
+                    throw new \InvalidArgumentException("Row {$index}: missing periodo");
                 }
 
-                if (! array_key_exists('activo_value', $row)
-                    || ! array_key_exists('pasivo_value', $row)
+                $period = (string) $row['periodo'];
+                if ($period === '' || ! preg_match('/^\d{6}$/', $period)) {
+                    throw new \InvalidArgumentException("Row {$index}: invalid or missing periodo");
+                }
+
+                if (! array_key_exists('activo_value', $row)) {
+                    throw new \InvalidArgumentException("Row {$index}: missing activo_value");
+                }
+
+                if (! array_key_exists('pasivo_value', $row)
                     || ! array_key_exists('patrimonio_value', $row)
                 ) {
-                    $errors[] = "Period {$period}: missing activo/pasivo/patrimonio values";
-
-                    continue;
+                    throw new \InvalidArgumentException(
+                        "Period {$period}: missing pasivo_value or patrimonio_value"
+                    );
                 }
 
                 $assets = $this->normalizeAmount($row['activo_value']);
@@ -127,27 +132,6 @@ class BalanceSheetImportService
         }
     }
 
-    /**
-     * Import from the default extracted source path.
-     *
-     * @return array{
-     *     periods_imported: int,
-     *     periods: list<string>,
-     *     snapshots: list<array{
-     *         period: string,
-     *         assets_cad: float,
-     *         liabilities_cad: float,
-     *         equity_cad: float
-     *     }>,
-     *     errors: list<string>
-     * }
-     */
-    public function importFromDefaultPath(): array
-    {
-        return $this->importFromFile(
-            base_path('plan/extracted/estado_financiero_2025_2026.json')
-        );
-    }
 
     /**
      * @return array{

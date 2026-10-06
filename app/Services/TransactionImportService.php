@@ -16,7 +16,7 @@ class TransactionImportService
     ) {}
 
     /**
-     * Import transactions from the historical JSON file.
+     * Import transactions from a JSON file (array of transaction objects).
      *
      * @param  string  $filePath  Path to the JSON file
      * @return array{imported: int, skipped: int, errors: array<string>}
@@ -37,7 +37,97 @@ class TransactionImportService
             throw new \InvalidArgumentException('Invalid JSON file: '.json_last_error_msg());
         }
 
+        if (! is_array($transactions) || ! array_is_list($transactions)) {
+            throw new \InvalidArgumentException('Transactions JSON must be an array of objects');
+        }
+
         return $this->importTransactions($transactions);
+    }
+
+    /**
+     * Import transactions from a CSV file.
+     *
+     * Required header columns: fecha, periodo, concepto_code, cad, usd, cop, comentarios.
+     * Extra columns are ignored. cad/usd/cop map onto nested value fields.
+     *
+     * @return array{imported: int, skipped: int, errors: array<string>}
+     */
+    public function importFromCsv(string $filePath): array
+    {
+        if (! file_exists($filePath)) {
+            throw new \InvalidArgumentException("File not found: {$filePath}");
+        }
+
+        $handle = fopen($filePath, 'r');
+        if ($handle === false) {
+            throw new \InvalidArgumentException("Failed to read file: {$filePath}");
+        }
+
+        try {
+            $header = fgetcsv($handle);
+            if ($header === false || $header === [null] || $header === []) {
+                throw new \InvalidArgumentException('CSV file is empty or missing a header row');
+            }
+
+            $header = array_map(
+                static fn ($column) => strtolower(trim((string) $column)),
+                $header
+            );
+
+            $required = ['fecha', 'periodo', 'concepto_code', 'cad', 'usd', 'cop', 'comentarios'];
+            foreach ($required as $column) {
+                if (! in_array($column, $header, true)) {
+                    throw new \InvalidArgumentException("CSV is missing required header: {$column}");
+                }
+            }
+
+            $indexByColumn = array_flip($header);
+            $transactions = [];
+
+            while (($row = fgetcsv($handle)) !== false) {
+                if ($row === [null] || $row === []) {
+                    continue;
+                }
+
+                $get = static function (string $column) use ($row, $indexByColumn): ?string {
+                    $index = $indexByColumn[$column];
+                    $value = $row[$index] ?? null;
+                    if ($value === null) {
+                        return null;
+                    }
+                    $trimmed = trim((string) $value);
+
+                    return $trimmed === '' ? null : $trimmed;
+                };
+
+                $transactions[] = [
+                    'fecha' => $get('fecha'),
+                    'periodo' => $get('periodo'),
+                    'concepto_code' => $get('concepto_code'),
+                    'cad' => ['value' => $this->parseCsvAmount($get('cad'))],
+                    'usd' => ['value' => $this->parseCsvAmount($get('usd'))],
+                    'cop' => ['value' => $this->parseCsvAmount($get('cop'))],
+                    'comentarios' => $get('comentarios'),
+                ];
+            }
+        } finally {
+            fclose($handle);
+        }
+
+        return $this->importTransactions($transactions);
+    }
+
+    private function parseCsvAmount(?string $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
     }
 
     /**

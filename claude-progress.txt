@@ -225,3 +225,37 @@ Test #27: Import by user upload (spec section 2).
   docsify docs (73-83), final sweep (84-86).
 
 
+
+## Session: 2026-10-06 (Import by user upload)
+
+### Accomplished
+1. **Section 2 — Import by user upload (features 28-40) DONE**
+   - Controllers accept multipart uploads only; reject `file_path`/`directory`.
+   - Temp-store under `tmp/imports`, parse, delete in `finally`.
+   - Invalid JSON/shape/extension and structural month-sheet/CSV errors return 422.
+   - `TransactionImportService::importFromCsv` maps flat cad/usd/cop columns.
+   - `AccountImportService::importFromFiles` for uploaded month sheets.
+   - Import UI: empty file inputs for transactions (.json/.csv), accounts (multi .json),
+     balance sheet (.json); client-side empty-submit guard; no personal filenames.
+   - Synthetic fixtures under `tests/fixtures/` (no `plan/extracted` copies).
+   - Updated PHPUnit + Playwright + frontend unit coverage; accounts/balance-sheet
+     browser specs upload fixtures instead of directory/path POSTs.
+
+2. **Verification**
+   - Backend: `php artisan test` 396 passed.
+   - Frontend: import unit tests + full suite via session helpers.
+   - Browser: `import-upload.spec.ts` 5/5; `accounts.spec.ts` 3/3;
+     `balance-sheet.spec.ts` 3/3 (including uploaded balance-sheet fixture).
+   - Screenshots in `verification/import-upload/`.
+   - Puppeteer MCP blocked in this session; Playwright UI verification used instead.
+   - Recreated corrupted sqlite after concurrent migrate-fresh collisions.
+
+### Progress
+- **36/87 features passing** (was 23/87).
+- Flipped import functional + style features 28-40 to true.
+
+### Next priority
+Locale preference and translations (spec section 6 / features ~40+):
+- users.locale migration (en/es), preferences language select, react-i18next catalogs,
+  Laravel locale middleware for authenticated requests.
+Then exchange-rate snapshots (section 8) and docsify guides (section 7).

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\BalanceSheetImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class BalanceSheetImportController extends Controller
 {
@@ -13,36 +16,42 @@ class BalanceSheetImportController extends Controller
     ) {}
 
     /**
-     * Import historical balance sheet data from estado_financiero JSON.
+     * Import historical balance sheet data from an uploaded JSON file.
      */
     public function import(Request $request): JsonResponse
     {
-        $request->validate([
-            'file_path' => 'nullable|string',
-        ]);
-
-        $fileName = $request->input('file_path', 'estado_financiero_2025_2026.json');
-
-        $basePath = base_path('plan/extracted');
-        $fullPath = realpath($basePath.'/'.$fileName);
-
-        if (! $fullPath || ! str_starts_with($fullPath, $basePath) || ! is_file($fullPath)) {
-            return response()->json([
-                'message' => 'Invalid file path',
-            ], 400);
+        if ($request->has('file_path') || $request->has('directory')) {
+            throw ValidationException::withMessages([
+                'file' => 'File path and directory imports are not supported. Upload a file instead.',
+            ]);
         }
 
+        $request->validate([
+            'file' => ['required', 'file', 'max:10240', 'extensions:json'],
+        ]);
+
+        /** @var UploadedFile $uploaded */
+        $uploaded = $request->file('file');
+        $storedPath = $uploaded->store('tmp/imports');
+        $absolutePath = Storage::path($storedPath);
+
         try {
-            $result = $this->importService->importFromFile($fullPath);
+            $result = $this->importService->importFromFile($absolutePath);
 
             return response()->json([
                 'message' => 'Balance sheet history import completed',
                 'data' => $result,
             ]);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Import failed: '.$e->getMessage(),
             ], 500);
+        } finally {
+            Storage::delete($storedPath);
         }
     }
 

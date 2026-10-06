@@ -641,7 +641,7 @@ destroy.form = destroyForm
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::importMethod
-* @see app/Http/Controllers/TransactionImportController.php:18
+* @see app/Http/Controllers/TransactionImportController.php:21
 * @route '/api/transactions/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -656,7 +656,7 @@ importMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::importMethod
-* @see app/Http/Controllers/TransactionImportController.php:18
+* @see app/Http/Controllers/TransactionImportController.php:21
 * @route '/api/transactions/import'
 */
 importMethod.url = (options?: RouteQueryOptions) => {
@@ -665,7 +665,7 @@ importMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::importMethod
-* @see app/Http/Controllers/TransactionImportController.php:18
+* @see app/Http/Controllers/TransactionImportController.php:21
 * @route '/api/transactions/import'
 */
 importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -675,7 +675,7 @@ importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::importMethod
-* @see app/Http/Controllers/TransactionImportController.php:18
+* @see app/Http/Controllers/TransactionImportController.php:21
 * @route '/api/transactions/import'
 */
 const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -685,7 +685,7 @@ const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'pos
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::importMethod
-* @see app/Http/Controllers/TransactionImportController.php:18
+* @see app/Http/Controllers/TransactionImportController.php:21
 * @route '/api/transactions/import'
 */
 importMethodForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

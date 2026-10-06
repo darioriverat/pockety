@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\TransactionImportController::statistics
-* @see app/Http/Controllers/TransactionImportController.php:53
+* @see app/Http/Controllers/TransactionImportController.php:66
 * @route '/api/transactions/import/statistics'
 */
 export const statistics = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ statistics.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::statistics
-* @see app/Http/Controllers/TransactionImportController.php:53
+* @see app/Http/Controllers/TransactionImportController.php:66
 * @route '/api/transactions/import/statistics'
 */
 statistics.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ statistics.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::statistics
-* @see app/Http/Controllers/TransactionImportController.php:53
+* @see app/Http/Controllers/TransactionImportController.php:66
 * @route '/api/transactions/import/statistics'
 */
 statistics.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ statistics.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::statistics
-* @see app/Http/Controllers/TransactionImportController.php:53
+* @see app/Http/Controllers/TransactionImportController.php:66
 * @route '/api/transactions/import/statistics'
 */
 statistics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ statistics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::statistics
-* @see app/Http/Controllers/TransactionImportController.php:53
+* @see app/Http/Controllers/TransactionImportController.php:66
 * @route '/api/transactions/import/statistics'
 */
 const statisticsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const statisticsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'>
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::statistics
-* @see app/Http/Controllers/TransactionImportController.php:53
+* @see app/Http/Controllers/TransactionImportController.php:66
 * @route '/api/transactions/import/statistics'
 */
 statisticsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ statisticsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::statistics
-* @see app/Http/Controllers/TransactionImportController.php:53
+* @see app/Http/Controllers/TransactionImportController.php:66
 * @route '/api/transactions/import/statistics'
 */
 statisticsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ statistics.form = statisticsForm
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::clear
-* @see app/Http/Controllers/TransactionImportController.php:65
+* @see app/Http/Controllers/TransactionImportController.php:78
 * @route '/api/transactions/import/clear'
 */
 export const clear = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ clear.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::clear
-* @see app/Http/Controllers/TransactionImportController.php:65
+* @see app/Http/Controllers/TransactionImportController.php:78
 * @route '/api/transactions/import/clear'
 */
 clear.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ clear.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::clear
-* @see app/Http/Controllers/TransactionImportController.php:65
+* @see app/Http/Controllers/TransactionImportController.php:78
 * @route '/api/transactions/import/clear'
 */
 clear.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ clear.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::clear
-* @see app/Http/Controllers/TransactionImportController.php:65
+* @see app/Http/Controllers/TransactionImportController.php:78
 * @route '/api/transactions/import/clear'
 */
 const clearForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const clearForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\TransactionImportController::clear
-* @see app/Http/Controllers/TransactionImportController.php:65
+* @see app/Http/Controllers/TransactionImportController.php:78
 * @route '/api/transactions/import/clear'
 */
 clearForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

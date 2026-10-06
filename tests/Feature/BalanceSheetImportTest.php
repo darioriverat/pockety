@@ -6,6 +6,8 @@ use App\Models\HistoricalBalanceSheet;
 use App\Models\User;
 use App\Services\BalanceSheetImportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class BalanceSheetImportTest extends TestCase
@@ -19,63 +21,95 @@ class BalanceSheetImportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Storage::fake('local');
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
-        $this->sourceFile = base_path('plan/extracted/estado_financiero_2025_2026.json');
+        $this->sourceFile = base_path('tests/fixtures/balance_sheet_sample.json');
     }
 
-    public function test_import_loads_all_periods_from_estado_financiero(): void
+    public function test_import_loads_all_periods_from_fixture(): void
     {
         $source = json_decode(file_get_contents($this->sourceFile), true);
         $this->assertIsArray($source);
-        $this->assertGreaterThanOrEqual(19, count($source));
+        $this->assertCount(2, $source);
 
         $service = app(BalanceSheetImportService::class);
         $result = $service->importFromFile($this->sourceFile);
 
-        $this->assertSame(count($source), $result['periods_imported']);
-        $this->assertCount(count($source), $result['periods']);
+        $this->assertSame(2, $result['periods_imported']);
         $this->assertSame([], $result['errors']);
-        $this->assertDatabaseCount('historical_balance_sheets', count($source));
+        $this->assertDatabaseCount('historical_balance_sheets', 2);
     }
 
-    public function test_import_values_match_source_for_january_2025(): void
+    public function test_import_values_match_fixture_for_january_2025(): void
     {
         $service = app(BalanceSheetImportService::class);
         $service->importFromFile($this->sourceFile);
 
         $row = HistoricalBalanceSheet::forPeriod('202501');
         $this->assertNotNull($row);
-        $this->assertEqualsWithDelta(24595.72549, (float) $row->assets_cad, 0.000001);
-        $this->assertEqualsWithDelta(35730.77158, (float) $row->liabilities_cad, 0.000001);
-        $this->assertEqualsWithDelta(-11135.04609, (float) $row->equity_cad, 0.000001);
+        $this->assertEqualsWithDelta(10000.5, (float) $row->assets_cad, 0.000001);
+        $this->assertEqualsWithDelta(4000.25, (float) $row->liabilities_cad, 0.000001);
+        $this->assertEqualsWithDelta(6000.25, (float) $row->equity_cad, 0.000001);
     }
 
-    public function test_import_api_endpoint_imports_selected_file(): void
+    public function test_import_api_endpoint_imports_uploaded_file(): void
     {
-        $source = json_decode(file_get_contents($this->sourceFile), true);
-
-        $response = $this->postJson('/api/balance-sheet/import', [
-            'file_path' => 'estado_financiero_2025_2026.json',
+        $response = $this->post('/api/balance-sheet/import', [
+            'file' => $this->fixtureUpload('balance_sheet_sample.json'),
         ]);
 
         $response->assertOk();
         $response->assertJsonPath('message', 'Balance sheet history import completed');
-        $response->assertJsonPath('data.periods_imported', count($source));
+        $response->assertJsonPath('data.periods_imported', 2);
         $response->assertJsonPath('data.errors', []);
         $this->assertDatabaseHas('historical_balance_sheets', [
+            'user_id' => $this->user->id,
             'period' => '202501',
         ]);
+        $this->assertSame([], Storage::disk('local')->allFiles('tmp/imports'));
     }
 
-    public function test_import_api_rejects_path_traversal(): void
+    public function test_import_api_rejects_file_path_and_directory(): void
     {
-        $response = $this->postJson('/api/balance-sheet/import', [
-            'file_path' => '../composer.json',
+        $pathResponse = $this->postJson('/api/balance-sheet/import', [
+            'file_path' => 'plan/extracted/estado_financiero_2025_2026.json',
         ]);
+        $pathResponse->assertStatus(422);
 
-        $response->assertStatus(400);
-        $response->assertJsonPath('message', 'Invalid file path');
+        $dirResponse = $this->postJson('/api/balance-sheet/import', [
+            'directory' => 'month_sheets',
+        ]);
+        $dirResponse->assertStatus(422);
+
+        $this->assertDatabaseCount('historical_balance_sheets', 0);
+    }
+
+    public function test_import_api_rejects_invalid_json_and_extensions(): void
+    {
+        $invalid = $this->post('/api/balance-sheet/import', [
+            'file' => $this->fixtureUpload('invalid/broken.json'),
+        ]);
+        $invalid->assertStatus(422);
+
+        $extension = $this->post('/api/balance-sheet/import', [
+            'file' => UploadedFile::fake()->create('sheet.txt', 10, 'text/plain'),
+        ]);
+        $extension->assertStatus(422);
+
+        $missingPeriodo = $this->post('/api/balance-sheet/import', [
+            'file' => $this->fixtureUpload('invalid/balance_sheet_missing_periodo.json'),
+        ]);
+        $missingPeriodo->assertStatus(422);
+        $this->assertStringContainsString('periodo', (string) $missingPeriodo->json('message'));
+
+        $missingActivo = $this->post('/api/balance-sheet/import', [
+            'file' => $this->fixtureUpload('invalid/balance_sheet_missing_activo.json'),
+        ]);
+        $missingActivo->assertStatus(422);
+        $this->assertStringContainsString('activo_value', (string) $missingActivo->json('message'));
+
+        $this->assertDatabaseCount('historical_balance_sheets', 0);
     }
 
     public function test_import_statistics_endpoint_returns_snapshots(): void
@@ -85,11 +119,11 @@ class BalanceSheetImportTest extends TestCase
         $response = $this->getJson('/api/balance-sheet/import/statistics');
 
         $response->assertOk();
-        $response->assertJsonPath('data.total', 19);
+        $response->assertJsonPath('data.total', 2);
         $response->assertJsonPath('data.periods_covered.min', '202501');
-        $response->assertJsonPath('data.periods_covered.max', '202607');
+        $response->assertJsonPath('data.periods_covered.max', '202502');
         $response->assertJsonPath('data.snapshots.0.period', '202501');
-        $response->assertJsonPath('data.snapshots.0.assets_cad', 24595.72549);
+        $response->assertJsonPath('data.snapshots.0.assets_cad', 10000.5);
     }
 
     public function test_import_is_idempotent(): void
@@ -135,5 +169,18 @@ class BalanceSheetImportTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page->component('import'));
+    }
+
+    private function fixtureUpload(string $relativePath): UploadedFile
+    {
+        $absolute = base_path('tests/fixtures/'.$relativePath);
+
+        return new UploadedFile(
+            $absolute,
+            basename($relativePath),
+            'application/json',
+            null,
+            true
+        );
     }
 }

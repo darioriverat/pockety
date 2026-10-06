@@ -44,7 +44,7 @@ class AccountImportService
     ];
 
     /**
-     * Import accounts (and recorded balances) from month_sheets JSON files.
+     * Import accounts (and recorded balances) from a directory of month-sheet JSON files.
      *
      * @return array{
      *     accounts_created: int,
@@ -68,6 +68,28 @@ class AccountImportService
 
         sort($files);
 
+        return $this->importFromFiles($files);
+    }
+
+    /**
+     * Import accounts from an explicit list of month-sheet JSON file paths.
+     *
+     * @param  list<string>  $files
+     * @return array{
+     *     accounts_created: int,
+     *     accounts_updated: int,
+     *     balances_imported: int,
+     *     transactions_linked: int,
+     *     accounts: list<string>,
+     *     errors: list<string>
+     * }
+     */
+    public function importFromFiles(array $files): array
+    {
+        if ($files === []) {
+            throw new \InvalidArgumentException('No month sheet files provided');
+        }
+
         /** @var array<string, array{type: string, currencies: array<string, bool>, notes: ?string}> $catalog */
         $catalog = [];
         /** @var array<string, array<string, array{cad: ?float, usd: ?float, cop: ?float}>> $balancesByAccount */
@@ -77,6 +99,9 @@ class AccountImportService
         foreach ($files as $file) {
             try {
                 $this->collectFromMonthSheet($file, $catalog, $balancesByAccount);
+            } catch (\InvalidArgumentException $e) {
+                // Structural validation failures must abort the import with a 422.
+                throw $e;
             } catch (\Throwable $e) {
                 $errors[] = basename($file).': '.$e->getMessage();
                 Log::error('Failed to parse month sheet for account import', [
@@ -177,23 +202,6 @@ class AccountImportService
     }
 
     /**
-     * Import using the default extracted month_sheets directory.
-     *
-     * @return array{
-     *     accounts_created: int,
-     *     accounts_updated: int,
-     *     balances_imported: int,
-     *     transactions_linked: int,
-     *     accounts: list<string>,
-     *     errors: list<string>
-     * }
-     */
-    public function importFromDefaultPath(): array
-    {
-        return $this->importFromMonthSheets(base_path('plan/extracted/month_sheets'));
-    }
-
-    /**
      * @param  array<string, array{type: string, currencies: array<string, bool>, notes: ?string}>  $catalog
      * @param  array<string, array<string, array{cad: ?float, usd: ?float, cop: ?float}>>  $balancesByAccount
      */
@@ -205,19 +213,28 @@ class AccountImportService
         }
 
         $data = json_decode($json, true);
-        if (! is_array($data)) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \InvalidArgumentException('Invalid JSON: '.json_last_error_msg());
+        }
+
+        if (! is_array($data) || array_is_list($data)) {
+            throw new \InvalidArgumentException(
+                'Invalid month sheet JSON: expected an object with header and sections'
+            );
         }
 
         $period = (string) ($data['header']['period']['value'] ?? '');
         if ($period === '' || ! preg_match('/^\d{6}$/', $period)) {
-            throw new \InvalidArgumentException('Missing or invalid period in month sheet');
+            throw new \InvalidArgumentException('Missing or invalid header.period.value in month sheet');
         }
 
-        $sections = $data['sections'] ?? [];
+        $sections = $data['sections'] ?? null;
+        if (! is_array($sections) || ! isset($sections['Cuentas']['items']) || ! is_array($sections['Cuentas']['items'])) {
+            throw new \InvalidArgumentException('Month sheet must include sections.Cuentas.items');
+        }
 
         $this->collectSectionItems(
-            $sections['Cuentas']['items'] ?? [],
+            $sections['Cuentas']['items'],
             'bank',
             $period,
             $catalog,

@@ -1,0 +1,60 @@
+{
+  "header": {
+    "title": "FEBRUARY",
+    "period": {
+      "formula": null,
+      "value": "202502"
+    }
+  },
+  "sections": {
+    "Cuentas": {
+      "items": [
+        {
+          "label": "RBC Checking",
+          "recorded": {
+            "cad": { "value": 4100.0 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "Bancolombia",
+          "recorded": {
+            "cad": { "value": null },
+            "usd": { "value": null },
+            "cop": { "value": 1600000.0 }
+          }
+        },
+        {
+          "label": "Total",
+          "recorded": {
+            "cad": { "value": 0 },
+            "usd": { "value": 0 },
+            "cop": { "value": 0 }
+          }
+        }
+      ]
+    },
+    "CREDITOS Y DEUDAS": {
+      "items": [
+        {
+          "label": "Personal LOAN CIBC",
+          "recorded": {
+            "cad": { "value": 18000.0 },
+            "usd": { "value": null },
+            "cop": { "value": null }
+          }
+        },
+        {
+          "label": "Total",
+          "recorded": {
+            "cad": { "value": 0 },
+            "usd": { "value": 0 },
+            "cop": { "value": 0 }
+          }
+        }
+      ]
+    }
+  },
+  "sheet_name": "SAMPLE 202502"
+}

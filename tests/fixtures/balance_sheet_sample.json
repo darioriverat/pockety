@@ -1,0 +1,16 @@
+[
+  {
+    "row": 1,
+    "periodo": "202501",
+    "activo_value": 10000.5,
+    "pasivo_value": 4000.25,
+    "patrimonio_value": 6000.25
+  },
+  {
+    "row": 2,
+    "periodo": "202502",
+    "activo_value": 11000.0,
+    "pasivo_value": 4200.0,
+    "patrimonio_value": 6800.0
+  }
+]
