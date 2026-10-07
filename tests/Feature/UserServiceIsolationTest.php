@@ -485,13 +485,13 @@ class UserServiceIsolationTest extends TestCase
         $this->actingAs($this->userA);
         $result = app(TransactionImportService::class)->importTransactions([
             [
-                'fecha' => '2026-01-07',
-                'periodo' => '202601',
-                'concepto_code' => 'C001',
+                'date' => '2026-01-07',
+                'period' => '202601',
+                'category_code' => 'C001',
                 'cad' => ['value' => 15.5],
                 'usd' => ['value' => null],
                 'cop' => ['value' => null],
-                'comentarios' => 'imported-for-a',
+                'comments' => 'imported-for-a',
             ],
         ]);
 

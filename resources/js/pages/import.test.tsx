@@ -128,7 +128,7 @@ describe('Import page uploads', () => {
         await waitFor(() => expect(fetchMock).toHaveBeenCalled());
 
         const file = new File(
-            [JSON.stringify([{ fecha: '2025-01-01', periodo: '202501' }])],
+            [JSON.stringify([{ date: '2025-01-01', period: '202501' }])],
             'sample.json',
             { type: 'application/json' },
         );

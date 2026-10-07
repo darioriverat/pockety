@@ -47,7 +47,7 @@ class TransactionImportService
     /**
      * Import transactions from a CSV file.
      *
-     * Required header columns: fecha, periodo, concepto_code, cad, usd, cop, comentarios.
+     * Required header columns: date, period, category_code, cad, usd, cop, comments.
      * Extra columns are ignored. cad/usd/cop map onto nested value fields.
      *
      * @return array{imported: int, skipped: int, errors: array<string>}
@@ -74,7 +74,7 @@ class TransactionImportService
                 $header
             );
 
-            $required = ['fecha', 'periodo', 'concepto_code', 'cad', 'usd', 'cop', 'comentarios'];
+            $required = ['date', 'period', 'category_code', 'cad', 'usd', 'cop', 'comments'];
             foreach ($required as $column) {
                 if (! in_array($column, $header, true)) {
                     throw new \InvalidArgumentException("CSV is missing required header: {$column}");
@@ -101,13 +101,13 @@ class TransactionImportService
                 };
 
                 $transactions[] = [
-                    'fecha' => $get('fecha'),
-                    'periodo' => $get('periodo'),
-                    'concepto_code' => $get('concepto_code'),
+                    'date' => $get('date'),
+                    'period' => $get('period'),
+                    'category_code' => $get('category_code'),
                     'cad' => ['value' => $this->parseCsvAmount($get('cad'))],
                     'usd' => ['value' => $this->parseCsvAmount($get('usd'))],
                     'cop' => ['value' => $this->parseCsvAmount($get('cop'))],
-                    'comentarios' => $get('comentarios'),
+                    'comments' => $get('comments'),
                 ];
             }
         } finally {
@@ -150,7 +150,7 @@ class TransactionImportService
         try {
             foreach ($transactions as $index => $transaction) {
                 // Skip template rows (no date or period)
-                if (empty($transaction['fecha']) || empty($transaction['periodo'])) {
+                if (empty($transaction['date']) || empty($transaction['period'])) {
                     $skipped++;
 
                     continue;
@@ -190,7 +190,7 @@ class TransactionImportService
     private function importTransaction(array $data, array $categoryMapping): void
     {
         // Map C040 to C031
-        $categoryCode = $data['concepto_code'];
+        $categoryCode = $data['category_code'];
         if ($categoryCode === 'C040') {
             $categoryCode = 'C031';
         }
@@ -202,7 +202,7 @@ class TransactionImportService
         }
 
         // Parse date
-        $date = new \DateTime($data['fecha']);
+        $date = new \DateTime($data['date']);
 
         // Get amounts
         $amountCad = $data['cad']['value'] ?? null;
@@ -210,7 +210,7 @@ class TransactionImportService
         $amountCop = $data['cop']['value'] ?? null;
 
         // Get comments
-        $comments = $data['comentarios'] ?? null;
+        $comments = $data['comments'] ?? null;
 
         // Detect debt component from comments
         $debtComponent = $this->detectDebtComponent($comments, $categoryCode);
@@ -222,7 +222,7 @@ class TransactionImportService
         Transaction::create([
             'user_id' => $this->owner->id(),
             'date' => $date->format('Y-m-d'),
-            'period' => (string) $data['periodo'],
+            'period' => (string) $data['period'],
             'category_id' => $categoryId,
             'account_id' => $accountId,
             'amount_cad' => $amountCad,

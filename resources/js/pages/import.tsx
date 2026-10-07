@@ -364,9 +364,9 @@ export default function Import() {
                     <CardHeader>
                         <CardTitle>{t('pages.import.transactions')}</CardTitle>
                         <CardDescription>
-                            Upload one .json or .csv file. JSON rows use fecha,
-                            periodo, concepto_code, nested cad/usd/cop values,
-                            and comentarios. CSV uses the same columns as a flat
+                            Upload one .json or .csv file. JSON rows use date,
+                            period, category_code, nested cad/usd/cop values,
+                            and comments. CSV uses the same columns as a flat
                             header.
                         </CardDescription>
                     </CardHeader>
@@ -518,7 +518,7 @@ export default function Import() {
                         <CardDescription>
                             Upload one or more month-sheet .json files. Each
                             file needs header.period.value and
-                            sections.Cuentas.items with recorded balances.
+                            sections.Accounts.items with recorded balances.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">

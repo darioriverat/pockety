@@ -1,38 +1,38 @@
 [
   {
-    "fecha": "2025-01-10",
-    "periodo": "202501",
-    "concepto_code": "C001",
+    "date": "2025-01-10",
+    "period": "202501",
+    "category_code": "C001",
     "cad": { "value": 42.5 },
     "usd": { "value": null },
     "cop": { "value": null },
-    "comentarios": "Synthetic groceries"
+    "comments": "Synthetic groceries"
   },
   {
-    "fecha": "2025-01-12",
-    "periodo": "202501",
-    "concepto_code": "C006",
+    "date": "2025-01-12",
+    "period": "202501",
+    "category_code": "C006",
     "cad": { "value": 18.0 },
     "usd": { "value": 5.0 },
     "cop": { "value": null },
-    "comentarios": "Synthetic dining receipt"
+    "comments": "Synthetic dining receipt"
   },
   {
-    "fecha": null,
-    "periodo": "202501",
-    "concepto_code": "C001",
+    "date": null,
+    "period": "202501",
+    "category_code": "C001",
     "cad": { "value": 1.0 },
     "usd": { "value": null },
     "cop": { "value": null },
-    "comentarios": "Template row without date"
+    "comments": "Template row without date"
   },
   {
-    "fecha": "2025-01-13",
-    "periodo": null,
-    "concepto_code": "C001",
+    "date": "2025-01-13",
+    "period": null,
+    "category_code": "C001",
     "cad": { "value": 2.0 },
     "usd": { "value": null },
     "cop": { "value": null },
-    "comentarios": "Template row without period"
+    "comments": "Template row without period"
   }
 ]

@@ -79,7 +79,7 @@ class TransactionImportTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $response->assertJsonFragment(['message' => 'CSV is missing required header: fecha']);
+        $response->assertJsonFragment(['message' => 'CSV is missing required header: date']);
         $this->assertSame($before, Transaction::query()->count());
     }
 

@@ -183,11 +183,11 @@ class AccountImportTest extends TestCase
         $noPeriod->assertStatus(422);
         $this->assertStringContainsString('header.period.value', (string) $noPeriod->json('message'));
 
-        $noCuentas = $this->post('/api/accounts/import', [
-            'files' => [$this->fixtureUpload('invalid/month_sheet_no_cuentas.json')],
+        $noAccounts = $this->post('/api/accounts/import', [
+            'files' => [$this->fixtureUpload('invalid/month_sheet_no_accounts.json')],
         ]);
-        $noCuentas->assertStatus(422);
-        $this->assertStringContainsString('sections.Cuentas.items', (string) $noCuentas->json('message'));
+        $noAccounts->assertStatus(422);
+        $this->assertStringContainsString('sections.Accounts.items', (string) $noAccounts->json('message'));
 
         $this->assertDatabaseCount('accounts', 0);
     }

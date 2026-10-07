@@ -7,7 +7,7 @@
     }
   },
   "sections": {
-    "Cuentas": {
+    "Accounts": {
       "items": [
         {
           "label": "RBC Checking",
@@ -35,7 +35,7 @@
         }
       ]
     },
-    "CREDITOS Y DEUDAS": {
+    "Credits and Debts": {
       "items": [
         {
           "label": "Personal LOAN CIBC",

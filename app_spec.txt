@@ -62,9 +62,9 @@ Required API
 - Stop accepting file_path and directory as locations on the server.
 - Accept multipart uploads only. Store them temporarily, parse them, then delete the temp files.
 - Never resolve a client-supplied path under plan/extracted or anywhere else on disk.
-- Transactions JSON: a JSON array of objects. Each object uses the fields TransactionImportService already reads: fecha, periodo, concepto_code, cad.value, usd.value, cop.value, comentarios. Rows missing fecha or periodo are skipped, as today.
-- Transactions CSV: header row with columns fecha, periodo, concepto_code, cad, usd, cop, comentarios. Map cad, usd, and cop onto the same nested value fields the JSON importer uses. Extra columns are ignored. A missing required header is a 422.
-- Accounts: each uploaded file is a month-sheet JSON document with header.period.value (YYYYMM) and sections.Cuentas.items (label plus recorded.cad/usd/cop.value). Pass those files to the existing month-sheet parser. Do not require a directory on disk.
+- Transactions JSON: a JSON array of objects. Each object uses the fields TransactionImportService already reads: date, period, category_code, cad.value, usd.value, cop.value, comments. Rows missing date or period are skipped, as today.
+- Transactions CSV: header row with columns date, period, category_code, cad, usd, cop, comments. Map cad, usd, and cop onto the same nested value fields the JSON importer uses. Extra columns are ignored. A missing required header is a 422.
+- Accounts: each uploaded file is a month-sheet JSON document with header.period.value (YYYYMM) and sections.Accounts.items (label plus recorded.cad/usd/cop.value). Liabilities live under sections["Credits and Debts"].items. Pass those files to the existing month-sheet parser. Do not require a directory on disk.
 - Balance sheet JSON: a JSON array of objects with periodo (YYYYMM), activo_value, pasivo_value, and patrimonio_value, parsed by BalanceSheetImportService.
 - Invalid JSON, the wrong top-level shape, or a disallowed extension returns 422 with a readable message. Do not return 500 for validation failures.
 

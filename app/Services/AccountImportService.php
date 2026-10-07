@@ -229,15 +229,15 @@ class AccountImportService
         }
 
         $sections = $data['sections'] ?? null;
-        if (! is_array($sections) || ! isset($sections['Cuentas']['items']) || ! is_array($sections['Cuentas']['items'])) {
-            throw new \InvalidArgumentException('Month sheet must include sections.Cuentas.items');
+        if (! is_array($sections) || ! isset($sections['Accounts']['items']) || ! is_array($sections['Accounts']['items'])) {
+            throw new \InvalidArgumentException('Month sheet must include sections.Accounts.items');
         }
 
-        /** @var list<array<string, mixed>> $cuentasItems */
-        $cuentasItems = $sections['Cuentas']['items'];
+        /** @var list<array<string, mixed>> $accountItems */
+        $accountItems = $sections['Accounts']['items'];
 
         $this->collectSectionItems(
-            $cuentasItems,
+            $accountItems,
             'bank',
             $period,
             $catalog,
@@ -245,7 +245,7 @@ class AccountImportService
         );
 
         $this->collectSectionItems(
-            $sections['CREDITOS Y DEUDAS']['items'] ?? [],
+            $sections['Credits and Debts']['items'] ?? [],
             'liability',
             $period,
             $catalog,

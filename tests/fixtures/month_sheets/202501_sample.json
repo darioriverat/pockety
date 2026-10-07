@@ -7,7 +7,7 @@
     }
   },
   "sections": {
-    "Cuentas": {
+    "Accounts": {
       "items": [
         {
           "label": "Bancolombia",
@@ -83,7 +83,7 @@
         }
       ]
     },
-    "CREDITOS Y DEUDAS": {
+    "Credits and Debts": {
       "items": [
         {
           "label": "Crédito Móvil **6174",
