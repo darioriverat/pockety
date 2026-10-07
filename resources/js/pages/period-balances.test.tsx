@@ -44,6 +44,15 @@ const registered = {
     updated_at: '2026-01-15T12:00:00.000000Z',
 };
 
+function figureRow(amount: HTMLElement): HTMLElement {
+    const row = amount.parentElement?.parentElement;
+    if (!row) {
+        throw new Error('Expected a figure row');
+    }
+
+    return row;
+}
+
 describe('PeriodBalances page', () => {
     beforeEach(() => {
         vi.restoreAllMocks();
@@ -96,6 +105,166 @@ describe('PeriodBalances page', () => {
         expect(
             screen.queryByTestId('overwrite-balance-dialog'),
         ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId('balance-figures-differ-warning'),
+        ).not.toBeInTheDocument();
+        expect(screen.getByTestId('proposed-balance-card')).not.toHaveAttribute(
+            'data-differs',
+        );
+        expect(screen.getByTestId('register-period-balance')).toHaveTextContent(
+            'Register balance',
+        );
+    });
+
+    it('highlights figures that differ from the registered balance', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: async () => ({
+                    data: {
+                        period: '202501',
+                        proposed: {
+                            ...proposed,
+                            assets_cad: 850,
+                            equity_cad: 850,
+                            reconciliation_status: 'balanced',
+                        },
+                        registered,
+                        history: [],
+                    },
+                }),
+            }),
+        );
+
+        render(<PeriodBalances />);
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('balance-figures-differ-warning'),
+            ).toHaveTextContent(
+                /assets, equity, and reconciliation status differ/i,
+            );
+        });
+        expect(
+            screen.getByTestId('balance-figures-differ-warning'),
+        ).toHaveTextContent(/overwrite/i);
+
+        expect(screen.getByTestId('proposed-balance-card')).toHaveAttribute(
+            'data-differs',
+            'true',
+        );
+        expect(screen.getByTestId('registered-balance-card')).toHaveAttribute(
+            'data-differs',
+            'true',
+        );
+        expect(screen.getByTestId('proposed-balance-card')).toHaveClass(
+            'border-amber-400',
+        );
+        expect(screen.getByTestId('registered-balance-card')).toHaveClass(
+            'border-amber-400',
+        );
+
+        const proposedAssets = screen.getByTestId('proposed-assets-cad');
+        expect(proposedAssets).toHaveTextContent('$850.00');
+        expect(figureRow(proposedAssets)).toHaveAttribute(
+            'data-differs',
+            'true',
+        );
+        expect(figureRow(proposedAssets)).toHaveClass('bg-amber-50');
+        expect(
+            screen.getByTestId('proposed-assets-cad-delta'),
+        ).toHaveTextContent('-$50.00');
+        expect(
+            figureRow(screen.getByTestId('proposed-equity-cad')),
+        ).toHaveClass('bg-amber-50');
+        expect(
+            screen.getByTestId('proposed-equity-cad-delta'),
+        ).toHaveTextContent('-$50.00');
+        expect(
+            figureRow(screen.getByTestId('proposed-liabilities-cad')),
+        ).not.toHaveAttribute('data-differs');
+        expect(
+            screen.queryByTestId('proposed-liabilities-cad-delta'),
+        ).not.toBeInTheDocument();
+        expect(
+            figureRow(screen.getByTestId('proposed-expenses-cad')),
+        ).not.toHaveAttribute('data-differs');
+
+        expect(
+            figureRow(screen.getByTestId('registered-assets-cad')),
+        ).toHaveClass('bg-amber-50');
+        expect(
+            screen.queryByTestId('registered-assets-cad-delta'),
+        ).not.toBeInTheDocument();
+        expect(
+            figureRow(screen.getByTestId('registered-liabilities-cad')),
+        ).not.toHaveAttribute('data-differs');
+
+        expect(
+            screen.getByTestId('proposed-reconciliation-status'),
+        ).toHaveAttribute('data-differs', 'true');
+        expect(
+            screen.getByTestId('registered-reconciliation-status'),
+        ).toHaveAttribute('data-differs', 'true');
+        expect(
+            screen.getByTestId('proposed-reconciliation-status'),
+        ).toHaveClass('bg-amber-50');
+        expect(screen.getByTestId('register-period-balance')).toHaveTextContent(
+            'Overwrite balance',
+        );
+    });
+
+    it('leaves matching registered figures unhighlighted', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: async () => ({
+                    data: {
+                        period: '202501',
+                        proposed,
+                        registered,
+                        history: [],
+                    },
+                }),
+            }),
+        );
+
+        render(<PeriodBalances />);
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('registered-assets-cad'),
+            ).toHaveTextContent('$900.00');
+        });
+
+        expect(
+            screen.queryByTestId('balance-figures-differ-warning'),
+        ).not.toBeInTheDocument();
+        expect(screen.getByTestId('proposed-balance-card')).not.toHaveAttribute(
+            'data-differs',
+        );
+        expect(
+            screen.getByTestId('registered-balance-card'),
+        ).not.toHaveAttribute('data-differs');
+        expect(
+            figureRow(screen.getByTestId('proposed-assets-cad')),
+        ).not.toHaveAttribute('data-differs');
+        expect(
+            figureRow(screen.getByTestId('registered-assets-cad')),
+        ).not.toHaveAttribute('data-differs');
+        expect(
+            screen.getByTestId('proposed-reconciliation-status'),
+        ).not.toHaveAttribute('data-differs');
+        expect(
+            screen.getByTestId('registered-reconciliation-status'),
+        ).not.toHaveAttribute('data-differs');
+        expect(screen.getByTestId('register-period-balance')).toHaveTextContent(
+            'Register balance',
+        );
     });
 
     it('asks before overwriting an existing balance and keeps the previous figures in history', async () => {
@@ -216,6 +385,24 @@ describe('PeriodBalances page', () => {
         expect(screen.getByTestId('overwrite-balance-comparison')).toHaveClass(
             'sm:grid-cols-2',
         );
+        expect(
+            screen.getByTestId('overwrite-figures-differ-warning'),
+        ).toHaveTextContent(/assets and equity differ/i);
+        expect(
+            figureRow(screen.getByTestId('overwrite-existing-assets-cad')),
+        ).toHaveClass('bg-amber-50');
+        expect(
+            figureRow(screen.getByTestId('overwrite-proposed-assets-cad')),
+        ).toHaveClass('bg-amber-50');
+        expect(
+            screen.getByTestId('overwrite-proposed-assets-cad-delta'),
+        ).toHaveTextContent('-$50.00');
+        expect(
+            figureRow(screen.getByTestId('overwrite-proposed-liabilities-cad')),
+        ).not.toHaveAttribute('data-differs');
+        expect(
+            screen.queryByTestId('overwrite-proposed-liabilities-cad-delta'),
+        ).not.toBeInTheDocument();
 
         const postsBeforeConfirm = fetchMock.mock.calls.filter(
             (call) => (call[1] as RequestInit | undefined)?.method === 'POST',
@@ -233,6 +420,9 @@ describe('PeriodBalances page', () => {
         expect(screen.getByTestId('registered-assets-cad')).toHaveTextContent(
             '$850.00',
         );
+        expect(
+            screen.queryByTestId('balance-figures-differ-warning'),
+        ).not.toBeInTheDocument();
         expect(screen.getByTestId('balance-history-row-3')).toBeInTheDocument();
         expect(
             screen.getByTestId('balance-history-assets-3'),

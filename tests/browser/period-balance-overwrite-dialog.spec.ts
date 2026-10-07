@@ -118,6 +118,22 @@ test('overwrite dialog layout is wide, side-by-side, and readable on desktop', a
     await expect(page.getByTestId('overwrite-proposed-assets-cad')).toHaveText(
         '$750.00',
     );
+    await expect(
+        page.getByTestId('overwrite-figures-differ-warning'),
+    ).toBeVisible();
+    await expect(
+        page.getByTestId('overwrite-proposed-assets-cad-delta'),
+    ).toHaveText('-$150.00');
+    await expect(
+        page
+            .getByTestId('overwrite-existing-assets-cad')
+            .locator('xpath=ancestor::div[1]'),
+    ).toHaveAttribute('data-differs', 'true');
+    await expect(
+        page
+            .getByTestId('overwrite-proposed-liabilities-cad')
+            .locator('xpath=ancestor::div[1]'),
+    ).not.toHaveAttribute('data-differs', 'true');
 
     await expect(dialog).toHaveClass(/sm:max-w-3xl/);
 

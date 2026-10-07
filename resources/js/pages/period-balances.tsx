@@ -33,8 +33,12 @@ import { PageContainer } from '@/components/page-container';
 import TextLink from '@/components/text-link';
 import { usePeriod } from '@/hooks/use-period';
 import { useSelectablePeriods } from '@/hooks/use-selectable-periods';
-import { formatDisplayCurrency } from '@/lib/currency';
+import {
+    formatDisplayCurrency,
+    formatSignedDisplayCurrency,
+} from '@/lib/currency';
 import { formatPeriod } from '@/lib/periods';
+import { cn } from '@/lib/utils';
 import { AlertTriangle, BookMarked, CheckCircle2, XCircle } from 'lucide-react';
 
 interface BalanceFigures {
@@ -87,36 +91,121 @@ function statusLabel(status: string): string {
     return status === 'balanced' ? 'Balanced' : 'Unbalanced';
 }
 
+const MONEY_EPSILON = 0.005;
+
+const FIGURE_ROWS: Array<{
+    label: string;
+    key: string;
+    field: keyof Pick<
+        BalanceFigures,
+        | 'assets_cad'
+        | 'liabilities_cad'
+        | 'equity_cad'
+        | 'income_cad'
+        | 'net_operating_expenses_cad'
+        | 'records_check_result_cad'
+    >;
+}> = [
+    { label: 'Assets', key: 'assets-cad', field: 'assets_cad' },
+    { label: 'Liabilities', key: 'liabilities-cad', field: 'liabilities_cad' },
+    { label: 'Equity', key: 'equity-cad', field: 'equity_cad' },
+    { label: 'Income', key: 'income-cad', field: 'income_cad' },
+    {
+        label: 'Net operating expenses',
+        key: 'expenses-cad',
+        field: 'net_operating_expenses_cad',
+    },
+    {
+        label: 'Records check',
+        key: 'records-check-cad',
+        field: 'records_check_result_cad',
+    },
+];
+
+function amountsDiffer(left: number, right: number): boolean {
+    return Math.abs(left - right) > MONEY_EPSILON;
+}
+
+function changedFigureKeys(
+    proposed: BalanceFigures,
+    registered: BalanceFigures,
+): Set<string> {
+    const changed = new Set<string>();
+
+    for (const row of FIGURE_ROWS) {
+        if (amountsDiffer(proposed[row.field], registered[row.field])) {
+            changed.add(row.key);
+        }
+    }
+
+    if (proposed.reconciliation_status !== registered.reconciliation_status) {
+        changed.add('reconciliation-status');
+    }
+
+    return changed;
+}
+
+function figureDeltas(
+    proposed: BalanceFigures,
+    registered: BalanceFigures,
+    changed: ReadonlySet<string>,
+): Record<string, number> {
+    const deltas: Record<string, number> = {};
+
+    for (const row of FIGURE_ROWS) {
+        if (changed.has(row.key)) {
+            deltas[row.key] =
+                Math.round(
+                    (proposed[row.field] - registered[row.field]) * 100,
+                ) / 100;
+        }
+    }
+
+    return deltas;
+}
+
+function describeChangedFigures(changed: ReadonlySet<string>): string {
+    const labels = FIGURE_ROWS.filter((row) => changed.has(row.key)).map(
+        (row) => row.label.toLowerCase(),
+    );
+
+    if (changed.has('reconciliation-status')) {
+        labels.push('reconciliation status');
+    }
+
+    if (labels.length === 0) {
+        return '';
+    }
+
+    const sentence =
+        labels.length === 1
+            ? `${labels[0]} differs`
+            : labels.length === 2
+              ? `${labels[0]} and ${labels[1]} differ`
+              : `${labels.slice(0, -1).join(', ')}, and ${labels[labels.length - 1]} differ`;
+
+    return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+}
+
 function FigureGrid({
     figures,
     testIdPrefix,
     columns = 'responsive',
+    changedKeys,
+    deltas,
 }: {
     figures: BalanceFigures;
     testIdPrefix: string;
     /** Single-column avoids nested-grid overlap inside the overwrite dialog. */
     columns?: 'responsive' | 'single';
+    changedKeys?: ReadonlySet<string>;
+    deltas?: Readonly<Record<string, number>>;
 }) {
-    const rows: Array<{ label: string; key: string; value: number }> = [
-        { label: 'Assets', key: 'assets-cad', value: figures.assets_cad },
-        {
-            label: 'Liabilities',
-            key: 'liabilities-cad',
-            value: figures.liabilities_cad,
-        },
-        { label: 'Equity', key: 'equity-cad', value: figures.equity_cad },
-        { label: 'Income', key: 'income-cad', value: figures.income_cad },
-        {
-            label: 'Net operating expenses',
-            key: 'expenses-cad',
-            value: figures.net_operating_expenses_cad,
-        },
-        {
-            label: 'Records check',
-            key: 'records-check-cad',
-            value: figures.records_check_result_cad,
-        },
-    ];
+    const rows = FIGURE_ROWS.map((row) => ({
+        label: row.label,
+        key: row.key,
+        value: figures[row.field],
+    }));
 
     return (
         <dl
@@ -126,22 +215,54 @@ function FigureGrid({
                     : 'grid gap-3 sm:grid-cols-2'
             }
         >
-            {rows.map((row) => (
-                <div
-                    key={row.key}
-                    className="flex items-baseline justify-between gap-4"
-                >
-                    <dt className="text-muted-foreground text-sm">
-                        {row.label}
-                    </dt>
-                    <dd
-                        className="text-sm font-medium tabular-nums"
-                        data-testid={`${testIdPrefix}-${row.key}`}
+            {rows.map((row) => {
+                const changed = changedKeys?.has(row.key) ?? false;
+                const delta = deltas?.[row.key];
+
+                return (
+                    <div
+                        key={row.key}
+                        data-differs={changed ? 'true' : undefined}
+                        className={cn(
+                            'flex items-baseline justify-between gap-4 rounded-md px-2 py-1',
+                            changed &&
+                                'bg-amber-50 ring-1 ring-amber-300 dark:bg-amber-950/50 dark:ring-amber-700',
+                        )}
                     >
-                        {formatCad(row.value)}
-                    </dd>
-                </div>
-            ))}
+                        <dt
+                            className={cn(
+                                'text-sm',
+                                changed
+                                    ? 'font-medium text-amber-950 dark:text-amber-100'
+                                    : 'text-muted-foreground',
+                            )}
+                        >
+                            {row.label}
+                        </dt>
+                        <dd className="flex items-baseline gap-2">
+                            <span
+                                className={cn(
+                                    'text-sm tabular-nums',
+                                    changed
+                                        ? 'font-semibold text-amber-900 dark:text-amber-100'
+                                        : 'font-medium',
+                                )}
+                                data-testid={`${testIdPrefix}-${row.key}`}
+                            >
+                                {formatCad(row.value)}
+                            </span>
+                            {delta !== undefined && (
+                                <span
+                                    className="text-xs font-medium text-amber-700 dark:text-amber-300"
+                                    data-testid={`${testIdPrefix}-${row.key}-delta`}
+                                >
+                                    {formatSignedDisplayCurrency(delta, 'CAD')}
+                                </span>
+                            )}
+                        </dd>
+                    </div>
+                );
+            })}
         </dl>
     );
 }
@@ -252,6 +373,17 @@ export default function PeriodBalances() {
     const proposed = payload?.proposed ?? null;
     const registered = payload?.registered ?? null;
     const history = payload?.history ?? [];
+    const changedKeys =
+        proposed && registered
+            ? changedFigureKeys(proposed, registered)
+            : new Set<string>();
+    const deltas =
+        proposed && registered
+            ? figureDeltas(proposed, registered, changedKeys)
+            : {};
+    const hasDifferences = changedKeys.size > 0;
+    const statusDiffers = changedKeys.has('reconciliation-status');
+    const differenceSummary = describeChangedFigures(changedKeys);
 
     return (
         <>
@@ -327,7 +459,16 @@ export default function PeriodBalances() {
                 ) : (
                     <>
                         {proposed && (
-                            <Card data-testid="proposed-balance-card">
+                            <Card
+                                data-testid="proposed-balance-card"
+                                data-differs={
+                                    hasDifferences ? 'true' : undefined
+                                }
+                                className={cn(
+                                    hasDifferences &&
+                                        'border-amber-400 dark:border-amber-600',
+                                )}
+                            >
                                 <CardHeader>
                                     <div className="flex flex-wrap items-center justify-between gap-3">
                                         <div>
@@ -350,6 +491,15 @@ export default function PeriodBalances() {
                                                     : 'secondary'
                                             }
                                             data-testid="proposed-reconciliation-status"
+                                            data-differs={
+                                                statusDiffers
+                                                    ? 'true'
+                                                    : undefined
+                                            }
+                                            className={cn(
+                                                statusDiffers &&
+                                                    'border-amber-500 bg-amber-50 text-amber-950 dark:border-amber-500 dark:bg-amber-950/60 dark:text-amber-100',
+                                            )}
                                         >
                                             {statusLabel(
                                                 proposed.reconciliation_status,
@@ -358,6 +508,24 @@ export default function PeriodBalances() {
                                     </div>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
+                                    {hasDifferences && (
+                                        <Alert
+                                            variant="warning"
+                                            data-testid="balance-figures-differ-warning"
+                                        >
+                                            <AlertTriangle className="h-4 w-4" />
+                                            <AlertTitle>
+                                                These figures differ from the
+                                                registered balance
+                                            </AlertTitle>
+                                            <AlertDescription>
+                                                {differenceSummary}. Highlighted
+                                                amounts show the change from the
+                                                saved balance. Registering will
+                                                overwrite those values.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
                                     {proposed.reconciliation_status !==
                                         'balanced' && (
                                         <Alert variant="warning">
@@ -373,6 +541,8 @@ export default function PeriodBalances() {
                                     <FigureGrid
                                         figures={proposed}
                                         testIdPrefix="proposed"
+                                        changedKeys={changedKeys}
+                                        deltas={deltas}
                                     />
                                     <Button
                                         onClick={handleRegisterClick}
@@ -380,19 +550,58 @@ export default function PeriodBalances() {
                                         data-testid="register-period-balance"
                                     >
                                         <BookMarked className="size-4 shrink-0 fill-none" />
-                                        Register balance
+                                        {hasDifferences
+                                            ? 'Overwrite balance'
+                                            : 'Register balance'}
                                     </Button>
                                 </CardContent>
                             </Card>
                         )}
 
-                        <Card data-testid="registered-balance-card">
+                        <Card
+                            data-testid="registered-balance-card"
+                            data-differs={hasDifferences ? 'true' : undefined}
+                            className={cn(
+                                hasDifferences &&
+                                    'border-amber-400 dark:border-amber-600',
+                            )}
+                        >
                             <CardHeader>
-                                <CardTitle>Registered balance</CardTitle>
-                                <CardDescription>
-                                    The balance currently saved for{' '}
-                                    {formatPeriod(selectedPeriod)}
-                                </CardDescription>
+                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <CardTitle>
+                                            Registered balance
+                                        </CardTitle>
+                                        <CardDescription>
+                                            The balance currently saved for{' '}
+                                            {formatPeriod(selectedPeriod)}
+                                        </CardDescription>
+                                    </div>
+                                    {registered && (
+                                        <Badge
+                                            variant={
+                                                registered.reconciliation_status ===
+                                                'balanced'
+                                                    ? 'default'
+                                                    : 'secondary'
+                                            }
+                                            data-testid="registered-reconciliation-status"
+                                            data-differs={
+                                                statusDiffers
+                                                    ? 'true'
+                                                    : undefined
+                                            }
+                                            className={cn(
+                                                statusDiffers &&
+                                                    'border-amber-500 bg-amber-50 text-amber-950 dark:border-amber-500 dark:bg-amber-950/60 dark:text-amber-100',
+                                            )}
+                                        >
+                                            {statusLabel(
+                                                registered.reconciliation_status,
+                                            )}
+                                        </Badge>
+                                    )}
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 {registered ? (
@@ -409,6 +618,7 @@ export default function PeriodBalances() {
                                         <FigureGrid
                                             figures={registered}
                                             testIdPrefix="registered"
+                                            changedKeys={changedKeys}
                                         />
                                     </div>
                                 ) : (
@@ -529,31 +739,48 @@ export default function PeriodBalances() {
                         </DialogDescription>
                     </DialogHeader>
                     {registered && proposed && (
-                        <div
-                            className="grid gap-6 sm:grid-cols-2"
-                            data-testid="overwrite-balance-comparison"
-                        >
-                            <div data-testid="overwrite-existing-column">
-                                <p className="mb-2 text-sm font-medium">
-                                    Current balance
-                                </p>
-                                <FigureGrid
-                                    figures={registered}
-                                    testIdPrefix="overwrite-existing"
-                                    columns="single"
-                                />
+                        <>
+                            {hasDifferences && (
+                                <Alert
+                                    variant="warning"
+                                    data-testid="overwrite-figures-differ-warning"
+                                >
+                                    <AlertTriangle className="h-4 w-4" />
+                                    <AlertDescription>
+                                        {differenceSummary}. Highlighted amounts
+                                        will replace the registered balance.
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+                            <div
+                                className="grid gap-6 sm:grid-cols-2"
+                                data-testid="overwrite-balance-comparison"
+                            >
+                                <div data-testid="overwrite-existing-column">
+                                    <p className="mb-2 text-sm font-medium">
+                                        Current balance
+                                    </p>
+                                    <FigureGrid
+                                        figures={registered}
+                                        testIdPrefix="overwrite-existing"
+                                        columns="single"
+                                        changedKeys={changedKeys}
+                                    />
+                                </div>
+                                <div data-testid="overwrite-proposed-column">
+                                    <p className="mb-2 text-sm font-medium">
+                                        New figures
+                                    </p>
+                                    <FigureGrid
+                                        figures={proposed}
+                                        testIdPrefix="overwrite-proposed"
+                                        columns="single"
+                                        changedKeys={changedKeys}
+                                        deltas={deltas}
+                                    />
+                                </div>
                             </div>
-                            <div data-testid="overwrite-proposed-column">
-                                <p className="mb-2 text-sm font-medium">
-                                    New figures
-                                </p>
-                                <FigureGrid
-                                    figures={proposed}
-                                    testIdPrefix="overwrite-proposed"
-                                    columns="single"
-                                />
-                            </div>
-                        </div>
+                        </>
                     )}
                     <DialogFooter>
                         <Button

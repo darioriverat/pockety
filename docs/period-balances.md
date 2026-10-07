@@ -18,7 +18,7 @@ Registration stores the month-end totals for that period. After a successful sav
 
 ## Overwrite with history
 
-If a balance is already registered for the period, registering again opens a confirmation dialog. It compares the existing figures with the newly proposed ones. Confirming overwrites the stored month-end balance and keeps history of the change.
+If a balance is already registered for the period, registering again opens a confirmation dialog. It compares the existing figures with the newly proposed ones. When those figures differ, both cards and the dialog highlight the changed amounts and show how far each one moves from the saved balance, so it is clear which values would be overwritten. Confirming overwrites the stored month-end balance and keeps history of the change.
 
 ## Separate from Manage Balances
 

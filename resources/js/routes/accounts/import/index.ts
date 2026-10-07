@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\AccountImportController::statistics
-* @see app/Http/Controllers/AccountImportController.php:70
+* @see app/Http/Controllers/AccountImportController.php:75
 * @route '/api/accounts/import/statistics'
 */
 export const statistics = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ statistics.definition = {
 
 /**
 * @see \App\Http\Controllers\AccountImportController::statistics
-* @see app/Http/Controllers/AccountImportController.php:70
+* @see app/Http/Controllers/AccountImportController.php:75
 * @route '/api/accounts/import/statistics'
 */
 statistics.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ statistics.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AccountImportController::statistics
-* @see app/Http/Controllers/AccountImportController.php:70
+* @see app/Http/Controllers/AccountImportController.php:75
 * @route '/api/accounts/import/statistics'
 */
 statistics.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ statistics.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\AccountImportController::statistics
-* @see app/Http/Controllers/AccountImportController.php:70
+* @see app/Http/Controllers/AccountImportController.php:75
 * @route '/api/accounts/import/statistics'
 */
 statistics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ statistics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\AccountImportController::statistics
-* @see app/Http/Controllers/AccountImportController.php:70
+* @see app/Http/Controllers/AccountImportController.php:75
 * @route '/api/accounts/import/statistics'
 */
 const statisticsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const statisticsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'>
 
 /**
 * @see \App\Http\Controllers\AccountImportController::statistics
-* @see app/Http/Controllers/AccountImportController.php:70
+* @see app/Http/Controllers/AccountImportController.php:75
 * @route '/api/accounts/import/statistics'
 */
 statisticsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ statisticsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 
 /**
 * @see \App\Http\Controllers\AccountImportController::statistics
-* @see app/Http/Controllers/AccountImportController.php:70
+* @see app/Http/Controllers/AccountImportController.php:75
 * @route '/api/accounts/import/statistics'
 */
 statisticsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

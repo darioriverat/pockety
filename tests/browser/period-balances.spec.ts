@@ -84,6 +84,12 @@ test('user can register a period balance from reconciliation figures and overwri
         '$0.00',
     );
     await expect(page.getByTestId('proposed-equity-cad')).toHaveText('$900.00');
+    await expect(
+        page.getByTestId('balance-figures-differ-warning'),
+    ).toHaveCount(0);
+    await expect(page.getByTestId('register-period-balance')).toHaveText(
+        'Register balance',
+    );
     await expect(page.getByTestId('registered-balance-empty')).toBeVisible();
     await expect(page.getByTestId('balance-history-empty')).toBeVisible();
 
@@ -113,9 +119,45 @@ test('user can register a period balance from reconciliation figures and overwri
     await expect(page.getByTestId('registered-assets-cad')).toHaveText(
         '$900.00',
     );
+    await expect(
+        page.getByTestId('balance-figures-differ-warning'),
+    ).toBeVisible();
+    await expect(
+        page.getByTestId('balance-figures-differ-warning'),
+    ).toContainText(/overwrite/i);
+    await expect(page.getByTestId('proposed-assets-cad-delta')).toHaveText(
+        '-$150.00',
+    );
+    await expect(page.getByTestId('proposed-balance-card')).toHaveAttribute(
+        'data-differs',
+        'true',
+    );
+    await expect(page.getByTestId('registered-balance-card')).toHaveAttribute(
+        'data-differs',
+        'true',
+    );
+    await expect(
+        page
+            .getByTestId('proposed-assets-cad')
+            .locator('xpath=ancestor::div[1]'),
+    ).toHaveAttribute('data-differs', 'true');
+    await expect(
+        page
+            .getByTestId('proposed-liabilities-cad')
+            .locator('xpath=ancestor::div[1]'),
+    ).not.toHaveAttribute('data-differs', 'true');
+    await expect(page.getByTestId('register-period-balance')).toHaveText(
+        'Overwrite balance',
+    );
 
     await page.getByTestId('register-period-balance').click();
     await expect(page.getByTestId('overwrite-balance-dialog')).toBeVisible();
+    await expect(
+        page.getByTestId('overwrite-figures-differ-warning'),
+    ).toBeVisible();
+    await expect(
+        page.getByTestId('overwrite-proposed-assets-cad-delta'),
+    ).toHaveText('-$150.00');
     await expect(page.getByTestId('overwrite-balance-title')).toHaveText(
         'Overwrite existing balance?',
     );
@@ -132,6 +174,13 @@ test('user can register a period balance from reconciliation figures and overwri
     );
     await expect(page.getByTestId('registered-assets-cad')).toHaveText(
         '$750.00',
+    );
+    await expect(page.getByTestId('proposed-assets-cad')).toHaveText('$600.00');
+    await expect(
+        page.getByTestId('balance-figures-differ-warning'),
+    ).toBeVisible();
+    await expect(page.getByTestId('proposed-assets-cad-delta')).toHaveText(
+        '-$150.00',
     );
 
     const savedBalances = await request.get(

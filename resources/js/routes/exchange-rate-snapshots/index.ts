@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::index
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:20
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:19
 * @route '/api/exchange-rate-snapshots'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::index
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:20
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:19
 * @route '/api/exchange-rate-snapshots'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::index
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:20
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:19
 * @route '/api/exchange-rate-snapshots'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::index
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:20
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:19
 * @route '/api/exchange-rate-snapshots'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::index
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:20
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:19
 * @route '/api/exchange-rate-snapshots'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::index
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:20
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:19
 * @route '/api/exchange-rate-snapshots'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::index
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:20
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:19
 * @route '/api/exchange-rate-snapshots'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::store
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:69
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:68
 * @route '/api/exchange-rate-snapshots'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::store
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:69
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:68
 * @route '/api/exchange-rate-snapshots'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::store
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:69
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:68
 * @route '/api/exchange-rate-snapshots'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::store
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:69
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:68
 * @route '/api/exchange-rate-snapshots'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::store
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:69
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:68
 * @route '/api/exchange-rate-snapshots'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -138,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::show
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:113
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:112
 * @route '/api/exchange-rate-snapshots/{snapshot}'
 */
 export const show = (args: { snapshot: string | number } | [snapshot: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -153,7 +153,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::show
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:113
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:112
 * @route '/api/exchange-rate-snapshots/{snapshot}'
 */
 show.url = (args: { snapshot: string | number } | [snapshot: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -180,7 +180,7 @@ show.url = (args: { snapshot: string | number } | [snapshot: string | number ] |
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::show
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:113
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:112
 * @route '/api/exchange-rate-snapshots/{snapshot}'
 */
 show.get = (args: { snapshot: string | number } | [snapshot: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -190,7 +190,7 @@ show.get = (args: { snapshot: string | number } | [snapshot: string | number ] |
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::show
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:113
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:112
 * @route '/api/exchange-rate-snapshots/{snapshot}'
 */
 show.head = (args: { snapshot: string | number } | [snapshot: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -200,7 +200,7 @@ show.head = (args: { snapshot: string | number } | [snapshot: string | number ] 
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::show
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:113
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:112
 * @route '/api/exchange-rate-snapshots/{snapshot}'
 */
 const showForm = (args: { snapshot: string | number } | [snapshot: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -210,7 +210,7 @@ const showForm = (args: { snapshot: string | number } | [snapshot: string | numb
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::show
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:113
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:112
 * @route '/api/exchange-rate-snapshots/{snapshot}'
 */
 showForm.get = (args: { snapshot: string | number } | [snapshot: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -220,7 +220,7 @@ showForm.get = (args: { snapshot: string | number } | [snapshot: string | number
 
 /**
 * @see \App\Http\Controllers\ExchangeRateSnapshotController::show
-* @see app/Http/Controllers/ExchangeRateSnapshotController.php:113
+* @see app/Http/Controllers/ExchangeRateSnapshotController.php:112
 * @route '/api/exchange-rate-snapshots/{snapshot}'
 */
 showForm.head = (args: { snapshot: string | number } | [snapshot: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
