@@ -102,7 +102,7 @@ class FinancialSummaryService
             ->get();
 
         $totalsByCategory = [];
-        $debtPaymentsExcluded = 0.0;
+        $debtPayments = 0.0;
 
         foreach ($transactions as $transaction) {
             $categoryId = (int) $transaction->category_id;
@@ -147,17 +147,17 @@ class FinancialSummaryService
                 && $transaction->debt_component !== 'principal'
                 && empty($totalsByCategory[$categoryId]['is_income_category'])
             ) {
-                $debtPaymentsExcluded += $cadEquivalent;
+                $debtPayments += $cadEquivalent;
             }
         }
 
         $categoryTotals = [];
         $totalRecordedDisbursements = 0.0;
-        $debtPrincipalExcluded = 0.0;
-        $depreciationExcluded = 0.0;
-        $debtInterestIncluded = 0.0;
+        $debtPrincipal = 0.0;
+        $depreciation = 0.0;
+        $debtInterest = 0.0;
 
-        $noAccountCreditExcluded = 0.0;
+        $noAccountCredit = 0.0;
 
         foreach ($totalsByCategory as $row) {
             $row['total_cad'] = round($row['total_cad'], 2);
@@ -173,12 +173,12 @@ class FinancialSummaryService
             }
 
             $totalRecordedDisbursements += $row['total_cad'];
-            $debtPrincipalExcluded += $row['principal_cad'];
-            $debtInterestIncluded += $row['interest_cad'];
-            $noAccountCreditExcluded += $row['no_account_credit_cad'];
+            $debtPrincipal += $row['principal_cad'];
+            $debtInterest += $row['interest_cad'];
+            $noAccountCredit += $row['no_account_credit_cad'];
 
             if ($row['is_depreciation']) {
-                $depreciationExcluded += $row['total_cad'];
+                $depreciation += $row['total_cad'];
             }
 
             $categoryTotals[] = $row;
@@ -190,9 +190,9 @@ class FinancialSummaryService
         );
 
         $netOperatingExpenses = $totalRecordedDisbursements
-            - $debtPrincipalExcluded
-            - $depreciationExcluded
-            - $debtPaymentsExcluded;
+            - $debtPrincipal
+            - $depreciation
+            - $debtPayments;
         $netOperatingExpenses = round($netOperatingExpenses, 2);
 
         $payload = [
@@ -201,11 +201,11 @@ class FinancialSummaryService
             'total_recorded_disbursements_cad' => round($totalRecordedDisbursements, 2),
             'net_operating_expenses_cad' => $netOperatingExpenses,
             'net_cad' => round($totalIncome - $netOperatingExpenses, 2),
-            'no_account_credit_excluded_cad' => round($noAccountCreditExcluded, 2),
-            'debt_principal_excluded_cad' => round($debtPrincipalExcluded, 2),
-            'depreciation_excluded_cad' => round($depreciationExcluded, 2),
-            'debt_interest_included_cad' => round($debtInterestIncluded, 2),
-            'debt_payments_excluded_cad' => round($debtPaymentsExcluded, 2),
+            'no_account_credit_excluded_cad' => round($noAccountCredit, 2),
+            'debt_principal_excluded_cad' => round($debtPrincipal, 2),
+            'depreciation_excluded_cad' => round($depreciation, 2),
+            'debt_interest_included_cad' => round($debtInterest, 2),
+            'debt_payments_excluded_cad' => round($debtPayments, 2),
             'income_lines' => $incomeLines,
             'category_totals' => $categoryTotals,
         ];
