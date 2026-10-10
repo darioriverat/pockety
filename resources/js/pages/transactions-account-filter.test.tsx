@@ -286,7 +286,7 @@ describe('Transactions - account filter', () => {
             expect(params.get('account_id')).toBe('7');
             expect(params.get('sort_by')).toBe('amount');
         });
-    }, 15000);
+    });
 
     it('preserves the account filter across pagination', async () => {
         totalForPagination = 120;
@@ -315,7 +315,7 @@ describe('Transactions - account filter', () => {
             expect(params.get('account_id')).toBe('7');
             expect(params.get('page')).toBe('2');
         });
-    }, 15000);
+    });
 
     it('sends no account_id after the all-accounts option is reselected', async () => {
         render(<Transactions />);
@@ -348,7 +348,7 @@ describe('Transactions - account filter', () => {
             expect(screen.getByTestId('transaction-row-1')).toBeInTheDocument();
             expect(screen.getByTestId('transaction-row-2')).toBeInTheDocument();
         });
-    }, 15000);
+    });
 
     it('keeps the filter select separate from the transaction form account field', async () => {
         render(<Transactions />);

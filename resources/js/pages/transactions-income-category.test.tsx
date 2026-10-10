@@ -263,7 +263,7 @@ describe('Transactions - income categories', () => {
             expect(body.category_id).toBe(incomeCategory.id);
             expect(body.account_id).toBe(account.id);
         });
-    }, 15000);
+    });
 
     it('shows an Income badge on income-category transactions', async () => {
         render(<Transactions />);
