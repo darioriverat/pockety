@@ -155,10 +155,10 @@ class FinancialSummaryTest extends TestCase
         $response = $this->getJson('/api/financial-summary?period=202501');
 
         // Disbursements = 100 + 500 + 50 + 75 = 725
-        // Net operating = 725 - 500 principal - 75 depreciation = 150 (100 groceries + 50 interest)
+        // Net operating = 725 - 500 principal - 75 depreciation - 50 interests = 100 (100 groceries)
         $response->assertOk()
             ->assertJsonPath('data.total_recorded_disbursements_cad', 725)
-            ->assertJsonPath('data.net_operating_expenses_cad', 150)
+            ->assertJsonPath('data.net_operating_expenses_cad', 100)
             ->assertJsonPath('data.debt_principal_excluded_cad', 500)
             ->assertJsonPath('data.depreciation_excluded_cad', 75)
             ->assertJsonPath('data.debt_interest_included_cad', 50);
@@ -188,7 +188,7 @@ class FinancialSummaryTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.total_recorded_disbursements_cad', 550)
-            ->assertJsonPath('data.net_operating_expenses_cad', 50);
+            ->assertJsonPath('data.net_operating_expenses_cad', 0);
 
         $c044 = collect($response->json('data.category_totals'))
             ->firstWhere('category_code', 'C044');
@@ -240,10 +240,10 @@ class FinancialSummaryTest extends TestCase
         $response = $this->getJson('/api/financial-summary?period=202501');
 
         // Disbursements = 110 + 100 + 10 = 220
-        // Net operating = 220 - 100 principal - 110 debt-payment spend = 10 (interest)
+        // Net operating = 220 - 100 principal - 110 debt-payment spend - 10 interest = 0
         $response->assertOk()
             ->assertJsonPath('data.total_recorded_disbursements_cad', 220)
-            ->assertJsonPath('data.net_operating_expenses_cad', 10)
+            ->assertJsonPath('data.net_operating_expenses_cad', 0)
             ->assertJsonPath('data.debt_principal_excluded_cad', 100)
             ->assertJsonPath('data.debt_payments_excluded_cad', 110)
             ->assertJsonPath('data.debt_interest_included_cad', 10);
