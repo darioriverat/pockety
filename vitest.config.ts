@@ -11,5 +11,8 @@ export default defineConfig({
         environment: 'jsdom',
         include: ['resources/js/**/*.test.{ts,tsx}'],
         setupFiles: ['./resources/js/tests/setup.ts'],
+        // GitHub-hosted runners are slower with jsdom and Radix selects.
+        testTimeout: process.env.CI ? 30_000 : 15_000,
+        hookTimeout: process.env.CI ? 30_000 : 15_000,
     },
 });

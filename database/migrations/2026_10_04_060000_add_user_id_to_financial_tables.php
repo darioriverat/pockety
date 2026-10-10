@@ -160,25 +160,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $blueprint) {
-            $blueprint->dropUnique(['user_id', 'code']);
-            $blueprint->unique('code');
-        });
-
-        Schema::table('exchange_rates', function (Blueprint $blueprint) {
-            $blueprint->dropUnique(['user_id', 'period']);
-            $blueprint->unique('period');
-        });
-
-        Schema::table('historical_balance_sheets', function (Blueprint $blueprint) {
-            $blueprint->dropUnique(['user_id', 'period']);
-            $blueprint->unique('period');
-        });
-
-        Schema::table('period_balances', function (Blueprint $blueprint) {
-            $blueprint->dropUnique(['user_id', 'period']);
-            $blueprint->unique('period');
-        });
+        $this->restoreSingleColumnUnique('categories', ['user_id', 'code'], 'code');
+        $this->restoreSingleColumnUnique('exchange_rates', ['user_id', 'period'], 'period');
+        $this->restoreSingleColumnUnique('historical_balance_sheets', ['user_id', 'period'], 'period');
+        $this->restoreSingleColumnUnique('period_balances', ['user_id', 'period'], 'period');
 
         foreach ($this->tables as $table) {
             if (Schema::hasColumn($table, 'user_id')) {
@@ -186,6 +171,53 @@ return new class extends Migration
                     $blueprint->dropConstrainedForeignId('user_id');
                 });
             }
+        }
+    }
+
+    /**
+     * MySQL binds the user_id foreign key to the composite unique index, so that
+     * index cannot be dropped until the foreign key is released.
+     *
+     * @param  list<string>  $compositeColumns
+     */
+    private function restoreSingleColumnUnique(string $table, array $compositeColumns, string $column): void
+    {
+        $compositeName = $table.'_'.implode('_', $compositeColumns).'_unique';
+
+        if (! $this->uniqueIndexExists($table, $compositeName, $compositeColumns)) {
+            return;
+        }
+
+        $driver = Schema::getConnection()->getDriverName();
+
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            $this->dropUserIdForeignKey($table);
+        }
+
+        Schema::table($table, function (Blueprint $blueprint) use ($compositeColumns, $column) {
+            $blueprint->dropUnique($compositeColumns);
+            $blueprint->unique($column);
+        });
+
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            Schema::table($table, function (Blueprint $blueprint) {
+                $blueprint->foreign('user_id')->references('id')->on('users')->restrictOnDelete();
+            });
+        }
+    }
+
+    private function dropUserIdForeignKey(string $table): void
+    {
+        foreach (Schema::getForeignKeys($table) as $foreignKey) {
+            if ($foreignKey['columns'] !== ['user_id'] || $foreignKey['name'] === null) {
+                continue;
+            }
+
+            $name = $foreignKey['name'];
+
+            Schema::table($table, function (Blueprint $blueprint) use ($name) {
+                $blueprint->dropForeign($name);
+            });
         }
     }
 };

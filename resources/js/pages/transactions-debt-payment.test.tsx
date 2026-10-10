@@ -237,7 +237,7 @@ describe('Transactions - paying a debt (cash source)', () => {
             expect(body.account_id).toBe(account.id);
             expect(body.amount_cad).toBe(110);
         });
-    }, 15000);
+    });
 
     it('prefills the debt payment checkbox when editing', async () => {
         render(<Transactions />);

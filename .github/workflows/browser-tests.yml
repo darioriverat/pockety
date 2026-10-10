@@ -1,0 +1,115 @@
+name: browser-tests
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-tests:
+    name: browser-tests
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      APP_URL: http://127.0.0.1:8000
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:8000
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: pockety_testing
+      DB_USERNAME: root
+      DB_PASSWORD: password
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: pockety_testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -ppassword --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql
+          coverage: none
+          tools: composer:v2
+          ini-values: memory_limit=1G
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build front-end assets
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Seed browser test data
+        run: |
+          php artisan migrate --force
+          php artisan db:seed --class=BrowserTestSeeder --force
+
+      - name: Start application
+        run: |
+          nohup php artisan serve --host=127.0.0.1 --port=8000 > ci-serve.txt 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -sf -o /dev/null http://127.0.0.1:8000/up; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat ci-serve.txt
+          exit 1
+
+      - name: Run browser tests
+        run: npm run test:browser
+
+      - name: Collect browser failure output
+        if: failure()
+        run: |
+          mkdir -p browser-test-failures
+          cp ci-serve.txt browser-test-failures/serve.txt 2>/dev/null || true
+          if [ -d test-results ]; then
+            cp -R test-results browser-test-failures/test-results
+          fi
+
+      - name: Upload browser failure output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-failures
+          path: browser-test-failures
+          if-no-files-found: ignore
+          retention-days: 7
