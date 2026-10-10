@@ -166,7 +166,6 @@ class AccountApiTest extends TestCase
 
         $category = Category::factory()->create([
             'user_id' => $user->id,
-            'code' => 'test-delete',
             'name' => 'Test Delete Category',
         ]);
 
