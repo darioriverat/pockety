@@ -802,9 +802,6 @@ describe('Reconciliation - Records Check', () => {
         expect(
             screen.getByTestId('records-check-down-payments'),
         ).toHaveTextContent('200');
-        expect(screen.getByTestId('records-check-interest')).toHaveTextContent(
-            '100',
-        );
         expect(
             screen.getByTestId('records-check-debt-payments'),
         ).toHaveTextContent('300');

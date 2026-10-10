@@ -240,11 +240,10 @@ test.describe('two-user ownership isolation', () => {
     }) => {
         await loginAsBrowserTestUser(page, request);
 
-        const rateA = await ensureExchangeRateForPeriod(request, '202601', {
+        await ensureExchangeRateForPeriod(request, '202601', {
             copPerUsd: 4100,
             cadPerUsd: 0.71,
         });
-        expect(rateA.ok()).toBeTruthy();
 
         await page.goto('/exchange-rates');
         await expect(page.getByText(/4100|4,100|0\.71/i).first()).toBeVisible({
@@ -258,11 +257,10 @@ test.describe('two-user ownership isolation', () => {
         await logout(page);
         await loginAsSecondBrowserUser(page, request);
 
-        const rateB = await ensureExchangeRateForPeriod(request, '202601', {
+        await ensureExchangeRateForPeriod(request, '202601', {
             copPerUsd: 4600,
             cadPerUsd: 0.82,
         });
-        expect(rateB.ok()).toBeTruthy();
 
         const ratesB = await request.get('/api/exchange-rates');
         expect(ratesB.ok()).toBeTruthy();

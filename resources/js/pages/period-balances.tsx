@@ -724,7 +724,7 @@ export default function PeriodBalances() {
             <Dialog open={overwriteOpen} onOpenChange={setOverwriteOpen}>
                 <DialogContent
                     data-testid="overwrite-balance-dialog"
-                    className="sm:max-w-3xl"
+                    className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-3xl"
                 >
                     <DialogHeader className="pr-10">
                         <DialogTitle data-testid="overwrite-balance-title">

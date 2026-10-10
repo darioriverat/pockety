@@ -548,7 +548,6 @@ AccountDetail.layout = {
     breadcrumbs: [
         {
             title: 'Home',
-            titleKey: 'pages.accountDetail.title',
             href: '/dashboard',
         },
         {

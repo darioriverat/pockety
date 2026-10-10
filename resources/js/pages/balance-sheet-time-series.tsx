@@ -512,7 +512,6 @@ BalanceSheetTimeSeries.layout = {
     breadcrumbs: [
         {
             title: 'Home',
-            titleKey: 'nav.bsTimeSeries',
             href: '/dashboard',
         },
         {

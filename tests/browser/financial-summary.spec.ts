@@ -104,9 +104,9 @@ test('feature 62-64: financial summary shows disbursements and net operating exp
     await expect(
         page.getByTestId('total-recorded-disbursements'),
     ).toContainText('725');
-    // 725 - 500 principal - 75 depreciation = 150
+    // 725 - 500 principal - 75 depreciation - 50 interest = 100
     await expect(page.getByTestId('net-operating-expenses')).toContainText(
-        '150',
+        '100',
     );
     await expect(page.getByTestId('debt-principal-excluded')).toContainText(
         '500',

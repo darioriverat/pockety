@@ -151,7 +151,8 @@ test('feature 112: user can set default currency preference for views', async ({
     const copIncome = await page
         .getByTestId('dashboard-total-income')
         .innerText();
-    expect(copIncome.replace(/\s/g, '')).toMatch(/15[.,]000[.,]000/);
+    // 5,000 CAD / 0.75 CAD per USD * 4,400 COP per USD
+    expect(copIncome.replace(/\s/g, '')).toMatch(/29[.,]333[.,]333/);
     expect(copIncome).not.toEqual(usdIncome);
     await page.screenshot({
         path: path.join(verificationDir, '05-dashboard-cop-toggle.png'),

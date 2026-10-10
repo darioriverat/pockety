@@ -192,7 +192,8 @@ class FinancialSummaryService
         $netOperatingExpenses = $totalRecordedDisbursements
             - $debtPrincipal
             - $depreciation
-            - $debtPayments;
+            - $debtPayments
+            - $debtInterest;
         $netOperatingExpenses = round($netOperatingExpenses, 2);
 
         $payload = [

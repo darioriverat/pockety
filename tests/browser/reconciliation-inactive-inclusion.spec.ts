@@ -146,10 +146,8 @@ test('reconciliation totals include inactive expense and debt categories', async
     await loadReconciliation(page);
     await expect(page.getByTestId('income-total')).toHaveText('$1,000.00');
     await expect(page.getByTestId('expenses-total')).toHaveText('$750.00');
-    await expect(page.getByTestId('net-expenses')).toHaveText('$250.00');
-    await expect(page.getByTestId('records-check-interest')).toContainText(
-        '50.00',
-    );
+    await expect(page.getByTestId('net-expenses')).toHaveText('$200.00');
+    await expect(page.getByTestId('records-check-interest')).toHaveCount(0);
     await expect(page.getByTestId('records-check-debt-payments')).toContainText(
         '550.00',
     );
@@ -177,16 +175,14 @@ test('reconciliation totals include inactive expense and debt categories', async
     await loadReconciliation(page);
     await expect(page.getByTestId('income-total')).toHaveText('$1,000.00');
     await expect(page.getByTestId('expenses-total')).toHaveText('$750.00');
-    await expect(page.getByTestId('net-expenses')).toHaveText('$250.00');
-    await expect(page.getByTestId('records-check-interest')).toContainText(
-        '50.00',
-    );
+    await expect(page.getByTestId('net-expenses')).toHaveText('$200.00');
+    await expect(page.getByTestId('records-check-interest')).toHaveCount(0);
     await expect(page.getByTestId('records-check-debt-payments')).toContainText(
         '550.00',
     );
     await expect(
         page.getByTestId('records-check-net-operating-expenses'),
-    ).toContainText('250.00');
+    ).toContainText('200.00');
     await page.getByTestId('records-check-card').scrollIntoViewIfNeeded();
     await page.screenshot({
         animations: 'disabled',

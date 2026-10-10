@@ -476,7 +476,6 @@ CategoryDetail.layout = {
     breadcrumbs: [
         {
             title: 'Home',
-            titleKey: 'pages.categories.title',
             href: '/dashboard',
         },
         {

@@ -18,39 +18,29 @@ for (const theme of ['light', 'dark'] as const) {
             page.locator('[data-slot="sidebar"][data-variant="inset"]'),
         ).toHaveAttribute('data-state', 'collapsed');
 
-        // Step 1: Navigate to page with tooltips (sidebar footer icons)
-        // The Repository and Documentation icons have tooltips
+        // Collapsed sidebar items show their label in a tooltip.
+        const dashboardLink = page.getByTestId('nav-link-dashboard');
+        await expect(dashboardLink).toBeVisible();
 
-        // Step 2 & 3: Hover over tooltip trigger and take screenshot
-        const repoLink = page
-            .getByTestId('app-sidebar')
-            .getByRole('link', { name: 'Repository' });
-        await expect(repoLink).toBeVisible();
-
-        // Take screenshot before hover
         await page.screenshot({
             animations: 'disabled',
             path: `verification/test-161-tooltips/${theme}-01-before-hover.png`,
         });
 
-        // Hover to trigger tooltip
-        await repoLink.hover();
-        await page.waitForTimeout(300); // Wait for tooltip to appear (default delay is 0ms)
+        await dashboardLink.hover();
+        await page.waitForTimeout(300);
 
-        // Step 4: Verify tooltip appears with helpful text
         const tooltip = page.locator('[data-slot="tooltip-content"]');
         await expect(tooltip).toBeVisible();
-        await expect(tooltip).toContainText('Repository');
+        await expect(tooltip).toContainText('Dashboard');
 
-        // Take screenshot with tooltip visible
         await page.screenshot({
             animations: 'disabled',
-            path: `verification/test-161-tooltips/${theme}-02-repo-tooltip.png`,
+            path: `verification/test-161-tooltips/${theme}-02-dashboard-tooltip.png`,
         });
 
-        // Step 5: Verify tooltip positioning (not overlapping content)
         const tooltipBox = await tooltip.boundingBox();
-        const triggerBox = await repoLink.boundingBox();
+        const triggerBox = await dashboardLink.boundingBox();
 
         expect(tooltipBox).not.toBeNull();
         expect(triggerBox).not.toBeNull();
@@ -76,19 +66,16 @@ for (const theme of ['light', 'dark'] as const) {
             path: `verification/test-161-tooltips/${theme}-03-after-mouseout.png`,
         });
 
-        // Test Documentation tooltip as well
-        const docsLink = page
-            .getByTestId('app-sidebar')
-            .getByRole('link', { name: 'Documentation' });
-        await docsLink.hover();
+        const accountsLink = page.getByTestId('nav-link-accounts');
+        await accountsLink.hover();
         await page.waitForTimeout(300);
 
         await expect(tooltip).toBeVisible();
-        await expect(tooltip).toContainText('Documentation');
+        await expect(tooltip).toContainText('Accounts');
 
         await page.screenshot({
             animations: 'disabled',
-            path: `verification/test-161-tooltips/${theme}-04-docs-tooltip.png`,
+            path: `verification/test-161-tooltips/${theme}-04-accounts-tooltip.png`,
         });
 
         // Verify tooltip styling
@@ -116,7 +103,7 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(tooltip).not.toBeVisible();
 
         // Focus the link with keyboard
-        await repoLink.focus();
+        await dashboardLink.focus();
         await page.waitForTimeout(300);
 
         // Tooltip should appear on focus

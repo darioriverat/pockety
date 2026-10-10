@@ -239,7 +239,6 @@ ReportsYtd.layout = {
     breadcrumbs: [
         {
             title: 'Home',
-            titleKey: 'nav.reports',
             href: '/dashboard',
         },
         {

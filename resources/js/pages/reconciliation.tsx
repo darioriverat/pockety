@@ -92,7 +92,6 @@ interface RecordsCheck {
     assets_difference_cad: number;
     liabilities_difference_cad: number;
     down_payments_cad: number;
-    interest_cad: number;
     debt_payments_cad: number;
     no_account_credits_cad: number;
     result_cad: number;
@@ -746,20 +745,6 @@ export default function Reconciliation() {
                                         {formatCurrency(
                                             report.records_check
                                                 .down_payments_cad,
-                                            'CAD',
-                                        )}
-                                    </span>
-                                </div>
-                                <div
-                                    className="grid grid-cols-[1fr_auto] gap-4 border-b py-2 text-sm"
-                                    data-testid="records-check-interest"
-                                >
-                                    <span className="text-muted-foreground">
-                                        + Interest
-                                    </span>
-                                    <span className="tabular-nums">
-                                        {formatCurrency(
-                                            report.records_check.interest_cad,
                                             'CAD',
                                         )}
                                     </span>

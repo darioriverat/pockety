@@ -360,7 +360,6 @@ class ReconciliationService
             + $assetsDifference
             - $liabilitiesDifference
             + $downPayments
-            + $interest
             - $debtPayments
             - $noAccountCredits,
             2

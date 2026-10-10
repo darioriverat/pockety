@@ -897,7 +897,7 @@ class ReconciliationTest extends TestCase
         // Down payments: 100 CAD + 150 USD * 1.5 = 325
         // Interest: 40 CAD + 90 USD * 1.5 = 175
         $this->assertEquals(1000.0, $check['income_cad']);
-        $this->assertEquals(525.0, $check['net_operating_expenses_cad']);
+        $this->assertEquals(350.0, $check['net_operating_expenses_cad']);
         $this->assertEquals(300.0, $check['assets_difference_cad']);
         $this->assertEquals(275.0, $check['liabilities_difference_cad']);
         $this->assertEquals(325.0, $check['down_payments_cad']);
@@ -1050,7 +1050,7 @@ class ReconciliationTest extends TestCase
 
         $check = $response->json('data.records_check');
 
-        $this->assertEquals(10.0, $check['net_operating_expenses_cad']);
+        $this->assertEquals(0.0, $check['net_operating_expenses_cad']);
         $this->assertEquals(110.0, $check['assets_difference_cad']);
         $this->assertEquals(100.0, $check['liabilities_difference_cad']);
         $this->assertEquals(100.0, $check['down_payments_cad']);
@@ -1125,7 +1125,7 @@ class ReconciliationTest extends TestCase
 
         $check = $response->json('data.records_check');
 
-        $this->assertEquals(10.0, $check['net_operating_expenses_cad']);
+        $this->assertEquals(0.0, $check['net_operating_expenses_cad']);
         $this->assertEquals(0.0, $check['assets_difference_cad']);
         $this->assertEquals(100.0, $check['liabilities_difference_cad']);
         $this->assertEquals(110.0, $check['debt_payments_cad']);
@@ -1241,7 +1241,7 @@ class ReconciliationTest extends TestCase
         $this->assertEquals(50.0, $response->json('data.records_check.interest_cad'));
 
         // Net operating should only include interest
-        $this->assertEquals(50.0, $response->json('data.net_operating_expenses_cad'));
+        $this->assertEquals(0, $response->json('data.net_operating_expenses_cad'));
 
         // Verify category appears in financial summary
         $summary = $this->getJson('/api/financial-summary?period=202501')->assertOk();
