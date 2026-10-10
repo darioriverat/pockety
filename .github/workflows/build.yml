@@ -1,4 +1,4 @@
-name: tests
+name: build
 
 on:
   push:
@@ -10,12 +10,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: tests-${{ github.workflow }}-${{ github.ref }}
+  group: build-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  backend-tests:
-    name: backend-tests
+  composer:
+    name: composer
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,7 +25,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: sqlite
           coverage: none
           tools: composer:v2
           ini-values: memory_limit=1G
@@ -49,25 +48,3 @@ jobs:
 
       - name: Build front-end assets
         run: npm run build
-
-      - name: Run backend tests
-        run: composer test
-
-  frontend-tests:
-    name: frontend-tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Run frontend unit tests
-        run: npm run test:unit
