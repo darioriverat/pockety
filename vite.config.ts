@@ -7,6 +7,20 @@ import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
+// Vite server configuration
+// 0.0.0.0 wildcard allows connections from any IP address. This configuration
+// facilitates local development with Docker containers.
+const viteServerHost = process.env.VITE_SERVER_HOST || '0.0.0.0';
+const viteServerPort = process.env.VITE_SERVER_PORT || 5173;
+
+// HMR server configuration
+// 0.0.0.0 wildcard allows connections from any IP address. This configuration
+// facilitates local development with Docker containers.
+const hmrServerHost = process.env.VITE_HMR_SERVER_HOST || '0.0.0.0';
+const hmrServerPort = process.env.VITE_HMR_SERVER_PORT || viteServerPort;
+
+const corsOrigins = process.env.VITE_CORS_ORIGINS?.split(',') || [`http://${hmrServerHost}:${hmrServerPort}`];
+
 export default defineConfig({
     plugins: lazyPlugins(() => [
         laravel({
@@ -34,15 +48,15 @@ export default defineConfig({
               ]),
     ]),
     server: {
-        host: '0.0.0.0',
-        port: 5173,
+        host: viteServerHost,
+        port: viteServerPort,
         strictPort: true,
         cors: {
-            origin: ['http://127.0.0.1:8080', 'http://dev.pockety.com:8080'],
+            origin: corsOrigins,
         },
         hmr: {
-            host: 'dev.pockety.com',
-            port: 5173,
+            host: hmrServerHost,
+            port: hmrServerPort,
         },
         watch: {
             ignored: [

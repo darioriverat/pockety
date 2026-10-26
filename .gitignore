@@ -35,3 +35,6 @@ set-test-password.php
 .last-run.json
 test-results/
 /.dsh/
+
+# Taskfile variables
+.env.taskfile

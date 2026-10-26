@@ -1,71 +1,94 @@
 version: "3"
 
+dotenv: ['.env.taskfile']
+
+vars:
+  PROJECT_ROOT: "{{ .PROJECT_ROOT | default \"/var/www/vhosts\" }}"
+  WEB_HOST_PORT: "{{ .WEB_HOST_PORT | default 8080 }}"
+  WEB_HOST_ADDRESS: "{{ .WEB_HOST_ADDRESS | default \"http://127.0.0.1\" }}"
+  VITE_SERVER_PORT: "{{ .VITE_SERVER_PORT | default 5173 }}"
+  VITE_HMR_SERVER_PORT: "{{ .VITE_HMR_SERVER_PORT | default 5173 }}"
+  VITE_CORS_ORIGINS: "http://127.0.0.1:{{ .WEB_HOST_PORT }},{{ .WEB_HOST_ADDRESS }}:{{ .WEB_HOST_PORT }}"
+  DOCKER_CONTAINER_NAME: "{{ .DOCKER_CONTAINER_NAME | default \"agent_skeleton_app\" }}"
+  DOCKER_CONTAINER_USER: "{{ .DOCKER_CONTAINER_USER | default \"skeleton-user\" }}"
+  PLAYWRIGHT_BASE_URL: "{{ .WEB_HOST_ADDRESS }}"
+
 tasks:
   shell:
     desc: Open a shell in the web container
     cmds:
       - |
-        docker exec -it -u appuser \
-            -w /var/www/vhosts web_app \
+        docker exec -it -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
             /bin/bash -l
   shell-root:
     desc: Open a shell in the web container with the root user
     cmds:
       - |
         docker exec -it -u root \
-            -w /var/www/vhosts web_app \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
             /bin/bash -l
   dev:
     desc: Run the front-end development server in the web container
     cmds:
       - |
-        docker exec -it -u appuser \
-            -w /var/www/vhosts web_app \
+        docker exec -it -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            "env" \
+            "VITE_SERVER_PORT={{ .VITE_SERVER_PORT }}" \
+            "VITE_HMR_SERVER_HOST={{ .VITE_HMR_SERVER_HOST }}" \
+            "VITE_HMR_SERVER_PORT={{ .VITE_HMR_SERVER_PORT }}" \
+            "VITE_CORS_ORIGINS={{ .VITE_CORS_ORIGINS }}" \
             "npm" "run" "dev"
   build:
     desc: Build the front-end assets
     cmds:
       - |
-        docker exec -it -u appuser \
-            -w /var/www/vhosts web_app \
+        docker exec -it -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
             "npm" "run" "build"
   backend-tests:
     desc: Execute backend tests
     cmds:
       - |
-        docker exec -u appuser \
-            -w /var/www/vhosts web_app \
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
             bash -lc "composer test"
   frontend-tests:
     desc: Execute frontend unit and component tests
     cmds:
       - |
         docker exec -u appuser \
-            -w /var/www/vhosts web_app \
-            bash -lc "npm run test:unit"
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "npm run test"
+  browser-install:
+    desc: Install Playwright browser binaries
+    cmds:
+      - |
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "npx playwright install chromium"
   browser-test-seed:
     desc: Seed browser test data
     cmds:
       - |
-        docker exec -u appuser \
-            -w /var/www/vhosts web_app \
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
             bash -lc "php artisan db:seed --class=BrowserTestSeeder"
-  browser-test-install:
-    desc: Install Playwright browser binaries
-    cmds:
-      - |
-        docker exec -u appuser \
-            -w /var/www/vhosts web_app \
-            bash -lc "npx playwright install chromium"
   browser-tests:
     desc: Execute Playwright browser tests
     cmds:
-      - task: browser-test-install
-      - task: browser-test-seed
+      - task: browser-install
+      # Enforce database to be sqlite.
+      # This is to prevent developers from overwriting the database while running the tests.
       - |
-        docker exec -u appuser \
-            -w /var/www/vhosts web_app \
-            bash -lc "PLAYWRIGHT_BASE_URL=http://host.docker.internal:8080 npm run test:browser"
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "php artisan  tinker --execute \"if (config('database.default') === 'sqlite') { echo 'SQLite database is in use'; } else { echo 'Database must be sqlite!'; exit(1); };\""
+      - |
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "PLAYWRIGHT_BASE_URL=\"{{ .PLAYWRIGHT_BASE_URL }}\" npm run test:browser"
   tests:
     desc: Execute backend and frontend tests
     cmds:

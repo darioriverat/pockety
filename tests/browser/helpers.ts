@@ -120,35 +120,21 @@ export async function selectDisplayedPeriod(
 }
 
 export function resetBrowserState(): void {
-    try {
-        execFileSync(
-            'php',
-            [
-                'artisan',
-                'migrate:fresh',
-                '--seed',
-                '--seeder=BrowserTestSeeder',
-                '--force',
-            ],
-            {
-                cwd: process.cwd(),
-                stdio: 'inherit',
-            },
-        );
-        return;
-    } catch {
-        // Host Playwright may not have PHP on PATH; fall back to app HTTP helpers.
-    }
-
-    const base =
-        process.env.PLAYWRIGHT_BASE_URL ?? 'http://dev.pockety.com:8080';
-
-    execFileSync('curl', ['-sf', `${base}/dev/migrate-fresh`], {
-        stdio: 'inherit',
-    });
-    execFileSync('curl', ['-sf', `${base}/dev/seed-browser`], {
-        stdio: 'inherit',
-    });
+    execFileSync(
+        'php',
+        [
+            'artisan',
+            'migrate:fresh',
+            '--seed',
+            '--seeder=BrowserTestSeeder',
+            '--force',
+        ],
+        {
+            cwd: process.cwd(),
+            stdio: 'inherit',
+        },
+    );
+    return;
 }
 
 export function trackConsoleErrors(page: Page): string[] {

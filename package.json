@@ -10,7 +10,8 @@
         "check:fix": "vp check --fix",
         "test:browser": "playwright test",
         "types:check": "tsc --noEmit",
-        "test:unit": "vitest run"
+        "test:unit": "vitest run",
+        "test": "npm run test:unit"
     },
     "dependencies": {
         "@inertiajs/react": "^3.0.0",
