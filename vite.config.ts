@@ -19,7 +19,9 @@ const viteServerPort = process.env.VITE_SERVER_PORT || 5173;
 const hmrServerHost = process.env.VITE_HMR_SERVER_HOST || '0.0.0.0';
 const hmrServerPort = process.env.VITE_HMR_SERVER_PORT || viteServerPort;
 
-const corsOrigins = process.env.VITE_CORS_ORIGINS?.split(',') || [`http://${hmrServerHost}:${hmrServerPort}`];
+const corsOrigins = process.env.VITE_CORS_ORIGINS?.split(',') || [
+    `http://${hmrServerHost}:${hmrServerPort}`,
+];
 
 export default defineConfig({
     plugins: lazyPlugins(() => [
