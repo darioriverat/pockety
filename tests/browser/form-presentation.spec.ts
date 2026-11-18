@@ -82,7 +82,6 @@ for (const theme of ['light', 'dark'] as const) {
             'amount',
             'comments',
             'is_recurring',
-            'is_credit',
             'is_debt_payment',
         ];
         for (const id of ids) {
@@ -159,8 +158,6 @@ for (const theme of ['light', 'dark'] as const) {
         ).toBeVisible();
         await expect(debt).toHaveAccessibleName(/Debt Component/i);
         await dialog.locator('#is_recurring').click();
-        await page.keyboard.press('Tab');
-        await expect(dialog.locator('#is_credit')).toBeFocused();
         await page.keyboard.press('Tab');
         await expect(debt).toBeFocused();
         await expect(debt).toBeInViewport();

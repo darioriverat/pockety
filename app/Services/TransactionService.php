@@ -225,6 +225,7 @@ class TransactionService implements TransactionServiceInterface
         // Validate category exists
         $this->validateCategory($data['category_id']);
         $this->validateIncomeRequiresAccount($data);
+        $this->validateCreditRequiresAssetAccount($data);
         $this->validateDebtPayment($data);
 
         $data['is_credit'] = (bool) ($data['is_credit'] ?? false);
@@ -257,6 +258,12 @@ class TransactionService implements TransactionServiceInterface
         }
 
         $this->validateIncomeRequiresAccount($data, $transaction);
+        $candidate = $transaction->replicate();
+        $candidate->forceFill(array_intersect_key($data, array_flip([
+            'is_credit',
+            'account_id',
+        ])));
+        $this->validateCreditRequiresAssetAccountFromTransaction($candidate);
         $this->validateDebtPayment($data, $transaction);
 
         if (array_key_exists('is_credit', $data)) {
@@ -578,6 +585,41 @@ class TransactionService implements TransactionServiceInterface
         if ($accountId === null) {
             throw new \InvalidArgumentException('Income transactions must be assigned to a deposit account.');
         }
+    }
+
+    /**
+     * Refunds and deposits are asset inflows. Liability accounts are already
+     * credit-nature, so the credit flag is only valid on an asset account.
+     *
+     * @param  array{account_id?: int|null, is_credit?: bool}  $data
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function validateCreditRequiresAssetAccount(array $data): void
+    {
+        if (! (bool) ($data['is_credit'] ?? false)) {
+            return;
+        }
+
+        $accountId = $data['account_id'] ?? null;
+        $account = $accountId
+            ? Account::query()->forUser($this->owner->id())->find($accountId)
+            : null;
+
+        if (! $account?->isAsset()) {
+            throw new \InvalidArgumentException('Credit transactions can only be recorded on an asset account.');
+        }
+    }
+
+    /**
+     * @throws \InvalidArgumentException
+     */
+    private function validateCreditRequiresAssetAccountFromTransaction(Transaction $transaction): void
+    {
+        $this->validateCreditRequiresAssetAccount([
+            'account_id' => $transaction->account_id,
+            'is_credit' => (bool) $transaction->is_credit,
+        ]);
     }
 
     /**

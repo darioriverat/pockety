@@ -70,6 +70,11 @@ const AMOUNT_INVALID_ERROR = 'Amount must be a valid number';
 const DATE_VALID_ERROR = 'Date must be a valid date.';
 const NO_ACCOUNT_VALUE = 'none';
 const DEPOSIT_ACCOUNT_PLACEHOLDER = 'select-deposit-account';
+const ASSET_ACCOUNT_TYPES = ['bank', 'investment', 'receivable'];
+
+function isAssetAccountType(type: string | undefined): boolean {
+    return type !== undefined && ASSET_ACCOUNT_TYPES.includes(type);
+}
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 50;
 const SORT_COLUMNS = ['date', 'amount', 'category'] as const;
@@ -229,6 +234,12 @@ export default function Transactions() {
     );
     const isDebtCategorySelected = Boolean(
         selectedFormCategory?.is_debt_category,
+    );
+    const selectedFormAccount = accounts.find(
+        (account) => account.id.toString() === formData.account_id,
+    );
+    const isAssetAccountSelected = isAssetAccountType(
+        selectedFormAccount?.type,
     );
     const [filters, setFilters] = useState<FilterState>(() => {
         const params =
@@ -517,7 +528,10 @@ export default function Transactions() {
                     : null,
             comments: formData.comments || null,
             is_recurring: formData.is_recurring,
-            is_credit: isIncomeCategorySelected ? false : formData.is_credit,
+            is_credit:
+                isIncomeCategorySelected || !isAssetAccountSelected
+                    ? false
+                    : formData.is_credit,
             is_debt_payment:
                 isIncomeCategorySelected || isDebtCategorySelected
                     ? false
@@ -588,7 +602,8 @@ export default function Transactions() {
                 if (
                     typeof message === 'string' &&
                     (message.toLowerCase().includes('deposit account') ||
-                        message.toLowerCase().includes('money left'))
+                        message.toLowerCase().includes('money left') ||
+                        message.toLowerCase().includes('asset account'))
                 ) {
                     setFieldErrors((prev) => ({
                         ...prev,
@@ -1226,15 +1241,29 @@ export default function Transactions() {
                                                                 account_id: '',
                                                             }),
                                                         );
+                                                        const accountId =
+                                                            value ===
+                                                                NO_ACCOUNT_VALUE ||
+                                                            value ===
+                                                                DEPOSIT_ACCOUNT_PLACEHOLDER
+                                                                ? ''
+                                                                : value;
+                                                        const nextAccount =
+                                                            accounts.find(
+                                                                (account) =>
+                                                                    account.id.toString() ===
+                                                                    accountId,
+                                                            );
                                                         setFormData({
                                                             ...formData,
                                                             account_id:
-                                                                value ===
-                                                                    NO_ACCOUNT_VALUE ||
-                                                                value ===
-                                                                    DEPOSIT_ACCOUNT_PLACEHOLDER
-                                                                    ? ''
-                                                                    : value,
+                                                                accountId,
+                                                            is_credit:
+                                                                isAssetAccountType(
+                                                                    nextAccount?.type,
+                                                                )
+                                                                    ? formData.is_credit
+                                                                    : false,
                                                         });
                                                     }}
                                                 >
@@ -1460,39 +1489,40 @@ export default function Transactions() {
                                                     Recurring transaction
                                                 </Label>
                                             </div>
-                                            {!isIncomeCategorySelected && (
-                                                <div className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        id="is_credit"
-                                                        checked={
-                                                            formData.is_credit
-                                                        }
-                                                        onCheckedChange={(
-                                                            checked,
-                                                        ) =>
-                                                            setFormData({
-                                                                ...formData,
-                                                                is_credit:
-                                                                    checked ===
-                                                                    true,
-                                                                is_debt_payment:
-                                                                    checked ===
-                                                                    true
-                                                                        ? false
-                                                                        : formData.is_debt_payment,
-                                                            })
-                                                        }
-                                                        data-testid="is-credit-checkbox"
-                                                    />
-                                                    <Label
-                                                        htmlFor="is_credit"
-                                                        className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                                    >
-                                                        Credit (refund /
-                                                        deposit)
-                                                    </Label>
-                                                </div>
-                                            )}
+                                            {!isIncomeCategorySelected &&
+                                                isAssetAccountSelected && (
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox
+                                                            id="is_credit"
+                                                            checked={
+                                                                formData.is_credit
+                                                            }
+                                                            onCheckedChange={(
+                                                                checked,
+                                                            ) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    is_credit:
+                                                                        checked ===
+                                                                        true,
+                                                                    is_debt_payment:
+                                                                        checked ===
+                                                                        true
+                                                                            ? false
+                                                                            : formData.is_debt_payment,
+                                                                })
+                                                            }
+                                                            data-testid="is-credit-checkbox"
+                                                        />
+                                                        <Label
+                                                            htmlFor="is_credit"
+                                                            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            Credit (refund /
+                                                            deposit)
+                                                        </Label>
+                                                    </div>
+                                                )}
                                             {!isIncomeCategorySelected &&
                                                 !isDebtCategorySelected && (
                                                     <div className="flex items-center space-x-2">
