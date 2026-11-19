@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { loginAsBrowserTestUser as login, resetBrowserState } from './helpers';
+import {
+    loginAsBrowserTestUser as login,
+    resetBrowserState,
+    selectDisplayedPeriod,
+} from './helpers';
 
 test.describe('Category Inactivate and Reactivate', () => {
     test.beforeEach(() => {
@@ -192,9 +196,13 @@ test.describe('Category Inactivate and Reactivate', () => {
         await expect(categoryCard.getByText('Retired')).toBeVisible();
         await expect(categoryCard).toHaveClass(/opacity-50/);
 
-        // Step 6: Verify existing transaction still valid
-        // Navigate to transactions page and verify the transaction exists
+        // Step 6: Verify existing transaction still valid.
+        // The list opens on the current month; this transaction is in October.
         await page.goto('/transactions');
+        await expect(
+            page.getByRole('heading', { name: 'Transactions' }),
+        ).toBeVisible();
+        await selectDisplayedPeriod(page, 'October 2026');
         await expect(
             page.getByText('Test transaction for category inactivation'),
         ).toBeVisible();

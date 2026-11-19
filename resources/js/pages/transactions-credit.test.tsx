@@ -66,6 +66,12 @@ const account = {
     type: 'bank',
 };
 
+const liability = {
+    id: 8,
+    name: 'Visa',
+    type: 'liability',
+};
+
 const creditTransaction = {
     id: 123,
     date: '2025-01-15',
@@ -110,7 +116,7 @@ describe('Transactions - credit (refund / deposit)', () => {
                 }
 
                 if (url.startsWith('/api/accounts')) {
-                    return jsonResponse({ data: [account] });
+                    return jsonResponse({ data: [account, liability] });
                 }
 
                 if (url === '/api/transactions' && init?.method === 'POST') {
@@ -175,7 +181,9 @@ describe('Transactions - credit (refund / deposit)', () => {
             ).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
+        expect(
+            screen.queryByTestId('is-credit-checkbox'),
+        ).not.toBeInTheDocument();
 
         fireEvent.change(screen.getByTestId('transaction-date-input'), {
             target: { value: '2025-01-20' },
@@ -188,6 +196,13 @@ describe('Transactions - credit (refund / deposit)', () => {
         fireEvent.click(
             await screen.findByRole('option', { name: /Groceries/ }),
         );
+
+        fireEvent.click(screen.getByTestId('account-field'));
+        fireEvent.click(
+            await screen.findByRole('option', { name: 'RBC Checking' }),
+        );
+
+        expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
 
         fireEvent.change(screen.getByTestId('transaction-amount-input'), {
             target: { value: '75' },
@@ -207,7 +222,109 @@ describe('Transactions - credit (refund / deposit)', () => {
             expect(postCall).toBeDefined();
             const body = JSON.parse(requestBodyText(postCall?.[1]));
             expect(body.is_credit).toBe(true);
+            expect(body.account_id).toBe(account.id);
             expect(body.amount_cad).toBe(75);
+        });
+    });
+
+    it('hides the credit checkbox unless the account is an asset', async () => {
+        render(<Transactions />);
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
+        });
+
+        expect(
+            screen.queryByTestId('is-credit-checkbox'),
+        ).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('account-field'));
+        fireEvent.click(await screen.findByRole('option', { name: 'Visa' }));
+
+        expect(
+            screen.queryByTestId('is-credit-checkbox'),
+        ).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('account-field'));
+        fireEvent.click(
+            await screen.findByRole('option', { name: 'RBC Checking' }),
+        );
+
+        expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
+    });
+
+    it('clears is_credit when the account changes to a liability', async () => {
+        render(<Transactions />);
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('transaction-row-123'),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.click(
+            screen.getByRole('button', { name: /add transaction/i }),
+        );
+
+        await waitFor(() => {
+            expect(
+                screen.getByTestId('transaction-form-dialog'),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.change(screen.getByTestId('transaction-date-input'), {
+            target: { value: '2025-01-20' },
+        });
+        fireEvent.change(screen.getByTestId('transaction-period-input'), {
+            target: { value: '202501' },
+        });
+        fireEvent.click(screen.getByTestId('transaction-category-field'));
+        fireEvent.click(
+            await screen.findByRole('option', { name: /Groceries/ }),
+        );
+        fireEvent.click(screen.getByTestId('account-field'));
+        fireEvent.click(
+            await screen.findByRole('option', { name: 'RBC Checking' }),
+        );
+        fireEvent.change(screen.getByTestId('transaction-amount-input'), {
+            target: { value: '40' },
+        });
+        fireEvent.click(screen.getByLabelText('Credit (refund / deposit)'));
+
+        fireEvent.click(screen.getByTestId('account-field'));
+        fireEvent.click(await screen.findByRole('option', { name: 'Visa' }));
+
+        expect(
+            screen.queryByTestId('is-credit-checkbox'),
+        ).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('transaction-form-submit'));
+
+        await waitFor(() => {
+            const postCall = (
+                global.fetch as ReturnType<typeof vi.fn>
+            ).mock.calls.find(
+                ([requestUrl, init]) =>
+                    String(requestUrl) === '/api/transactions' &&
+                    (init as RequestInit | undefined)?.method === 'POST',
+            );
+
+            expect(postCall).toBeDefined();
+            const body = JSON.parse(requestBodyText(postCall?.[1]));
+            expect(body.is_credit).toBe(false);
+            expect(body.account_id).toBe(liability.id);
         });
     });
 
@@ -291,6 +408,11 @@ describe('Transactions - credit (refund / deposit)', () => {
                 screen.getByTestId('transaction-form-dialog'),
             ).toBeInTheDocument();
         });
+
+        fireEvent.click(screen.getByTestId('account-field'));
+        fireEvent.click(
+            await screen.findByRole('option', { name: 'RBC Checking' }),
+        );
 
         expect(screen.getByTestId('is-credit-checkbox')).toBeInTheDocument();
 

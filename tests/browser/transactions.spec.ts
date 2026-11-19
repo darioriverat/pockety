@@ -484,6 +484,7 @@ test('user can mark a transaction as a credit refund or deposit', async ({
 }) => {
     const consoleErrors = trackConsoleErrors(page);
     const comments = `feature-credit-${Date.now()}`;
+    const account = await createAccount(request, 'Credit Refund Checking');
 
     await openTransactionsPage(page);
     await openAddTransactionDialog(page);
@@ -491,6 +492,7 @@ test('user can mark a transaction as a credit refund or deposit', async ({
         date: '2026-01-23',
         period: '202601',
         category: 'C001 - Groceries',
+        account: account.name,
         currency: 'CAD',
         amount: '25.00',
         comments,

@@ -107,7 +107,7 @@ describe('Transactions - Required Field Validation', () => {
             'Amount',
             'Comments',
             'Recurring transaction',
-            'Credit (refund / deposit)',
+            'Paying a debt (cash source)',
         ]) {
             const control = within(dialog).getByLabelText(name, {
                 exact: true,
