@@ -1,5 +1,16 @@
 import { execFileSync } from 'node:child_process';
 import { expect, type APIRequestContext, type Page } from '@playwright/test';
+import { exit } from 'node:process';
+
+let isDockerEnv: boolean = true;
+
+if (process.env.DOCKER_ENV === 'false') {
+    isDockerEnv = false;
+} else if (process.env.DOCKER_ENV === 'true' || process.env.DOCKER_ENV === undefined) {
+    isDockerEnv = true;
+} else {
+    isDockerEnv = Boolean(process.env.DOCKER_ENV);
+}
 
 export interface ApiCategory {
     id: number;
@@ -120,6 +131,13 @@ export async function selectDisplayedPeriod(
 }
 
 export function resetBrowserState(): void {
+    // php is not often available in the local environment, not to mention a full installation.
+    // so we use the task command to reset the browser state.
+    if (!isDockerEnv) {
+        execFileSync('task', ['reset-browser-state']);
+        return;
+    }
+
     execFileSync(
         'php',
         [

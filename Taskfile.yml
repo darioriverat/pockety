@@ -12,6 +12,7 @@ vars:
   DOCKER_CONTAINER_NAME: "{{ .DOCKER_CONTAINER_NAME | default \"agent_skeleton_app\" }}"
   DOCKER_CONTAINER_USER: "{{ .DOCKER_CONTAINER_USER | default \"skeleton-user\" }}"
   PLAYWRIGHT_BASE_URL: "{{ .WEB_HOST_ADDRESS }}"
+  PLAYWRIGHT_TEST_FILE: "{{ .PLAYWRIGHT_TEST_FILE | default \"\" }}"
 
 tasks:
   shell:
@@ -68,6 +69,11 @@ tasks:
         docker exec -u {{ .DOCKER_CONTAINER_USER }} \
             -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
             bash -lc "npx playwright install chromium"
+  browser-install-local:
+    desc: Install Playwright browser dependencies
+    cmds:
+      - |
+        npx playwright install chromium
   browser-test-seed:
     desc: Seed browser test data
     cmds:
@@ -89,6 +95,38 @@ tasks:
         docker exec -u {{ .DOCKER_CONTAINER_USER }} \
             -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
             bash -lc "PLAYWRIGHT_BASE_URL=\"{{ .PLAYWRIGHT_BASE_URL }}\" npm run test:browser"
+  browser-tests-single:
+    desc: Execute a single Playwright browser test
+    cmds:
+      - task: browser-install
+      # Enforce database to be sqlite.
+      # This is to prevent developers from overwriting the database while running the tests.
+      - |
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "php artisan  tinker --execute \"if (config('database.default') === 'sqlite') { echo 'SQLite database is in use'; } else { echo 'Database must be sqlite!'; exit(1); };\""
+      - |
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "PLAYWRIGHT_BASE_URL=\"{{ .PLAYWRIGHT_BASE_URL }}\" npm run test:browser {{ .PLAYWRIGHT_TEST_FILE }}"
+  reset-browser-state:
+    desc: Reset the browser test state
+    cmds:
+      - |
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "php artisan migrate:fresh --seed --seeder=BrowserTestSeeder --force"
+  browser-tests-single-local:
+    desc: Execute a single Playwright browser test
+    cmds:
+      - |
+        docker exec -u {{ .DOCKER_CONTAINER_USER }} \
+            -w {{ .PROJECT_ROOT }} {{ .DOCKER_CONTAINER_NAME }} \
+            bash -lc "php artisan  tinker --execute \"if (config('database.default') === 'sqlite') { echo 'SQLite database is in use'; } else { echo 'Database must be sqlite!'; exit(1); };\""
+      - |
+        PLAYWRIGHT_BASE_URL="{{ .PLAYWRIGHT_BASE_URL }}:{{ .WEB_HOST_PORT }}" \
+        DOCKER_ENV=false \
+        npx playwright test {{ .PLAYWRIGHT_TEST_FILE }} --headed --debug
   tests:
     desc: Execute backend and frontend tests
     cmds:
